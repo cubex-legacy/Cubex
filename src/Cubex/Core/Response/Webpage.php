@@ -30,11 +30,13 @@ class Webpage implements
   protected $_request;
   protected $_title;
   protected $_meta;
-  protected $_bodyAttributes;
-  protected $_renderables;
+  protected $_bodyAttributes = [];
+  protected $_renderables = [];
 
-  public function __construct()
+  public function __construct(Request $request, Response $response)
   {
+    $this->setRequest($request);
+    $this->setResponse($response);
     $this->registerPageTitleListener();
   }
 
@@ -191,6 +193,7 @@ class Webpage implements
    */
   public function body()
   {
+    if(empty($this->_renderables)) return null;
     $result = '';
     foreach($this->_renderables as $render)
     {
@@ -289,6 +292,7 @@ class Webpage implements
    */
   protected function _bodyAttributes()
   {
+    if(empty($this->_bodyAttributes)) return null;
     $attr = array();
     foreach($this->_bodyAttributes as $k => $v)
     {
