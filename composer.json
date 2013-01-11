@@ -14,14 +14,17 @@
     }
   ],
   "require":           {
-    "php":              ">=5.4.0",
-    "psr/log":          "1.0.0"
+    "php":     ">=5.4.0",
+    "psr/log": "1.0.0"
   },
   "autoload":          {
+    "files": [
+      "src/Cubex/Generics/_Helper.php"
+    ],
     "psr-0": {
       "Cubex": "src/"
     }
   },
   "minimum-stability": "dev",
-  "version": "0.0.1"
+  "version":           "0.0.1"
 }
