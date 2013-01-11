@@ -4,7 +4,6 @@
   "version":           "0.0.1",
   "keywords":          ["framework", "cubex"],
   "homepage":          "http://cubex.io",
-  "license":           "MIT",
   "minimum-stability": "dev",
   "authors":           [
     {
