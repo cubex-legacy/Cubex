@@ -19,16 +19,4 @@ interface Controller extends Dispatchable
    * @return \Cubex\Core\Application\Application
    */
   public function application();
-
-  /**
-   * @return string
-   */
-  public function layoutName();
-
-  /**
-   * @param $layout
-   *
-   * @return static
-   */
-  public function setLayoutName($layout);
 }
