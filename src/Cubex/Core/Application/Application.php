@@ -147,6 +147,10 @@ abstract class Application implements Dispatchable, DispatchableAccess
 
     if($dispatcher instanceof Dispatchable)
     {
+      if($dispatcher instanceof Controller)
+      {
+        $dispatcher->setApplication($this);
+      }
       $dispatcher->configure($this->_configuration);
       $response = $dispatcher->dispatch($request, $response);
     }
