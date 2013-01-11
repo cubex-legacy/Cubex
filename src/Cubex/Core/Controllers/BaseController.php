@@ -30,10 +30,7 @@ class BaseController implements Controller, HandlerInterface
    * @var \Cubex\Core\Http\Response
    */
   protected $_response;
-  /**
-   * @var string
-   */
-  protected $_layout;
+
   /**
    * @var \Cubex\Core\Application\Application
    */
@@ -60,28 +57,6 @@ class BaseController implements Controller, HandlerInterface
   public function application()
   {
     return $this->_application;
-  }
-
-  /**
-   * @return string
-   */
-  public function layout()
-  {
-    if($this->_layout === null)
-    {
-      $this->setLayout($this->application()->layout());
-    }
-    return $this->_layout;
-  }
-
-  /**
-   * @param $layout
-   *
-   * @return static
-   */
-  public function setLayout($layout)
-  {
-    $this->_layout = $layout;
   }
 
   /**

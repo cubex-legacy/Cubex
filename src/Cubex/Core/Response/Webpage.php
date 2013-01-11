@@ -12,7 +12,10 @@ use Cubex\Events\EventManager as EM;
 use Cubex\Foundation\Renderable;
 use Cubex\Core\Http\DispatchInjection;
 use Cubex\View\HtmlElement;
+use Cubex\View\Impart;
+use Cubex\View\Layout;
 use Cubex\View\Partial;
+use Cubex\View\RenderGroup;
 use Cubex\View\ResponseAwareRenderable;
 
 class Webpage implements
@@ -32,6 +35,12 @@ class Webpage implements
   protected $_meta;
   protected $_bodyAttributes = [];
   protected $_renderables = [];
+
+  /**
+   * @var \Cubex\View\Layout
+   */
+  protected $_layout;
+  protected $_renderNestName = 'content';
 
   public function __construct(Request $request, Response $response)
   {
@@ -193,16 +202,24 @@ class Webpage implements
    */
   public function body()
   {
-    if(empty($this->_renderables)) return null;
-    $result = '';
+    $renderGroup = new RenderGroup();
     foreach($this->_renderables as $render)
     {
       if($render instanceof Renderable)
       {
-        $result .= $render->render();
+        $renderGroup->add($render);
       }
     }
-    return $result;
+
+    if($this->_layout === null)
+    {
+      return $renderGroup;
+    }
+    else
+    {
+      $this->_layout->nest($this->_renderNestName, $renderGroup);
+      return $this->_layout;
+    }
   }
 
   /**
@@ -343,5 +360,20 @@ class Webpage implements
   public function renderables()
   {
     return $this->_renderables;
+  }
+
+  public function layout()
+  {
+    return $this->_layout;
+  }
+
+  public function setLayout(Layout $layout)
+  {
+    $this->_layout = $layout;
+  }
+
+  public function renderableNest($nestName)
+  {
+    $this->_renderNestName = $nestName;
   }
 }

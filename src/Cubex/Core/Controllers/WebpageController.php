@@ -9,6 +9,7 @@ use Cubex\Core\Http\Response;
 use Cubex\Core\Response\Webpage;
 use Cubex\Foundation\Renderable;
 use Cubex\View\Impart;
+use Cubex\View\Layout;
 
 class WebpageController extends BaseController
 {
@@ -16,6 +17,16 @@ class WebpageController extends BaseController
    * @var \Cubex\Core\Response\Webpage
    */
   protected $_webpage;
+  protected $_actionNest = 'content';
+  /**
+   * @var string
+   */
+  protected $_layout;
+
+  protected function _getActionNestName()
+  {
+    return $this->_actionNest;
+  }
 
   /**
    * @return \Cubex\Core\Response\Webpage
@@ -23,6 +34,34 @@ class WebpageController extends BaseController
   public function webpage()
   {
     return $this->_webpage;
+  }
+
+  /**
+   * @return string
+   */
+  public function layoutName()
+  {
+    if($this->_layout === null)
+    {
+      $this->setLayoutName($this->application()->layout());
+    }
+    return $this->_layout;
+  }
+
+  /**
+   * @param $layout
+   *
+   * @return static
+   */
+  public function setLayoutName($layout)
+  {
+    $this->_layout = $layout;
+  }
+
+  public function nest($name, Renderable $content)
+  {
+    $this->webpage()->layout()->nest($name, $content);
+    return $this;
   }
 
   /**
@@ -35,6 +74,10 @@ class WebpageController extends BaseController
   public function dispatch(Request $request, Response $response)
   {
     $this->_webpage = new Webpage($request, $response);
+    $layout         = new Layout();
+    $layout->setTemplate($this->layoutName());
+    $this->_webpage->setLayout($layout);
+    $this->_webpage->renderableNest($this->_getActionNestName());
     return parent::dispatch($request, $response);
   }
 

@@ -23,12 +23,12 @@ interface Controller extends Dispatchable
   /**
    * @return string
    */
-  public function layout();
+  public function layoutName();
 
   /**
    * @param $layout
    *
    * @return static
    */
-  public function setLayout($layout);
+  public function setLayoutName($layout);
 }

@@ -17,7 +17,7 @@ class Impart implements Renderable
   /**
    * @param $content
    */
-  public function __construct($content)
+  public function __construct($content = '')
   {
     $this->setContent($content);
   }
