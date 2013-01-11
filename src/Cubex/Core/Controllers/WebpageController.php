@@ -74,7 +74,7 @@ class WebpageController extends BaseController
   public function dispatch(Request $request, Response $response)
   {
     $this->_webpage = new Webpage($request, $response);
-    $layout         = new Layout();
+    $layout         = new Layout($this->application());
     $layout->setTemplate($this->layoutName());
     $this->_webpage->setLayout($layout);
     $this->_webpage->renderableNest($this->_getActionNestName());

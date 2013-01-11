@@ -55,7 +55,7 @@ class TemplatedViewModel extends ViewModel
 
   protected function _calculateTemplate()
   {
-    $class     = get_class($this);
+    $class     = get_called_class();
     $reflector = new \ReflectionClass($class);
     $ns        = ltrim($reflector->getName(), "\\");
     $nsParts   = explode('\\', $ns);

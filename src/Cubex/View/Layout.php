@@ -5,6 +5,7 @@
 
 namespace Cubex\View;
 
+use Cubex\Core\Interfaces\DirectoryAware;
 use Cubex\Foundation\Renderable;
 
 class Layout implements Renderable
@@ -12,10 +13,16 @@ class Layout implements Renderable
   use PhtmlParser;
 
   private $_nested = array();
-  protected $_layoutTemplate = 'default';
+  protected $_layoutTemplate = 'Default';
   protected $_layoutDirectory = '';
 
   protected $_renderHooks = array('before' => array(), 'after' => array());
+
+  public function __construct(DirectoryAware $entity)
+  {
+    $this->_layoutDirectory = $entity->containingDirectory();
+    $this->_layoutDirectory .= '/Templates/Layouts/';
+  }
 
   public function setLayoutsDirectory($directory)
   {

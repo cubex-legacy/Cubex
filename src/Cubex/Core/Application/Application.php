@@ -4,6 +4,7 @@
  */
 namespace Cubex\Core\Application;
 
+use Cubex\Core\Interfaces\DirectoryAware;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Core\Http\Dispatchable;
@@ -18,7 +19,8 @@ use Cubex\Routing\StdRouter;
 /**
  * Web Application
  */
-abstract class Application implements Dispatchable, DispatchableAccess
+abstract class Application
+  implements Dispatchable, DispatchableAccess, DirectoryAware
 {
   use ConfigTrait;
 
@@ -267,5 +269,17 @@ abstract class Application implements Dispatchable, DispatchableAccess
   {
     $this->_layout = $layout;
     return $this;
+  }
+
+  /**
+   * Returns the directory of the class
+   *
+   * @return string
+   */
+  public function containingDirectory()
+  {
+    $class     = get_called_class();
+    $reflector = new \ReflectionClass($class);
+    return dirname($reflector->getFileName());
   }
 }
