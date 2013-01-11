@@ -194,7 +194,7 @@ class BaseController implements Controller, HandlerInterface
   }
 
   /**
-   * @return \Cubex\Core\Http\Request
+   * @return mixed|string
    */
   public function routeRequest()
   {
@@ -236,7 +236,7 @@ class BaseController implements Controller, HandlerInterface
       $result = $buffered;
     }
 
-    return $this->_response->from($result);
+    return $result;
   }
 
   /**
