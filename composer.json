@@ -1,0 +1,27 @@
+{
+  "name":              "cubex/cubex",
+  "description":       "Cubex Framework",
+  "keywords":          ["framework", "cubex"],
+  "license":           "MIT",
+  "authors":           [
+    {
+      "name":  "Brooke Bryan",
+      "email": "brooke@bajb.net"
+    },
+    {
+      "name":  "Gareth Evans",
+      "email": "garoevans@gmail.com"
+    }
+  ],
+  "require":           {
+    "php":              ">=5.4.0",
+    "psr/log":          "1.0.0"
+  },
+  "autoload":          {
+    "psr-0": {
+      "Cubex": "src/"
+    }
+  },
+  "minimum-stability": "dev",
+  "version": "0.0.1"
+}
