@@ -29,7 +29,7 @@ class Mapper extends Dispatcher
     parent::__construct($configGroup);
 
     $this->_projectNamespace = $projectNamespace;
-    $this->_projectBasePath = $projectBasePath . "/";
+    $this->_projectBasePath = $projectBasePath . DS;
     $this->_entityMap = $entityMap;
   }
 
@@ -56,7 +56,7 @@ class Mapper extends Dispatcher
 
   public function getNamespaceRoot()
   {
-    return $this->_projectBasePath . $this->_projectNamespace . "/";
+    return $this->_projectBasePath . $this->_projectNamespace . DS;
   }
 
   /**
@@ -98,8 +98,8 @@ class Mapper extends Dispatcher
   public function findEntities($subPath = '')
   {
     $entities = [];
-    $subPath = rtrim($subPath, "/\\") . "/";
-    if($subPath === "/") $subPath = "";
+    $subPath = rtrim($subPath, "/\\") . DS;
+    if($subPath === DS) $subPath = "";
 
     $directory = $this->getNamespaceRoot() . $subPath;
     $directoryMap = $this->_mapDirectory($directory);
@@ -165,7 +165,7 @@ class Mapper extends Dispatcher
     {
       if($this->shouldMap($fileName))
       {
-        $fileOrEntity = $entity . "/" . $fileName;
+        $fileOrEntity = $entity . DS . $fileName;
         $file = $this->getNamespaceRoot() . $fileOrEntity;
 
         if(is_dir($file))
@@ -174,7 +174,7 @@ class Mapper extends Dispatcher
         }
         else
         {
-          $safeRel       = ltrim(str_replace('\\', '/', $fileOrEntity), '/');
+          $safeRel       = ltrim(str_replace("\\", "/", $fileOrEntity), "/");
           $map[$safeRel] = md5(
             $this->_concatAllRelatedContent($entity, $fileOrEntity)
           );
@@ -272,7 +272,7 @@ class Mapper extends Dispatcher
       $brandDirectories,
       function(&$directory, $key, $pathDirectories)
       {
-        $directory = $pathDirectories[0] . "/" . $directory;
+        $directory = $pathDirectories[0] . DS . $directory;
         $directory .= $pathDirectories[1];
       },
       array($this->getNamespaceRoot(), $entity)
@@ -284,7 +284,7 @@ class Mapper extends Dispatcher
     {
       foreach($filenames as $possibleFilename)
       {
-        $currentFileRef = $directory . "/" . $possibleFilename;
+        $currentFileRef = $directory . DS . $possibleFilename;
         if(file_exists($currentFileRef))
         {
           $content .= file_get_contents($currentFileRef);
@@ -308,7 +308,7 @@ class Mapper extends Dispatcher
 
     foreach($directoryMap as $directoryName)
     {
-      $fullPath = $directory . "/" . $directoryName;
+      $fullPath = $directory . DS . $directoryName;
 
       if(\is_dir($fullPath) && \substr($directoryName, 0, 1) === '.')
       {
@@ -333,18 +333,18 @@ class Mapper extends Dispatcher
 
     try
     {
-      $path = $this->getNamespaceRoot() . "/" . $entity;
+      $path = $this->getNamespaceRoot() . DS . $entity;
       $currentMd5 = '';
 
       // Do not overwrite the same file - causes havock with rsync
-      if(file_exists($path . "/" . $filename))
+      if(file_exists($path . DS . $filename))
       {
-        $currentMd5 = md5_file($path . "/" . $filename);
+        $currentMd5 = md5_file($path . DS . $filename);
       }
 
       if($currentMd5 !== md5($mapped))
       {
-        file_put_contents($path . "/" . $filename, $mapped);
+        file_put_contents($path . DS . $filename, $mapped);
       }
     }
     catch(\Exception $e)
