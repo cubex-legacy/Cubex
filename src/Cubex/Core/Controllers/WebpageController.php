@@ -38,7 +38,7 @@ class WebpageController extends BaseController
     return parent::dispatch($request, $response);
   }
 
-  public function _getResponseFromActionResponse($actionResponse)
+  protected function _getResponseFromActionResponse($actionResponse)
   {
     if($actionResponse instanceof Response)
     {
