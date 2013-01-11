@@ -223,7 +223,7 @@ class Loader implements Configurable, DispatchableAccess
   /**
    * @return \Cubex\Core\Http\Response
    */
-  public function getResponse()
+  public function response()
   {
     return $this->_response;
   }
@@ -231,7 +231,7 @@ class Loader implements Configurable, DispatchableAccess
   /**
    * @return \Cubex\Core\Http\Request
    */
-  public function getRequest()
+  public function request()
   {
     return $this->_request;
   }
