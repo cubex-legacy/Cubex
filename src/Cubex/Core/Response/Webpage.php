@@ -112,7 +112,7 @@ class Webpage implements
     return $this;
   }
 
-  public function getTitle()
+  public function title()
   {
     return $this->_title;
   }
@@ -128,7 +128,7 @@ class Webpage implements
    *
    * @return string
    */
-  public function getCharset()
+  public function charset()
   {
     return 'UTF-8';
   }
@@ -140,7 +140,7 @@ class Webpage implements
    *
    * @return mixed
    */
-  public function getMeta($key = null)
+  public function meta($key = null)
   {
     if($key === null)
     {
@@ -154,7 +154,7 @@ class Webpage implements
    *
    * @return string
    */
-  public function getMetaHTML()
+  public function metaHTML()
   {
     if(!$this->_meta) return '';
     $html = '';
@@ -171,7 +171,7 @@ class Webpage implements
    *
    * @return string
    */
-  public function getHead()
+  public function head()
   {
     $cssHeaders = new Partial(
       '<link type="text/css" rel="stylesheet" href="%s" />'
@@ -181,7 +181,7 @@ class Webpage implements
     {
       $cssHeaders->addElements($cssUris);
     }*/
-    return $cssHeaders . $this->getMetaHTML();
+    return $cssHeaders . $this->metaHTML();
   }
 
   /**
@@ -189,7 +189,7 @@ class Webpage implements
    *
    * @return mixed
    */
-  public function getBody()
+  public function body()
   {
     $result = '';
     foreach($this->_renderables as $render)
@@ -207,7 +207,7 @@ class Webpage implements
    *
    * @return \Cubex\View\Partial
    */
-  public function getClosing()
+  public function closing()
   {
     $jsItems = new Partial(
       '<script type="text/javascript" src' . '="%s"></script>'
@@ -227,9 +227,9 @@ class Webpage implements
    */
   public function renderHead()
   {
-    $charset = $this->getCharset();
-    $title   = $this->getTitle();
-    $head    = $this->getHead();
+    $charset = $this->charset();
+    $title   = $this->title();
+    $head    = $this->head();
 
     $method = \strtoupper($this->request()->requestMethod());
 
@@ -270,7 +270,7 @@ class Webpage implements
    */
   public function renderBody()
   {
-    return $this->getBody();
+    return $this->body();
   }
 
   /**
@@ -304,7 +304,7 @@ class Webpage implements
    */
   public function renderClosing()
   {
-    return $this->getClosing() . '</body></html>';
+    return $this->closing() . '</body></html>';
   }
 
   /**
