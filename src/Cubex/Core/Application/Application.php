@@ -28,7 +28,7 @@ abstract class Application
    * @var \Cubex\Core\Project\Project
    */
   protected $_project;
-  protected $_layout = 'default';
+  protected $_layout = 'Default';
 
   /**
    * @var \Cubex\Core\Http\Request
