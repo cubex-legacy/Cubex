@@ -10,7 +10,7 @@ use Cubex\Core\Http\Response;
 use Cubex\Events\Event;
 use Cubex\Events\EventManager as EM;
 use Cubex\Foundation\Renderable;
-use Cubex\Http\DispatchInjection;
+use Cubex\Core\Http\DispatchInjection;
 use Cubex\View\HtmlElement;
 use Cubex\View\Partial;
 use Cubex\View\ResponseAwareRenderable;

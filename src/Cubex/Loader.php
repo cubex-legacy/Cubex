@@ -4,6 +4,7 @@
  */
 namespace Cubex;
 
+use Cubex\Core\Http\DispatchInjection;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
@@ -16,7 +17,7 @@ use Cubex\Core\Http\Response;
 /**
  * Cubex Loader
  */
-class Loader implements Configurable, DispatchableAccess
+class Loader implements Configurable, DispatchableAccess, DispatchInjection
 {
   use ConfigTrait;
 

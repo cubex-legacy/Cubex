@@ -2,7 +2,7 @@
 /**
  * @author  brooke.bryan
  */
-namespace Cubex\Http;
+namespace Cubex\Core\Http;
 
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
