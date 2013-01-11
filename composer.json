@@ -1,16 +1,22 @@
 {
   "name":              "cubex/cubex",
   "description":       "Cubex Framework",
+  "version":           "0.0.1",
   "keywords":          ["framework", "cubex"],
+  "homepage":          "http://cubex.io",
   "license":           "MIT",
+  "minimum-stability": "dev",
   "authors":           [
     {
-      "name":  "Brooke Bryan",
-      "email": "brooke@bajb.net"
+      "name":     "Brooke Bryan",
+      "email":    "brooke@bajb.net",
+      "homepage": "http://www.bajb.net",
+      "role":     "Developer"
     },
     {
       "name":  "Gareth Evans",
-      "email": "garoevans@gmail.com"
+      "email": "garoevans@gmail.com",
+      "role":  "Developer"
     }
   ],
   "require":           {
@@ -24,7 +30,6 @@
     "psr-0": {
       "Cubex": "src/"
     }
-  },
-  "minimum-stability": "dev",
-  "version":           "0.0.1"
+  }
+
 }
