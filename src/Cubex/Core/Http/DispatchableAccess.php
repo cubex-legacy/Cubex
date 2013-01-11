@@ -10,10 +10,10 @@ interface DispatchableAccess
   /**
    * @return \Cubex\Core\Http\Request
    */
-  public function getRequest();
+  public function request();
 
   /**
    * @return \Cubex\Core\Http\Response
    */
-  public function getResponse();
+  public function response();
 }

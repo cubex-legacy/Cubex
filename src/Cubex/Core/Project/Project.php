@@ -11,6 +11,7 @@ use Cubex\Core\Http\Dispatchable;
 use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
+use Cubex\Http\DispatchInjection;
 
 /**
  * Project Dispatchable
@@ -156,7 +157,7 @@ abstract class Project implements Dispatchable, DispatchableAccess
   /**
    * @return \Cubex\Core\Http\Request
    */
-  public function getRequest()
+  public function request()
   {
     return $this->_request;
   }
@@ -164,7 +165,7 @@ abstract class Project implements Dispatchable, DispatchableAccess
   /**
    * @return \Cubex\Core\Http\Response
    */
-  public function getResponse()
+  public function response()
   {
     return $this->_response;
   }

@@ -30,4 +30,9 @@ trait ConfigTrait
   {
     return $this->_configuration;
   }
+
+  public function config($name = '_cubex_')
+  {
+    return $this->getConfig()->get($name);
+  }
 }
