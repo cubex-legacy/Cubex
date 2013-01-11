@@ -121,6 +121,18 @@ class BaseController implements Controller, HandlerInterface
       $actionResponse = $this->failedProcess($e);
     }
 
+    $this->_response = $this->_getResponseFromActionResponse($actionResponse);
+
+    return $this->_response;
+  }
+
+  /**
+   * @param $actionResponse
+   *
+   * @return \Cubex\Core\Http\Response
+   */
+  protected function _getResponseFromActionResponse($actionResponse)
+  {
     if($actionResponse instanceof Response)
     {
       $this->_response = $actionResponse;
@@ -129,7 +141,6 @@ class BaseController implements Controller, HandlerInterface
     {
       $this->_response->from($actionResponse);
     }
-
     return $this->_response;
   }
 
