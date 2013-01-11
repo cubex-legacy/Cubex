@@ -214,11 +214,15 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
   }
 
   /**
-   * @param \Cubex\Core\Http\Request $request
+   * @param Core\Http\Request $request
+   *
+   * @return \Cubex\Loader
    */
   public function setRequest(Request $request)
   {
     $this->_request = $request;
+
+    return $this;
   }
 
   /**
@@ -253,11 +257,15 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
   }
 
   /**
-   * @param \Cubex\Core\Http\Response $response
+   * @param Core\Http\Response $response
+   *
+   * @return \Cubex\Loader
    */
   public function setResponse(Response $response)
   {
     $this->_response = $response;
+
+    return $this;
   }
 
   public function buildResponse()
