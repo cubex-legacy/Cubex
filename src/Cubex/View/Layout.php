@@ -15,13 +15,23 @@ class Layout implements Renderable
   private $_nested = array();
   protected $_layoutTemplate = 'Default';
   protected $_layoutDirectory = '';
+  protected $_entity;
 
   protected $_renderHooks = array('before' => array(), 'after' => array());
 
   public function __construct(DirectoryAware $entity)
   {
+    $this->_entity          = $entity;
     $this->_layoutDirectory = $entity->containingDirectory();
     $this->_layoutDirectory .= '/Templates/Layouts/';
+  }
+
+  /**
+   * @return \Cubex\Core\Interfaces\DirectoryAware
+   */
+  public function entity()
+  {
+    return $this->_entity;
   }
 
   public function setLayoutsDirectory($directory)
