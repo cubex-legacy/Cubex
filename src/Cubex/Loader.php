@@ -59,10 +59,9 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
   {
     defined('PHP_START') or define('PHP_START', microtime(true));
 
-    $w = isset($_SERVER['DOCUMENT_ROOT']) && !empty($_SERVER['DOCUMENT_ROOT']);
-    define("CUBEX_WEB", (bool)$w);
-    define("CUBEX_CLI", php_sapi_name() == 'cli');
-    define("WEB_ROOT", CUBEX_WEB ? $_SERVER['DOCUMENT_ROOT'] : false);
+    define("CUBEX_CLI", php_sapi_name() === 'cli');
+    define("CUBEX_WEB", !CUBEX_CLI);
+    define("WEB_ROOT", $_SERVER['DOCUMENT_ROOT']);
 
     $this->setResponse($this->buildResponse());
     set_exception_handler(array($this, 'handleException'));
