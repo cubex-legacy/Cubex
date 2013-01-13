@@ -27,7 +27,7 @@ class EventManager
   const DISPATCH_RESOURCE_REQUIRE = 'dispatch.resource.require';
   const DISPATCH_PACKAGE_REQUIRE  = 'dispatch.package.require';
 
-  private static $_listeners = array();
+  protected static $_listeners = array();
 
   /**
    * Listen into an event
@@ -72,23 +72,55 @@ class EventManager
    * @param array $args
    * @param null  $callee
    *
-   * @return mixed|null
+   * @return mixed[]
    */
   public static function trigger($eventName, $args = array(), $callee = null)
   {
     $event = new StdEvent($eventName, $args, $callee);
-    return static::triggerWithEvent($eventName, $event);
+    return static::triggerWithEvent($eventName, $event, false);
   }
 
-  public static function triggerWithEvent($eventName, Event $event)
+  /**
+   * Trigger an event, stopping with the first event that returns
+   *
+   * @param       $eventName
+   * @param array $args
+   * @param null  $callee
+   *
+   * @return mixed
+   */
+  public static function triggerUntil($eventName, $args = [], $callee = null)
   {
-    $result    = null;
+    $event = new StdEvent($eventName, $args, $callee);
+    return static::triggerWithEvent($eventName, $event, true);
+  }
+
+  /**
+   * @param       $eventName
+   * @param Event $event
+   * @param bool  $returnFirst
+   *
+   * @return array|mixed
+   */
+  public static function triggerWithEvent(
+    $eventName, Event $event, $returnFirst = false
+  )
+  {
+    $result    = [];
     $listeners = self::getListeners($eventName);
     foreach($listeners as $listen)
     {
       if(!\is_callable($listen)) continue;
-      $result = call_user_func($listen, $event);
-      if($event->isPropagationStopped() || $result !== null)
+      $res = call_user_func($listen, $event);
+      if($res !== null)
+      {
+        $result[] = $res;
+        if($returnFirst)
+        {
+          return $res;
+        }
+      }
+      if($event->isPropagationStopped())
       {
         break;
       }
@@ -97,6 +129,11 @@ class EventManager
     return $result;
   }
 
+  /**
+   * @param $eventName
+   *
+   * @return array
+   */
   public static function getListeners($eventName)
   {
     if(isset(self::$_listeners[$eventName]))
