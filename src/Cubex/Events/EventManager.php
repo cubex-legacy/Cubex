@@ -25,7 +25,7 @@ class EventManager
   const CUBEX_LOG   = 'cubex.log';
 
   const DISPATCH_RESOURCE_REQUIRE = 'dispatch.resource.require';
-  const DISPATCH_PACKAGE_REQUIRE = 'dispatch.package.require';
+  const DISPATCH_PACKAGE_REQUIRE  = 'dispatch.package.require';
 
   private static $_listeners = array();
 
@@ -70,26 +70,31 @@ class EventManager
    *
    * @param       $eventName
    * @param array $args
-   * @param mixed $callee
+   * @param null  $callee
+   *
+   * @return mixed|null
    */
   public static function trigger($eventName, $args = array(), $callee = null)
   {
-    $listeners = self::getListeners($eventName);
-    foreach($listeners as $listen)
-    {
-      if(!\is_callable($listen)) continue;
-      call_user_func($listen, new StdEvent($eventName, $args, $callee));
-    }
+    $event = new StdEvent($eventName, $args, $callee);
+    return static::triggerWithEvent($eventName, $event);
   }
 
   public static function triggerWithEvent($eventName, Event $event)
   {
+    $result    = null;
     $listeners = self::getListeners($eventName);
     foreach($listeners as $listen)
     {
       if(!\is_callable($listen)) continue;
-      call_user_func($listen, $event);
+      $result = call_user_func($listen, $event);
+      if($event->isPropagationStopped() || $result !== null)
+      {
+        break;
+      }
     }
+
+    return $result;
   }
 
   public static function getListeners($eventName)
