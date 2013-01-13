@@ -27,7 +27,7 @@
       "src/Cubex/Foundation/Generics/_Helper.php"
     ],
     "psr-0": {
-      "Cubex": "src/"
+      "Cubex\\": "src/"
     }
   }
 
