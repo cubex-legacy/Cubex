@@ -126,7 +126,7 @@ class EventManager
       }
     }
 
-    return $result;
+    return $returnFirst ? null : $result;
   }
 
   /**
