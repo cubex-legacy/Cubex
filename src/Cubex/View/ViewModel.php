@@ -4,6 +4,7 @@
  */
 namespace Cubex\View;
 
+use Cubex\Dispatch\RequireTrait;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Renderable;
 use Cubex\I18n\Translatable;
@@ -12,6 +13,7 @@ use Cubex\I18n\TranslateTraits;
 abstract class ViewModel implements Renderable, Translatable
 {
   use TranslateTraits;
+  use RequireTrait;
 
   abstract public function render();
 

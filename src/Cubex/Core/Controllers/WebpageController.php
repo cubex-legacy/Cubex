@@ -7,12 +7,14 @@ namespace Cubex\Core\Controllers;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Core\Response\Webpage;
+use Cubex\Dispatch\RequireTrait;
 use Cubex\Foundation\Renderable;
 use Cubex\View\Impart;
 use Cubex\View\Layout;
 
 class WebpageController extends BaseController
 {
+  use RequireTrait;
   /**
    * @var \Cubex\Core\Response\Webpage
    */
