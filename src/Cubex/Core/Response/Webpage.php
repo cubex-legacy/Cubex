@@ -187,11 +187,13 @@ class Webpage implements
     $cssHeaders = new Partial(
       '<link type="text/css" rel="stylesheet" href="%s" />'
     );
-    /*$cssUris    = Prop::getResourceUris('css');
+
+    $cssUris = Prop::getResourceUris(new TypeEnum(TypeEnum::CSS));
     if($cssUris)
     {
       $cssHeaders->addElements($cssUris);
-    }*/
+    }
+
     return $cssHeaders . $this->metaHTML();
   }
 
