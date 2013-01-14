@@ -38,9 +38,6 @@ abstract class Application
    */
   protected $_project;
   protected $_layout = 'Default';
-  protected $_translator;
-  protected $_textdomain = 'messages';
-  protected $_boundTd = false;
 
   /**
    * @var \Cubex\Core\Http\Request
