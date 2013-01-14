@@ -369,7 +369,7 @@ class Response
 
   /**
    * Set HTTP status code
-   * 
+   *
    * @param $code
    *
    * @return Response
