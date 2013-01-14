@@ -8,13 +8,13 @@ use Cubex\I18n\Locale;
 
 class AbstractFormat
 {
-  public static function getLocale()
+  protected static function getLocale()
   {
     $l = new Locale();
     return $l->getLocale();
   }
 
-  public static function getTimezone()
+  protected static function getTimezone()
   {
     $l = new Locale();
     return $l->getTimezone();
