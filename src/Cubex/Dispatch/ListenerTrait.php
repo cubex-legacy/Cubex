@@ -11,7 +11,7 @@ trait ListenerTrait
   /**
    * @return string
    */
-  abstract protected function _getNamespace();
+  abstract public function getNamespace();
 
   protected function _listen()
   {
