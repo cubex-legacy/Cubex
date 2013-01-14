@@ -42,6 +42,4 @@ interface Loader
    * @return string
    */
   public function p($textDomain, $singular, $plural = null, $number = 0);
-
-  public function bindLanguage($textdomain, $filepath);
 }
