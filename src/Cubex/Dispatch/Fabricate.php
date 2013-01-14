@@ -252,20 +252,29 @@ final class Fabricate extends Dispatcher
       }
     }
 
-    $preHash = $this->preHash($base, $event->getSource()->request(), $path);
+    $preHash = $this->preHash(
+      $base, $event->getSource()->request(), $this->getPathToResource($event)
+    );
 
     return implode('/', array($preHash, $resourceHash, $path));
   }
 
   public function packageUri(Event $event)
   {
-    $path = ltrim($event->getFile(), "/");
-
-    $preHash = $this->preHash(false, $event->getSource()->request(), $path);
+    $preHash = $this->preHash(
+      false, $event->getSource()->request(), $this->getPathToResource($event)
+    );
 
     return implode(
       "/", array($preHash, "pkg", $event->name() . "." . $event->getType())
     );
+  }
+
+  public function getPathToResource(Event $event)
+  {
+    $pathToResource = ltrim(str_replace("\\", "/", $event->getNamespace()), "/");
+
+    return $pathToResource . "/".self::getResourceDirectory();
   }
 
   /**
@@ -281,7 +290,7 @@ final class Fabricate extends Dispatcher
         // TODO get dispatch.ini from a config
         self::$_baseMap = @parse_ini_file(
           $this->getProjectBasePath() . $this->getResourceDirectory() . DS .
-          "dispatch.ini"
+            "dispatch.ini"
         );
 
         if(!is_array(self::$_baseMap))
@@ -354,14 +363,14 @@ final class Fabricate extends Dispatcher
     return \substr(\md5($entityPath), 0, 6);
   }
 
-  public function preHash($base = false, Request $request, $path)
+  public function preHash($base = false, Request $request, $pathToResource)
   {
     return implode("/",
       array(
         "",
         $this->getResourceDirectory(),
         $this->_getDomainHash($request),
-        $base ? $this->getBaseHash() : $this->getEntityHash($path)
+        $base ? $this->getBaseHash() : $this->getEntityHash($pathToResource)
       )
     );
   }
