@@ -56,7 +56,6 @@ trait RequireTrait
     $event = (new Event(EventManager::DISPATCH_RESOURCE_REQUIRE))
       ->setFile($file)
       ->setType($type)
-      ->setNamespace($namespace)
       ->setSource($this);
 
     EventManager::triggerWithEvent(
@@ -73,7 +72,6 @@ trait RequireTrait
 
     $event = (new Event(EventManager::DISPATCH_PACKAGE_REQUIRE))
       ->setType($type)
-      ->setNamespace($namespace)
       ->setSource($this);
 
     EventManager::triggerWithEvent(
