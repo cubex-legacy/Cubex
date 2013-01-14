@@ -15,8 +15,8 @@ class EventManager
 
   const CUBEX_PAGE_TITLE = 'cubex.page.title';
 
-  const CUBEX_TRANSLATE_T  = 'cubex.translation.t';
-  const CUBEX_TRANSLATE_P  = 'cubex.translation.p';
+  const CUBEX_TRANSLATE_T = 'cubex.translation.t';
+  const CUBEX_TRANSLATE_P = 'cubex.translation.p';
 
   const CUBEX_APPLICATION_CANLAUNCH  = 'cubex.application.canlaunch';
   const CUBEX_APPLICATION_LAUNCHFAIL = 'cubex.application.launchfailed';
@@ -30,6 +30,7 @@ class EventManager
   const DISPATCH_RESOURCE_REQUIRE = 'dispatch.resource.require';
   const DISPATCH_PACKAGE_REQUIRE  = 'dispatch.package.require';
 
+  protected static $_nsListenEvents = array();
   protected static $_listeners = array();
   protected static $_nsListeners = array();
 
@@ -76,6 +77,13 @@ class EventManager
     }
     else
     {
+      if(!isset(self::$_nsListenEvents[$eventName]))
+      {
+        self::$_nsListenEvents[$eventName] = [];
+      }
+
+      self::$_nsListenEvents[$eventName][] = $namespace;
+
       if(!isset(self::$_nsListeners[$namespace]))
       {
         self::$_nsListeners[$namespace] = array();
@@ -134,13 +142,16 @@ class EventManager
     $eventName, Event $event, $returnFirst = false, $namespace = null
   )
   {
-    if($namespace === null && $namespace !== false)
+    if(isset(self::$_nsListenEvents[$eventName]))
     {
-      $source = $event->source();
-      if($source !== null)
+      if($namespace === null && $namespace !== false)
       {
-        $reflect   = new \ReflectionClass(get_class($source));
-        $namespace = $reflect->getNamespaceName();
+        $source = $event->source();
+        if($source !== null)
+        {
+          $reflect   = new \ReflectionClass(get_class($source));
+          $namespace = $reflect->getNamespaceName();
+        }
       }
     }
 
@@ -154,18 +165,26 @@ class EventManager
       $ns          = explode('\\', $namespace);
       while(!empty($ns))
       {
-        $cns = self::getNamespaceListeners($eventName, implode('\\', $ns));
-        if(!empty($cns))
+        $checkNs = implode('\\', $ns);
+        if(in_array($checkNs, self::$_nsListenEvents[$eventName]))
         {
+          $cns         = self::getNamespaceListeners($eventName, $checkNs);
           $nsListeners = array_merge($nsListeners, $cns);
         }
         array_pop($ns);
       }
 
-      $listeners = array_merge(
-        $nsListeners,
-        self::getListeners($eventName)
-      );
+      if(empty($nsListeners))
+      {
+        $listeners = self::getListeners($eventName);
+      }
+      else
+      {
+        $listeners = array_merge(
+          $nsListeners,
+          self::getListeners($eventName)
+        );
+      }
     }
 
     $result = [];
