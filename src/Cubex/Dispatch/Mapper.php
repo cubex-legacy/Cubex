@@ -139,6 +139,7 @@ class Mapper extends Dispatcher
         else
         {
           $safeRel       = ltrim(str_replace("\\", "/", $fileOrEntity), "/");
+
           $map[$safeRel] = md5(
             $this->_concatAllRelatedContent($entity, $fileOrEntity)
           );
@@ -301,6 +302,9 @@ class Mapper extends Dispatcher
 
     foreach($map as $file => $checksum)
     {
+      list(, $file) = explode(
+        "/" . self::getResourceDirectory() . "/", $file, 2
+      );
       $mapped .= "$file = \"$checksum\"\n";
     }
 
