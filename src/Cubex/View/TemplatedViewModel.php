@@ -80,7 +80,7 @@ class TemplatedViewModel extends ViewModel
       $templatesPath = dirname($templatesPath);
     }
 
-    $directory = $templatesPath . DIRECTORY_SEPARATOR . 'templates';
+    $directory = $templatesPath . DIRECTORY_SEPARATOR . 'Templates';
     $file      = implode('\\', $nsParts);
 
     return array('directory' => $directory, 'file' => $file);
