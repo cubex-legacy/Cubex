@@ -369,12 +369,16 @@ class Response
 
   /**
    * Set HTTP status code
-   *
+   * 
    * @param $code
+   *
+   * @return Response
    */
   public function setStatusCode($code)
   {
     $this->_httpStatus = $code;
+
+    return $this;
   }
 
   /**
