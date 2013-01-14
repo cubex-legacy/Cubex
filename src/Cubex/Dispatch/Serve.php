@@ -25,7 +25,6 @@ class Serve extends Dispatcher implements Dispatchable
   protected $_relativePath;
 
   private static $_baseHash = "esabot";
-  private static $_nomapDescriptor = "pamon";
   private static $_nocacheDebugString = "nocache";
 
   public function __construct($dispatchPath,
@@ -90,22 +89,6 @@ class Serve extends Dispatcher implements Dispatchable
   public static function getBaseHash()
   {
     return self::$_baseHash;
-  }
-
-  /**
-   * @param $nomapDescriptor
-   */
-  public static function setNomapDescriptor($nomapDescriptor)
-  {
-    self::$_nomapDescriptor = $nomapDescriptor;
-  }
-
-  /**
-   * @return string
-   */
-  public static function getNomapDescriptor()
-  {
-    return self::$_nomapDescriptor;
   }
 
   /**

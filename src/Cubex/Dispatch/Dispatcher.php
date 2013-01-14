@@ -14,6 +14,7 @@ abstract class Dispatcher implements Configurable
   use ConfigTrait;
 
   private static $_resourceDirectory = "res";
+  private static $_nomapDescriptor = "pamon";
 
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
@@ -37,6 +38,22 @@ abstract class Dispatcher implements Configurable
   public static function getResourceDirectory()
   {
     return self::$_resourceDirectory;
+  }
+
+  /**
+   * @param $nomapDescriptor
+   */
+  public static function setNomapDescriptor($nomapDescriptor)
+  {
+    self::$_nomapDescriptor = $nomapDescriptor;
+  }
+
+  /**
+   * @return string
+   */
+  public static function getNomapDescriptor()
+  {
+    return self::$_nomapDescriptor;
   }
 
   /**
