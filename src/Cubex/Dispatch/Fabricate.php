@@ -4,9 +4,15 @@
  */
 namespace Cubex\Dispatch;
 
+use Cubex\Core\Http\Request;
+
 final class Fabricate extends Dispatcher
 {
   private static $_baseMap;
+  private $_entityMap;
+
+  private $_domainHash;
+  private $_entityHash;
 
   public function getData($pathRoot, $filePath, $domain = null)
   {
@@ -219,14 +225,14 @@ final class Fabricate extends Dispatcher
   /**
    * Create a resource uri
    *
-   * @param $path
+   * @param Event $event
    *
    * @return string
    */
-  public function resourceUri($path)
+  public function resourceUri(Event $event)
   {
-    $base         = \substr($path, 0, 1) == '/';
-    $path         = ltrim($path, "/");
+    $base         = substr($event->getFile(), 0, 1) === "/";
+    $path         = ltrim($event->getFile(), "/");
     $resourceHash = $this->getNomapDescriptor();
 
     if($base)
@@ -238,15 +244,33 @@ final class Fabricate extends Dispatcher
     }
     else
     {
-
+      if(array_key_exists($path, $this->getEntityMap()))
+      {
+        $resourceHash = $this->generateResourceHash(
+          $this->getEntityMap()[$path]
+        );
+      }
     }
 
+    $preHash = $this->preHash($base, $event->getSource()->request(), $path);
 
-    return \implode('/', array($this->preHash($base), $resourceHash, $path));
+    return implode('/', array($preHash, $resourceHash, $path));
+  }
+
+  public function packageUri(Event $event)
+  {
+    $path = ltrim($event->getFile(), "/");
+
+    $preHash = $this->preHash(false, $event->getSource()->request(), $path);
+
+    return implode(
+      "/", array($preHash, "pkg", $event->name() . "." . $event->getType())
+    );
   }
 
   /**
    * @return array
+   * @throws \Exception
    */
   public function getBaseMap()
   {
@@ -255,10 +279,15 @@ final class Fabricate extends Dispatcher
       try
       {
         // TODO get dispatch.ini from a config
-        self::$_baseMap = parse_ini_file(
+        self::$_baseMap = @parse_ini_file(
           $this->getProjectBasePath() . $this->getResourceDirectory() . DS .
           "dispatch.ini"
         );
+
+        if(!is_array(self::$_baseMap))
+        {
+          throw new \Exception("Base Map not found");
+        }
       }
       catch(\Exception $e)
       {
@@ -270,6 +299,32 @@ final class Fabricate extends Dispatcher
   }
 
   /**
+   * @return array
+   * @throws \Exception
+   */
+  public function getEntityMap()
+  {
+    try
+    {
+      // TODO get dispatch.ini from a config
+      $this->_entityMap = @parse_ini_file(
+        $this->getNamespaceRoot() . "dispatch.ini", false
+      );
+
+      if(!is_array($this->_entityMap))
+      {
+        throw new \Exception("Entity Map not found");
+      }
+    }
+    catch(\Exception $e)
+    {
+      $this->_entityMap = [];
+    }
+
+    return $this->_entityMap;
+  }
+
+  /**
    * @param $hash
    *
    * @return string
@@ -277,5 +332,58 @@ final class Fabricate extends Dispatcher
   public function generateResourceHash($hash)
   {
     return \substr($hash, 0, 10);
+  }
+
+  /**
+   * @param $domain
+   *
+   * @return string
+   */
+  public static function generateDomainHash($domain)
+  {
+    return \substr(\md5($domain), 0, 6);
+  }
+
+  /**
+   * @param $entityPath
+   *
+   * @return string
+   */
+  public static function generateEntityHash($entityPath)
+  {
+    return \substr(\md5($entityPath), 0, 6);
+  }
+
+  public function preHash($base = false, Request $request, $path)
+  {
+    return implode("/",
+      array(
+        "",
+        $this->getResourceDirectory(),
+        $this->_getDomainHash($request),
+        $base ? $this->getBaseHash() : $this->getEntityHash($path)
+      )
+    );
+  }
+
+  private function _getDomainHash(Request $request)
+  {
+    if($this->_domainHash === null)
+    {
+      $domain = $request->domain() . "." . $request->tld();
+      $this->_domainHash = $this->generateDomainHash($domain);
+    }
+
+    return $this->_domainHash;
+  }
+
+  public function getEntityHash($path)
+  {
+    if($this->_entityHash === null)
+    {
+      $this->_entityHash = $this->generateDomainHash($path);
+    }
+
+    return $this->_entityHash;
   }
 }
