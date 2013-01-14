@@ -348,7 +348,7 @@ class Analyse
       foreach($match as $m)
       {
         $result = str_replace(
-          $m, str_replace("\n", "", $m) . "\"\n\"", $result
+          $m, str_replace("\n", "", $m) . "\\n\"\n\"", $result
         );
       }
     }
