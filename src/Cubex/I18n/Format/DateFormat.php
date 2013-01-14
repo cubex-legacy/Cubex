@@ -14,7 +14,7 @@ class DateFormat extends AbstractFormat
    *
    * @return string
    */
-  public function format($time, $format = 'd MMM y')
+  public static function format($time, $format = 'd MMM y')
   {
     $fmt = new \IntlDateFormatter(
       static::getLocale(),

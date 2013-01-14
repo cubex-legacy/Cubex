@@ -8,12 +8,13 @@ class Locale
 {
   protected $_locale;
   protected $_timezone;
-  protected static $locale;
+  protected static $_localeStatic;
+  protected static $_timezoneStatic;
 
   public function __construct()
   {
     $this->setLocale($this->getLocale());
-    $this->setTimezone(date_default_timezone_get());
+    $this->setTimezone($this->getTimezone());
   }
 
   public function setTimezone($timezone)
@@ -24,13 +25,23 @@ class Locale
 
   public function getTimezone()
   {
-    return $this->_timezone;
+    $timezone = $this->_locale;
+    if($timezone === null)
+    {
+      $timezone = static::$_timezoneStatic;
+    }
+
+    if($timezone === null)
+    {
+      $timezone = date_default_timezone_get();
+    }
+    return $timezone;
   }
 
   public function setLocale($locale)
   {
-    $this->_locale  = $locale;
-    static::$locale = $locale;
+    $this->_locale         = $locale;
+    static::$_localeStatic = $locale;
     return $this;
   }
 
@@ -39,7 +50,7 @@ class Locale
     $locale = $this->_locale;
     if($locale === null)
     {
-      $locale = static::$locale;
+      $locale = static::$_localeStatic;
     }
     if($locale === null)
     {
