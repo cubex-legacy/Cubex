@@ -103,6 +103,7 @@ abstract class Application
   {
     $this->_request  = $request;
     $this->_response = $response;
+    $this->_listen();
 
     $router = new StdRouter($this->_getRoutes(), $request->requestMethod());
 
