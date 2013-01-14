@@ -30,7 +30,7 @@ trait ListenerTrait
 
         $prop->requireResource($event);
       },
-      $this->_getNamespace()
+      $this->getNamespace()
     );
 
     EventManager::listen(
@@ -48,7 +48,7 @@ trait ListenerTrait
 
         $prop->requirePackage($event);
       },
-      $this->_getNamespace()
+      $this->getNamespace()
     );
   }
 }
