@@ -13,6 +13,9 @@ class Cli implements CliTask
 {
   use ConfigTrait;
 
+  /**
+   * @var Build
+   */
   protected $_builder;
 
   public function __construct()
