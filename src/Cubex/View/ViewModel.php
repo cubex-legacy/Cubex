@@ -6,9 +6,12 @@ namespace Cubex\View;
 
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Renderable;
+use Cubex\I18n\TranslateTraits;
 
 abstract class ViewModel implements Renderable
 {
+  use TranslateTraits;
+
   abstract public function render();
 
   public function __toString()

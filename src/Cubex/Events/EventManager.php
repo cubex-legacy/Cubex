@@ -15,6 +15,10 @@ class EventManager
 
   const CUBEX_PAGE_TITLE = 'cubex.page.title';
 
+  const CUBEX_TRANSLATE_T  = 'cubex.translation.t';
+  const CUBEX_TRANSLATE_P  = 'cubex.translation.p';
+  const CUBEX_TRANSLATE_TP = 'cubex.translation.tp';
+
   const CUBEX_APPLICATION_CANLAUNCH  = 'cubex.application.canlaunch';
   const CUBEX_APPLICATION_LAUNCHFAIL = 'cubex.application.launchfailed';
   const CUBEX_APPLICATION_PRELAUNCH  = 'cubex.application.launching';
@@ -28,41 +32,61 @@ class EventManager
   const DISPATCH_PACKAGE_REQUIRE  = 'dispatch.package.require';
 
   protected static $_listeners = array();
+  protected static $_nsListeners = array();
 
   /**
    * Listen into an event
    *
-   * @param string|array         $eventName
-   * @param callable             $callback
+   * @param          $eventName
+   * @param callable $callback
+   * @param null     $namespace
    */
-  public static function listen($eventName, callable $callback)
+  public static function listen($eventName, callable $callback,
+                                $namespace = null)
   {
     if(is_array($eventName))
     {
       foreach($eventName as $event)
       {
-        self::_listen($event, $callback);
+        self::_listen($event, $callback, $namespace);
       }
     }
     else if(is_scalar($eventName))
     {
-      self::_listen($eventName, $callback);
+      self::_listen($eventName, $callback, $namespace);
     }
   }
 
   /**
    * Listen into an event
    *
-   * @param string|array         $eventName
-   * @param callable             $callback
+   * @param          $eventName
+   * @param callable $callback
+   * @param null     $namespace
    */
-  private static function _listen($eventName, callable $callback)
+  protected static function _listen($eventName, callable $callback,
+                                    $namespace = null)
   {
-    if(!isset(self::$_listeners[$eventName]))
+    if($namespace === null)
     {
-      self::$_listeners[$eventName] = array();
+      if(!isset(self::$_listeners[$eventName]))
+      {
+        self::$_listeners[$eventName] = array();
+      }
+      self::$_listeners[$eventName][] = $callback;
     }
-    self::$_listeners[$eventName][] = $callback;
+    else
+    {
+      if(!isset(self::$_nsListeners[$namespace]))
+      {
+        self::$_nsListeners[$namespace] = array();
+      }
+      if(!isset(self::$_nsListeners[$namespace][$eventName]))
+      {
+        self::$_nsListeners[$namespace][$eventName] = array();
+      }
+      self::$_nsListeners[$namespace][$eventName][] = $callback;
+    }
   }
 
   /**
@@ -71,13 +95,15 @@ class EventManager
    * @param       $eventName
    * @param array $args
    * @param null  $callee
+   * @param null  $namespace
    *
-   * @return mixed[]
+   * @return array|mixed|null
    */
-  public static function trigger($eventName, $args = array(), $callee = null)
+  public static function trigger($eventName, $args = array(), $callee = null,
+                                 $namespace = null)
   {
     $event = new StdEvent($eventName, $args, $callee);
-    return static::triggerWithEvent($eventName, $event, false);
+    return static::triggerWithEvent($eventName, $event, false, $namespace);
   }
 
   /**
@@ -86,28 +112,64 @@ class EventManager
    * @param       $eventName
    * @param array $args
    * @param null  $callee
+   * @param null  $namespace
    *
-   * @return mixed
+   * @return array|mixed|null
    */
-  public static function triggerUntil($eventName, $args = [], $callee = null)
+  public static function triggerUntil($eventName, $args = [], $callee = null,
+                                      $namespace = null)
   {
     $event = new StdEvent($eventName, $args, $callee);
-    return static::triggerWithEvent($eventName, $event, true);
+    return static::triggerWithEvent($eventName, $event, true, $namespace);
   }
 
   /**
    * @param       $eventName
    * @param Event $event
    * @param bool  $returnFirst
+   * @param null  $namespace
    *
-   * @return array|mixed
+   * @return array|mixed|null
    */
   public static function triggerWithEvent(
-    $eventName, Event $event, $returnFirst = false
+    $eventName, Event $event, $returnFirst = false, $namespace = null
   )
   {
-    $result    = [];
-    $listeners = self::getListeners($eventName);
+    if($namespace === null && $namespace !== false)
+    {
+      $source = $event->source();
+      if($source !== null)
+      {
+        $reflect   = new \ReflectionClass(get_class($source));
+        $namespace = $reflect->getNamespaceName();
+      }
+    }
+
+    if($namespace === null)
+    {
+      $listeners = self::getListeners($eventName);
+    }
+    else
+    {
+      $nsListeners = array();
+      $ns          = explode('\\', $namespace);
+      while(!empty($ns))
+      {
+        $cns = self::getNamespaceListeners($eventName, implode('\\', $ns));
+        if(!empty($cns))
+        {
+          $nsListeners = array_merge($nsListeners, $cns);
+        }
+        array_pop($ns);
+      }
+
+      $listeners = array_merge(
+        $nsListeners,
+        self::getListeners($eventName)
+      );
+    }
+
+    $result = [];
     foreach($listeners as $listen)
     {
       if(!\is_callable($listen)) continue;
@@ -139,6 +201,24 @@ class EventManager
     if(isset(self::$_listeners[$eventName]))
     {
       return self::$_listeners[$eventName];
+    }
+    else
+    {
+      return array();
+    }
+  }
+
+  /**
+   * @param $eventName
+   * @param $namespace
+   *
+   * @return array
+   */
+  public static function getNamespaceListeners($eventName, $namespace)
+  {
+    if(isset(self::$_nsListeners[$namespace][$eventName]))
+    {
+      return self::$_nsListeners[$namespace][$eventName];
     }
     else
     {
