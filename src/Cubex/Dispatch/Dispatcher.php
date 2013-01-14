@@ -14,6 +14,7 @@ abstract class Dispatcher implements Configurable
   use ConfigTrait;
 
   private static $_resourceDirectory = "res";
+  private static $_baseHash = "esabot";
   private static $_nomapDescriptor = "pamon";
 
   /**
@@ -38,6 +39,22 @@ abstract class Dispatcher implements Configurable
   public static function getResourceDirectory()
   {
     return self::$_resourceDirectory;
+  }
+
+  /**
+   * @param $baseHash
+   */
+  public static function setBaseHash($baseHash)
+  {
+    self::$_baseHash = $baseHash;
+  }
+
+  /**
+   * @return string
+   */
+  public static function getBaseHash()
+  {
+    return self::$_baseHash;
   }
 
   /**
@@ -102,7 +119,30 @@ abstract class Dispatcher implements Configurable
       $cubexConfig = $this->_getCubexConfig();
     }
 
-    return $this->_getCubexConfig()->getStr("project_base", "..") . DS;
+    return $cubexConfig->getStr("project_base", "..") . DS;
+  }
+
+  /**
+   * @param \Cubex\Foundation\Config\Config $projectConfig
+   *
+   * @return mixed|null
+   */
+  public function getProjectNamespace(Config $projectConfig = null)
+  {
+    if($projectConfig === null)
+    {
+      $projectConfig = $this->_getProjectConfig();
+    }
+
+    return $projectConfig->getStr("namespace", "Project");
+  }
+
+  /**
+   * @return string
+   */
+  public function getNamespaceRoot()
+  {
+    return $this->getProjectBasePath() . $this->getProjectNamespace() . DS;
   }
 
   /**

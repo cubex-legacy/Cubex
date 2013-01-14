@@ -24,7 +24,6 @@ class Serve extends Dispatcher implements Dispatchable
   protected $_debugString;
   protected $_relativePath;
 
-  private static $_baseHash = "esabot";
   private static $_nocacheDebugString = "nocache";
 
   public function __construct($dispatchPath,
@@ -73,22 +72,6 @@ class Serve extends Dispatcher implements Dispatchable
   public function getUseMap()
   {
     return $this->_useMap;
-  }
-
-  /**
-   * @param $baseHash
-   */
-  public static function setBaseHash($baseHash)
-  {
-    self::$_baseHash = $baseHash;
-  }
-
-  /**
-   * @return string
-   */
-  public static function getBaseHash()
-  {
-    return self::$_baseHash;
   }
 
   /**

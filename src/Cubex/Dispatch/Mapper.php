@@ -54,11 +54,6 @@ class Mapper extends Dispatcher
     );
   }
 
-  public function getNamespaceRoot()
-  {
-    return $this->_projectBasePath . $this->_projectNamespace . DS;
-  }
-
   /**
    * @param string $subPath
    *
