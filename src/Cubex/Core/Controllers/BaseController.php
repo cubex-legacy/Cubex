@@ -13,14 +13,17 @@ use Cubex\Foundation\DataHandler\HandlerTrait;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 
+use Cubex\I18n\Translatable;
+use Cubex\I18n\TranslateTraits;
 use Cubex\Routing\Route;
 use Cubex\Routing\StdRoute;
 use Cubex\Routing\StdRouter;
 
-class BaseController implements Controller, HandlerInterface
+class BaseController implements Controller, HandlerInterface, Translatable
 {
   use HandlerTrait;
   use ConfigTrait;
+  use TranslateTraits;
 
   /**
    * @var \Cubex\Core\Http\Request
