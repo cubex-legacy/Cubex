@@ -42,4 +42,12 @@ interface Loader
    * @return string
    */
   public function p($textDomain, $singular, $plural = null, $number = 0);
+
+  /**
+   * @param $textDomain
+   * @param $filePath
+   *
+   * @return bool|string
+   */
+  public function bindLanguage($textDomain, $filePath);
 }

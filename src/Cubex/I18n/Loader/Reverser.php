@@ -57,4 +57,15 @@ class Reverser implements Loader
   {
     return $number == 1 ? strrev($singular) : strrev($plural);
   }
+
+  /**
+   * @param $textDomain
+   * @param $filePath
+   *
+   * @return bool|string
+   */
+  public function bindLanguage($textDomain, $filePath)
+  {
+    return true;
+  }
 }

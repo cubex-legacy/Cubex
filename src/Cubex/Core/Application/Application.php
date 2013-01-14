@@ -5,6 +5,7 @@
 namespace Cubex\Core\Application;
 
 use Cubex\Core\Interfaces\DirectoryAware;
+use Cubex\Core\Interfaces\NamespaceAware;
 use Cubex\Events\Event;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\ConfigTrait;
@@ -25,7 +26,7 @@ use Cubex\Routing\StdRouter;
  */
 abstract class Application
   implements Dispatchable, DispatchableAccess,
-  DirectoryAware, Translatable, TranslatorAccess
+  DirectoryAware, Translatable, TranslatorAccess, NamespaceAware
 {
   use ConfigTrait;
 
