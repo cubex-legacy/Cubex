@@ -189,4 +189,16 @@ abstract class Dispatcher implements Configurable
 
     return null;
   }
+
+  /**
+   * @param object $source
+   *
+   * @return string
+   */
+  public function getNamespaceFromSource($source)
+  {
+    $sourceObjectRefelction = new \ReflectionClass($source);
+
+    return $sourceObjectRefelction->getNamespaceName();
+  }
 }
