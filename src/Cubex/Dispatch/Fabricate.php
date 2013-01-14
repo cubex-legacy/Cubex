@@ -6,6 +6,8 @@ namespace Cubex\Dispatch;
 
 final class Fabricate extends Dispatcher
 {
+  private static $_baseMap;
+
   public function getData($pathRoot, $filePath, $domain = null)
   {
     $filePathParts = explode("/", $filePath);
@@ -196,5 +198,84 @@ final class Fabricate extends Dispatcher
     }
 
     return $data;
+  }
+
+  /**
+   * Determine if a resource is external
+   *
+   * @param $resource
+   *
+   * @return bool
+   */
+  public function isExternalUri($resource)
+  {
+    return (
+      substr($resource, 0, 2) == '//'
+        || substr($resource, 0, 7) == 'http://'
+        || substr($resource, 0, 8) == 'https://'
+    );
+  }
+
+  /**
+   * Create a resource uri
+   *
+   * @param $path
+   *
+   * @return string
+   */
+  public function resourceUri($path)
+  {
+    $base         = \substr($path, 0, 1) == '/';
+    $path         = ltrim($path, "/");
+    $resourceHash = $this->getNomapDescriptor();
+
+    if($base)
+    {
+      if(array_key_exists($path, $this->getBaseMap()))
+      {
+        $resourceHash = $this->generateResourceHash($this->getBaseMap()[$path]);
+      }
+    }
+    else
+    {
+
+    }
+
+
+    return \implode('/', array($this->preHash($base), $resourceHash, $path));
+  }
+
+  /**
+   * @return array
+   */
+  public function getBaseMap()
+  {
+    if(self::$_baseMap === null)
+    {
+      try
+      {
+        // TODO get dispatch.ini from a config
+        self::$_baseMap = parse_ini_file(
+          $this->getProjectBasePath() . $this->getResourceDirectory() . DS .
+          "dispatch.ini"
+        );
+      }
+      catch(\Exception $e)
+      {
+        self::$_baseMap = [];
+      }
+    }
+
+    return self::$_baseMap;
+  }
+
+  /**
+   * @param $hash
+   *
+   * @return string
+   */
+  public function generateResourceHash($hash)
+  {
+    return \substr($hash, 0, 10);
   }
 }
