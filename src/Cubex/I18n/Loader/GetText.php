@@ -95,6 +95,6 @@ class GetText implements Loader
       return false;
     }
 
-    return \bindtextdomain($textDomain, $filePath . '\\locale');
+    return \bindtextdomain($textDomain, $filePath);
   }
 }
