@@ -67,7 +67,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
     define("CUBEX_WEB", !CUBEX_CLI);
     define(
     "WEB_ROOT", (isset($_SERVER['DOCUMENT_ROOT'])
-    ? $_SERVER['DOCUMENT_ROOT'] : false)
+      ? $_SERVER['DOCUMENT_ROOT'] : false)
     );
 
     spl_autoload_register([$this, "loadClass"], true, true);
@@ -204,7 +204,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
         $config = $this->getConfig()->get("dispatch");
         $this->setDispatchable(
           new Serve(
-            $this->request()->path(),
+            str_replace("/" . Dispatcher::getResourceDirectory() . "/", "", $this->request()->path()),
             $config->getArr("entity_map", []),
             $config->getArr("domain_map", [])
           )
