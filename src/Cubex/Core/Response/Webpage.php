@@ -8,6 +8,7 @@ use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Dispatch\Prop;
+use Cubex\Dispatch\TypeEnum;
 use Cubex\Events\Event;
 use Cubex\Events\EventManager as EM;
 use Cubex\Foundation\Renderable;
