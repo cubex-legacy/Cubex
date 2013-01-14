@@ -258,4 +258,32 @@ abstract class Dispatcher implements Configurable
 
     return $sourceObjectRefelction->getNamespaceName();
   }
+
+  /**
+   * @param $entityHash
+   *
+   * @return null|string
+   */
+  public function getEntityPathByHash($entityHash)
+  {
+    if($entityHash === self::getBaseHash())
+    {
+      return "cubex/" . self::getResourceDirectory();
+    }
+    else if(array_key_exists($entityHash, $this->_entityMap))
+    {
+      return $this->_entityMap[$entityHash];
+    }
+    else
+    {
+      $path = $this->locateEntityPath($entityHash);
+
+      if($path === null)
+      {
+        return rawurldecode($entityHash);
+      }
+
+      return $path;
+    }
+  }
 }

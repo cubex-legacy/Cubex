@@ -75,7 +75,7 @@ final class Fabricate extends Dispatcher
 
         try
         {
-          $fileData = file_get_contents($file);
+          $fileData = @file_get_contents($file);
 
           if(!empty($fileData))
           {
@@ -375,9 +375,9 @@ final class Fabricate extends Dispatcher
     );
   }
 
-  private function _getDomainHash(Request $request)
+  private function _getDomainHash(Request $request = null)
   {
-    if($this->_domainHash === null)
+    if($this->_domainHash === null && $request !== null)
     {
       $domain = $request->domain() . "." . $request->tld();
       $this->_domainHash = $this->generateDomainHash($domain);
@@ -386,13 +386,86 @@ final class Fabricate extends Dispatcher
     return $this->_domainHash;
   }
 
-  public function getEntityHash($path)
+  public function getEntityHash($path = null)
   {
-    if($this->_entityHash === null)
+    if($this->_entityHash === null && $path !== null)
     {
       $this->_entityHash = $this->generateDomainHash($path);
     }
 
     return $this->_entityHash;
+  }
+
+  /**
+   * Calculate nested images
+   *
+   * @param $data
+   *
+   * @return string
+   */
+  public function dispatchUri($data)
+  {
+    $uri = trim($data[1], "'\" \r\t\n");
+
+    if(in_array(substr($uri, 0, 7), ['data:im', 'http://', 'https:/']))
+    {
+      return "url('$uri')";
+    }
+
+    $entityHash = $this->getEntityHash();
+
+    if(\substr($uri, 0, 1) == '/')
+    {
+      $uri        = \substr($uri, 1);
+      $entityHash = 'esabot';
+    }
+
+    $resources    = false;
+    $resourceHash = 'pamon';
+
+    try
+    {
+      $map = $this->getEntityPathByHash($entityHash);
+      if($map)
+      {
+        $basePath  = $this->getProjectBasePath() . DS . $map;
+        $resources = @parse_ini_file($basePath . DS . "dispatch.ini", false);
+      }
+    }
+    catch(\Exception $e)
+    {
+    }
+
+    $ext = end(explode(".", $uri));
+    if($ext == "css")
+    {
+      $uri = "css/" . $uri;
+    }
+    else if($ext == "js")
+    {
+      $uri = "js/" . $uri;
+    }
+    else
+    {
+      $uri = "img/" . $uri;
+    }
+
+    if($resources)
+    {
+      if(isset($resources[$uri]))
+      {
+        $resourceHash = $this->generateResourceHash($resources[$uri]);
+      }
+    }
+
+    $parts = array(
+      $this->_getDomainHash(),
+      $entityHash,
+      $resourceHash,
+      $uri,
+    );
+
+    return "url('/". self::getResourceDirectory() . "/" . implode("/", $parts) .
+      "')";
   }
 }

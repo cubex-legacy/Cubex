@@ -40,7 +40,7 @@ class Serve extends Dispatcher implements Dispatchable
     {
       throw new \UnexpectedValueException(
         "The dispatch path should include at least four directory seperator ".
-        "seperated sections"
+          "seperated sections"
       );
     }
 
@@ -203,29 +203,6 @@ class Serve extends Dispatcher implements Dispatchable
     }
 
     return false;
-  }
-
-  public function getEntityPathByHash($entityHash)
-  {
-    if($entityHash === self::getBaseHash())
-    {
-      return "cubex/" . self::getResourceDirectory();
-    }
-    else if(array_key_exists($entityHash, $this->_entityMap))
-    {
-      return $this->_entityMap[$entityHash];
-    }
-    else
-    {
-      $path = $this->locateEntityPath($entityHash);
-
-      if($path === null)
-      {
-        return rawurldecode($entityHash);
-      }
-
-      return $path;
-    }
   }
 
   /**
