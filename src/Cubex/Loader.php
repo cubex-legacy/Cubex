@@ -13,6 +13,7 @@ use Cubex\Core\Http\Dispatchable;
 use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
+use Cubex\I18n\Locale;
 
 /**
  * Cubex Loader
@@ -82,6 +83,18 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
     }
 
     define("CUBEX_TRANSACTION", $this->createTransaction());
+
+    $this->setLocale();
+  }
+
+  public function setLocale($locale = null)
+  {
+    if($locale == null)
+    {
+      $locale = (new Locale())->getLocale();
+    }
+    putenv('LC_ALL=' . $locale);
+    setlocale(LC_ALL, $locale);
   }
 
   /**
