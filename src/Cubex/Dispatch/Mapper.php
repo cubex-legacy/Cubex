@@ -29,7 +29,7 @@ class Mapper extends Dispatcher
     parent::__construct($configGroup);
 
     $this->_projectNamespace = $projectNamespace;
-    $this->_projectBasePath = $projectBasePath . DS;
+    $this->_projectBasePath = $projectBasePath;
     $this->_entityMap = $entityMap;
   }
 
@@ -49,7 +49,7 @@ class Mapper extends Dispatcher
     return new $calledClass(
       $configGroup,
       $projectConfig->getStr("namespace", "Project"),
-      $cubexConfig->getStr("project_base", "../"),
+      $cubexConfig->getStr("project_base", "..") . DS,
       $dispatchConfig->getArr("entity_map", [])
     );
   }
@@ -57,37 +57,6 @@ class Mapper extends Dispatcher
   public function getNamespaceRoot()
   {
     return $this->_projectBasePath . $this->_projectNamespace . DS;
-  }
-
-  /**
-   * @param $directory
-   *
-   * @return array
-   */
-  protected function _mapDirectory($directory)
-  {
-    $directoryMap = [];
-
-    try
-    {
-      if($handle = @opendir($directory))
-      {
-        while(false !== ($dirName = readdir($handle)))
-        {
-          $directoryMap[] = $dirName;
-        }
-      }
-    }
-    catch(\Exception $e)
-    {
-      // Unable to open directory (probably)
-      if(isset($handle))
-      {
-        closedir($handle);
-      }
-    }
-
-    return $directoryMap;
   }
 
   /**
@@ -322,6 +291,15 @@ class Mapper extends Dispatcher
     return $directories;
   }
 
+  /**
+   * // TODO make the filename an external config
+   *
+   * @param array  $map
+   * @param        $entity
+   * @param string $filename
+   *
+   * @return bool
+   */
   public function saveMap(array $map, $entity, $filename = "dispatch.ini")
   {
     $mapped = "";
