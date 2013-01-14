@@ -244,10 +244,10 @@ final class Fabricate extends Dispatcher
     }
     else
     {
-      if(array_key_exists($path, $this->getEntityMap()))
+      if(array_key_exists($path, $this->getEntityMap($event)))
       {
         $resourceHash = $this->generateResourceHash(
-          $this->getEntityMap()[$path]
+          $this->getEntityMap($event)[$path]
         );
       }
     }
@@ -272,7 +272,9 @@ final class Fabricate extends Dispatcher
 
   public function getPathToResource(Event $event)
   {
-    $pathToResource = ltrim(str_replace("\\", "/", $event->getNamespace()), "/");
+    $pathToResource = ltrim(
+      str_replace("\\", "/", $event->getNamespace()), "/"
+    );
 
     return $pathToResource . "/".self::getResourceDirectory();
   }
@@ -289,7 +291,7 @@ final class Fabricate extends Dispatcher
       {
         // TODO get dispatch.ini from a config
         self::$_baseMap = @parse_ini_file(
-          $this->getProjectBasePath() . $this->getResourceDirectory() . DS .
+          $this->getNamespaceRoot() . $this->getResourceDirectory() . DS .
             "dispatch.ini"
         );
 
@@ -308,16 +310,20 @@ final class Fabricate extends Dispatcher
   }
 
   /**
+   * @param Event $event
+   *
    * @return array
    * @throws \Exception
    */
-  public function getEntityMap()
+  public function getEntityMap(Event $event)
   {
     try
     {
       // TODO get dispatch.ini from a config
       $this->_entityMap = @parse_ini_file(
-        $this->getNamespaceRoot() . "dispatch.ini", false
+        $this->getProjectBasePath() . $event->getNamespace() . DS .
+          self::getResourceDirectory() . DS . "dispatch.ini",
+        false
       );
 
       if(!is_array($this->_entityMap))
