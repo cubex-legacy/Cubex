@@ -145,6 +145,7 @@ abstract class Project implements Dispatchable, DispatchableAccess
 
     $app = $this->getApplication($request);
     $app->setProject($this);
+    $app->init();
 
     if($this->_configuration === null)
     {
