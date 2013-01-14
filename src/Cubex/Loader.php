@@ -63,6 +63,8 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
     define("CUBEX_WEB", !CUBEX_CLI);
     define("WEB_ROOT", $_SERVER['DOCUMENT_ROOT']);
 
+    spl_autoload_register([$this, "loadClass"], true, true);
+
     $this->setResponse($this->buildResponse());
     set_exception_handler(array($this, 'handleException'));
 
@@ -430,5 +432,40 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
 
     $this->_response->fromText($output);
     return $this->_response;
+  }
+
+  /**
+   * Avoid file_exists overhead for autoloading within the Cubex namespace
+   *
+   * @param $class
+   *
+   * @return bool
+   */
+  public function loadClass($class)
+  {
+    $class = \ltrim($class, '\\');
+    try
+    {
+      if(substr($class, 0, 5) != 'Cubex')
+      {
+        return false;
+      }
+      $class       = ltrim($class, '\\');
+      $includeFile = '';
+      if($lastNsPos = strrpos($class, '\\'))
+      {
+        $namespace   = substr($class, 0, $lastNsPos);
+        $class       = substr($class, $lastNsPos + 1);
+        $includeFile = str_replace(
+          '\\', DIRECTORY_SEPARATOR, $namespace
+        ) . DIRECTORY_SEPARATOR;
+      }
+      $includeFile .= str_replace('_', DIRECTORY_SEPARATOR, $class) . '.php';
+      include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . $includeFile;
+    }
+    catch(\Exception $e)
+    {
+    }
+    return true;
   }
 }
