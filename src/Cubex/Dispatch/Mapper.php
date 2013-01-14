@@ -107,13 +107,13 @@ class Mapper extends Dispatcher
       if(!$this->isEntityInMap($entity))
       {
         $this->addRecommendedEntityMapIni($entity);
+      }
 
-        $mapped = $this->mapEntity($entity);
+      $mapped = $this->mapEntity($entity);
 
-        if(count($mapped))
-        {
-          $this->saveMap($mapped, $entity);
-        }
+      if(count($mapped))
+      {
+        $this->saveMap($mapped, $entity);
       }
     }
   }
