@@ -46,9 +46,15 @@ class Serve extends Dispatcher implements Dispatchable
 
     $this->_domainHash = $dispatchPathParts[0];
     $this->_entityHash = $dispatchPathParts[1];
-    list($this->_typeDescriptor, $this->_debugString) = explode(
-      ";", $dispatchPathParts[2], 2
-    );
+
+    $this->_typeDescriptor = $dispatchPathParts[2];
+    if(strstr($dispatchPathParts[2], ";") !== false)
+    {
+      list($this->_typeDescriptor, $this->_debugString) = explode(
+        ";", $dispatchPathParts[2], 2
+      );
+    }
+
     $this->_relativePath = $dispatchPathParts[3];
 
     $this->setUseMap($this->_typeDescriptor !== self::getNomapDescriptor());
@@ -57,7 +63,7 @@ class Serve extends Dispatcher implements Dispatchable
   /**
    * @param $useMap
    *
-   * @return \Cubex\Dispatch\Serve
+   * @return Serve
    */
   public function setUseMap($useMap)
   {

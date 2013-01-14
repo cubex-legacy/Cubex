@@ -6,6 +6,8 @@ namespace Cubex;
 
 use Cubex\Cli\CliTask;
 use Cubex\Core\Http\DispatchInjection;
+use Cubex\Dispatch\Dispatcher;
+use Cubex\Dispatch\Serve;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
@@ -189,6 +191,27 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
    */
   public function getDispatchable()
   {
+    $trimmedPath = ltrim($this->request()->path(), "/");
+
+    if(substr_count($trimmedPath, "/") > 0)
+    {
+      list($potentialDispatcherDirectory, ) = explode(
+        "/", $trimmedPath, 2
+      );
+
+      if(Dispatcher::getResourceDirectory() === $potentialDispatcherDirectory)
+      {
+        $config = $this->getConfig()->get("dispatch");
+        $this->setDispatchable(
+          new Serve(
+            $this->request()->path(),
+            $config->getArr("entity_map", []),
+            $config->getArr("domain_map", [])
+          )
+        );
+      }
+    }
+
     if(!$this->canDispatch())
     {
       $presume = $this->presumeDispatchable();
@@ -197,6 +220,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
         $this->setDispatchable($presume);
       }
     }
+
     if(!$this->canDispatch())
     {
       throw new \RuntimeException(
@@ -348,12 +372,13 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
 
         $this->_response->addHeader("X-Cubex-TID", CUBEX_TRANSACTION);
 
-        $dispatcher = $this->getDispatchable();
-
         if($this->_configuration === null)
         {
           $this->_newConfiguration();
         }
+
+        $dispatcher = $this->getDispatchable();
+
         $dispatcher->configure($this->_configuration);
 
         $this->_response = $dispatcher->dispatch(
