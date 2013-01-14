@@ -4,6 +4,7 @@
  */
 namespace Cubex;
 
+use Cubex\Cli\CliTask;
 use Cubex\Core\Http\DispatchInjection;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
@@ -416,7 +417,15 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
 
     if(class_exists($script))
     {
-      new $script($this, $arguments);
+      $obj = new $script($this, $arguments);
+      if($obj instanceof Configurable)
+      {
+        $obj->configure($this->getConfig());
+      }
+      if($obj instanceof CliTask)
+      {
+        $obj->init();
+      }
     }
     else
     {

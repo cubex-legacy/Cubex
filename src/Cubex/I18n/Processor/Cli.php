@@ -5,11 +5,11 @@
 
 namespace Cubex\I18n\Processor;
 
+use Cubex\Cli\CliTask;
 use Cubex\Foundation\Config\ConfigTrait;
-use Cubex\Foundation\Config\Configurable;
-use Cubex\I18n\Translator\Reversulator;
+use Cubex\I18n\Translator\Jumbler;
 
-class Cli implements Configurable
+class Cli implements CliTask
 {
   use ConfigTrait;
 
@@ -17,10 +17,14 @@ class Cli implements Configurable
 
   public function __construct()
   {
+  }
+
+  public function init()
+  {
     $this->_builder = new Build(
       $this->getConfig()->get("_cubex_")->getStr(
         'project_base'
-      ), new Reversulator()
+      ), new Jumbler()
     );
 
     $this->_builder->addArea(
