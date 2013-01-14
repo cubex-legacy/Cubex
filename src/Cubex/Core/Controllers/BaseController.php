@@ -38,10 +38,6 @@ class BaseController implements Controller, HandlerInterface, Translatable
    * @var \Cubex\Core\Application\Application
    */
   protected $_application;
-  /**
-   * @var \Cubex\Foundation\Config\ConfigGroup
-   */
-  protected $_configuration;
 
 
   /**
