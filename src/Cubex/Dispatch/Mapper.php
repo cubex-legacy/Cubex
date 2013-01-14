@@ -99,6 +99,7 @@ class Mapper extends Dispatcher
   {
     foreach($entities as $entity)
     {
+      $entity = $this->_projectNamespace . "/" . $entity;
       if(!$this->isEntityInMap($entity))
       {
         $this->addRecommendedEntityMapIni($entity);
