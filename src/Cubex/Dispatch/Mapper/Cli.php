@@ -64,7 +64,7 @@ _  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
       echo "It is recommended you add the following lines to\n";
       echo "the Dispatch section of " . CUBEX_ENV . ".ini\n";
 
-      echo "\n[Dispatch]\n";
+      echo "\n[dispatch]\n";
       foreach($recommendedProjectIni as $recommendedProjectIniLine)
       {
         echo Shell::colourText(
