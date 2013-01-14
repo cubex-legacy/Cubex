@@ -61,7 +61,10 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
 
     define("CUBEX_CLI", php_sapi_name() === 'cli');
     define("CUBEX_WEB", !CUBEX_CLI);
-    define("WEB_ROOT", $_SERVER['DOCUMENT_ROOT']);
+    define(
+    "WEB_ROOT", (isset($_SERVER['DOCUMENT_ROOT'])
+    ? $_SERVER['DOCUMENT_ROOT'] : false)
+    );
 
     spl_autoload_register([$this, "loadClass"], true, true);
 
