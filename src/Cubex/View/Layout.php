@@ -6,11 +6,16 @@
 namespace Cubex\View;
 
 use Cubex\Core\Interfaces\DirectoryAware;
+use Cubex\Core\Interfaces\NamespaceAware;
+use Cubex\Dispatch\RequireTrait;
 use Cubex\Foundation\Renderable;
+use Cubex\I18n\TranslateTraits;
 
-class Layout implements Renderable
+class Layout implements Renderable, NamespaceAware
 {
   use PhtmlParser;
+  use TranslateTraits;
+  use RequireTrait;
 
   private $_nested = array();
   protected $_layoutTemplate = 'Default';
@@ -24,6 +29,24 @@ class Layout implements Renderable
     $this->_entity          = $entity;
     $this->_layoutDirectory = $entity->containingDirectory();
     $this->_layoutDirectory .= '/Templates/Layouts/';
+  }
+
+  public function getNamespace()
+  {
+    if($this->_entity instanceof NamespaceAware)
+    {
+      return $this->_entity->getNamespace();
+    }
+    else if($this->_entity !== null)
+    {
+      $class   = get_class($this->_entity);
+      $reflect = new \ReflectionClass($class);
+      return $reflect->getNamespaceName();
+    }
+    else
+    {
+      return __NAMESPACE__;
+    }
   }
 
   /**
