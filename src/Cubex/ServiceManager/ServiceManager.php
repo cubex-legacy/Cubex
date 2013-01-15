@@ -7,6 +7,7 @@ namespace Cubex\ServiceManager;
 /**
  * Container for services
  */
+use Cubex\Database\Database;
 use Cubex\Session\SessionService;
 
 class ServiceManager
@@ -120,6 +121,22 @@ class ServiceManager
     {
       throw new \InvalidArgumentException("Service does not exist");
     }
+  }
+
+  /**
+   * @param string $connection
+   *
+   * @return \Cubex\Database\Database
+   * @throws \Exception
+   */
+  public function db($connection = 'db')
+  {
+    $database = $this->get($connection);
+    if($database instanceof Database)
+    {
+      return $database;
+    }
+    throw new \Exception("No database service available");
   }
 
   /**
