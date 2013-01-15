@@ -21,7 +21,7 @@ trait ListenerTrait
       {
         $event->setNamespace($this->getNamespace());
 
-        $prop = new Prop($event->getSource()->getConfig());
+        $prop = new Prop($this->getConfig());
         $prop->requireResource($event);
       },
       $this->getNamespace()
@@ -33,8 +33,21 @@ trait ListenerTrait
       {
         $event->setNamespace($this->getNamespace());
 
-        $prop = new Prop($event->getSource()->getConfig());
+        $prop = new Prop($this->getConfig());
         $prop->requirePackage($event);
+      },
+      $this->getNamespace()
+    );
+
+    EventManager::listen(
+      EventManager::DISPATCH_IMG_URL,
+      function(Event $event)
+      {
+        $event->setNamespace($this->getNamespace());
+
+        $dispatchImage = new Image($this->getConfig());
+
+        return $dispatchImage->getUri($event);
       },
       $this->getNamespace()
     );

@@ -255,7 +255,7 @@ abstract class Dispatcher implements Configurable
    *
    * @return string
    */
-  public function getNamespaceFromSource($source)
+  public static function getNamespaceFromSource($source)
   {
     $sourceObjectRefelction = new \ReflectionClass($source);
 

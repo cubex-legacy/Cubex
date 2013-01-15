@@ -163,7 +163,9 @@ final class Fabricate extends Dispatcher
   public function dispatchContent($data)
   {
     $data = preg_replace_callback(
-      '@url\s*\((\s*[\'"]?.*?)\)@s', array($this, "dispatchUri"), $data
+      '@url\s*\((\s*[\'"]?.*?)\)@s',
+      array($this, "dispatchUrlWrappedUri"),
+      $data
     );
 
     return $data;
@@ -429,20 +431,32 @@ final class Fabricate extends Dispatcher
    *
    * @return string
    */
-  public function dispatchUri($data)
+  public function dispatchUrlWrappedUri($data)
   {
-    $uri = trim($data[1], "'\" \r\t\n");
+    $uri = $this->dispatchUri($data[1]);
+
+    return "url('$uri')";
+  }
+
+  /**
+   * @param $uri
+   *
+   * @return string
+   */
+  public function dispatchUri($uri)
+  {
+    $uri = trim($uri, "'\" \r\t\n");
 
     if(in_array(substr($uri, 0, 7), ['data:im', 'http://', 'https:/']))
     {
-      return "url('$uri')";
+      return $uri;
     }
 
     $entityHash = $this->getEntityHash();
 
-    if(\substr($uri, 0, 1) == '/')
+    if(substr($uri, 0, 1) == '/')
     {
-      $uri        = \substr($uri, 1);
+      $uri        = substr($uri, 1);
       $entityHash = $this->getBaseHash();
     }
 
@@ -491,7 +505,6 @@ final class Fabricate extends Dispatcher
       $uri,
     );
 
-    return "url('/". self::getResourceDirectory() . "/" . implode("/", $parts) .
-      "')";
+    return "/". self::getResourceDirectory() . "/" . implode("/", $parts);
   }
 }

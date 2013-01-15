@@ -19,7 +19,7 @@ class Prop extends Dispatcher
   /**
    * @return Fabricate
    */
-  private function _fabricate()
+  protected function _fabricate()
   {
     if(self::$_fabricate === null)
     {

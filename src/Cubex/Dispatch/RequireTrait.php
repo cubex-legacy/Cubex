@@ -90,7 +90,20 @@ trait RequireTrait
     }
     else
     {
-      return (new Prop($this->getConfig()))->getNamespaceFromSource($this);
+      return Prop::getNamespaceFromSource($this);
     }
+  }
+
+  public function imgUrl($file)
+  {
+    $event = (new Event(EventManager::DISPATCH_IMG_URL))
+      ->setFile($file)
+      ->setSource($this);
+
+    $namespace = $this->_getOrFindNamespace();
+
+    return EventManager::triggerWithEvent(
+      EventManager::DISPATCH_IMG_URL, $event, true, $namespace
+    );
   }
 }
