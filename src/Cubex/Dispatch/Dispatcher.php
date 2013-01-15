@@ -271,7 +271,7 @@ abstract class Dispatcher implements Configurable
   {
     if($entityHash === self::getBaseHash())
     {
-      return "cubex/" . self::getResourceDirectory();
+      return $this->getProjectNamespace(). "/" . self::getResourceDirectory();
     }
     else if(array_key_exists($entityHash, $this->_entityMap))
     {
