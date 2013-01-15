@@ -116,7 +116,7 @@ class Layout implements Renderable, NamespaceAware
       $nest = $this->_nested[$name];
       if($nest instanceof Renderable)
       {
-        $rendered = $nest->render();
+        $rendered .= $nest->render();
       }
     }
 
