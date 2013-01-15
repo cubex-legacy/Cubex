@@ -7,6 +7,7 @@ namespace Cubex\ServiceManager;
 /**
  * Container for services
  */
+use Cubex\Cache\CacheService;
 use Cubex\Database\Database;
 use Cubex\Session\SessionService;
 
@@ -121,6 +122,22 @@ class ServiceManager
     {
       throw new \InvalidArgumentException("Service does not exist");
     }
+  }
+
+  /**
+   * @param string $connection
+   *
+   * @return \Cubex\Cache\CacheService
+   * @throws \Exception
+   */
+  public function cache($connection = 'local')
+  {
+    $cache = $this->get($connection);
+    if($cache instanceof CacheService)
+    {
+      return $cache;
+    }
+    throw new \Exception("No cache service available");
   }
 
   /**
