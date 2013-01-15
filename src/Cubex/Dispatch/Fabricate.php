@@ -476,7 +476,8 @@ final class Fabricate extends Dispatcher
     {
     }
 
-    $ext = end(explode(".", $uri));
+    $explode = explode(".", $uri);
+    $ext = end($explode);
     if($ext == "css")
     {
       $uri = "css/" . $uri;
