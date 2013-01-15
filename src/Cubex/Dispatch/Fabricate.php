@@ -19,7 +19,8 @@ final class Fabricate extends Dispatcher
     $filePathParts = explode("/", $filePath);
     $filename = array_pop($filePathParts);
     $subDirectory = implode("/", $filePathParts);
-    $filenameExtension = end(explode(".", $filename));
+    $explode = explode(".", $filename);
+    $filenameExtension = end($explode);
     $filenames = $this->getAllFilenamesOrdered($filename);
     $filenamesOrder = array_keys($filenames);
 

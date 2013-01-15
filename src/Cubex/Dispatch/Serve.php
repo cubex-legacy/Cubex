@@ -119,7 +119,8 @@ class Serve extends Dispatcher implements Dispatchable
     }
 
     $entityPath = $this->getEntityPathByHash($this->_entityHash);
-    $resourceType = end(explode(".", $this->_relativePath));
+    $explode = explode(".", $this->_relativePath);
+    $resourceType = end($explode);
 
     $type = $this->_typeDescriptor !== "pkg" ?
       "static" : $this->_typeDescriptor;
