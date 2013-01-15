@@ -9,7 +9,6 @@ use Cubex\Core\Http\Request;
 final class Fabricate extends Dispatcher
 {
   private static $_baseMap;
-  private $_entityMap;
 
   private $_domainHash;
   private $_entityHash;

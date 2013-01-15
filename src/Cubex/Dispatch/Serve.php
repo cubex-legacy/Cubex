@@ -16,7 +16,6 @@ class Serve extends Dispatcher implements Dispatchable
   protected $_useMap = true;
 
   protected $_dispatchPath;
-  protected $_entityMap = [];
   protected $_domainMap = [];
 
   protected $_domainHash;

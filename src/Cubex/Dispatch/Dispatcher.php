@@ -17,6 +17,8 @@ abstract class Dispatcher implements Configurable
   private static $_baseHash = "esabot";
   private static $_nomapDescriptor = "pamon";
 
+  protected $_entityMap = [];
+
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
    */
@@ -199,6 +201,7 @@ abstract class Dispatcher implements Configurable
     $base = $this->getProjectBasePath();
     $matchLen = strlen($match);
 
+    $path = str_replace("\\", "/", $path);
     $resourceDir = self::getResourceDirectory();
     $directoryMap = $this->_mapDirectory($base . $path);
 
@@ -234,7 +237,7 @@ abstract class Dispatcher implements Configurable
       if($depth < 2 && is_dir($base . $path . DS . $filename))
       {
         $matched = $this->locateEntityPath(
-          $path . (empty($path) ? '' : DS) . $filename, $match, ++$depth
+          $match, $path . (empty($path) ? '' : DS) . $filename, ++$depth
         );
 
         if($matched !== null)
