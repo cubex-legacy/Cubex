@@ -311,7 +311,7 @@ class Mapper extends Dispatcher
 
     try
     {
-      $path = $this->getNamespaceRoot() . DS . $entity;
+      $path = $this->getProjectBasePath() . DS . $entity;
       $currentMd5 = '';
 
       // Do not overwrite the same file - causes havock with rsync
