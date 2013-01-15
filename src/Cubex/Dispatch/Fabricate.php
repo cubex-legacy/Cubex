@@ -25,7 +25,7 @@ final class Fabricate extends Dispatcher
     $filenamesOrder = array_keys($filenames);
 
     $this->getEntityHash($entityPath);
-    $this->_getDomainHash(null, $domain);
+    $this->getDomainHash(null, $domain);
 
     $locateList = [];
     foreach($filenamesOrder as $filenameOrder)
@@ -381,7 +381,7 @@ final class Fabricate extends Dispatcher
       array(
         "",
         $this->getResourceDirectory(),
-        $this->_getDomainHash($request),
+        $this->getDomainHash($request),
         $base ? $this->getBaseHash() : $this->getEntityHash($pathToResource)
       )
     );
@@ -396,7 +396,7 @@ final class Fabricate extends Dispatcher
    *
    * @return string
    */
-  private function _getDomainHash(Request $request = null, $domain = null)
+  public function getDomainHash(Request $request = null, $domain = null)
   {
     if($this->_domainHash === null)
     {
@@ -499,7 +499,7 @@ final class Fabricate extends Dispatcher
     }
 
     $parts = array(
-      $this->_getDomainHash(),
+      $this->getDomainHash(),
       $entityHash,
       $resourceHash,
       $uri,

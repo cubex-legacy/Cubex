@@ -7,6 +7,8 @@ namespace Cubex;
 use Cubex\Cli\CliTask;
 use Cubex\Core\Http\DispatchInjection;
 use Cubex\Dispatch\Dispatcher;
+use Cubex\Dispatch\Fabricate;
+use Cubex\Dispatch\Prop;
 use Cubex\Dispatch\Serve;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
@@ -191,6 +193,18 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
    */
   public function getDispatchable()
   {
+    if($this->request()->path() === "/favicon.ico")
+    {
+      $prop = new Prop($this->getConfig());
+      $fab  = new Fabricate($this->getConfig());
+
+      $this->request()->setPath(
+        "/" . Dispatcher::getResourceDirectory() . "/" .
+        $fab->getDomainHash($this->request()) . "/" . $prop->getBaseHash() .
+        "/" . $prop->getNomapDescriptor() . "/favicon.ico"
+      );
+    }
+
     $trimmedPath = ltrim($this->request()->path(), "/");
 
     if(substr_count($trimmedPath, "/") > 0)
