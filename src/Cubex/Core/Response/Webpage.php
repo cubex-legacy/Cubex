@@ -14,7 +14,6 @@ use Cubex\Events\EventManager as EM;
 use Cubex\Foundation\Renderable;
 use Cubex\Core\Http\DispatchInjection;
 use Cubex\View\HtmlElement;
-use Cubex\View\Impart;
 use Cubex\View\Layout;
 use Cubex\View\Partial;
 use Cubex\View\RenderGroup;
@@ -294,7 +293,18 @@ class Webpage implements
    */
   public function renderBody()
   {
-    return $this->body();
+    $body = $this->body();
+
+    $processed = EM::triggerUntil(
+      EM::CUBEX_WEBPAGE_RENDER_BODY, ["content" => $body], $this
+    );
+
+    if($processed !== null)
+    {
+      $body = $processed;
+    }
+
+    return $body;
   }
 
   /**
@@ -379,5 +389,36 @@ class Webpage implements
   public function renderableNest($nestName)
   {
     $this->_renderNestName = $nestName;
+  }
+
+  /**
+   * Minify HTML code
+   *
+   * @param $html
+   *
+   * @return mixed
+   */
+  public function minifyHtml($html)
+  {
+    if($html instanceof Event)
+    {
+      $html = $html->getStr("content");
+    }
+
+    $html = preg_replace(
+      '/<!--[^\[](.|\s)*?-->/', '', $html
+    ); //Strip HTML Comments
+
+    $search  = array(
+      '/\>[^\S ]+/s', //strip whitespaces after tags, except space
+      '/[^\S ]+\</s', //strip whitespaces before tags, except space
+      '/(\s)+/s' // shorten multiple whitespace sequences
+    );
+    $replace = array(
+      '>',
+      '<',
+      '\\1'
+    );
+    return preg_replace($search, $replace, $html);
   }
 }

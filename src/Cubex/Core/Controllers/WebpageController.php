@@ -8,6 +8,7 @@ use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Core\Response\Webpage;
 use Cubex\Dispatch\RequireTrait;
+use Cubex\Events\EventManager;
 use Cubex\Foundation\Renderable;
 use Cubex\View\Impart;
 use Cubex\View\Layout;
@@ -15,6 +16,7 @@ use Cubex\View\Layout;
 class WebpageController extends BaseController
 {
   use RequireTrait;
+
   /**
    * @var \Cubex\Core\Response\Webpage
    */
@@ -76,7 +78,16 @@ class WebpageController extends BaseController
   public function dispatch(Request $request, Response $response)
   {
     $this->_webpage = new Webpage($request, $response);
-    $layout         = new Layout($this->application());
+
+    if($this->config("response")->getBool("minify_html", true))
+    {
+      EventManager::listen(
+        EventManager::CUBEX_WEBPAGE_RENDER_BODY,
+        [$this->_webpage, "minifyHtml"]
+      );
+    }
+
+    $layout = new Layout($this->application());
     $layout->setTemplate($this->layoutName());
     $this->_webpage->setLayout($layout);
     $this->_webpage->renderableNest($this->_getActionNestName());

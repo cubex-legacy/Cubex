@@ -18,6 +18,8 @@ class EventManager
   const CUBEX_TRANSLATE_T = 'cubex.translation.t';
   const CUBEX_TRANSLATE_P = 'cubex.translation.p';
 
+  const CUBEX_WEBPAGE_RENDER_BODY = 'cubex.webpage.renderbody';
+
   const CUBEX_APPLICATION_CANLAUNCH  = 'cubex.application.canlaunch';
   const CUBEX_APPLICATION_LAUNCHFAIL = 'cubex.application.launchfailed';
   const CUBEX_APPLICATION_PRELAUNCH  = 'cubex.application.launching';
