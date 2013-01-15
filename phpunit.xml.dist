@@ -1,0 +1,14 @@
+<phpunit bootstrap="phpunit.autoload.php.dist">
+  <php>
+    <env name="CUBEX_ENV" value="development" />
+    <env name="CUBEX_UNITTEST" value="true" />
+  </php>
+
+  <testsuites>
+    <testsuite name="Cubex Test Suite">
+      <directory>./src/Cubex/Tests</directory>
+      <directory>./src/Cubex/*/Tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
+
