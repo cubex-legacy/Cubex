@@ -220,7 +220,7 @@ abstract class Dispatcher implements Configurable
       else if($depth === 2)
       {
         $oldPath = $path;
-        list(, $path) = explode("/", $path, 2);
+        list(, $path) = explode("/", str_replace("\\", "/", $path), 2);
 
         $matchCheck = substr(
           md5($path . "/" . $filename . "/" . $resourceDir), 0, $matchLen
