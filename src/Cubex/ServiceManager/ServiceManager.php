@@ -7,6 +7,8 @@ namespace Cubex\ServiceManager;
 /**
  * Container for services
  */
+use Cubex\Session\SessionService;
+
 class ServiceManager
 {
   protected $_services = array();
@@ -118,5 +120,19 @@ class ServiceManager
     {
       throw new \InvalidArgumentException("Service does not exist");
     }
+  }
+
+  /**
+   * @return \Cubex\Session\SessionService
+   * @throws \Exception
+   */
+  public function session()
+  {
+    $session = $this->get("session");
+    if($session instanceof SessionService)
+    {
+      return $session;
+    }
+    throw new \Exception("No session service available");
   }
 }
