@@ -5,10 +5,10 @@
 
 namespace Cubex\Database\MySQL;
 
-use Cubex\Database\Database;
+use Cubex\Database\DatabaseService;
 use Cubex\ServiceManager\ServiceConfig;
 
-class MySQL implements Database
+class MySQL implements DatabaseService
 {
   /**
    * @var \mysqli

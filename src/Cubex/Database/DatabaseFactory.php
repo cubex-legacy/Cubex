@@ -15,7 +15,7 @@ class Factory implements ServiceFactory
   /**
    * @param \Cubex\ServiceManager\ServiceConfig $config
    *
-   * @return \Cubex\Database\Database
+   * @return \Cubex\Database\DatabaseService
    * @throws \Exception
    */
   public function createService(ServiceConfig $config)

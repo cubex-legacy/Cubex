@@ -8,7 +8,7 @@ namespace Cubex\ServiceManager;
  * Container for services
  */
 use Cubex\Cache\CacheService;
-use Cubex\Database\Database;
+use Cubex\Database\DatabaseService;
 use Cubex\Session\SessionService;
 
 class ServiceManager
@@ -143,13 +143,13 @@ class ServiceManager
   /**
    * @param string $connection
    *
-   * @return \Cubex\Database\Database
+   * @return \Cubex\Database\DatabaseService
    * @throws \Exception
    */
   public function db($connection = 'db')
   {
     $database = $this->get($connection);
-    if($database instanceof Database)
+    if($database instanceof DatabaseService)
     {
       return $database;
     }
