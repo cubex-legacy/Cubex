@@ -196,6 +196,13 @@ abstract class Dispatcher implements Configurable
     );
   }
 
+  /**
+   * @param        $match
+   * @param string $path
+   * @param int    $depth
+   *
+   * @return null|string
+   */
   public function locateEntityPath($match, $path = "", $depth = 0)
   {
     $base = $this->getProjectBasePath();
@@ -210,7 +217,9 @@ abstract class Dispatcher implements Configurable
       if(substr($filename, 0, 1) === ".") continue;
 
       $matchCheck = substr(
-        md5($path . "/" . $filename . "/" . $resourceDir), 0, $matchLen
+        md5(ltrim($path . "/" . $filename . "/" . $resourceDir, "/")),
+        0,
+        $matchLen
       );
 
       if($matchCheck === $match)
@@ -220,7 +229,8 @@ abstract class Dispatcher implements Configurable
       else if($depth === 2)
       {
         $oldPath = $path;
-        list(, $path) = explode("/", str_replace("\\", "/", $path), 2);
+        if(!stristr($path, "/")) $path = "/$path";
+        list(, $path) = explode("/", $path, 2);
 
         $matchCheck = substr(
           md5($path . "/" . $filename . "/" . $resourceDir), 0, $matchLen
