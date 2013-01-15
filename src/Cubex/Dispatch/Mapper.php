@@ -131,7 +131,7 @@ class Mapper extends Dispatcher
       if($this->shouldMap($fileName))
       {
         $fileOrEntity = $entity . DS . $fileName;
-        $file = $this->getNamespaceRoot() . $fileOrEntity;
+        $file = $this->getProjectBasePath() . $fileOrEntity;
 
         if(is_dir($file))
         {
@@ -234,23 +234,13 @@ class Mapper extends Dispatcher
     );
     $filenames = $this->getAllFilenamesOrdered($filename);
 
-    array_walk(
-      $brandDirectories,
-      function(&$directory, $key, $pathDirectories)
-      {
-        $directory = $pathDirectories[0] . DS . $directory;
-        $directory .= $pathDirectories[1];
-      },
-      array($this->getNamespaceRoot(), $entity)
-    );
-
-    $brandDirectories[] = $this->getNamespaceRoot() . $entity;
+    $brandDirectories[] = $this->getProjectBasePath();
 
     foreach($brandDirectories as $directory)
     {
       foreach($filenames as $possibleFilename)
       {
-        $currentFileRef = $directory . DS . $possibleFilename;
+        $currentFileRef = $directory . $possibleFilename;
         if(file_exists($currentFileRef))
         {
           $content .= file_get_contents($currentFileRef);
