@@ -6,11 +6,11 @@ namespace Cubex\Foundation\Config;
 
 class ConfigGroup implements \Countable, \IteratorAggregate
 {
-  private $_count = 0;
+  protected $_count = 0;
   /**
    * @var Config[]
    */
-  private $_configs = array();
+  protected $_configs = array();
 
   /**
    * @param        $name

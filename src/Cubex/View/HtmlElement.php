@@ -16,12 +16,12 @@ use Cubex\Foundation\Renderable;
 class HtmlElement implements Renderable
 {
 
-  private $_tag = '';
-  private $_nested = array();
-  private $_attributes = array();
-  private $_content = '';
-  private $_preRender;
-  private $_postRender;
+  protected $_tag = '';
+  protected $_nested = array();
+  protected $_attributes = array();
+  protected $_content = '';
+  protected $_preRender;
+  protected $_postRender;
 
   /**
    * @param string $tag

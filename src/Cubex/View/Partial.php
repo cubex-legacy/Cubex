@@ -11,23 +11,23 @@ class Partial implements Renderable
   /**
    * @var bool
    */
-  private $_escapeInput = true;
+  protected $_escapeInput = true;
   /**
    * @var string
    */
-  private $_template;
+  protected $_template;
   /**
    * @var array|null
    */
-  private $_variables;
+  protected $_variables;
   /**
    * @var
    */
-  private $_elements;
+  protected $_elements;
   /**
    * @var array
    */
-  private $_elementData = array();
+  protected $_elementData = array();
   /**
    * @var string
    */

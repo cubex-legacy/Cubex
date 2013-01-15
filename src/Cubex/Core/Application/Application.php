@@ -42,12 +42,12 @@ abstract class Application
   /**
    * @var \Cubex\Core\Http\Request
    */
-  private $_request;
+  protected $_request;
 
   /**
    * @var \Cubex\Core\Http\Response
    */
-  private $_response;
+  protected $_response;
 
   /**
    * Name of application

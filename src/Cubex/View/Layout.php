@@ -17,7 +17,7 @@ class Layout implements Renderable, NamespaceAware
   use TranslateTraits;
   use RequireTrait;
 
-  private $_nested = array();
+  protected $_nested = array();
   protected $_layoutTemplate = 'Default';
   protected $_layoutDirectory = '';
   protected $_entity;

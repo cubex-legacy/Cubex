@@ -10,8 +10,8 @@ final class Fabricate extends Dispatcher
 {
   private static $_baseMap;
 
-  private $_domainHash;
-  private $_entityHash;
+  protected $_domainHash;
+  protected $_entityHash;
 
   public function getData($entityPath, $filePath, $domain = null)
   {

@@ -8,9 +8,9 @@ use Cubex\Events\StdEvent;
 
 class Event extends StdEvent
 {
-  private $_file;
-  private $_type;
-  private $_namespace;
+  protected $_file;
+  protected $_type;
+  protected $_namespace;
 
   public function __construct($name, array $args = array(), $source = null)
   {

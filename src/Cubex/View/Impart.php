@@ -12,7 +12,7 @@ use Cubex\Foundation\Renderable;
 
 class Impart implements Renderable
 {
-  private $_content = '';
+  protected $_content = '';
 
   /**
    * @param $content

@@ -18,7 +18,7 @@ class GetText implements Loader
   /**
    * @var bool
    */
-  private $_boundTd = false;
+  protected $_boundTd = false;
 
   /**
    * Translate String

@@ -15,14 +15,14 @@ class Request implements \IteratorAggregate
   const TYPE_FORM     = '_cubex_form_';
   const NO_JAVASCRIPT = '__noscript__';
 
-  private $_requestMethod;
-  private $_path;
-  private $_host;
-  private $_subdomain;
-  private $_domain;
-  private $_tld;
-  private $_port = 80;
-  private $_processedHost;
+  protected $_requestMethod;
+  protected $_path;
+  protected $_host;
+  protected $_subdomain;
+  protected $_domain;
+  protected $_tld;
+  protected $_port = 80;
+  protected $_processedHost;
   protected $_definedTlds = array();
   protected $_knownTlds = array('co', 'com', 'org', 'me', 'gov', 'net', 'edu');
 

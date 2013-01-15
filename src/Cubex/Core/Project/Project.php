@@ -38,12 +38,12 @@ abstract class Project implements Dispatchable, DispatchableAccess
   /**
    * @var \Cubex\Core\Http\Request
    */
-  private $_request;
+  protected $_request;
 
   /**
    * @var \Cubex\Core\Http\Response
    */
-  private $_response;
+  protected $_response;
 
   /**
    * @param \Cubex\Core\Http\Request $req
