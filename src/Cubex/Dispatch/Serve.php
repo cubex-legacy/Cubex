@@ -113,6 +113,7 @@ class Serve extends Dispatcher implements Dispatchable
     }
 
     $domain = $this->getDomainByHash($this->_domainHash);
+
     if($domain === false)
     {
       $domain = $request->domain() . "." . $request->tld();
@@ -141,7 +142,6 @@ class Serve extends Dispatcher implements Dispatchable
     if($type === "pkg")
     {
       $data = $fabricate->getPackageData(
-        $this->getProjectBasePath() . $entityPath,
         $entityPath,
         $this->_relativePath,
         $domain,
@@ -151,7 +151,7 @@ class Serve extends Dispatcher implements Dispatchable
     else
     {
       $data = $fabricate->getData(
-        $this->getProjectBasePath() . $entityPath,
+        $entityPath,
         $this->_relativePath,
         $domain
       );

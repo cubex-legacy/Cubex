@@ -13,8 +13,9 @@ final class Fabricate extends Dispatcher
   private $_domainHash;
   private $_entityHash;
 
-  public function getData($pathRoot, $filePath, $domain = null)
+  public function getData($entityPath, $filePath, $domain = null)
   {
+    $pathRoot = $this->getProjectBasePath() . $entityPath;
     $filePathParts = explode("/", $filePath);
     $filename = array_pop($filePathParts);
     $subDirectory = implode("/", $filePathParts);
@@ -22,6 +23,9 @@ final class Fabricate extends Dispatcher
     $filenameExtension = end($explode);
     $filenames = $this->getAllFilenamesOrdered($filename);
     $filenamesOrder = array_keys($filenames);
+
+    $this->getEntityHash($entityPath);
+    $this->_getDomainHash(null, $domain);
 
     $locateList = [];
     foreach($filenamesOrder as $filenameOrder)
@@ -37,7 +41,7 @@ final class Fabricate extends Dispatcher
 
       foreach($domainParts as $domainPart)
       {
-        // Prepend with . on domain to avoid conflicts in ssandard resources
+        // Prepend with . on domain to avoid conflicts in standard resources
         $domainPath .= ".$domainPart";
         $locateFilePath = $pathRoot . DS . $domainPath . DS . $subDirectory;
         $locateFilePath .= DS;
@@ -101,9 +105,9 @@ final class Fabricate extends Dispatcher
     return $data;
   }
 
-  public function getPackageData($pathRoot, $entityPath, $filePath, $domain,
-                                 $useMap)
+  public function getPackageData($entityPath, $filePath, $domain, $useMap)
   {
+    $pathRoot = $this->getProjectBasePath() . $entityPath;
     $response = "";
 
     try
@@ -140,7 +144,7 @@ final class Fabricate extends Dispatcher
         {
           if(end(explode(".", $resource)) === $matchExt)
           {
-            $response .= $this->getData($pathRoot, $resource, $domain) . "\n";
+            $response .= $this->getData($entityPath, $resource, $domain) . "\n";
           }
         }
       }
@@ -381,12 +385,28 @@ final class Fabricate extends Dispatcher
     );
   }
 
-  private function _getDomainHash(Request $request = null)
+  /**
+   * As long as this receives one or the other params we can deal with it and
+   * set the domainHash
+   *
+   * @param \Cubex\Core\Http\Request|null $request
+   * @param null                          $domain
+   *
+   * @return string
+   */
+  private function _getDomainHash(Request $request = null, $domain = null)
   {
-    if($this->_domainHash === null && $request !== null)
+    if($this->_domainHash === null)
     {
-      $domain = $request->domain() . "." . $request->tld();
-      $this->_domainHash = $this->generateDomainHash($domain);
+      if($request !== null)
+      {
+        $domain = $request->domain() . "." . $request->tld();
+        $this->_domainHash = $this->generateDomainHash($domain);
+      }
+      else if($domain !== false)
+      {
+        $this->_domainHash = $this->generateDomainHash($domain);
+      }
     }
 
     return $this->_domainHash;
@@ -396,7 +416,7 @@ final class Fabricate extends Dispatcher
   {
     if($this->_entityHash === null && $path !== null)
     {
-      $this->_entityHash = $this->generateDomainHash($path);
+      $this->_entityHash = $this->generateEntityHash($path);
     }
 
     return $this->_entityHash;
@@ -423,11 +443,11 @@ final class Fabricate extends Dispatcher
     if(\substr($uri, 0, 1) == '/')
     {
       $uri        = \substr($uri, 1);
-      $entityHash = 'esabot';
+      $entityHash = $this->getBaseHash();
     }
 
     $resources    = false;
-    $resourceHash = 'pamon';
+    $resourceHash = $this->getNomapDescriptor();
 
     try
     {
