@@ -355,7 +355,8 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
   /**
    * Respond to Web Request
    *
-   * @return \Cubex\Core\Http\Response
+   * @return Core\Http\Response
+   * @throws \RuntimeException
    */
   public function respondToWebRequest()
   {
@@ -384,9 +385,20 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
 
         $dispatcher->configure($this->_configuration);
 
-        $this->_response = $dispatcher->dispatch(
+        $resp = $dispatcher->dispatch(
           $this->_request, $this->_response
         );
+
+        if(!($resp instanceof Response))
+        {
+          throw new \RuntimeException(
+            "Invalid Response object received from dispatcher", 500
+          );
+        }
+        else
+        {
+          $this->_response = $resp;
+        }
       }
       catch(\Exception $e)
       {
