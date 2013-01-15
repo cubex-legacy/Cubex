@@ -123,7 +123,7 @@ class Mapper extends Dispatcher
   {
     $map = [];
 
-    $directory = $this->getNamespaceRoot() . $entity;
+    $directory = $this->getProjectBasePath() . $entity;
     $directoryMap = $this->_mapDirectory($directory);
 
     foreach($directoryMap as $fileName)
