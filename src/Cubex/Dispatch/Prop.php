@@ -8,13 +8,13 @@ use Cubex\Events\EventManager;
 
 class Prop extends Dispatcher
 {
-  private static $_requires = array(
+  protected static $_requires = array(
     "css" => [],
     "js" => [],
     "packages" => []
   );
 
-  private static $_fabricate;
+  protected static $_fabricate;
 
   /**
    * @return Fabricate
@@ -63,7 +63,7 @@ class Prop extends Dispatcher
   /**
    * @param Event $event
    */
-  private function _requireResource(Event $event)
+  protected function _requireResource(Event $event)
   {
     $resource = $event->getFile();
 
@@ -105,7 +105,7 @@ class Prop extends Dispatcher
   /**
    * @param Event $event
    */
-  private function _requirePackage(Event $event)
+  protected function _requirePackage(Event $event)
   {
     $uri = $this->_fabricate()->packageUri($event);
 

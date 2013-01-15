@@ -70,7 +70,7 @@ class Partial implements Renderable
   /**
    * @param $args
    */
-  private function _addItem($args)
+  protected function _addItem($args)
   {
     $element = $this->_template;
     //Allow for changing the template at a later point in time, or handling in render

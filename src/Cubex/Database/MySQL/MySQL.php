@@ -18,7 +18,7 @@ class MySQL implements Database
    * @var \Cubex\ServiceManager\ServiceConfig
    */
   protected $_config;
-  private $_connected = false;
+  protected $_connected = false;
 
   /**
    * @param \Cubex\ServiceManager\ServiceConfig $config

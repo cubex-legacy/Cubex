@@ -49,7 +49,7 @@ trait RequireTrait
    * @param          $file
    * @param TypeEnum $type
    */
-  private function _requireResource($file, TypeEnum $type)
+  protected function _requireResource($file, TypeEnum $type)
   {
     $namespace = $this->_getOrFindNamespace();
 
@@ -66,7 +66,7 @@ trait RequireTrait
   /**
    * @param TypeEnum $type
    */
-  private function _requirePackage(TypeEnum $type)
+  protected function _requirePackage(TypeEnum $type)
   {
     $namespace = $this->_getOrFindNamespace();
 
@@ -82,7 +82,7 @@ trait RequireTrait
   /**
    * @return string
    */
-  private function _getOrFindNamespace()
+  protected function _getOrFindNamespace()
   {
     if($this instanceof NamespaceAware)
     {

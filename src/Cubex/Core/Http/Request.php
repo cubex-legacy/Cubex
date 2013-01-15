@@ -97,7 +97,7 @@ class Request implements \IteratorAggregate
    *
    * @return Request
    */
-  private function _processHost($host)
+  protected function _processHost($host)
   {
     if($this->_processedHost)
     {
@@ -337,7 +337,7 @@ class Request implements \IteratorAggregate
    *
    * @return array
    */
-  private function _getVariables($array)
+  protected function _getVariables($array)
   {
     $variables = array();
     foreach($array as $k => $v)

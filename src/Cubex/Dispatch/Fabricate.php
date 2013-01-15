@@ -8,7 +8,7 @@ use Cubex\Core\Http\Request;
 
 final class Fabricate extends Dispatcher
 {
-  private static $_baseMap;
+  protected static $_baseMap;
 
   protected $_domainHash;
   protected $_entityHash;

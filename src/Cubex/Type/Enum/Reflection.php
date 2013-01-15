@@ -7,12 +7,12 @@ namespace Cubex\Type\Enum;
 
 abstract class Reflection
 {
-  private $_default;
-  private $_enum;
-  private $_enums = array();
-  private $_enumsReversed = array();
+  protected $_default;
+  protected $_enum;
+  protected $_enums = array();
+  protected $_enumsReversed = array();
 
-  private static $_defaultKey = "__default";
+  protected static $_defaultKey = "__default";
 
 
   /**
@@ -35,7 +35,7 @@ abstract class Reflection
    * @return Reflection $this
    * @throws \UnexpectedValueException
    */
-  private function _setDefault(array $constants)
+  protected function _setDefault(array $constants)
   {
     if(!isset($constants[self::$_defaultKey]))
     {
@@ -53,7 +53,7 @@ abstract class Reflection
    * @return Reflection $this
    * @throws \UnexpectedValueException
    */
-  private function _setEnums(array $constants)
+  protected function _setEnums(array $constants)
   {
     $tempConstants = $constants;
 
@@ -79,7 +79,7 @@ abstract class Reflection
    * @return Reflection $this
    * @throws \UnexpectedValueException
    */
-  private function _setEnum($enum)
+  protected function _setEnum($enum)
   {
     if($enum === null)
     {

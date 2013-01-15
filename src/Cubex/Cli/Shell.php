@@ -36,8 +36,8 @@ class Shell
   const COLOUR_BACKGROUND_CYAN       = '46';
   const COLOUR_BACKGROUND_LIGHT_GREY = '47';
 
-  private static $_foregroundColour;
-  private static $_backgroundColour;
+  protected static $_foregroundColour;
+  protected static $_backgroundColour;
 
   /**
    * Set forground colour for all shell output

@@ -31,7 +31,7 @@ class Cli extends Mapper
   /**
    *
    */
-  private function _startMapper()
+  protected function _startMapper()
   {
     echo \str_repeat("\n", 100);
 
@@ -53,7 +53,7 @@ _  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
   /**
    * @param array $recommendedProjectIni
    */
-  private function _completeMapper(array $recommendedProjectIni)
+  protected function _completeMapper(array $recommendedProjectIni)
   {
     if(count($recommendedProjectIni))
     {
@@ -92,7 +92,7 @@ _  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
    *
    * @return string
    */
-  private function _getResult($success)
+  protected function _getResult($success)
   {
     if($success)
     {
@@ -112,7 +112,7 @@ _  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
   /**
    *
    */
-  private function _run()
+  protected function _run()
   {
     echo Shell::colourText("Using Path: ", Shell::COLOUR_FOREGROUND_CYAN);
     echo $this->getNamespaceRoot() . "\n\n";

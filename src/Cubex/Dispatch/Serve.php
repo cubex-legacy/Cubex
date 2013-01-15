@@ -24,7 +24,7 @@ class Serve extends Dispatcher implements Dispatchable
   protected $_debugString;
   protected $_relativePath;
 
-  private static $_nocacheDebugString = "nocache";
+  protected static $_nocacheDebugString = "nocache";
 
   public function __construct($dispatchPath,
                               array $entityMap = array(),

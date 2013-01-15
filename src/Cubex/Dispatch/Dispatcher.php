@@ -13,9 +13,9 @@ abstract class Dispatcher implements Configurable
 {
   use ConfigTrait;
 
-  private static $_resourceDirectory = "res";
-  private static $_baseHash = "esabot";
-  private static $_nomapDescriptor = "pamon";
+  protected static $_resourceDirectory = "res";
+  protected static $_baseHash = "esabot";
+  protected static $_nomapDescriptor = "pamon";
 
   protected $_entityMap = [];
 
