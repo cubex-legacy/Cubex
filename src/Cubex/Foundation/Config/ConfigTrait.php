@@ -33,6 +33,11 @@ trait ConfigTrait
 
   public function config($name = '_cubex_')
   {
-    return $this->getConfig()->get($name);
+    $config = $this->getConfig()->get($name);
+    if($config === null)
+    {
+      return new Config();
+    }
+    return $config;
   }
 }
