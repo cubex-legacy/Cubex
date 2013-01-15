@@ -236,11 +236,11 @@ class Webpage implements
     $jsItems = new Partial(
       '<script type="text/javascript" src' . '="%s"></script>'
     );
-    /*$jsUris  = Prop::getResourceUris('js');
+    $jsUris  = Prop::getResourceUris(new TypeEnum(TypeEnum::JS));
     if($jsUris)
     {
       $jsItems->addElements($jsUris);
-    }*/
+    }
     return $jsItems;
   }
 
