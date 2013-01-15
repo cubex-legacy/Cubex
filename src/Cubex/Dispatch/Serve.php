@@ -7,6 +7,7 @@ namespace Cubex\Dispatch;
 use Cubex\Core\Http\Dispatchable;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
+use Cubex\View\Templates\Errors\Error404;
 
 class Serve extends Dispatcher implements Dispatchable
 {
@@ -128,15 +129,13 @@ class Serve extends Dispatcher implements Dispatchable
     // Stop possible hacks for disk paths, e.g. /js/../../../etc/passwd
     if(preg_match("@(//|\.\.)@", $this->_relativePath))
     {
-      // TODO return an error page
-      return null;
+      return $response->fromRenderable(new Error404())->setStatusCode(404);
     }
 
     // Either hack attempt or a dev needs a slapped wrist
     if(!array_key_exists($resourceType, $this->supportedTypes()))
     {
-      // TODO return error page
-      return null;
+      return $response->fromRenderable(new Error404())->setStatusCode(404);
     }
 
     $fabricate = new Fabricate($this->getConfig());
@@ -162,8 +161,7 @@ class Serve extends Dispatcher implements Dispatchable
     // No data found, assume 404
     if(empty($data))
     {
-      // TODO return error page
-      return null;
+      return $response->fromRenderable(new Error404())->setStatusCode(404);
     }
 
     $response->from($data)
