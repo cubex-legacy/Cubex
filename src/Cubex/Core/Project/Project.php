@@ -143,6 +143,8 @@ abstract class Project implements Dispatchable, DispatchableAccess
     $this->_request  = $request;
     $this->_response = $response;
 
+    $this->init();
+
     $app = $this->getApplication($request);
     $app->setProject($this);
     $app->init();
@@ -169,5 +171,12 @@ abstract class Project implements Dispatchable, DispatchableAccess
   public function response()
   {
     return $this->_response;
+  }
+
+  /**
+   * Initialise Project
+   */
+  public function init()
+  {
   }
 }
