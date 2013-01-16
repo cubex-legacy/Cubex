@@ -34,8 +34,14 @@ class ContainerTest extends TestCase
 
   public function testBindIf()
   {
-    Container::bind("containertest.bindif", $this);
-    Container::bindIf("containertest.bindif", $this);
+    Container::bindif("containertest.bindif", $this);
+
+    $this->assertInstanceOf(
+      "\\Cubex\\Container\\Tests\\ContainerTest",
+      Container::get("containertest.bindif")
+    );
+
+    Container::bindIf("containertest.bindif", new \stdClass());
 
     $this->assertInstanceOf(
       "\\Cubex\\Container\\Tests\\ContainerTest",
