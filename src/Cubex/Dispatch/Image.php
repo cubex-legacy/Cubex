@@ -15,6 +15,10 @@ class Image extends Prop
       return $file;
     }
 
+    $this->_fabricate()->getEntityHash(
+      $this->_fabricate()->getPathToResource($event)
+    );
+
     return $this->_fabricate()->dispatchUri($file);
   }
 }
