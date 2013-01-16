@@ -5,6 +5,7 @@
   "keywords":          ["framework", "cubex"],
   "homepage":          "http://cubex.io",
   "minimum-stability": "dev",
+  "licence":           "BSD-3-Clause",
   "authors":           [
     {
       "name":     "Brooke Bryan",
