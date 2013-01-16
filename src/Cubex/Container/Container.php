@@ -32,6 +32,12 @@ class Container
     return isset(static::$_bound[$name]);
   }
 
+  /**
+   * @param       $name
+   * @param mixed $default
+   *
+   * @return mixed
+   */
   public static function get($name, $default = null)
   {
     if(static::bound($name))
