@@ -43,6 +43,18 @@ class Session implements SessionService
   public function set($key, $data)
   {
     $_SESSION['cubex'][$key] = $data;
+    return true;
+  }
+
+  public function delete($key)
+  {
+    unset($_SESSION['cubex'][$key]);
+    return true;
+  }
+
+  public function exists($key)
+  {
+    return isset($_SESSION['cubex'][$key]);
   }
 
   /**

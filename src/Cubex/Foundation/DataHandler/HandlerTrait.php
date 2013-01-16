@@ -257,8 +257,33 @@ trait HandlerTrait
    */
   public function getIterator()
   {
-    $o = new \ArrayObject($this->_data);
+    return new \ArrayIterator($this->_data);
+  }
 
-    return $o->getIterator();
+  public function offsetSet($offset, $value)
+  {
+    if($offset === null)
+    {
+      $this->_data[] = $value;
+    }
+    else
+    {
+      $this->_data[$offset] = $value;
+    }
+  }
+
+  public function offsetExists($offset)
+  {
+    return isset($this->_data[$offset]);
+  }
+
+  public function offsetUnset($offset)
+  {
+    unset($this->_data[$offset]);
+  }
+
+  public function offsetGet($offset)
+  {
+    return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
   }
 }

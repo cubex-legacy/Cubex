@@ -10,7 +10,7 @@ namespace Cubex\Database;
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\ServiceManager\ServiceFactory;
 
-class Factory implements ServiceFactory
+class DatabaseFactory implements ServiceFactory
 {
   /**
    * @param \Cubex\ServiceManager\ServiceConfig $config

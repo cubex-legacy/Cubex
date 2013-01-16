@@ -21,7 +21,7 @@ interface SessionService extends Service
    * @param $key
    * @param $data
    *
-   * @return mixed
+   * @return bool
    */
   public function set($key, $data);
 
@@ -32,5 +32,22 @@ interface SessionService extends Service
    */
   public function get($key);
 
+  /**
+   * @param $key
+   *
+   * @return bool
+   */
+  public function delete($key);
+
+  /**
+   * @param $key
+   *
+   * @return bool
+   */
+  public function exists($key);
+
+  /**
+   * @return bool
+   */
   public function destroy();
 }

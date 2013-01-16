@@ -8,7 +8,7 @@ namespace Cubex\Foundation\Config;
 use Cubex\Foundation\DataHandler\HandlerInterface;
 use Cubex\Foundation\DataHandler\HandlerTrait;
 
-class Config implements \IteratorAggregate, HandlerInterface
+class Config implements \IteratorAggregate, HandlerInterface, \ArrayAccess
 {
   use HandlerTrait;
 }

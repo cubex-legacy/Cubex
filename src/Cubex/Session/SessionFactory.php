@@ -23,6 +23,8 @@ class SessionFactory implements ServiceFactory
    */
   public function createService(ServiceConfig $config)
   {
-    return new Session();
+    $session = new Session();
+    $session->init();
+    return $session;
   }
 }

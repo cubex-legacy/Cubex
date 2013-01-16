@@ -4,7 +4,7 @@
  */
 namespace Cubex\Foundation\Config;
 
-class ConfigGroup implements \Countable, \IteratorAggregate
+class ConfigGroup implements \Countable, \IteratorAggregate, \ArrayAccess
 {
   protected $_count = 0;
   /**
@@ -49,11 +49,38 @@ class ConfigGroup implements \Countable, \IteratorAggregate
   }
 
   /**
-   * @return \Traversable
+   * @return Config[]
    */
   public function getIterator()
   {
-    return $this->_configs;
+    return new \ArrayIterator($this->_configs);
+  }
+
+  public function offsetSet($offset, $value)
+  {
+    if($offset === null)
+    {
+      $this->_configs[] = $value;
+    }
+    else
+    {
+      $this->_configs[$offset] = $value;
+    }
+  }
+
+  public function offsetExists($offset)
+  {
+    return isset($this->_configs[$offset]);
+  }
+
+  public function offsetUnset($offset)
+  {
+    unset($this->_configs[$offset]);
+  }
+
+  public function offsetGet($offset)
+  {
+    return isset($this->_configs[$offset]) ? $this->_configs[$offset] : null;
   }
 
   /**

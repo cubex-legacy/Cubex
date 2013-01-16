@@ -20,6 +20,7 @@ use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\I18n\Locale;
+use Cubex\ServiceManager\ServiceConfig;
 use Cubex\ServiceManager\ServiceManager;
 use Cubex\ServiceManager\ServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
@@ -103,6 +104,38 @@ class Loader
   public function init()
   {
     $sm = new ServiceManager();
+    foreach($this->_configuration as $section => $conf)
+    {
+      if($conf instanceof Config)
+      {
+        if(stristr($section, '\\'))
+        {
+          $parent = current(explode('\\', $section));
+          foreach($this->_configuration->get($parent) as $k => $v)
+          {
+            if(!$conf->getExists($k))
+            {
+              $conf->setData($k, $v);
+            }
+          }
+        }
+
+        $factory           = $conf->getRaw("factory", false);
+        $registerServiceAs = $conf->getRaw("register_service_as", false);
+
+        if($factory && $registerServiceAs)
+        {
+          $service = new ServiceConfig();
+          $service->fromConfig($conf);
+          $shared = $conf->getBool('register_service_shared', true);
+          $sm->register(
+            $conf->getStr('register_service_as', $section),
+            $service, $shared
+          );
+        }
+      }
+    }
+
     Container::bind(Container::SERVICE_MANAGER, $sm);
     $this->setServiceManager($sm);
   }
