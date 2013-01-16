@@ -18,12 +18,16 @@ use Cubex\I18n\TranslateTraits;
 use Cubex\Routing\Route;
 use Cubex\Routing\StdRoute;
 use Cubex\Routing\StdRouter;
+use Cubex\ServiceManager\ServiceManagerAware;
+use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
-class BaseController implements Controller, HandlerInterface, Translatable
+class BaseController
+  implements Controller, HandlerInterface, Translatable, ServiceManagerAware
 {
   use HandlerTrait;
   use ConfigTrait;
   use TranslateTraits;
+  use ServiceManagerAwareTrait;
 
   /**
    * @var \Cubex\Core\Http\Request

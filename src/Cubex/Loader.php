@@ -19,13 +19,19 @@ use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\I18n\Locale;
+use Cubex\ServiceManager\ServiceManager;
+use Cubex\ServiceManager\ServiceManagerAware;
+use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
 /**
  * Cubex Loader
  */
-class Loader implements Configurable, DispatchableAccess, DispatchInjection
+class Loader
+  implements Configurable, DispatchableAccess,
+  DispatchInjection, ServiceManagerAware
 {
   use ConfigTrait;
+  use ServiceManagerAwareTrait;
 
   /**
    * @var \Cubex\Core\Http\Request
@@ -65,12 +71,11 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
   {
     defined('PHP_START') or define('PHP_START', microtime(true));
 
+    isset($_SERVER['DOCUMENT_ROOT']) or $_SERVER['DOCUMENT_ROOT'] = false;
+
     define("CUBEX_CLI", php_sapi_name() === 'cli');
     define("CUBEX_WEB", !CUBEX_CLI);
-    define(
-    "WEB_ROOT", (isset($_SERVER['DOCUMENT_ROOT'])
-    ? $_SERVER['DOCUMENT_ROOT'] : false)
-    );
+    define("WEB_ROOT", $_SERVER['DOCUMENT_ROOT']);
 
     spl_autoload_register([$this, "loadClass"], true, true);
 
@@ -90,6 +95,12 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
     define("CUBEX_TRANSACTION", $this->createTransaction());
 
     $this->setLocale();
+  }
+
+  public function init()
+  {
+    $sm = new ServiceManager();
+    $this->setServiceManager($sm);
   }
 
   public function setLocale($locale = null)
@@ -374,6 +385,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
    */
   public function respondToWebRequest()
   {
+    $this->init();
     if(!$this->_failed)
     {
       try
@@ -398,6 +410,11 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
         $dispatcher = $this->getDispatchable();
 
         $dispatcher->configure($this->_configuration);
+
+        if($dispatcher instanceof ServiceManagerAware)
+        {
+          $dispatcher->setServiceManager($this->getServiceManager());
+        }
 
         $resp = $dispatcher->dispatch(
           $this->_request, $this->_response
@@ -434,6 +451,8 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
   {
     $script    = $_REQUEST['__path__'] = '';
     $arguments = array();
+
+    $this->init();
 
     if($this->_response === null)
     {
@@ -472,10 +491,17 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection
     if(class_exists($script))
     {
       $obj = new $script($this, $arguments);
+
       if($obj instanceof Configurable)
       {
         $obj->configure($this->getConfig());
       }
+
+      if($obj instanceof ServiceManagerAware)
+      {
+        $obj->setServiceManager($this->getServiceManager());
+      }
+
       if($obj instanceof CliTask)
       {
         $obj->init();

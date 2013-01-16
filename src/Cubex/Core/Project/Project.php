@@ -12,6 +12,8 @@ use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Http\DispatchInjection;
+use Cubex\ServiceManager\ServiceManagerAware;
+use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
 /**
  * Project Dispatchable
@@ -19,8 +21,10 @@ use Cubex\Http\DispatchInjection;
  * Handles dispatching a request to the relevant application
  *
  */
-abstract class Project implements Dispatchable, DispatchableAccess
+abstract class Project
+  implements Dispatchable, DispatchableAccess, ServiceManagerAware
 {
+  use ServiceManagerAwareTrait;
   use ConfigTrait;
 
   /**
@@ -146,6 +150,7 @@ abstract class Project implements Dispatchable, DispatchableAccess
     $this->init();
 
     $app = $this->getApplication($request);
+    $app->setServiceManager($this->getServiceManager());
     $app->setProject($this);
     $app->init();
 
