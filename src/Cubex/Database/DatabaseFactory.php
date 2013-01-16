@@ -7,6 +7,7 @@ namespace Cubex\Database;
 /**
  * Database Factory
  */
+use Cubex\Database\MySQL\MySQL;
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\ServiceManager\ServiceFactory;
 
