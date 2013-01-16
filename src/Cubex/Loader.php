@@ -5,6 +5,7 @@
 namespace Cubex;
 
 use Cubex\Cli\CliTask;
+use Cubex\Container\Container;
 use Cubex\Core\Http\DispatchInjection;
 use Cubex\Dispatch\Dispatcher;
 use Cubex\Dispatch\Fabricate;
@@ -94,12 +95,15 @@ class Loader
 
     define("CUBEX_TRANSACTION", $this->createTransaction());
 
+    Container::bind(Container::LOADER, $this);
+
     $this->setLocale();
   }
 
   public function init()
   {
     $sm = new ServiceManager();
+    Container::bind(Container::SERVICE_MANAGER, $sm);
     $this->setServiceManager($sm);
   }
 
@@ -171,6 +175,7 @@ class Loader
     $configuration->addConfig('_cubex_', $cubexConfig);
 
     $this->_configuration = $configuration;
+    Container::bind(Container::CONFIG, $this->_configuration);
 
     return $this;
   }
@@ -291,6 +296,7 @@ class Loader
   public function setRequest(Request $request)
   {
     $this->_request = $request;
+    Container::bind(Container::REQUEST, $this->_request);
 
     return $this;
   }
@@ -334,6 +340,7 @@ class Loader
   public function setResponse(Response $response)
   {
     $this->_response = $response;
+    Container::bind(Container::RESPONSE, $this->_response);
 
     return $this;
   }

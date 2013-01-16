@@ -8,6 +8,12 @@ class Container
 {
   protected static $_bound;
 
+  const LOADER          = 'cubex.loader';
+  const CONFIG          = 'cubex.configuration';
+  const SERVICE_MANAGER = 'cubex.servicemanager';
+  const REQUEST         = 'cubex.request';
+  const RESPONSE        = 'cubex.response';
+
   public static function bind($name, $object)
   {
     static::$_bound[$name] = $object;
