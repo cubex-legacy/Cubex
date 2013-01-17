@@ -9,6 +9,7 @@ use Cubex\Container\Container;
 use Cubex\Core\Http\DispatchInjection;
 use Cubex\Dispatch\Dispatcher;
 use Cubex\Dispatch\Fabricate;
+use Cubex\Dispatch\FileSystem;
 use Cubex\Dispatch\Prop;
 use Cubex\Dispatch\Serve;
 use Cubex\Foundation\Config\Config;
@@ -209,7 +210,7 @@ class Loader
    */
   public function getDispatchable()
   {
-    if($this->request()->path() === "/favicon.ico")
+    /*if($this->request()->path() === "/favicon.ico")
     {
       $prop = new Prop($this->getConfig());
       $fab  = new Fabricate($this->getConfig());
@@ -219,7 +220,7 @@ class Loader
         $fab->getDomainHash($this->request()) . "/" . $prop->getBaseHash() .
         "/" . $prop->getNomapDescriptor() . "/favicon.ico"
       );
-    }
+    }*/
 
     $trimmedPath = ltrim($this->request()->path(), "/");
 
@@ -229,19 +230,14 @@ class Loader
         "/", $trimmedPath, 2
       );
 
-      if(Dispatcher::getResourceDirectory() === $potentialDispatcherDirectory)
+      $dispatchServe = new Serve(
+        $this->getConfig(), new FileSystem(), $this->request()->path()
+      );
+
+      if($dispatchServe->getResourceDirectory()
+        === $potentialDispatcherDirectory)
       {
-        $config = $this->getConfig()->get("dispatch", new Config());
-        $this->setDispatchable(
-          new Serve(
-            str_replace(
-              "/" . Dispatcher::getResourceDirectory() . "/", "",
-              $this->request()->path()
-            ),
-            $config->getArr("entity_map", []),
-            $config->getArr("domain_map", [])
-          )
-        );
+        $this->setDispatchable($dispatchServe);
       }
     }
 

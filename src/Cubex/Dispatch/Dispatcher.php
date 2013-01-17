@@ -4,6 +4,7 @@
  */
  namespace Cubex\Dispatch;
 
+use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
 
@@ -226,6 +227,16 @@ class Dispatcher
   }
 
   /**
+   * @param string $resource
+   *
+   * @return string
+   */
+  public function generateResourceHash($resource, $length = 10)
+  {
+    return \substr($resource, 0, $length);
+  }
+
+  /**
    * @param object $source
    *
    * @return string
@@ -235,6 +246,15 @@ class Dispatcher
     $sourceObjectRefelction = new \ReflectionClass($source);
 
     return $sourceObjectRefelction->getNamespaceName();
+  }
+
+  public function getDispatchIni($entity)
+  {
+    $fullEntityPath = $this->getProjectBase() . DS . $entity;
+
+    return @parse_ini_file(
+      $fullEntityPath . DS . $this->getDispatchIniFilename(), false
+    );
   }
 
   /**
@@ -302,5 +322,129 @@ class Dispatcher
     }
 
     return null;
+  }
+
+  /**
+   * Does what it says on the tin, for the specified resource type the data gets
+   * minified (all the shit removed)
+   *
+   * @param string $data
+   * @param string $fileExtension
+   *
+   * @return string
+   */
+  public function minifyData($data, $fileExtension)
+  {
+    if(\strpos($data, '@' . 'do-not-minify') !== false)
+    {
+      return $data;
+    }
+
+    switch($fileExtension)
+    {
+      case 'css':
+        // Remove comments.
+        $data = preg_replace('@/\*.*?\*/@s', '', $data);
+        // Remove whitespace around symbols.
+        $data = preg_replace('@\s*([{}:;,])\s*@', '\1', $data);
+        // Remove unnecessary semicolons.
+        $data = preg_replace('@;}@', '}', $data);
+        // Replace #rrggbb with #rgb when possible.
+        $data = preg_replace(
+          '@#([a-f0-9])\1([a-f0-9])\2([a-f0-9])\3@i', '#\1\2\3', $data
+        );
+        $data = trim($data);
+        break;
+      case 'js':
+        //Strip Comments
+        $data = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $data);
+        $data = preg_replace('!^([\t ]+)?\/\/.+$!m', '', $data);
+        //remove tabs, spaces, newlines, etc.
+        $data = str_replace(array("\t"), ' ', $data);
+        $data = str_replace(
+          array("\r\n", "\r", "\n", '  ', '    ', '    '), '', $data
+        );
+        break;
+    }
+
+    return $data;
+  }
+
+  /**
+   * @param string $uri
+   * @param string $entityHash
+   * @param string $domainHash
+   *
+   * @return string
+   */
+  public function dispatchUri($uri, $entityHash, $domainHash)
+  {
+    $uri = trim($uri, "'\" \r\t\n");
+
+    if(in_array(substr($uri, 0, 7), ['data:im', 'http://', 'https:/']))
+    {
+      return $uri;
+    }
+
+    if(substr($uri, 0, 1) == '/')
+    {
+      $uri        = substr($uri, 1);
+      $entityHash = $this->getBaseHash();
+    }
+
+    $entityMap    = false;
+    $resourceHash = $this->getNomapHash();
+
+    $entity = $this->findEntityFromHash($entityHash);
+    if($entity)
+    {
+      $entityMap = $this->getDispatchIni($entity);
+    }
+
+    if($entityMap)
+    {
+      if(isset($entityMap[$uri]))
+      {
+        $resourceHash = $this->generateResourceHash($entityMap[$uri]);
+      }
+    }
+
+    $uri = $this->addRootResourceDirectory($uri);
+
+    $parts = array(
+      $domainHash,
+      $entityHash,
+      $resourceHash,
+      $uri,
+    );
+
+    return "/". $this->getResourceDirectory() . "/" . implode("/", $parts);
+  }
+
+  /**
+   * @param string $uri
+   *
+   * @return string
+   */
+  public function addRootResourceDirectory($uri)
+  {
+    $uriParts = explode(".", $uri);
+    $fileExtension = end($uriParts);
+    switch($fileExtension)
+    {
+      case "css":
+        $uri = "css/$uri";
+        break;
+      case "js":
+        $uri = "js/$uri";
+        break;
+      case "ico":
+        break;
+      default:
+        $uri = "img/$uri";
+        break;
+    }
+
+    return $uri;
   }
 }
