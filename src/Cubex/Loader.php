@@ -4,16 +4,7 @@
  */
 namespace Cubex;
 
-use Cubex\Cli\CliTask;
-use Cubex\Container\Container;
 use Cubex\Core\Http\DispatchInjection;
-use Cubex\Dispatch\Dependency\Image;
-use Cubex\Dispatch\Dispatcher;
-use Cubex\Dispatch\Fabricate;
-use Cubex\Dispatch\FileSystem;
-use Cubex\Dispatch\Path;
-use Cubex\Dispatch\Prop;
-use Cubex\Dispatch\Serve;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
@@ -22,7 +13,6 @@ use Cubex\Core\Http\Dispatchable;
 use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
-use Cubex\I18n\Locale;
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\ServiceManager\ServiceManager;
 use Cubex\ServiceManager\ServiceManagerAware;
@@ -101,7 +91,9 @@ class Loader
 
     define("CUBEX_TRANSACTION", $this->createTransaction());
 
-    Container::bind(Container::LOADER, $this);
+    \Cubex\Container\Container::bind(
+      \Cubex\Container\Container::LOADER, $this
+    );
   }
 
   public function init()
@@ -139,7 +131,9 @@ class Loader
       }
     }
 
-    Container::bind(Container::SERVICE_MANAGER, $sm);
+    \Cubex\Container\Container::bind(
+      \Cubex\Container\Container::SERVICE_MANAGER, $sm
+    );
     $this->setServiceManager($sm);
   }
 
@@ -152,7 +146,7 @@ class Loader
 
     if($locale == null)
     {
-      $locale = (new Locale())->getLocale();
+      $locale = (new \Cubex\I18n\Locale())->getLocale();
     }
     putenv('LC_ALL=' . $locale);
     setlocale(LC_ALL, $locale);
@@ -220,7 +214,9 @@ class Loader
     $configuration->addConfig('_cubex_', $cubexConfig);
 
     $this->_configuration = $configuration;
-    Container::bind(Container::CONFIG, $this->_configuration);
+    \Cubex\Container\Container::bind(
+      \Cubex\Container\Container::CONFIG, $this->_configuration
+    );
 
     return $this;
   }
@@ -258,7 +254,9 @@ class Loader
     $pathEnd   = end($pathParts);
     if($pathEnd === "ico")
     {
-      $dispatchImage = new Image($this->getConfig(), new FileSystem());
+      $dispatchImage = new \Cubex\Dispatch\Dependency\Image(
+        $this->getConfig(), new \Cubex\Dispatch\FileSystem()
+      );
       $faviconPath   = $dispatchImage->getFaviconPath(
         $this->request()->path(), $this->request()
       );
@@ -273,10 +271,10 @@ class Loader
         "/", $trimmedPath, 2
       );
 
-      $dispatchServe = new Serve(
+      $dispatchServe = new \Cubex\Dispatch\Serve(
         $this->getConfig(),
-        new FileSystem(),
-        new Path($this->request()->path())
+        new \Cubex\Dispatch\FileSystem(),
+        new \Cubex\Dispatch\Path($this->request()->path())
       );
 
       if($dispatchServe->getResourceDirectory()
@@ -338,7 +336,9 @@ class Loader
   public function setRequest(Request $request)
   {
     $this->_request = $request;
-    Container::bind(Container::REQUEST, $this->_request);
+    \Cubex\Container\Container::bind(
+      \Cubex\Container\Container::REQUEST, $this->_request
+    );
 
     return $this;
   }
@@ -382,7 +382,9 @@ class Loader
   public function setResponse(Response $response)
   {
     $this->_response = $response;
-    Container::bind(Container::RESPONSE, $this->_response);
+    \Cubex\Container\Container::bind(
+      \Cubex\Container\Container::RESPONSE, $this->_response
+    );
 
     return $this;
   }
@@ -553,7 +555,7 @@ class Loader
         $obj->setServiceManager($this->getServiceManager());
       }
 
-      if($obj instanceof CliTask)
+      if($obj instanceof \Cubex\Cli\CliTask)
       {
         $obj->init();
       }
