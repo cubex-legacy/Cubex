@@ -15,52 +15,24 @@ class Serve extends Dispatcher implements Dispatchable
 {
   private $_cacheTime = 2592000;
   private $_useMap = true;
-  private $_domainHash;
-  private $_entityHash;
-  private $_resourceHash;
-  private $_debugString;
-  private $_pathToResource;
+  private $_dispatchPath;
 
   private static $_nocacheDebugString = "nocache";
 
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
    * @param FileSystem                           $fileSystem
-   * @param string                               $dispatchPath
+   * @param Path                                 $dispatchPath
    */
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem,
-                              $dispatchPath)
+                              Path $dispatchPath)
   {
     parent::__construct($configGroup, $fileSystem);
 
-    // Need to tidy up and pop the resource directory off the start before we
-    // can work with the dispatchPath
-    $dispatchPath = ltrim($dispatchPath, "/");
-    $dispatchPath = substr($dispatchPath, strpos($dispatchPath, "/")+1);
-
-    $dispatchPathParts = explode("/", $dispatchPath, 4);
-
-    if(count($dispatchPathParts) !== 4)
-    {
-      throw new \UnexpectedValueException(
-        "The dispatch path should include at least four directory seperator ".
-        "seperated sections"
+    $this->setDispatchPath($dispatchPath)
+      ->setUseMap(
+        $this->getDispatchPath()->getResourceHash() !== $this->getNomapHash()
       );
-    }
-
-    if(strstr($dispatchPathParts[2], ";") === false)
-    {
-      $dispatchPathParts[2] .= ";";
-    }
-
-    list($resourceHash, $debugString) = explode( ";", $dispatchPathParts[2], 2);
-
-    $this->setDomainHash($dispatchPathParts[0])
-      ->setEntityHash($dispatchPathParts[1])
-      ->setResourceHash($resourceHash)
-      ->setDebugString($debugString)
-      ->setPathToResource($dispatchPathParts[3])
-      ->setUseMap($this->getResourceHash() !== $this->getNomapHash());
   }
 
   /**
@@ -74,12 +46,15 @@ class Serve extends Dispatcher implements Dispatchable
     $response->addHeader("Vary", "Accept-Encoding");
 
     if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
-      && $this->getDebugString() !== self::getNocacheDebugString()
-      && $this->getResourceHash() != $this->getNomapHash())
+      && $this->getDispatchPath()->getDebugString()
+        !== self::getNocacheDebugString()
+      && $this->getDispatchPath()->getResourceHash() != $this->getNomapHash())
     {
       $this->_setCacheHeaders($response);
     }
-    else if(preg_match("@(//|\.\.)@", $this->getPathToResource()))
+    else if(preg_match(
+      "@(//|\.\.)@", $this->getDispatchPath()->getPathToResource()
+    ))
     {
       // Stop possible hacks for disk paths, e.g. /js/../../../etc/passwd
       $response->fromRenderable(new Error404())->setStatusCode(404);
@@ -99,7 +74,7 @@ class Serve extends Dispatcher implements Dispatchable
    */
   private function _buildResponse(Response $response, $domain)
   {
-    $pathToResource = $this->getPathToResource();
+    $pathToResource = $this->getDispatchPath()->getPathToResource();
     $pathToResourceParts = explode(".", $pathToResource);
     $resourceType = end($pathToResourceParts);
 
@@ -129,7 +104,8 @@ class Serve extends Dispatcher implements Dispatchable
         $response->from($data);
         $this->_setResponseHeaders($response, $data, $resourceType);
 
-        if($this->getDebugString() === self::getNocacheDebugString())
+        if($this->getDispatchPath()->getDebugString()
+          === self::getNocacheDebugString())
         {
           $response->disbleCache();
         }
@@ -151,12 +127,12 @@ class Serve extends Dispatcher implements Dispatchable
     $data = "";
     $locatedFileKeys = [];
 
-    $pathToResource = $this->getPathToResource();
+    $pathToResource = $this->getDispatchPath()->getPathToResource();
     $filePathParts  = explode("/", $pathToResource);
     $filename       = array_pop($filePathParts);
     $pathToFile     = implode("/", $filePathParts);
     $fullEntityPath = $this->getProjectBase() . DS .
-      $this->getEntityPathByHash($this->getEntityHash());
+      $this->getEntityPathByHash($this->getDispatchPath()->getEntityHash());
 
     $locateList = $this->buildResourceLocateDirectoryList(
       $fullEntityPath, $pathToFile, $filename, $domain
@@ -197,7 +173,9 @@ class Serve extends Dispatcher implements Dispatchable
     $data = "";
     $entityMap = false;
 
-    $entity = $this->findEntityFromHash($this->getEntityHash());
+    $entity = $this->findEntityFromHash(
+      $this->getDispatchPath()->getEntityHash()
+    );
     if($entity)
     {
       $entityMap = $this->getDispatchIni($entity);
@@ -209,7 +187,9 @@ class Serve extends Dispatcher implements Dispatchable
       $entityMap = $this->findAndSaveEntityMap($entity, $mapper);
     }
 
-    $fileExtension = end(explode(".", $this->getPathToResource()));
+    $fileExtension = end(
+      explode(".", $this->getDispatchPath()->getPathToResource())
+    );
 
     // Only allow JS and CSS packages
     $typeEnums = (new TypeEnum())->getConstList();
@@ -277,7 +257,9 @@ class Serve extends Dispatcher implements Dispatchable
   public function dispatchUrlWrappedUri($data)
   {
     $uri = $this->dispatchUri(
-      $data[1], $this->getEntityHash(), $this->getDomainHash()
+      $data[1],
+      $this->getDispatchPath()->getEntityHash(),
+      $this->getDispatchPath()->getDomainHash()
     );
 
     return "url('$uri')";
@@ -395,101 +377,21 @@ class Serve extends Dispatcher implements Dispatchable
   }
 
   /**
-   * @return string
+   * @return \Cubex\Dispatch\Path
    */
-  public function getDomainHash()
+  public function getDispatchPath()
   {
-    return $this->_domainHash;
+    return $this->_dispatchPath;
   }
 
   /**
-   * @param string $domainHash
+   * @param Path $dispatchPath
    *
    * @return \Cubex\Dispatch\Serve
    */
-  public function setDomainHash($domainHash)
+  public function setDispatchPath(Path $dispatchPath)
   {
-    $this->_domainHash = $domainHash;
-
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
-  public function getEntityHash()
-  {
-    return $this->_entityHash;
-  }
-
-  /**
-   * @param string $entityHash
-   *
-   * @return \Cubex\Dispatch\Serve
-   */
-  public function setEntityHash($entityHash)
-  {
-    $this->_entityHash = $entityHash;
-
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
-  public function getResourceHash()
-  {
-    return $this->_resourceHash;
-  }
-
-  /**
-   * @param $resourceHash
-   *
-   * @return \Cubex\Dispatch\Serve
-   */
-  public function setResourceHash($resourceHash)
-  {
-    $this->_resourceHash = $resourceHash;
-
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
-  public function getDebugString()
-  {
-    return $this->_debugString;
-  }
-
-  /**
-   * @param string $debugString
-   *
-   * @return \Cubex\Dispatch\Serve
-   */
-  public function setDebugString($debugString)
-  {
-    $this->_debugString = $debugString;
-
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
-  public function getPathToResource()
-  {
-    return $this->_pathToResource;
-  }
-
-  /**
-   * @param string $pathToResource
-   *
-   * @return \Cubex\Dispatch\Serve
-   */
-  public function setPathToResource($pathToResource)
-  {
-    $this->_pathToResource = $pathToResource;
+    $this->_dispatchPath = $dispatchPath;
 
     return $this;
   }

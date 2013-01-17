@@ -11,6 +11,7 @@ use Cubex\Dispatch\Dependency\Image;
 use Cubex\Dispatch\Dispatcher;
 use Cubex\Dispatch\Fabricate;
 use Cubex\Dispatch\FileSystem;
+use Cubex\Dispatch\Path;
 use Cubex\Dispatch\Prop;
 use Cubex\Dispatch\Serve;
 use Cubex\Foundation\Config\Config;
@@ -229,7 +230,9 @@ class Loader
       );
 
       $dispatchServe = new Serve(
-        $this->getConfig(), new FileSystem(), $this->request()->path()
+        $this->getConfig(),
+        new FileSystem(),
+        new Path($this->request()->path())
       );
 
       if($dispatchServe->getResourceDirectory()
