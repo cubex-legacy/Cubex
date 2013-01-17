@@ -11,6 +11,8 @@ use Cubex\Foundation\Config\ConfigGroup;
 
 class Cli extends Mapper
 {
+  private $_output = [];
+
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
     parent::__construct($configGroup, $fileSystem);
@@ -23,11 +25,18 @@ class Cli extends Mapper
       "=======================================\n\n",
       Shell::COLOUR_FOREGROUND_DARK_GREY
     );
-    echo Shell::colourText("Processing ", Shell::COLOUR_FOREGROUND_CYAN) . "\n";
 
     $entities = $this->findEntities();
     $maps = $this->mapEntities($entities);
     $savedMaps = $this->saveMaps($maps);
+
+    foreach($this->_output as $outputEntity)
+    {
+      foreach($outputEntity as $outputLine)
+      {
+        echo $outputLine;
+      }
+    }
 
     $recommendedIni = [];
     foreach($entities as $entity)
@@ -44,30 +53,46 @@ class Cli extends Mapper
 
   public function mapEntity($entity)
   {
-    echo Shell::colourText(
-      "     Found ", Shell::COLOUR_FOREGROUND_LIGHT_CYAN
-    );
-    echo Shell::colourText(
-      $this->generateEntityHash($entity), Shell::COLOUR_FOREGROUND_PURPLE
-    );
-    echo " $entity\n";
-    echo "           Mapping Directory:   ";
-    flush();
+    $resourceDirectory = $this->getResourceDirectory();
+    $entityParts       = explode("/", $entity);
+    $shouldOutput      = end($entityParts) === $resourceDirectory;
+
+    $entityHash = $this->generateEntityHash($entity);
+
+    if($shouldOutput)
+    {
+      $this->pushLine(
+        $entityHash,
+        Shell::colourText("Found ", Shell::COLOUR_FOREGROUND_LIGHT_CYAN)
+      );
+      $this->pushLine(
+        $entityHash,
+        Shell::colourText($entityHash, Shell::COLOUR_FOREGROUND_PURPLE)
+      );
+      $this->pushLine($entityHash, " $entity\n");
+      $this->pushLine($entityHash, "      Mapping Directory:   ");
+      flush();
+    }
 
     $mapped = parent::mapEntity($entity);
     $numMapped = count($mapped);
-    echo $this->_getResult($numMapped > 0);
+
+    if($shouldOutput)
+    {
+      $this->pushLine($entityHash, $this->_getResult($numMapped > 0));
+    }
 
     return $mapped;
   }
 
   public function saveMap(array $map, $entity)
   {
-    echo "           Saving Dispatch Map: ";
+    $entityHash = $this->generateEntityHash($entity);
+    $this->pushLine($entityHash, "      Saving Dispatch Map: ");
 
     $saved = parent::saveMap($map, $entity);
 
-    echo $this->_getResult($saved);
+    $this->pushLine($entityHash, $this->_getResult($saved) . "\n");
   }
 
   /*****************************************************************************
@@ -142,5 +167,10 @@ _  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
       $result .= " ]\n";
     }
     return $result;
+  }
+
+  private function pushLine($entityHash, $line)
+  {
+    $this->_output[$entityHash][] = $line;
   }
 }
