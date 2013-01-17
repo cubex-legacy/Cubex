@@ -8,15 +8,11 @@ class FileSystem
 {
   public function fileExists($path)
   {
-    $path = $this->resolvePath($path);
-
     return file_exists($path);
   }
 
   public function readFile($path)
   {
-    $path = $this->resolvePath($path);
-
     $data = @file_get_contents($path);
 
     if($data === false)
@@ -29,8 +25,6 @@ class FileSystem
 
   public function writeFile($path, $data)
   {
-    $path = $this->resolvePath($path);
-
     $written = @file_put_contents($path, $data);
 
     if($written === false)
@@ -41,8 +35,6 @@ class FileSystem
 
   public function listDirectory($path, $includeHidden = true)
   {
-    $path = $this->resolvePath($path);
-
     $list = @scandir($path);
 
     if($list === false)
