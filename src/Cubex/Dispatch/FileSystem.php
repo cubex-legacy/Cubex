@@ -29,6 +29,8 @@ class FileSystem
 
   public function writeFile($path, $data)
   {
+    $path = $this->resolvePath($path);
+
     $written = @file_put_contents($path, $data);
 
     if($written === false)

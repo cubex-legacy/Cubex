@@ -57,7 +57,15 @@ class Mapper extends Dispatcher
     }
 
     $directory = $this->getProjectPath() . DS . $entityPath;
-    $directoryList = $this->getFileSystem()->listDirectory($directory, false);
+
+    try
+    {
+      $directoryList = $this->getFileSystem()->listDirectory($directory, false);
+    }
+    catch(\Exception $e)
+    {
+      $directoryList = [];
+    }
 
     foreach($directoryList as $directoryListItem)
     {
@@ -123,7 +131,15 @@ class Mapper extends Dispatcher
     $map = [];
 
     $directory = $this->getProjectBase() . DS . $entity;
-    $directoryList = $this->getFileSystem()->listDirectory($directory, false);
+
+    try
+    {
+      $directoryList = $this->getFileSystem()->listDirectory($directory, false);
+    }
+    catch(\Exception $e)
+    {
+      $directoryList = [];
+    }
 
     foreach($directoryList as $directoryListItem)
     {
@@ -254,7 +270,14 @@ class Mapper extends Dispatcher
   {
     $directories = [];
 
-    $directoryList = $this->getFileSystem()->listDirectory($directory);
+    try
+    {
+      $directoryList = $this->getFileSystem()->listDirectory($directory);
+    }
+    catch(\Exception $e)
+    {
+      $directoryList = [];
+    }
 
     foreach($directoryList as $directoryListItem)
     {
