@@ -228,13 +228,14 @@ class Dispatcher
   }
 
   /**
-   * @param string $resource
+   * @param string $resourceHash
+   * @param int    $length
    *
    * @return string
    */
-  public function generateResourceHash($resource, $length = 10)
+  public function generateResourceHash($resourceHash, $length = 10)
   {
-    return \substr($resource, 0, $length);
+    return substr($resourceHash, 0, $length);
   }
 
   /**
