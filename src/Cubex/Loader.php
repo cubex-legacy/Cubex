@@ -100,8 +100,6 @@ class Loader
     define("CUBEX_TRANSACTION", $this->createTransaction());
 
     Container::bind(Container::LOADER, $this);
-
-    $this->setLocale();
   }
 
   public function init()
@@ -145,12 +143,18 @@ class Loader
 
   public function setLocale($locale = null)
   {
+    if(!$this->config("locale")->getBool('enabled', true))
+    {
+      return $this;
+    }
+
     if($locale == null)
     {
       $locale = (new Locale())->getLocale();
     }
     putenv('LC_ALL=' . $locale);
     setlocale(LC_ALL, $locale);
+    return $this;
   }
 
   /**
@@ -246,11 +250,11 @@ class Loader
   public function getDispatchable()
   {
     $pathParts = explode(".", $this->request()->path());
-    $pathEnd = end($pathParts);
+    $pathEnd   = end($pathParts);
     if($pathEnd === "ico")
     {
       $dispatchImage = new Image($this->getConfig(), new FileSystem());
-      $faviconPath = $dispatchImage->getFaviconPath(
+      $faviconPath   = $dispatchImage->getFaviconPath(
         $this->request()->path(), $this->request()
       );
       $this->request()->setPath($faviconPath);
@@ -271,7 +275,8 @@ class Loader
       );
 
       if($dispatchServe->getResourceDirectory()
-        === $potentialDispatcherDirectory)
+      === $potentialDispatcherDirectory
+      )
       {
         $this->setDispatchable($dispatchServe);
       }
@@ -425,6 +430,8 @@ class Loader
   public function respondToWebRequest()
   {
     $this->init();
+    $this->setLocale();
+
     if(!$this->_failed)
     {
       try
