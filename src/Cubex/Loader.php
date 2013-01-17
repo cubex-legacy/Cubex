@@ -7,6 +7,7 @@ namespace Cubex;
 use Cubex\Cli\CliTask;
 use Cubex\Container\Container;
 use Cubex\Core\Http\DispatchInjection;
+use Cubex\Dispatch\Dependency\Image;
 use Cubex\Dispatch\Dispatcher;
 use Cubex\Dispatch\Fabricate;
 use Cubex\Dispatch\FileSystem;
@@ -210,17 +211,14 @@ class Loader
    */
   public function getDispatchable()
   {
-    /*if($this->request()->path() === "/favicon.ico")
+    if(end(explode(".", $this->request()->path())) === "ico")
     {
-      $prop = new Prop($this->getConfig());
-      $fab  = new Fabricate($this->getConfig());
-
-      $this->request()->setPath(
-        "/" . Dispatcher::getResourceDirectory() . "/" .
-        $fab->getDomainHash($this->request()) . "/" . $prop->getBaseHash() .
-        "/" . $prop->getNomapDescriptor() . "/favicon.ico"
+      $dispatchImage = new Image($this->getConfig(), new FileSystem());
+      $faviconPath = $dispatchImage->getFaviconPath(
+        $this->request()->path(), $this->request()
       );
-    }*/
+      $this->request()->setPath($faviconPath);
+    }
 
     $trimmedPath = ltrim($this->request()->path(), "/");
 
