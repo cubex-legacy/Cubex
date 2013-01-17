@@ -7,7 +7,7 @@ namespace Cubex\Core\Controllers;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Core\Response\Webpage;
-use Cubex\Dispatch\RequireTrait;
+use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Renderable;
 use Cubex\View\Impart;

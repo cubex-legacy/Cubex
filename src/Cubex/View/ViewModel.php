@@ -4,7 +4,7 @@
  */
 namespace Cubex\View;
 
-use Cubex\Dispatch\RequireTrait;
+use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Renderable;
 use Cubex\I18n\Translatable;
