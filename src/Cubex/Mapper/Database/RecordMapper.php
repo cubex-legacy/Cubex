@@ -8,6 +8,7 @@ namespace Cubex\Mapper\Database;
 use Cubex\Container\Container;
 use Cubex\Data\Attribute;
 use Cubex\Database\ConnectionMode;
+use Cubex\Log\Debug;
 use Cubex\Mapper\DataMapper;
 use Cubex\Sprintf\ParseQuery;
 
@@ -35,10 +36,14 @@ class RecordMapper extends DataMapper
   protected $_dbServiceName = 'db';
   protected $_dbTableName;
 
-  public function __construct()
+  public function __construct($id = null, $columns = ['*'])
   {
     parent::__construct();
     $this->_addIdAttribute();
+    if($id !== null)
+    {
+      $this->load($id, $columns);
+    }
   }
 
   protected function _addIdAttribute()
@@ -69,25 +74,31 @@ class RecordMapper extends DataMapper
     }
   }
 
-  public static function load($id, $columns = ['*'])
+  /**
+   * @param       $id
+   * @param array $columns
+   *
+   * @return static
+   * @throws \Exception
+   */
+  public function load($id, $columns = ['*'])
   {
     /**
-     * @var $mapper self
+     * @var $this self
      */
-    $mapper = new static;
-    $mapper->setExists(false);
-    $pattern = $mapper->_idPattern();
+    $this->setExists(false);
+    $pattern = $this->_idPattern();
     $pattern = 'SELECT %LC FROM %T WHERE ' . $pattern;
 
-    $connection = $mapper->connection(
+    $connection = $this->connection(
       new ConnectionMode(ConnectionMode::READ)
     );
 
     $args = array(
       $pattern,
       $columns,
-      $mapper->getTableName(),
-      $mapper->getIDKey(),
+      $this->getTableName(),
+      $this->getIDKey(),
       $id,
     );
 
@@ -96,16 +107,16 @@ class RecordMapper extends DataMapper
     $rows = $connection->getRows($query);
     if(!$rows)
     {
-      $set = "set" . $mapper->getIDKey();
-      $mapper->$set($id);
+      $set = "set" . $this->getIDKey();
+      $this->$set($id);
     }
     else
     {
       if(count($rows) == 1)
       {
         $row = $rows[0];
-        $mapper->hydrate((array)$row);
-        $mapper->setExists(true);
+        $this->hydrate((array)$row);
+        $this->setExists(true);
       }
       else
       {
@@ -113,7 +124,7 @@ class RecordMapper extends DataMapper
       }
     }
 
-    return $mapper;
+    return $this;
   }
 
   /**
@@ -231,5 +242,77 @@ class RecordMapper extends DataMapper
   public function composeID( /*$key1,$key2*/)
   {
     return implode("|", func_get_args());
+  }
+
+
+  /**
+   * @return mixed
+   */
+  public function saveChanges()
+  {
+    $connection = $this->connection(new ConnectionMode(ConnectionMode::WRITE));
+    $modified   = $this->getModifiedAttributes();
+    $updates    = $inserts = array();
+
+    foreach($modified as $attr)
+    {
+      if($attr instanceof Attribute)
+      {
+        if($attr->isModified())
+        {
+          $inserts[$attr->name()] = $attr->serialize();
+          $updates[]              = ParseQuery::parse(
+            $connection,
+            array("%C = %ns", $attr->name(), $attr->serialize())
+          );
+          $attr->unsetModified();
+        }
+      }
+    }
+
+    if(empty($updates))
+    {
+      return true;
+    }
+
+    if(!$this->exists())
+    {
+      $pattern = 'INSERT INTO %T (%LC) VALUES(%Ls)';
+
+      $args = array(
+        $this->getTableName(),
+        array_keys($inserts),
+        array_values($inserts),
+      );
+
+      if($this->id() !== null)
+      {
+        $pattern .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
+        $pattern .= ' WHERE ' . $this->_idPattern();
+        $args[] = $this->getIDKey();
+        $args[] = $this->id();
+      }
+
+      array_unshift($args, $pattern);
+    }
+    else
+    {
+      $pattern = 'UPDATE %T SET ' .
+      implode(', ', $updates) .
+      ' WHERE ' . $this->_idPattern();
+
+      $args = array(
+        $pattern,
+        $this->getTableName(),
+        $this->getIDKey(),
+        $this->id(),
+      );
+    }
+
+    $query = ParseQuery::parse($connection, $args);
+
+    Debug::info("Query Executed: " . $query);
+
+    return $connection->query($query);
   }
 }
