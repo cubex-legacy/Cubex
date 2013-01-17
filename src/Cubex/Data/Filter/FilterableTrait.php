@@ -55,8 +55,9 @@ trait FilterableTrait
 
       if(is_callable($filter))
       {
-        $params = array_unshift($options, $value);
-        $value  = call_user_func($filter, $params);
+        $params = $options;
+        array_unshift($params, $value);
+        $value = call_user_func_array($filter, $params);
         continue;
       }
       else if(is_scalar($filter))
