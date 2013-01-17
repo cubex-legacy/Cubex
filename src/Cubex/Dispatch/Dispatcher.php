@@ -229,6 +229,13 @@ class Dispatcher
    */
   public function generateEntityHash($entity, $length = 6)
   {
+    $baseEntity = $this->getProjectNamespace() . "/";
+    $baseEntity .= $this->getResourceDirectory();
+    if($entity === $baseEntity)
+    {
+      return $this->getBaseHash();
+    }
+
     return substr(md5($entity), 0, $length);
   }
 
