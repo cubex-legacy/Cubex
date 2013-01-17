@@ -359,7 +359,7 @@ class Dispatcher
       self::$_entities = $entities = $mapper->findEntities();
     }
 
-    foreach($entities as $entity)
+    foreach(self::$_entities as $entity)
     {
       if($this->generateEntityHash($entity, strlen($hash)) === $hash)
       {
