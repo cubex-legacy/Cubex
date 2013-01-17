@@ -336,8 +336,6 @@ class Dispatcher
   }
 
   /**
-   * // TODO need to decouple this method from the mapper
-   *
    * We don't really want to do this, but it's for times that an entityHash has
    * come through that isn't in our map and we want to try and find it on the
    * fly. Once this request is over it should get cached seeing as it thinks
@@ -347,13 +345,13 @@ class Dispatcher
    * the method to call it's self recursively.
    *
    * @param string $hash
+   * @param Mapper $mapper
    *
    * @return null|string
    */
-  public function findEntityFromHash($hash)
+  public function findEntityFromHash($hash, Mapper $mapper)
   {
-    $entities = (new Mapper($this->getConfig(), $this->getFileSystem()))
-      ->findEntities();
+    $entities = $mapper->findEntities();
 
     foreach($entities as $entity)
     {
@@ -437,7 +435,8 @@ class Dispatcher
     $entityMap    = false;
     $resourceHash = $this->getNomapHash();
 
-    $entity = $this->findEntityFromHash($entityHash);
+    $mapper = new Mapper($this->getConfig(), $this->getFileSystem());
+    $entity = $this->findEntityFromHash($entityHash, $mapper);
     if($entity)
     {
       $entityMap = $this->getDispatchIni($entity);

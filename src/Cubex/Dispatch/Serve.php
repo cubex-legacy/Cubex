@@ -172,8 +172,9 @@ class Serve extends Dispatcher implements Dispatchable
     $data = "";
     $entityMap = false;
 
+    $mapper = new Mapper($this->getConfig(), $this->getFileSystem());
     $entity = $this->findEntityFromHash(
-      $this->getDispatchPath()->getEntityHash()
+      $this->getDispatchPath()->getEntityHash(), $mapper
     );
     if($entity)
     {
