@@ -2,262 +2,239 @@
 /**
  * @author: gareth.evans
  */
-namespace Cubex\Dispatch;
+ namespace Cubex\Dispatch;
 
-use Cubex\Foundation\Config\Config;
+use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
-use Cubex\Foundation\Config\Configurable;
 
-abstract class Dispatcher implements Configurable
+class Dispatcher
 {
   use ConfigTrait;
 
-  protected static $_resourceDirectory = "res";
-  protected static $_baseHash = "esabot";
-  protected static $_nomapDescriptor = "pamon";
-
-  protected $_entityMap = [];
+  private $_fileSystem;
+  private $_domainMap;
+  private $_entityMap;
+  private $_dispatchIniFilename;
+  private $_resourceDirectory;
+  private $_projectNamespace;
+  private $_projectBase;
+  private $_baseHash = "esabot";
+  private $_nomapHash = "pamon";
+  private $_supportedTypes = [
+    'ico' => 'image/x-icon',
+    'css' => 'text/css; charset=utf-8',
+    'js'  => 'text/javascript; charset=utf-8',
+    'png' => 'image/png',
+    'jpg' => 'image/jpg',
+    'gif' => 'image/gif',
+    'swf' => 'application/x-shockwave-flash',
+  ];
+  private $_dispatchInis = [];
 
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
+   * @param FileSystem                           $fileSystem
    */
-  public function __construct(ConfigGroup $configGroup)
+  public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
+    if(!defined("DS")) define("DS", DIRECTORY_SEPARATOR);
+
     $this->configure($configGroup);
-  }
 
-  /**
-   * @param $resourceDirectory
-   */
-  public static function setResourceDirectory($resourceDirectory)
-  {
-    self::$_resourceDirectory = $resourceDirectory;
-  }
+    $dispatchConfig = $this->config("dispatch");
+    $projectConfig  = $this->config("project");
+    $cubexConfig    = $this->config("_cubex_");
 
-  /**
-   * @return string
-   */
-  public static function getResourceDirectory()
-  {
-    return self::$_resourceDirectory;
-  }
+    $this->_domainMap  = $dispatchConfig->getArr("domain_map", []);
+    $this->_entityMap  = $dispatchConfig->getArr("entity_map", []);
+    $this->_fileSystem = $fileSystem;
 
-  /**
-   * @param $baseHash
-   */
-  public static function setBaseHash($baseHash)
-  {
-    self::$_baseHash = $baseHash;
-  }
-
-  /**
-   * @return string
-   */
-  public static function getBaseHash()
-  {
-    return self::$_baseHash;
-  }
-
-  /**
-   * @param $nomapDescriptor
-   */
-  public static function setNomapDescriptor($nomapDescriptor)
-  {
-    self::$_nomapDescriptor = $nomapDescriptor;
-  }
-
-  /**
-   * @return string
-   */
-  public static function getNomapDescriptor()
-  {
-    return self::$_nomapDescriptor;
-  }
-
-  /**
-   * @return \Cubex\Foundation\Config\Config|mixed
-   */
-  protected function _getCubexConfig()
-  {
-    return $this->getConfig()->get("_cubex_");
-  }
-
-  /**
-   * @return \Cubex\Foundation\Config\Config|mixed
-   */
-  protected function _getProjectConfig()
-  {
-    return $this->getConfig()->get("project");
-  }
-
-  /**
-   * @return \Cubex\Foundation\Config\Config|mixed
-   */
-  protected function _getDispatchConfig()
-  {
-    return $this->getConfig()->get("dispatch");
-  }
-
-  /**
-   * @param $entityPath
-   *
-   * @return string
-   */
-  protected function _generateEntityHash($entityPath)
-  {
-    return substr(md5($entityPath), 0, 6);
-  }
-
-  /**
-   * @param \Cubex\Foundation\Config\Config $cubexConfig
-   *
-   * @return string
-   */
-  public function getProjectBasePath(Config $cubexConfig = null)
-  {
-    if($cubexConfig === null)
-    {
-      $cubexConfig = $this->_getCubexConfig();
-    }
-
-    return $cubexConfig->getStr("project_base", "..") . DS;
-  }
-
-  /**
-   * @param \Cubex\Foundation\Config\Config $projectConfig
-   *
-   * @return mixed|null
-   */
-  public function getProjectNamespace(Config $projectConfig = null)
-  {
-    if($projectConfig === null)
-    {
-      $projectConfig = $this->_getProjectConfig();
-    }
-
-    return $projectConfig->getStr("namespace", "Project");
-  }
-
-  /**
-   * @return string
-   */
-  public function getNamespaceRoot()
-  {
-    return $this->getProjectBasePath() . $this->getProjectNamespace() . DS;
-  }
-
-  /**
-   * @param $directory
-   *
-   * @return array
-   */
-  protected function _mapDirectory($directory)
-  {
-    $directoryMap = [];
-
-    try
-    {
-      if($handle = @opendir($directory))
-      {
-        while(false !== ($dirName = readdir($handle)))
-        {
-          $directoryMap[] = $dirName;
-        }
-      }
-    }
-    catch(\Exception $e)
-    {
-      // Unable to open directory (probably)
-      if(isset($handle))
-      {
-        closedir($handle);
-      }
-    }
-
-    return $directoryMap;
-  }
-
-  /**
-   * @param $filename
-   *
-   * @return array
-   */
-  public function getAllFilenamesOrdered($filename)
-  {
-    $filenameParts = explode(".", $filename);
-    $filenameExtension = array_pop($filenameParts);
-    $filenameName = implode(".", $filenameParts);
-
-    return array(
-      "pre"  => "{$filenameName}.pre.{$filenameExtension}",
-      "main" => "{$filenameName}.{$filenameExtension}",
-      "post" => "{$filenameName}.post.{$filenameExtension}"
+    $this->_dispatchIniFilename = $dispatchConfig->getStr(
+      "dispatch_ini_filename", "dispatch.ini"
+    );
+    $this->_resourceDirectory   = $dispatchConfig->getStr(
+      "resource_directory", "res"
+    );
+    $this->_projectNamespace    = $projectConfig->getStr(
+      "namespace", "Project"
+    );
+    $this->_projectBase         = $this->getFileSystem()->resolvePath(
+      $cubexConfig->getStr("project_base", "..")
     );
   }
 
   /**
-   * @param        $match
-   * @param string $path
-   * @param int    $depth
-   *
-   * @return null|string
+   * @return array
    */
-  public function locateEntityPath($match, $path = "", $depth = 0)
+  public function getDomainMap()
   {
-    $base = $this->getProjectBasePath();
-    $matchLen = strlen($match);
+    return $this->_domainMap;
+  }
 
-    $path = str_replace("\\", "/", $path);
-    $resourceDir = self::getResourceDirectory();
-    $directoryMap = $this->_mapDirectory($base . $path);
+  /**
+   * @return array
+   */
+  public function getEntityMap()
+  {
+    return $this->_entityMap;
+  }
 
-    foreach($directoryMap as $filename)
+  /**
+   * @return FileSystem
+   */
+  public function getFileSystem()
+  {
+    return $this->_fileSystem;
+  }
+
+  /**
+   * @return string
+   */
+  public function getDispatchIniFilename()
+  {
+    return $this->_dispatchIniFilename;
+  }
+
+  /**
+   * @return string
+   */
+  public function getResourceDirectory()
+  {
+    return $this->_resourceDirectory;
+  }
+
+  /**
+   * @return string
+   */
+  public function getProjectNamespace()
+  {
+    return $this->_projectNamespace;
+  }
+
+  /**
+   * @return string
+   */
+  public function getProjectBase()
+  {
+    return $this->_projectBase;
+  }
+
+  /**
+   * @return string
+   */
+  public function getProjectPath()
+  {
+    return $this->getProjectBase() . DS . $this->getProjectNamespace();
+  }
+
+  /**
+   * @return string
+   */
+  public function getBaseHash()
+  {
+    return $this->_baseHash;
+  }
+
+  /**
+   * @return string
+   */
+  public function getNomapHash()
+  {
+    return $this->_nomapHash;
+  }
+
+  /**
+   * @return array
+   */
+  public function getSupportedTypes()
+  {
+    return $this->_supportedTypes;
+  }
+
+  /**
+   * @param $entityHash
+   *
+   * @return string
+   */
+  public function getEntityPathByHash($entityHash)
+  {
+    if($entityHash === $this->getBaseHash())
     {
-      if(substr($filename, 0, 1) === ".") continue;
-
-      $matchCheck = substr(
-        md5(ltrim($path . "/" . $filename . "/" . $resourceDir, "/")),
-        0,
-        $matchLen
-      );
-
-      if($matchCheck === $match)
-      {
-        return $path . "/" . $filename . "/" . $resourceDir;
-      }
-      else if($depth === 2)
-      {
-        $oldPath = $path;
-        if(!stristr($path, "/")) $path = "/$path";
-        list(, $path) = explode("/", $path, 2);
-
-        $matchCheck = substr(
-          md5($path . "/" . $filename . "/" . $resourceDir), 0, $matchLen
-        );
-
-        if($matchCheck === $match)
-        {
-          return $path . "/" . $filename . "/" . $resourceDir;
-        }
-
-        $path = $oldPath;
-      }
-
-      if($depth < 2 && is_dir($base . $path . DS . $filename))
-      {
-        $matched = $this->locateEntityPath(
-          $match, $path . (empty($path) ? '' : DS) . $filename, ++$depth
-        );
-
-        if($matched !== null)
-        {
-          return $matched;
-        }
-      }
+      return $this->getProjectNamespace(). "/" . $this->getResourceDirectory();
     }
+    else if(array_key_exists($entityHash, $this->getEntityMap()))
+    {
+      return $this->getEntityMap()[$entityHash];
+    }
+    else
+    {
+      $path = $this->findEntityFromHash($entityHash);
 
-    return null;
+      if($path === null)
+      {
+        return rawurldecode($entityHash);
+      }
+
+      return $path;
+    }
+  }
+
+  /**
+   * This will expand a filename and return an array of filenames that may get
+   * included. This is for rendering resources before and after the main file
+   *
+   * @param $filename
+   *
+   * @return array
+   */
+  public function getRelatedFilenamesOrdered($filename)
+  {
+    $fileParts = explode(".", $filename);
+    $fileExtension = array_pop($fileParts);
+    $filename = implode(".", $fileParts);
+
+    return array(
+      "pre"  => "{$filename}.pre.{$fileExtension}",
+      "main" => "{$filename}.{$fileExtension}",
+      "post" => "{$filename}.post.{$fileExtension}"
+    );
+  }
+
+  /*****************************************************************************
+   * The methods below do a little more than the mass of getters above
+   */
+
+  /**
+   * @param string $entity
+   * @param int    $length
+   *
+   * @return string
+   */
+  public function generateEntityHash($entity, $length = 6)
+  {
+    return substr(md5($entity), 0, $length);
+  }
+
+  /**
+   * @param string $domain
+   * @param int    $length
+   *
+   * @return string
+   */
+  public function generateDomainHash($domain, $length = 6)
+  {
+    return substr(md5($domain), 0, $length);
+  }
+
+  /**
+   * @param string $resource
+   *
+   * @return string
+   */
+  public function generateResourceHash($resource, $length = 10)
+  {
+    return \substr($resource, 0, $length);
   }
 
   /**
@@ -273,30 +250,233 @@ abstract class Dispatcher implements Configurable
   }
 
   /**
-   * @param $entityHash
+   * @param string $entity
+   *
+   * @return array
+   */
+  public function getDispatchIni($entity)
+  {
+    if(!array_key_exists($entity, $this->_dispatchInis))
+    {
+      $fullEntityPath = $this->getProjectBase() . DS . $entity;
+
+      $this->_dispatchInis[$entity] =  @parse_ini_file(
+        $fullEntityPath . DS . $this->getDispatchIniFilename(), false
+      );
+    }
+
+    return $this->_dispatchInis[$entity];
+  }
+
+  /**
+   * Will read the filename, and all pre/post/related files from the direcotry
+   * returning as a concatonated string
+   *
+   * @param string $directory
+   * @param string $filename
+   *
+   * @return string
+   */
+  public function getFileMerge($directory, $filename)
+  {
+    $contents = "";
+
+    foreach($this->getRelatedFilenamesOrdered($filename) as $relatedFilename)
+    {
+      $relatedFilePath = $directory . DS . $relatedFilename;
+      if($this->getFileSystem()->fileExists($relatedFilePath))
+      {
+        try
+        {
+          $content = $this->getFileSystem()->readFile($relatedFilePath);
+        }
+        catch(\Exception $e)
+        {
+          // We don't bubble this at the moment, might log it if the logger is
+          // available
+          $content = "";
+        }
+
+        $contents .= $content;
+      }
+    }
+
+    return $contents;
+  }
+
+  /**
+   * // TODO need to decouple this method from the mapper
+   *
+   * We don't really want to do this, but it's for times that an entityHash has
+   * come through that isn't in our map and we want to try and find it on the
+   * fly. Once this request is over it should get cached seeing as it thinks
+   * it's in a map so no big deal.
+   *
+   * When you call it we only really want the hash, the path and depth are for
+   * the method to call it's self recursively.
+   *
+   * @param string $hash
    *
    * @return null|string
    */
-  public function getEntityPathByHash($entityHash)
+  public function findEntityFromHash($hash)
   {
-    if($entityHash === self::getBaseHash())
-    {
-      return $this->getProjectNamespace(). "/" . self::getResourceDirectory();
-    }
-    else if(array_key_exists($entityHash, $this->_entityMap))
-    {
-      return $this->_entityMap[$entityHash];
-    }
-    else
-    {
-      $path = $this->locateEntityPath($entityHash);
+    $entities = (new Mapper($this->getConfig(), $this->getFileSystem()))
+      ->findEntities();
 
-      if($path === null)
+    foreach($entities as $entity)
+    {
+      if($this->generateEntityHash($entity, strlen($hash)) === $hash)
       {
-        return rawurldecode($entityHash);
+        return $entity;
       }
-
-      return $path;
     }
+
+    return null;
+  }
+
+  /**
+   * Does what it says on the tin, for the specified resource type the data gets
+   * minified (all the shit removed)
+   *
+   * @param string $data
+   * @param string $fileExtension
+   *
+   * @return string
+   */
+  public function minifyData($data, $fileExtension)
+  {
+    if(\strpos($data, '@' . 'do-not-minify') !== false)
+    {
+      return $data;
+    }
+
+    switch($fileExtension)
+    {
+      case 'css':
+        // Remove comments.
+        $data = preg_replace('@/\*.*?\*/@s', '', $data);
+        // Remove whitespace around symbols.
+        $data = preg_replace('@\s*([{}:;,])\s*@', '\1', $data);
+        // Remove unnecessary semicolons.
+        $data = preg_replace('@;}@', '}', $data);
+        // Replace #rrggbb with #rgb when possible.
+        $data = preg_replace(
+          '@#([a-f0-9])\1([a-f0-9])\2([a-f0-9])\3@i', '#\1\2\3', $data
+        );
+        $data = trim($data);
+        break;
+      case 'js':
+        //Strip Comments
+        $data = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $data);
+        $data = preg_replace('!^([\t ]+)?\/\/.+$!m', '', $data);
+        //remove tabs, spaces, newlines, etc.
+        $data = str_replace(array("\t"), ' ', $data);
+        $data = str_replace(
+          array("\r\n", "\r", "\n", '  ', '    ', '    '), '', $data
+        );
+        break;
+    }
+
+    return $data;
+  }
+
+  /**
+   * @param string $uri
+   * @param string $entityHash
+   * @param string $domainHash
+   *
+   * @return string
+   */
+  public function dispatchUri($uri, $entityHash, $domainHash)
+  {
+    $uri = trim($uri, "'\" \r\t\n");
+
+    if($this->isExternalUri($uri))
+    {
+      return $uri;
+    }
+
+    if(substr($uri, 0, 1) === "/")
+    {
+      $uri        = substr($uri, 1);
+      $entityHash = $this->getBaseHash();
+    }
+
+    $entityMap    = false;
+    $resourceHash = $this->getNomapHash();
+
+    $entity = $this->findEntityFromHash($entityHash);
+    if($entity)
+    {
+      $entityMap = $this->getDispatchIni($entity);
+    }
+
+    if($entityMap)
+    {
+      if(isset($entityMap[$uri]))
+      {
+        $resourceHash = $this->generateResourceHash($entityMap[$uri]);
+      }
+    }
+
+    $pathToResource = $this->addRootResourceDirectory($uri);
+
+    $dispatchPath = Path::fromParams(
+      $this->getResourceDirectory(),
+      $domainHash,
+      $entityHash,
+      $resourceHash,
+      $pathToResource
+    );
+
+    return $dispatchPath->getDispatchPath();
+  }
+
+  /**
+   * Determine if a resource is external
+   *
+   * @param $uri
+   *
+   * @return bool
+   */
+  public function isExternalUri($uri)
+  {
+    foreach(["http://", "https://", "//", "data:"] as $protocol)
+    {
+      if(strpos($uri, $protocol) === 0)
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * @param string $uri
+   *
+   * @return string
+   */
+  public function addRootResourceDirectory($uri)
+  {
+    $uriParts = explode(".", $uri);
+    $fileExtension = end($uriParts);
+    switch($fileExtension)
+    {
+      case "css":
+        $uri = "css/$uri";
+        break;
+      case "js":
+        $uri = "js/$uri";
+        break;
+      case "ico":
+        break;
+      default:
+        $uri = "img/$uri";
+        break;
+    }
+
+    return $uri;
   }
 }

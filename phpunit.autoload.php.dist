@@ -1,6 +1,9 @@
 <?php
 namespace Cubex\Tests;
 
+// Little hack so that we get lovely web based things
+$_SERVER['DOCUMENT_ROOT'] = __DIR__ . DIRECTORY_SEPARATOR . 'src';
+
 define('PHP_START', microtime(true));
 
 $autoLoader = require 'vendor/autoload.php';
@@ -9,7 +12,9 @@ $cubex = new \Cubex\Loader($autoLoader);
 $configArray = \Cubex\Foundation\Config\ConfigGroup::fromArray(
   array(
     "project" => array(
-      "source" => "src", "namespace" => "", "environment" => "development"
+      "source" => "src",
+      "namespace" => "Project",
+      "environment" => "development"
     ),
     "response" => array("minify_html" => false),
   )
@@ -26,4 +31,4 @@ class Transport
 }
 
 Transport::$data[Transport::CUBEX] = $cubex;
-Transport::$data[Transport::CONFIG_GROUP] = $configArray;
+Transport::$data[Transport::CONFIG_GROUP] = $cubex->getConfig();

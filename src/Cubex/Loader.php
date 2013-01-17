@@ -7,8 +7,11 @@ namespace Cubex;
 use Cubex\Cli\CliTask;
 use Cubex\Container\Container;
 use Cubex\Core\Http\DispatchInjection;
+use Cubex\Dispatch\Dependency\Image;
 use Cubex\Dispatch\Dispatcher;
 use Cubex\Dispatch\Fabricate;
+use Cubex\Dispatch\FileSystem;
+use Cubex\Dispatch\Path;
 use Cubex\Dispatch\Prop;
 use Cubex\Dispatch\Serve;
 use Cubex\Foundation\Config\Config;
@@ -242,16 +245,13 @@ class Loader
    */
   public function getDispatchable()
   {
-    if($this->request()->path() === "/favicon.ico")
+    if(end(explode(".", $this->request()->path())) === "ico")
     {
-      $prop = new Prop($this->getConfig());
-      $fab  = new Fabricate($this->getConfig());
-
-      $this->request()->setPath(
-        "/" . Dispatcher::getResourceDirectory() . "/" .
-        $fab->getDomainHash($this->request()) . "/" . $prop->getBaseHash() .
-        "/" . $prop->getNomapDescriptor() . "/favicon.ico"
+      $dispatchImage = new Image($this->getConfig(), new FileSystem());
+      $faviconPath = $dispatchImage->getFaviconPath(
+        $this->request()->path(), $this->request()
       );
+      $this->request()->setPath($faviconPath);
     }
 
     $trimmedPath = ltrim($this->request()->path(), "/");
@@ -262,19 +262,16 @@ class Loader
         "/", $trimmedPath, 2
       );
 
-      if(Dispatcher::getResourceDirectory() === $potentialDispatcherDirectory)
+      $dispatchServe = new Serve(
+        $this->getConfig(),
+        new FileSystem(),
+        new Path($this->request()->path())
+      );
+
+      if($dispatchServe->getResourceDirectory()
+        === $potentialDispatcherDirectory)
       {
-        $config = $this->getConfig()->get("dispatch", new Config());
-        $this->setDispatchable(
-          new Serve(
-            str_replace(
-              "/" . Dispatcher::getResourceDirectory() . "/", "",
-              $this->request()->path()
-            ),
-            $config->getArr("entity_map", []),
-            $config->getArr("domain_map", [])
-          )
-        );
+        $this->setDispatchable($dispatchServe);
       }
     }
 

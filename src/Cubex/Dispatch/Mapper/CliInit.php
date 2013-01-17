@@ -3,12 +3,14 @@
  * @author: gareth.evans
  */
 namespace Cubex\Dispatch\Mapper;
+
+use Cubex\Dispatch\FileSystem;
 use Cubex\Loader;
 
 class CliInit
 {
   public function __construct(Loader $loader)
   {
-    Cli::initFromConfig($loader->getConfig());
+    new Cli($loader->getConfig(), new FileSystem());
   }
 }

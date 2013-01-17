@@ -2,6 +2,7 @@
   <php>
     <env name="CUBEX_ENV" value="development" />
     <env name="CUBEX_UNITTEST" value="true" />
+    <ini name="display_errors" value="-1"/>
   </php>
 
   <testsuites>

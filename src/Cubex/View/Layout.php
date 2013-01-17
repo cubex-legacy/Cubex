@@ -7,7 +7,7 @@ namespace Cubex\View;
 
 use Cubex\Core\Interfaces\DirectoryAware;
 use Cubex\Core\Interfaces\NamespaceAware;
-use Cubex\Dispatch\RequireTrait;
+use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Foundation\Renderable;
 use Cubex\I18n\TranslateTraits;
 

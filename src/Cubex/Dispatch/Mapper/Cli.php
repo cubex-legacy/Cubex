@@ -5,33 +5,76 @@
 namespace Cubex\Dispatch\Mapper;
 
 use Cubex\Cli\Shell;
+use Cubex\Dispatch\FileSystem;
 use Cubex\Dispatch\Mapper;
 use Cubex\Foundation\Config\ConfigGroup;
 
 class Cli extends Mapper
 {
-  /**
-   * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
-   * @param string                               $projectNamespace
-   * @param string                               $projectBasePath
-   * @param array                                $entityMap
-   */
-  public function __construct(ConfigGroup $configGroup, $projectNamespace,
-                              $projectBasePath, array $entityMap = array())
+  public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
-    parent::__construct(
-      $configGroup, $projectNamespace, $projectBasePath, $entityMap
-    );
+    parent::__construct($configGroup, $fileSystem);
 
     $this->_startMapper();
-    $this->_run();
-    $this->_completeMapper($this->getRecommendedProjectIni());
+
+    echo Shell::colourText("Using Path: ", Shell::COLOUR_FOREGROUND_CYAN);
+    echo $this->getProjectPath() . "\n\n";
+    echo Shell::colourText(
+      "=======================================\n\n",
+      Shell::COLOUR_FOREGROUND_DARK_GREY
+    );
+    echo Shell::colourText("Processing ", Shell::COLOUR_FOREGROUND_CYAN) . "\n";
+
+    $entities = $this->findEntities();
+    $maps = $this->mapEntities($entities);
+    $savedMaps = $this->saveMaps($maps);
+
+    $recommendedIni = [];
+    foreach($entities as $entity)
+    {
+      $entityHash = $this->generateEntityHash($entity);
+      if(!array_key_exists($entityHash, $this->getEntityMap()))
+      {
+        $recommendedIni[] = "entity_map[$entityHash] = $entity\n";
+      }
+    }
+
+    $this->_completeMapper($recommendedIni);
   }
 
-  /**
-   *
+  public function mapEntity($entity)
+  {
+    echo Shell::colourText(
+      "     Found ", Shell::COLOUR_FOREGROUND_LIGHT_CYAN
+    );
+    echo Shell::colourText(
+      $this->generateEntityHash($entity), Shell::COLOUR_FOREGROUND_PURPLE
+    );
+    echo " $entity\n";
+    echo "           Mapping Directory:   ";
+    flush();
+
+    $mapped = parent::mapEntity($entity);
+    $numMapped = count($mapped);
+    echo $this->_getResult($numMapped > 0);
+
+    return $mapped;
+  }
+
+  public function saveMap(array $map, $entity)
+  {
+    echo "           Saving Dispatch Map: ";
+
+    $saved = parent::saveMap($map, $entity);
+
+    echo $this->_getResult($saved);
+  }
+
+  /*****************************************************************************
+   * Cli Start and finish methods, and a helper, not mapper specific
    */
-  protected function _startMapper()
+
+  private function _startMapper()
   {
     echo \str_repeat("\n", 100);
 
@@ -50,12 +93,9 @@ _  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
     echo Shell::colourText("\n$mapper\n\n", Shell::COLOUR_FOREGROUND_LIGHT_RED);
   }
 
-  /**
-   * @param array $recommendedProjectIni
-   */
-  protected function _completeMapper(array $recommendedProjectIni)
+  private function _completeMapper(array $recommendedIni)
   {
-    if(count($recommendedProjectIni))
+    if(count($recommendedIni))
     {
       echo "\n\n";
 
@@ -65,10 +105,10 @@ _  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
       echo "the Dispatch section of " . CUBEX_ENV . ".ini\n";
 
       echo "\n[dispatch]\n";
-      foreach($recommendedProjectIni as $recommendedProjectIniLine)
+      foreach($recommendedIni as $recommendedIniLine)
       {
         echo Shell::colourText(
-          $recommendedProjectIniLine, Shell::COLOUR_FOREGROUND_LIGHT_BLUE
+          $recommendedIniLine, Shell::COLOUR_FOREGROUND_LIGHT_BLUE
         );
       }
     }
@@ -87,12 +127,7 @@ _  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
     echo "\n";
   }
 
-  /**
-   * @param bool $success
-   *
-   * @return string
-   */
-  protected function _getResult($success)
+  private function _getResult($success)
   {
     if($success)
     {
@@ -107,51 +142,5 @@ _  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
       $result .= " ]\n";
     }
     return $result;
-  }
-
-  /**
-   *
-   */
-  protected function _run()
-  {
-    echo Shell::colourText("Using Path: ", Shell::COLOUR_FOREGROUND_CYAN);
-    echo $this->getNamespaceRoot() . "\n\n";
-
-    echo Shell::colourText(
-      "=======================================\n\n",
-      Shell::COLOUR_FOREGROUND_DARK_GREY
-    );
-    echo Shell::colourText("Processing ", Shell::COLOUR_FOREGROUND_CYAN) . "\n";
-
-    $entities = $this->findEntities();
-    $this->mapEntities($entities);
-  }
-
-  public function mapEntity($entity)
-  {
-    echo Shell::colourText(
-      "     Found ", Shell::COLOUR_FOREGROUND_LIGHT_CYAN
-    );
-    echo Shell::colourText(
-      $this->_generateEntityHash($entity), Shell::COLOUR_FOREGROUND_PURPLE
-    );
-    echo " $entity\n";
-    echo "           Mapping Directory:   ";
-    \flush();
-
-    $mapped = parent::mapEntity($entity);
-    $numMapped = count($mapped);
-    echo $this->_getResult($numMapped > 0);
-
-    return $mapped;
-  }
-
-  public function saveMap(array $map, $entity, $filename = "dispatch.ini")
-  {
-    echo "           Saving Dispatch Map: ";
-
-    $saved = parent::saveMap($map, $entity, $filename);
-
-    echo $this->_getResult($saved);
   }
 }

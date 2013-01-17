@@ -2,7 +2,7 @@
 /**
  * @author: gareth.evans
  */
-namespace Cubex\Dispatch;
+namespace Cubex\Dispatch\Dependency\Resource;
 
 use Cubex\Type\Enum;
 

@@ -4,6 +4,7 @@
  */
 namespace Cubex\Dispatch;
 
+use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Events\StdEvent;
 
 class Event extends StdEvent
@@ -81,6 +82,7 @@ class Event extends StdEvent
   public function setNamespace($namespace)
   {
     $this->_namespace = $namespace;
+
     return $this;
   }
 }

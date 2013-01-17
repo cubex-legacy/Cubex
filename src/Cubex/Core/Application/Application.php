@@ -6,7 +6,7 @@ namespace Cubex\Core\Application;
 
 use Cubex\Core\Interfaces\DirectoryAware;
 use Cubex\Core\Interfaces\NamespaceAware;
-use Cubex\Dispatch\ListenerTrait;
+use Cubex\Dispatch\Utils\ListenerTrait;
 use Cubex\Events\Event;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\ConfigTrait;

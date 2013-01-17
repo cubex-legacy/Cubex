@@ -4,88 +4,79 @@
  */
 namespace Cubex\Dispatch;
 
-use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
 
 class Mapper extends Dispatcher
 {
-  protected $_ignoredDirectories = array(".", "..");
-  protected $_ignoredFiles = array(".gitignore", "dispatch.ini");
-
-  protected $_projectNamespace;
-  protected $_projectBasePath;
-  protected $_entityMap = array();
-  protected $_recommendedProjectIni = array();
-
   /**
-   * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
-   * @param string                               $projectNamespace
-   * @param string                               $projectBasePath
-   * @param array                                $entityMap
-   */
-  public function __construct(ConfigGroup $configGroup, $projectNamespace,
-                              $projectBasePath, array $entityMap = array())
-  {
-    parent::__construct($configGroup);
-
-    $this->_projectNamespace = $projectNamespace;
-    $this->_projectBasePath = $projectBasePath;
-    $this->_entityMap = $entityMap;
-  }
-
-  /**
-   * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
+   * The array is keyed with the filename to be ignore and the value is ignored.
+   * This is done for the speed benefit of array_key_exists() over in_array().
    *
-   * @return Mapper
+   * @var array
    */
-  public static function initFromConfig(ConfigGroup $configGroup)
+  private $_ignoredFiles = [];
+
+  public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
-    $calledClass = get_called_class();
+    parent::__construct($configGroup, $fileSystem);
 
-    $cubexConfig = $configGroup->get("_cubex_", new Config());
-    $projectConfig = $configGroup->get("project", new Config());
-    $dispatchConfig = $configGroup->get("dispatch", new Config());
-
-    return new $calledClass(
-      $configGroup,
-      $projectConfig->getStr("namespace", "Project"),
-      $cubexConfig->getStr("project_base", "..") . DS,
-      $dispatchConfig->getArr("entity_map", [])
-    );
+    $this->_ignoredFiles[$this->getDispatchIniFilename()] = true;
   }
 
   /**
-   * @param string $subPath
+   * This will run through all the functionality of the mapper. Find a list of
+   * entities in the current project, map it and save
+   */
+  public function run()
+  {
+    $entities = $this->findEntities();
+    $maps = $this->mapEntities($entities);
+    $savedMaps = $this->saveMaps($maps);
+
+    return [$entities, $maps, $savedMaps];
+  }
+
+  /**
+   * Find all directories in the current project matching the resource
+   * direcotry. The entity is the path inside the project including the project
+   * namespace;
+   *
+   * Full path: /qbex/project/src/Project/Application/Www/res/
+   * Entity path: Project/Application/Www/res
+   *
+   * @var string $entityPath
    *
    * @return array
    */
-  public function findEntities($subPath = '')
+  public function findEntities($entityPath = "")
   {
     $entities = [];
-    $subPath = rtrim($subPath, "/\\") . DS;
-    if($subPath === DS) $subPath = "";
-
-    $directory = $this->getNamespaceRoot() . $subPath;
-    $directoryMap = $this->_mapDirectory($directory);
-
-    foreach($directoryMap as $directoryName)
+    if(!empty($entityPath))
     {
-      $srcDirectory = $directory . $directoryName;
+      $entityPath = $this->getFileSystem()->normalizePath($entityPath);
+    }
 
-      if(substr($directoryName, 0, 1) === ".") continue;
-      if(!is_dir($srcDirectory)) continue;
+    $directory = $this->getProjectPath() . DS . $entityPath;
+    $directoryList = $this->getFileSystem()->listDirectory($directory, false);
 
-      if($directoryName !== $this->getResourceDirectory())
+    foreach($directoryList as $directoryListItem)
+    {
+      if($this->getFileSystem()->isDir($directory . DS . $directoryListItem))
       {
-        $subPathReference = $subPath . $directoryName;
-        $entities = array_merge(
-          $entities,
-          $this->findEntities($subPathReference)
-        );
-      }
-      else
-      {
-        $entities[] = str_replace("\\", "/", $subPath . $directoryName);
+        $newEntityPath = $entityPath . DS . $directoryListItem;
+        if($directoryListItem === $this->getResourceDirectory())
+        {
+          $entities[] = $this->getFileSystem()->normalizePath(
+            $this->getProjectNamespace() . DS . $newEntityPath
+          );
+        }
+        else
+        {
+          $entities = array_merge(
+            $entities,
+            $this->findEntities($newEntityPath)
+          );
+        }
       }
     }
 
@@ -93,29 +84,37 @@ class Mapper extends Dispatcher
   }
 
   /**
-   * @param array $entities
+   * A little helper that maps an array of entities. Returns an array of the
+   * mapped entities' content. It assumes that you don't want empty maps. The
+   * returned array is keyed with the entity string, this is a requirement of
+   * the saveMaps() method.
+   *
+   * @var array $entities
+   *
+   * @return array
    */
   public function mapEntities(array $entities)
   {
+    $mappedEntitiesArr = [];
+
     foreach($entities as $entity)
     {
-      $entity = $this->_projectNamespace . "/" . $entity;
-      if(!$this->isEntityInMap($entity))
-      {
-        $this->addRecommendedEntityMapIni($entity);
-      }
+      $map = $this->mapEntity($entity);
 
-      $mapped = $this->mapEntity($entity);
-
-      if(count($mapped))
+      if(count($map))
       {
-        $this->saveMap($mapped, $entity);
+        $mappedEntitiesArr[$entity] = $map;
       }
     }
+
+    return $mappedEntitiesArr;
   }
 
   /**
-   * @param $entity
+   * Gets an array of mapped entity paths, the value is the md5 of the content
+   * from all related files.
+   *
+   * @param string $entity
    *
    * @return array
    */
@@ -123,28 +122,21 @@ class Mapper extends Dispatcher
   {
     $map = [];
 
-    $directory = $this->getProjectBasePath() . $entity;
-    $directoryMap = $this->_mapDirectory($directory);
+    $directory = $this->getProjectBase() . DS . $entity;
+    $directoryList = $this->getFileSystem()->listDirectory($directory, false);
 
-    foreach($directoryMap as $fileName)
+    foreach($directoryList as $directoryListItem)
     {
-      if($this->shouldMap($fileName))
+      $currentEntity = $entity . DS . $directoryListItem;
+      if($this->getFileSystem()->isDir($directory . DS . $directoryListItem))
       {
-        $fileOrEntity = $entity . DS . $fileName;
-        $file = $this->getProjectBasePath() . $fileOrEntity;
-
-        if(is_dir($file))
-        {
-          $map = \array_merge($map, $this->mapEntity($fileOrEntity));
-        }
-        else
-        {
-          $safeRel       = ltrim(str_replace("\\", "/", $fileOrEntity), "/");
-
-          $map[$safeRel] = md5(
-            $this->_concatAllRelatedContent($entity, $fileOrEntity)
-          );
-        }
+        $map = array_merge($map, $this->mapEntity($currentEntity));
+      }
+      else if(!array_key_exists($directoryListItem, $this->_ignoredFiles))
+      {
+        $map[$this->getFileSystem()->normalizePath($currentEntity)] = md5(
+          $this->_concatAllRelatedFiles($entity, $directoryListItem)
+        );
       }
     }
 
@@ -152,175 +144,129 @@ class Mapper extends Dispatcher
   }
 
   /**
-   * @param $entity
-   */
-  public function addRecommendedEntityMapIni($entity)
-  {
-    $entityHash = $this->_generateEntityHash($entity);
-
-    $this->addRecommendedProjectIni("entity_map[$entityHash] = $entity\n");
-  }
-
-  /**
-   * @param $recommendedProjectIni
-   */
-  public function addRecommendedProjectIni($recommendedProjectIni)
-  {
-    $this->_recommendedProjectIni[] = $recommendedProjectIni;
-  }
-
-  /**
+   * Helper function to save an array of maps, returns an array keyed as the
+   * maps array with a bool to denote the success of saveMap(). The maps array
+   * needs to be generated from the mapEntities() method so that the keys are
+   * the reated entity.
+   *
+   * @param array $maps
+   *
    * @return array
    */
-  public function getRecommendedProjectIni()
+  public function saveMaps(array $maps)
   {
-    return $this->_recommendedProjectIni;
+    $mapResult = [];
+
+    foreach($maps as $entity => $map)
+    {
+      $mapResult[$entity] = $this->saveMap($map, $entity);
+    }
+
+    return $mapResult;
   }
 
   /**
-   * @param $entity
+   * @param array  $map
+   * @param string $entity
    *
    * @return bool
    */
-  public function isEntityInMap($entity)
+  public function saveMap(array $map, $entity)
   {
-    $entityHash = $this->_generateEntityHash($entity);
+    $toMap = "";
 
-    if(!array_key_exists($entityHash, $this->_entityMap))
+    // We only key the map from inside the resource directory, so we explode on
+    // it to get the second part
+    foreach($map as $file => $checksum)
     {
-      return false;
+      $file = explode("/" . $this->getResourceDirectory() . "/", $file, 2)[1];
+      $toMap .= "$file = \"$checksum\"\n";
+    }
+
+    $dispatchFile = $this->getProjectBase() . DS . $entity . DS .
+      $this->getDispatchIniFilename();
+
+    try
+    {
+      $existingMd5 = md5($this->getFileSystem()->readFile($dispatchFile));
+    }
+    catch(\Exception $e)
+    {
+      // Seems we don't have one yet, let just set an emtyp string md5
+      $existingMd5 = md5("");
+    }
+
+    if($existingMd5 !== md5($toMap))
+    {
+      try
+      {
+        $this->getFileSystem()->writeFile($dispatchFile, $toMap);
+      }
+      catch(\Exception $e)
+      {
+        // Failed writing to file, can't win them all... Maybe worth logging if
+        // logger is available
+        return false;
+      }
     }
 
     return true;
   }
 
-  /**
-   * @param $fileName
-   *
-   * @return bool
+  /*****************************************************************************
+   * Private functions for finding all branding directories and all the related
+   * files from within (pre, post etc...)
    */
-  public function shouldMap($fileName)
-  {
-    $shouldMap = true;
-
-    $ignoredFilenameEntries = array_merge(
-      $this->_ignoredDirectories, $this->_ignoredFiles
-    );
-
-    if(in_array($fileName, $ignoredFilenameEntries))
-    {
-      $shouldMap = false;
-    }
-
-    if(\substr($fileName, 0, 1) == '.')
-    {
-      $shouldMap = false;
-    }
-
-    return $shouldMap;
-  }
 
   /**
-   * @param $entity
-   * @param $filename
+   * Returns a concatenated string of the content from all the files related to
+   * the passed file.
+   *
+   * @param string $entity
+   * @param string $filename
    *
    * @return string
    */
-  protected function _concatAllRelatedContent($entity, $filename)
+  private function _concatAllRelatedFiles($entity, $filename)
   {
-    $content = '';
-    $brandDirectories = $this->_getBrandDirectoryList(
-      $this->getNamespaceRoot()
-    );
-    $filenames = $this->getAllFilenamesOrdered($filename);
+    $contents           = "";
+    $directory          = $this->getProjectBase() . DS . $entity;
+    $brandDirectories   = $this->_getBrandDirectoryList($directory);
+    $brandDirectories[] = $this->getProjectBase() . DS . $entity;
 
-    $brandDirectories[] = $this->getProjectBasePath();
-
-    foreach($brandDirectories as $directory)
+    foreach($brandDirectories as $brandDirectory)
     {
-      foreach($filenames as $possibleFilename)
-      {
-        $currentFileRef = $directory . $possibleFilename;
-        if(file_exists($currentFileRef))
-        {
-          $content .= file_get_contents($currentFileRef);
-        }
-      }
+      $contents .= $this->getFileMerge($brandDirectory, $filename);
     }
 
-    return $content;
+    return $contents;
   }
 
   /**
+   * Gets a list of paths where the directory starts with a ".", dispatch sees
+   * these as brand specific directories.
+   *
    * @param $directory
    *
    * @return array
    */
-  protected function _getBrandDirectoryList($directory)
+  private function _getBrandDirectoryList($directory)
   {
-    $directories = array();
+    $directories = [];
 
-    $directoryMap = $this->_mapDirectory($directory);
+    $directoryList = $this->getFileSystem()->listDirectory($directory);
 
-    foreach($directoryMap as $directoryName)
+    foreach($directoryList as $directoryListItem)
     {
-      $fullPath = $directory . DS . $directoryName;
+      $brandDirectory = $directory . DS . $directoryListItem;
 
-      if(\is_dir($fullPath) && \substr($directoryName, 0, 1) === '.')
+      if($this->getFileSystem()->isDir($brandDirectory)
+        && strncmp($brandDirectory, ".", 1) === 0)
       {
-        if(!in_array($directoryName, $this->_ignoredDirectories))
-        {
-          $directories[] = $directoryName;
-        }
+        $directories[] = $brandDirectory;
       }
     }
 
     return $directories;
-  }
-
-  /**
-   * // TODO make the filename an external config
-   *
-   * @param array  $map
-   * @param        $entity
-   * @param string $filename
-   *
-   * @return bool
-   */
-  public function saveMap(array $map, $entity, $filename = "dispatch.ini")
-  {
-    $mapped = "";
-
-    foreach($map as $file => $checksum)
-    {
-      list(, $file) = explode(
-        "/" . self::getResourceDirectory() . "/", $file, 2
-      );
-      $mapped .= "$file = \"$checksum\"\n";
-    }
-
-    try
-    {
-      $path = $this->getProjectBasePath() . DS . $entity;
-      $currentMd5 = '';
-
-      // Do not overwrite the same file - causes havock with rsync
-      if(file_exists($path . DS . $filename))
-      {
-        $currentMd5 = md5_file($path . DS . $filename);
-      }
-
-      if($currentMd5 !== md5($mapped))
-      {
-        file_put_contents($path . DS . $filename, $mapped);
-      }
-    }
-    catch(\Exception $e)
-    {
-      // Unable to write file
-      return false;
-    }
-
-    return true;
   }
 }

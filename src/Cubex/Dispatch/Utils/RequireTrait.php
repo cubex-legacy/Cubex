@@ -2,9 +2,12 @@
 /**
  * @author: gareth.evans
  */
-namespace Cubex\Dispatch;
+namespace Cubex\Dispatch\Utils;
 
 use Cubex\Core\Interfaces\NamespaceAware;
+use Cubex\Dispatch\Dependency\Resource\TypeEnum;
+use Cubex\Dispatch\Dispatcher;
+use Cubex\Dispatch\Event;
 use Cubex\Events\EventManager;
 
 trait RequireTrait
@@ -79,21 +82,6 @@ trait RequireTrait
     );
   }
 
-  /**
-   * @return string
-   */
-  protected function _getOrFindNamespace()
-  {
-    if($this instanceof NamespaceAware)
-    {
-      return $this->getNamespace();
-    }
-    else
-    {
-      return Prop::getNamespaceFromSource($this);
-    }
-  }
-
   public function imgUrl($file)
   {
     $event = (new Event(EventManager::DISPATCH_IMG_URL))
@@ -105,5 +93,20 @@ trait RequireTrait
     return EventManager::triggerWithEvent(
       EventManager::DISPATCH_IMG_URL, $event, true, $namespace
     );
+  }
+
+  /**
+   * @return string
+   */
+  protected function _getOrFindNamespace()
+  {
+    if($this instanceof NamespaceAware)
+    {
+      return $this->getNamespace();
+    }
+    else
+    {
+      return Dispatcher::getNamespaceFromSource($this);
+    }
   }
 }
