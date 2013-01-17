@@ -72,6 +72,7 @@ class Mapper extends Dispatcher
       if($this->getFileSystem()->isDir($directory . DS . $directoryListItem))
       {
         $newEntityPath = $entityPath . DS . $directoryListItem;
+        $newEntityPath = ltrim($newEntityPath, DS);
         if($directoryListItem === $this->getResourceDirectory())
         {
           $entities[] = $this->getFileSystem()->normalizePath(
