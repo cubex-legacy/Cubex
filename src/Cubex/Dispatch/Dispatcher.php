@@ -30,6 +30,7 @@ class Dispatcher
     'gif' => 'image/gif',
     'swf' => 'application/x-shockwave-flash',
   ];
+  private $_dispatchInis = [];
 
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
@@ -248,13 +249,23 @@ class Dispatcher
     return $sourceObjectRefelction->getNamespaceName();
   }
 
+  /**
+   * @param string $entity
+   *
+   * @return array
+   */
   public function getDispatchIni($entity)
   {
-    $fullEntityPath = $this->getProjectBase() . DS . $entity;
+    if(!array_key_exists($entity, $this->_dispatchInis))
+    {
+      $fullEntityPath = $this->getProjectBase() . DS . $entity;
 
-    return @parse_ini_file(
-      $fullEntityPath . DS . $this->getDispatchIniFilename(), false
-    );
+      $this->_dispatchInis[$entity] =  @parse_ini_file(
+        $fullEntityPath . DS . $this->getDispatchIniFilename(), false
+      );
+    }
+
+    return $this->_dispatchInis[$entity];
   }
 
   /**
@@ -381,12 +392,12 @@ class Dispatcher
   {
     $uri = trim($uri, "'\" \r\t\n");
 
-    if(in_array(substr($uri, 0, 7), ['data:im', 'http://', 'https:/']))
+    if($this->isExternalUri($uri))
     {
       return $uri;
     }
 
-    if(substr($uri, 0, 1) == '/')
+    if(substr($uri, 0, 1) === "/")
     {
       $uri        = substr($uri, 1);
       $entityHash = $this->getBaseHash();
@@ -409,16 +420,37 @@ class Dispatcher
       }
     }
 
-    $uri = $this->addRootResourceDirectory($uri);
+    $pathToResource = $this->addRootResourceDirectory($uri);
 
-    $parts = array(
+    $dispatchPath = Path::fromParams(
+      $this->getResourceDirectory(),
       $domainHash,
       $entityHash,
       $resourceHash,
-      $uri,
+      $pathToResource
     );
 
-    return "/". $this->getResourceDirectory() . "/" . implode("/", $parts);
+    return $dispatchPath->getDispatchPath();
+  }
+
+  /**
+   * Determine if a resource is external
+   *
+   * @param $uri
+   *
+   * @return bool
+   */
+  public function isExternalUri($uri)
+  {
+    foreach(["http://", "https://", "//", "data:"] as $protocol)
+    {
+      if(strpos($uri, $protocol) === 0)
+      {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

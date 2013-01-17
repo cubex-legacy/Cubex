@@ -7,7 +7,7 @@ namespace Cubex\Core\Response;
 use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
-use Cubex\Dispatch\Dependency;
+use Cubex\Dispatch\Dependency\Resource;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Events\Event;
 use Cubex\Events\EventManager as EM;
@@ -189,7 +189,7 @@ class Webpage implements
       '<link type="text/css" rel="stylesheet" href="%s" />'
     );
 
-    $cssUris = Dependency::getResourceUris(new TypeEnum(TypeEnum::CSS));
+    $cssUris = Resource::getResourceUris(new TypeEnum(TypeEnum::CSS));
     if($cssUris)
     {
       $cssHeaders->addElements($cssUris);
@@ -235,7 +235,7 @@ class Webpage implements
     $jsItems = new Partial(
       '<script type="text/javascript" src' . '="%s"></script>'
     );
-    $jsUris  = Dependency::getResourceUris(new TypeEnum(TypeEnum::JS));
+    $jsUris  = Resource::getResourceUris(new TypeEnum(TypeEnum::JS));
     if($jsUris)
     {
       $jsItems->addElements($jsUris);

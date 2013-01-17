@@ -6,6 +6,8 @@ namespace Cubex\Dispatch;
 
 class Path
 {
+  private $_dispatchPath;
+  private $_resourceDirectory;
   private $_domainHash;
   private $_entityHash;
   private $_resourceHash;
@@ -14,33 +16,52 @@ class Path
 
   public function __construct($dispatchPath)
   {
-    // Need to tidy up and pop the resource directory off the start before we
-    // can work with the dispatchPath
+    $this->setDispatchPath($dispatchPath);
+
     $dispatchPath = ltrim($dispatchPath, "/");
-    $dispatchPath = substr($dispatchPath, strpos($dispatchPath, "/")+1);
+    $dispatchPathParts = explode("/", $dispatchPath, 5);
 
-    $dispatchPathParts = explode("/", $dispatchPath, 4);
-
-    if(count($dispatchPathParts) !== 4)
+    if(count($dispatchPathParts) !== 5)
     {
       throw new \UnexpectedValueException(
-        "The dispatch path should include at least four directory seperator ".
+        "The dispatch path should include at least five directory seperator ".
           "seperated sections"
       );
     }
 
-    if(strstr($dispatchPathParts[2], ";") === false)
+    if(strstr($dispatchPathParts[3], ";") === false)
     {
-      $dispatchPathParts[2] .= ";";
+      $dispatchPathParts[3] .= ";";
     }
 
-    list($resourceHash, $debugString) = explode( ";", $dispatchPathParts[2], 2);
+    list($resourceHash, $debugString) = explode( ";", $dispatchPathParts[3], 2);
 
-    $this->setDomainHash($dispatchPathParts[0])
-      ->setEntityHash($dispatchPathParts[1])
+    $this->setResourceDirectory($dispatchPathParts[0])
+      ->setDomainHash($dispatchPathParts[1])
+      ->setEntityHash($dispatchPathParts[2])
       ->setResourceHash($resourceHash)
       ->setDebugString($debugString)
-      ->setPathToResource($dispatchPathParts[3]);
+      ->setPathToResource($dispatchPathParts[4]);
+  }
+
+  /**
+   * @return string
+   */
+  public function getResourceDirectory()
+  {
+    return $this->_resourceDirectory;
+  }
+
+  /**
+   * @param string $resourceDirectory
+   *
+   * @return \Cubex\Dispatch\Path
+   */
+  public function setResourceDirectory($resourceDirectory)
+  {
+    $this->_resourceDirectory = $resourceDirectory;
+
+    return $this;
   }
 
   /**
@@ -141,5 +162,62 @@ class Path
     $this->_pathToResource = $pathToResource;
 
     return $this;
+  }
+
+  /**
+   * @param bool $rebuild
+   *
+   * @return string
+   */
+  public function getDispatchPath($rebuild = false)
+  {
+    if($rebuild)
+    {
+      $this->_rebuildDispatchPath();
+    }
+
+    return $this->_dispatchPath;
+  }
+
+  /**
+   * @param string $dispatchPath
+   *
+   * @return \Cubex\Dispatch\Path
+   */
+  public function setDispatchPath($dispatchPath)
+  {
+    $this->_dispatchPath = $dispatchPath;
+
+    return $this;
+  }
+
+  private function _rebuildDispatchPath()
+  {
+    $this->setDispatchPath(
+      implode("/", [
+        $this->getResourceDirectory(),
+        $this->getDomainHash(),
+        $this->getEntityHash(),
+        $this->getResourceHash(),
+        $this->getPathToResource()
+      ])
+    );
+  }
+
+  /**
+   * @param string $resourceDirectory
+   * @param string $domainHash
+   * @param string $entityHash
+   * @param string $resourceHash
+   * @param string $pathToResource
+   *
+   * @return Path
+   */
+  public static function fromParams($resourceDirectory, $domainHash,
+                                    $entityHash, $resourceHash, $pathToResource)
+  {
+    $params = func_get_args();
+
+    return new Path(implode("/", $params));
   }
 }

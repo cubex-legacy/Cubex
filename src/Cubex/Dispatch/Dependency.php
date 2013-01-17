@@ -4,12 +4,51 @@
  */
 namespace Cubex\Dispatch;
 
+use Cubex\Core\Http\Request;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 
 class Dependency extends Dispatcher
 {
-  public static function getResourceUris(TypeEnum $type)
+  /**
+   * @param \Cubex\Dispatch\Event    $event
+   * @param \Cubex\Core\Http\Request $request
+   *
+   * @return \Cubex\Dispatch\Path
+   */
+  public function getDispatchPath(Event $event, Request $request)
   {
-    return [];
+    $path   = ltrim($event->getFile(), "/");
+    $base   = substr($event->getFile(), 0, 1) === "/";
+    $domain = $request->domain() . "." . $request->tld();
+
+    if($base)
+    {
+      $entity = $this->getProjectNamespace() . "/";
+      $entity .= $this->getResourceDirectory();
+    }
+    else
+    {
+      $entity = $event->getNamespace() . DS . $this->getResourceDirectory();
+      $entity = $this->getFileSystem()->normalizePath($entity);
+    }
+
+    $resourceDirectory = $this->getResourceDirectory();
+    $domainHash        = $this->generateDomainHash($domain);
+    $entityHash        = $this->generateEntityHash($entity);
+    $resourceHash      = $this->getNomapHash();
+
+    $ini = $this->getDispatchIni($entity);
+    if(array_key_exists($path, $ini))
+    {
+      $resourceHash = $this->generateResourceHash($ini[$path]);
+    }
+
+    return Path::fromParams(
+      $resourceDirectory,
+      $domainHash,
+      $entityHash,
+      $resourceHash,
+      $path
+    );
   }
 }
