@@ -1,0 +1,218 @@
+<?php
+/**
+ * @author  brooke.bryan
+ */
+
+namespace Cubex\Data;
+
+use Cubex\Data\Filter\Filterable;
+use Cubex\Data\Filter\FilterableTrait;
+use Cubex\Data\Validator\Validatable;
+use Cubex\Data\Validator\ValidatableTrait;
+
+class Attribute implements Validatable, Filterable
+{
+  use ValidatableTrait;
+  use FilterableTrait;
+
+  const SERIALIZATION_NONE = 'id';
+  const SERIALIZATION_JSON = 'json';
+  const SERIALIZATION_PHP  = 'php';
+
+  protected $_id;
+  protected $_modified;
+  protected $_serializer;
+  protected $_name;
+  protected $_required;
+  protected $_options;
+  protected $_data;
+  protected $_originalData;
+  protected $_populated = false;
+
+  public function __construct($name,
+                              $required = false,
+                              $options = null,
+                              $data = null,
+                              $serializer = self::SERIALIZATION_NONE)
+  {
+    $this->name($name);
+    $this->setRequired($required);
+    $this->setData($data);
+    $this->setOptions($options);
+    $this->setSerializer($serializer);
+    $this->_modified = false;
+  }
+
+  public function __toString()
+  {
+    return $this->_name . " = " . $this->data();
+  }
+
+  public function populated()
+  {
+    return $this->_populated ? true : false;
+  }
+
+  public function setName($name)
+  {
+    $this->_name = $name;
+    return $this;
+  }
+
+  public function name()
+  {
+    return $this->_name;
+  }
+
+  public function setId($id)
+  {
+    $this->_id = $id;
+    return $this;
+  }
+
+  public function id()
+  {
+    if($this->_id === null)
+    {
+      $this->setId(str_replace(' ', '-', str_replace('_', '-', $this->name())));
+    }
+    return $this->_id;
+  }
+
+  public function setRequired($required = false)
+  {
+    $this->_required = (bool)$required;
+    return $this;
+  }
+
+  public function required()
+  {
+    return (bool)$this->_required;
+  }
+
+  public function isEmpty()
+  {
+    return empty($this->_data);
+  }
+
+  public function setData($data)
+  {
+    if($data == $this->_data)
+    {
+      return true;
+    }
+    else if(!$this->isModified())
+    {
+      $this->_originalData = $this->_data;
+    }
+
+    $this->_populated = $data !== null;
+    $this->_data      = $data;
+    $this->_modified  = true;
+
+    return $this;
+  }
+
+  public function rawData()
+  {
+    return $this->_data;
+  }
+
+  public function data()
+  {
+    return $this->filter($this->_data);
+  }
+
+  /**
+   * Validate the filtered value of this attribute
+   *
+   * @return bool
+   */
+  public function valid()
+  {
+    return $this->isValid($this->data());
+  }
+
+  public function setOptions($options)
+  {
+    $this->_options = $options;
+    return $this;
+  }
+
+  public function addOption($option)
+  {
+    $this->_options[] = $option;
+    return $this;
+  }
+
+  public function options()
+  {
+    return $this->_options;
+  }
+
+  public function originalData()
+  {
+    return $this->_originalData;
+  }
+
+  public function revert()
+  {
+    $this->setData($this->_originalData);
+    $this->unsetModified();
+
+    return true;
+  }
+
+  public function isModified()
+  {
+    return $this->_modified;
+  }
+
+  public function setModified()
+  {
+    $this->_modified = true;
+    return $this;
+  }
+
+  public function unsetModified()
+  {
+    $this->_modified = false;
+    return $this;
+  }
+
+  public function setSerializer($serializer)
+  {
+    $this->_serializer = $serializer;
+    return $this;
+  }
+
+  public function getSerializer()
+  {
+    return $this->_serializer;
+  }
+
+  public function serialize()
+  {
+    switch($this->getSerializer())
+    {
+      case self::SERIALIZATION_JSON:
+        return json_encode($this->rawData());
+      case self::SERIALIZATION_PHP:
+        return serialize($this->rawData());
+    }
+    return $this->rawData();
+  }
+
+  public function unserialize($data)
+  {
+    switch($this->getSerializer())
+    {
+      case self::SERIALIZATION_JSON:
+        return json_decode($data);
+      case self::SERIALIZATION_PHP:
+        return unserialize($data);
+    }
+
+    return $data;
+  }
+}
