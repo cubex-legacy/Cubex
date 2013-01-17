@@ -5,14 +5,15 @@
 namespace Cubex\Dispatch\Mapper;
 
 use Cubex\Cli\Shell;
+use Cubex\Dispatch\FileSystem;
 use Cubex\Dispatch\Mapper;
 use Cubex\Foundation\Config\ConfigGroup;
 
 class Cli extends Mapper
 {
-  public function __construct(ConfigGroup $configGroup)
+  public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
-    parent::__construct($configGroup);
+    parent::__construct($configGroup, $fileSystem);
 
     $this->_startMapper();
 

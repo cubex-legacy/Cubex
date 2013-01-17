@@ -16,9 +16,9 @@ class Mapper extends Dispatcher
    */
   private $_ignoredFiles = [];
 
-  public function __construct(ConfigGroup $configGroup)
+  public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
-    parent::__construct($configGroup);
+    parent::__construct($configGroup, $fileSystem);
 
     $this->_ignoredFiles[$this->getDispatchIniFilename()] = true;
   }
@@ -53,11 +53,11 @@ class Mapper extends Dispatcher
     $entities = [];
     if(!empty($entityPath))
     {
-      $entityPath = FileSystem::normalizePath($entityPath);
+      $entityPath = $this->getFileSystem()->normalizePath($entityPath);
     }
 
     $directory = $this->getProjectPath() . DS . $entityPath;
-    $directoryList = FileSystem::listDirectory($directory, false);
+    $directoryList = $this->getFileSystem()->listDirectory($directory, false);
 
     foreach($directoryList as $directoryListItem)
     {
@@ -66,7 +66,7 @@ class Mapper extends Dispatcher
         $newEntityPath = $entityPath . DS . $directoryListItem;
         if($directoryListItem === $this->getResourceDirectory())
         {
-          $entities[] = FileSystem::normalizePath(
+          $entities[] = $this->getFileSystem()->normalizePath(
             $this->getProjectNamespace() . DS . $newEntityPath
           );
         }
@@ -123,7 +123,7 @@ class Mapper extends Dispatcher
     $map = [];
 
     $directory = $this->getProjectBase() . DS . $entity;
-    $directoryList = FileSystem::listDirectory($directory, false);
+    $directoryList = $this->getFileSystem()->listDirectory($directory, false);
 
     foreach($directoryList as $directoryListItem)
     {
@@ -134,7 +134,7 @@ class Mapper extends Dispatcher
       }
       else if(!array_key_exists($directoryListItem, $this->_ignoredFiles))
       {
-        $map[FileSystem::normalizePath($currentEntity)] = md5(
+        $map[$this->getFileSystem()->normalizePath($currentEntity)] = md5(
           $this->_concatAllRelatedFiles($entity, $directoryListItem)
         );
       }
@@ -188,7 +188,7 @@ class Mapper extends Dispatcher
 
     try
     {
-      $existingMd5 = md5(FileSystem::readFile($dispatchFile));
+      $existingMd5 = md5($this->getFileSystem()->readFile($dispatchFile));
     }
     catch(\Exception $e)
     {
@@ -200,7 +200,7 @@ class Mapper extends Dispatcher
     {
       try
       {
-        FileSystem::writeFile($dispatchFile, $toMap);
+        $this->getFileSystem()->writeFile($dispatchFile, $toMap);
       }
       catch(\Exception $e)
       {
@@ -254,7 +254,7 @@ class Mapper extends Dispatcher
   {
     $directories = [];
 
-    $directoryList = FileSystem::listDirectory($directory);
+    $directoryList = $this->getFileSystem()->listDirectory($directory);
 
     foreach($directoryList as $directoryListItem)
     {

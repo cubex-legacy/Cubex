@@ -6,9 +6,9 @@ namespace Cubex\Dispatch;
 
 final class FileSystem
 {
-  public static function readFile($path)
+  public function readFile($path)
   {
-    $path = self::resolvePath($path);
+    $path = $this->resolvePath($path);
 
     $data = @file_get_contents($path);
 
@@ -20,9 +20,9 @@ final class FileSystem
     return $data;
   }
 
-  public static function writeFile($path, $data)
+  public function writeFile($path, $data)
   {
-    $path = self::resolvePath($path);
+    $path = $this->resolvePath($path);
 
     $written = @file_put_contents($path, $data);
 
@@ -32,9 +32,9 @@ final class FileSystem
     }
   }
 
-  public static function listDirectory($path, $includeHidden = true)
+  public function listDirectory($path, $includeHidden = true)
   {
-    $path = self::resolvePath($path);
+    $path = $this->resolvePath($path);
 
     $list = @scandir($path);
 
@@ -54,13 +54,13 @@ final class FileSystem
     return array_values($list);
   }
 
-  public static function normalizePath($path)
+  public function normalizePath($path)
   {
     $isAbsolute = preg_match('/^[A-Z]+:/', $path);
     $isAbsolute = $isAbsolute ? : strncmp($path, DIRECTORY_SEPARATOR, 1) === 0;
 
     $unresolvedPath = $path;
-    $path = self::resolvePath($path);
+    $path = $this->resolvePath($path);
     if($path === false)
     {
       $path = $unresolvedPath;
@@ -83,7 +83,7 @@ final class FileSystem
     return $path;
   }
 
-  public static function resolvePath($path)
+  public function resolvePath($path)
   {
     return realpath($path);
   }

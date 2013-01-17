@@ -11,6 +11,7 @@ class Dispatcher
 {
   use ConfigTrait;
 
+  private $_fileSystem;
   private $_domainMap;
   private $_entityMap;
   private $_dispatchIniFilename;
@@ -31,8 +32,9 @@ class Dispatcher
 
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
+   * @param FileSystem                           $fileSystem
    */
-  public function __construct(ConfigGroup $configGroup)
+  public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
     if(!defined("DS")) define("DS", DIRECTORY_SEPARATOR);
 
@@ -42,8 +44,9 @@ class Dispatcher
     $projectConfig  = $this->config("project");
     $cubexConfig    = $this->config("_cubex_");
 
-    $this->_domainMap = $dispatchConfig->getArr("domain_map", []);
-    $this->_entityMap = $dispatchConfig->getArr("entity_map", []);
+    $this->_domainMap  = $dispatchConfig->getArr("domain_map", []);
+    $this->_entityMap  = $dispatchConfig->getArr("entity_map", []);
+    $this->_fileSystem = $fileSystem;
 
     $this->_dispatchIniFilename = $dispatchConfig->getStr(
       "dispatch_ini_filename", "dispatch.ini"
@@ -54,7 +57,7 @@ class Dispatcher
     $this->_projectNamespace    = $projectConfig->getStr(
       "namespace", "Project"
     );
-    $this->_projectBase         = FileSystem::resolvePath(
+    $this->_projectBase         = $this->getFileSystem()->resolvePath(
       $cubexConfig->getStr("project_base", "..")
     );
   }
@@ -73,6 +76,14 @@ class Dispatcher
   public function getEntityMap()
   {
     return $this->_entityMap;
+  }
+
+  /**
+   * @return FileSystem
+   */
+  public function getFileSystem()
+  {
+    return $this->_fileSystem;
   }
 
   /**
@@ -246,7 +257,7 @@ class Dispatcher
       {
         try
         {
-          $content = FileSystem::readFile($relatedFilePath);
+          $content = $this->getFileSystem()->readFile($relatedFilePath);
         }
         catch(\Exception $e)
         {
