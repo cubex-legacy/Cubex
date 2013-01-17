@@ -47,7 +47,7 @@ class DispatcherTest extends TestCase
         "project"   => array(
           "namespace" => $this->_namespace
         ),
-        "__cubex__" => array(
+        "_cubex_" => array(
           "project_base" => $this->_projectBase
         )
       )
