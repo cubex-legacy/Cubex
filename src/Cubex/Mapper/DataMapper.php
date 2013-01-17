@@ -8,6 +8,7 @@ use Cubex\Data\Attribute;
 
 abstract class DataMapper
 {
+  protected $_id;
   protected $_attributes;
   protected $_invalidAttributes;
   protected $_exists = false;
@@ -16,10 +17,26 @@ abstract class DataMapper
    * Automatically add all public properties as attributes
    * and unset them for automatic handling of data
    */
-  public function __construct()
+  public function __construct($id = null)
   {
+    $this->setId($id);
     $this->_buildAttributes();
     $this->_configure();
+  }
+
+  public function id()
+  {
+    return $this->_id;
+  }
+
+  public function setId($id)
+  {
+    if($this->_attributeExists('id'))
+    {
+      $this->_doCall("setId", [$id]);
+    }
+    $this->_id = $id;
+    return $this;
   }
 
   protected function _buildAttributes()
@@ -46,10 +63,12 @@ abstract class DataMapper
   /**
    *
    */
-  protected function __clone()
+  public function __clone()
   {
     $attrs             = $this->_attributes;
     $this->_attributes = array();
+    $this->_cloneSetup();
+
     foreach($attrs as $attr)
     {
       if($attr instanceof Attribute)
@@ -58,6 +77,10 @@ abstract class DataMapper
         $this->_addAttribute(clone $attr);
       }
     }
+  }
+
+  protected function _cloneSetup()
+  {
   }
 
   /**
