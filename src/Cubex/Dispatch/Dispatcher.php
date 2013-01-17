@@ -260,9 +260,16 @@ class Dispatcher
     {
       $fullEntityPath = $this->getProjectBase() . DS . $entity;
 
-      $this->_dispatchInis[$entity] =  @parse_ini_file(
+      $dispatchIni =  @parse_ini_file(
         $fullEntityPath . DS . $this->getDispatchIniFilename(), false
       );
+
+      if($dispatchIni === false)
+      {
+        $dispatchIni = [];
+      }
+
+      $this->_dispatchInis[$entity] = $dispatchIni;
     }
 
     return $this->_dispatchInis[$entity];
