@@ -35,7 +35,7 @@ class Attribute implements Validatable, Filterable
                               $data = null,
                               $serializer = self::SERIALIZATION_NONE)
   {
-    $this->name($name);
+    $this->setName($name);
     $this->setRequired($required);
     $this->setData($data);
     $this->setOptions($options);
