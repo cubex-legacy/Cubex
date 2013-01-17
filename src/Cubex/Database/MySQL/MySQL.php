@@ -73,6 +73,11 @@ class MySQL implements DatabaseService
    */
   public function escapeColumnName($column)
   {
+    if($column == '*')
+    {
+      return '*';
+    }
+
     $column = str_replace('`', '', $this->escapeString($column));
 
     return "`$column`";
