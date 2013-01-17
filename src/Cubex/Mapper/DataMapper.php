@@ -6,7 +6,7 @@ namespace Cubex\Mapper;
 
 use Cubex\Data\Attribute;
 
-abstract class DataMapper
+abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 {
   protected $_id;
   protected $_attributes;
@@ -96,16 +96,7 @@ abstract class DataMapper
    */
   public function __toString()
   {
-    $properties = array();
-    $attributes = $this->_getRawAttributesArr($this->_attributes);
-    foreach($attributes as $name => $value)
-    {
-      $property = "$name = ";
-      $property .= is_scalar($value) ? $value : print_r($value, true);
-      $properties[] = $property;
-    }
-
-    return \get_class($this) . " {" . implode(', ', $properties) . "}";
+    return get_class($this) . " " . json_encode($this);
   }
 
   /**
@@ -124,7 +115,6 @@ abstract class DataMapper
   protected function _getRawAttributesArr(array $attributes)
   {
     $rawAttributes = [];
-
     foreach($attributes as $attribute)
     {
       if($attribute instanceof Attribute)
