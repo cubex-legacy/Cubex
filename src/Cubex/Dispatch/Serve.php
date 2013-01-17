@@ -75,8 +75,7 @@ class Serve extends Dispatcher implements Dispatchable
   private function _buildResponse(Response $response, $domain)
   {
     $pathToResource = $this->getDispatchPath()->getPathToResource();
-    $pathToResourceParts = explode(".", $pathToResource);
-    $resourceType = end($pathToResourceParts);
+    $resourceType = $this->getResourceExtension($pathToResource);
 
     if(!array_key_exists($resourceType, $this->getSupportedTypes()))
     {
@@ -162,7 +161,7 @@ class Serve extends Dispatcher implements Dispatchable
 
     if(!empty($data))
     {
-      $data = $this->minifyData($data, end(explode(".", $filename)));
+      $data = $this->minifyData($data, $this->getResourceExtension($filename));
     }
 
     return $data;
@@ -183,12 +182,12 @@ class Serve extends Dispatcher implements Dispatchable
 
     if(!$entityMap)
     {
-      $mapper = new Mapper($this->getConfig());
+      $mapper = new Mapper($this->getConfig(), $this->getFileSystem());
       $entityMap = $this->findAndSaveEntityMap($entity, $mapper);
     }
 
-    $fileExtension = end(
-      explode(".", $this->getDispatchPath()->getPathToResource())
+    $fileExtension = $this->getResourceExtension(
+      $this->getDispatchPath()->getPathToResource()
     );
 
     // Only allow JS and CSS packages
@@ -200,7 +199,8 @@ class Serve extends Dispatcher implements Dispatchable
         $entityMap = array_keys($entityMap);
         foreach($entityMap as $resource)
         {
-          if(end(explode(".", $resource)) === $fileExtension)
+          $resourceExtension = $this->getResourceExtension($resource);
+          if($resourceExtension === $fileExtension)
           {
             $data .= $this->getData($domain) . "\n";
           }

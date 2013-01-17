@@ -181,6 +181,22 @@ class Dispatcher
   }
 
   /**
+   * This doesn't think too much about what's going on, if you pass it a path
+   * with no "." it will jsut return the whole path.
+   *
+   * @param string $resource
+   *
+   * @return string
+   */
+  public function getResourceExtension($resource)
+  {
+    $resourceParts = explode(".", $resource);
+    $resoruceEnd   = end($resourceParts);
+
+    return $resoruceEnd;
+  }
+
+  /**
    * This will expand a filename and return an array of filenames that may get
    * included. This is for rendering resources before and after the main file
    *
@@ -468,8 +484,7 @@ class Dispatcher
    */
   public function addRootResourceDirectory($uri)
   {
-    $uriParts = explode(".", $uri);
-    $fileExtension = end($uriParts);
+    $fileExtension = $this->getResourceExtension($uri);
     switch($fileExtension)
     {
       case "css":

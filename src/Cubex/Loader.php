@@ -245,8 +245,9 @@ class Loader
    */
   public function getDispatchable()
   {
-    $path = $this->request()->path();
-    if(end(explode(".", $path)) === "ico")
+    $pathParts = explode(".", $this->request()->path());
+    $pathEnd = end($pathParts);
+    if($pathEnd === "ico")
     {
       $dispatchImage = new Image($this->getConfig(), new FileSystem());
       $faviconPath = $dispatchImage->getFaviconPath(

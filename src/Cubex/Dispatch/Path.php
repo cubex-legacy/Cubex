@@ -176,7 +176,7 @@ class Path
       $this->_rebuildDispatchPath();
     }
 
-    return $this->_dispatchPath;
+    return "/" . $this->_dispatchPath;
   }
 
   /**
