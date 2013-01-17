@@ -127,6 +127,32 @@ class RecordMapper extends DataMapper
     return $this;
   }
 
+  public function delete()
+  {
+    if($this->exists())
+    {
+      $connection = $this->connection(
+        new ConnectionMode(ConnectionMode::WRITE)
+      );
+
+      $pattern = $this->_idPattern();
+      $pattern = 'DELETE FROM %T WHERE ' . $pattern;
+
+      $args = array(
+        $pattern,
+        $this->getTableName(),
+        $this->getIDKey(),
+        $this->id(),
+      );
+
+      $query = ParseQuery::parse($connection, $args);
+
+      $connection->query($query);
+      $this->setExists(false);
+    }
+    return $this;
+  }
+
   /**
    * Column Name for ID field
    *
