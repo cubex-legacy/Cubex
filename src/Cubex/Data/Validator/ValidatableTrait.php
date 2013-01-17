@@ -50,23 +50,30 @@ trait ValidatableTrait
   public function isValid($value)
   {
     $this->_validationErrors = [];
-    $valid                   = true;
+    $result                  = true;
 
     foreach($this->_validators as $validatable)
     {
       $validator = $validatable['validator'];
       $options   = (array)$validatable['options'];
+      $valid     = true;
 
       if(is_callable($validator))
       {
         try
         {
-          $params = array_unshift($options, $value);
-          $valid  = call_user_func($validator, $params);
+          $params = $options;
+          array_unshift($params, $value);
+          $valid = call_user_func_array($validator, $params);
+          if(!$valid)
+          {
+            $result = false;
+          }
         }
         catch(\Exception $e)
         {
           $this->_validationErrors[] = $e->getMessage();
+          $result = false;
         }
         continue;
       }
@@ -90,8 +97,13 @@ trait ValidatableTrait
           );
         }
       }
+
+      if(!$valid)
+      {
+        $result = false;
+      }
     }
-    return $valid;
+    return $result;
   }
 
   public function validationErrors()
