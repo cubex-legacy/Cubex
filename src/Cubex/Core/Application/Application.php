@@ -37,6 +37,8 @@ abstract class Application
   use ListenerTrait;
   use ServiceManagerAwareTrait;
 
+  protected $_namespaceCache;
+
   /**
    * @var \Cubex\Core\Project\Project
    */
@@ -139,8 +141,8 @@ abstract class Application
       else
       {
         $try   = [];
-        $try[] = $this->getNamespace() . '\\' . $dispatcherResult;
         $try[] = $this->getNamespace() . '\Controllers\\' . $dispatcherResult;
+        $try[] = $this->getNamespace() . '\\' . $dispatcherResult;
 
         foreach($try as $controller)
         {
@@ -210,8 +212,12 @@ abstract class Application
    */
   public function getNamespace()
   {
-    $reflector = new \ReflectionClass(get_called_class());
-    return $reflector->getNamespaceName();
+    if($this->_namespaceCache === null)
+    {
+      $reflector             = new \ReflectionClass(get_called_class());
+      $this->_namespaceCache = $reflector->getNamespaceName();
+    }
+    return $this->_namespaceCache;
   }
 
   /**

@@ -94,14 +94,6 @@ abstract class Project
    */
   public function getBySubDomainAndPath($subdomain, $path)
   {
-    switch($subdomain)
-    {
-      default:
-        switch($path)
-        {
-        }
-        break;
-    }
     return null;
   }
 
@@ -114,9 +106,6 @@ abstract class Project
    */
   public function getBySubDomain($subdomain)
   {
-    switch($subdomain)
-    {
-    }
     return null;
   }
 
@@ -129,9 +118,6 @@ abstract class Project
    */
   public function getByPath($path)
   {
-    switch($path)
-    {
-    }
     return null;
   }
 

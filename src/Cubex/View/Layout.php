@@ -21,6 +21,7 @@ class Layout implements Renderable, NamespaceAware
   protected $_layoutTemplate = 'Default';
   protected $_layoutDirectory = '';
   protected $_entity;
+  protected $_namespaceCache;
 
   protected $_renderHooks = array('before' => array(), 'after' => array());
 
@@ -33,20 +34,24 @@ class Layout implements Renderable, NamespaceAware
 
   public function getNamespace()
   {
-    if($this->_entity instanceof NamespaceAware)
+    if($this->_namespaceCache === null)
     {
-      return $this->_entity->getNamespace();
+      if($this->_entity instanceof NamespaceAware)
+      {
+        $this->_namespaceCache = $this->_entity->getNamespace();
+      }
+      else if($this->_entity !== null)
+      {
+        $class                 = get_class($this->_entity);
+        $reflect               = new \ReflectionClass($class);
+        $this->_namespaceCache = $reflect->getNamespaceName();
+      }
+      else
+      {
+        $this->_namespaceCache = __NAMESPACE__;
+      }
     }
-    else if($this->_entity !== null)
-    {
-      $class   = get_class($this->_entity);
-      $reflect = new \ReflectionClass($class);
-      return $reflect->getNamespaceName();
-    }
-    else
-    {
-      return __NAMESPACE__;
-    }
+    return $this->_namespaceCache;
   }
 
   /**
