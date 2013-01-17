@@ -67,6 +67,8 @@ class Loader
    */
   protected $_failed = false;
 
+  protected $_projectSourceRoot;
+
   /**
    * Initiate Cubex
    *
@@ -204,7 +206,10 @@ class Loader
     {
       $ns = $configuration->get("project")->getStr("namespace", "Project");
       $this->setNamespace($ns);
-      $src = $configuration->get("project")->getStr("source", $src);
+      $src                      = $configuration->get("project")->getStr(
+        "source", $src
+      );
+      $this->_projectSourceRoot = realpath(dirname(WEB_ROOT) . DS . $src);
     }
 
     $cubexConfig = new Config();
@@ -594,29 +599,39 @@ class Loader
    */
   public function loadClass($class)
   {
-    $class = \ltrim($class, '\\');
+    $base  = null;
+    $class = ltrim($class, '\\');
     try
     {
-      if(substr($class, 0, 5) != 'Cubex')
+      if(strpos($class, 'Cubex') === 0)
+      {
+        $base = dirname(__DIR__);
+      }
+      else if(strpos($class, $this->_namespace) === 0)
+      {
+        $base = $this->_projectSourceRoot;
+      }
+
+      if($base === null)
       {
         return false;
       }
-      $class       = ltrim($class, '\\');
+
       $includeFile = '';
       if($lastNsPos = strrpos($class, '\\'))
       {
         $namespace   = substr($class, 0, $lastNsPos);
         $class       = substr($class, $lastNsPos + 1);
-        $includeFile = str_replace(
-          '\\', DIRECTORY_SEPARATOR, $namespace
-        ) . DIRECTORY_SEPARATOR;
+        $includeFile = str_replace('\\', DS, $namespace) . DS;
       }
-      $includeFile .= str_replace('_', DIRECTORY_SEPARATOR, $class) . '.php';
-      include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . $includeFile;
+
+      $includeFile .= str_replace('_', DS, $class) . '.php';
+      $included = @include_once $base . DS . $includeFile;
     }
     catch(\Exception $e)
     {
+      return false;
     }
-    return true;
+    return $included;
   }
 }
