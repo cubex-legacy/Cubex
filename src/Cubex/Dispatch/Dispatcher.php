@@ -167,7 +167,7 @@ class Dispatcher
     }
     else
     {
-      $path = $this->getEntityPathByHash($entityHash);
+      $path = $this->findEntityFromHash($entityHash);
 
       if($path === null)
       {
@@ -253,7 +253,7 @@ class Dispatcher
     foreach($this->getRelatedFilenamesOrdered($filename) as $relatedFilename)
     {
       $relatedFilePath = $directory . DS . $relatedFilename;
-      if(file_exists($relatedFilePath))
+      if($this->getFileSystem()->fileExists($relatedFilePath))
       {
         try
         {
@@ -274,6 +274,8 @@ class Dispatcher
   }
 
   /**
+   * // TODO need to decouple this method from the mapper
+   *
    * We don't really want to do this, but it's for times that an entityHash has
    * come through that isn't in our map and we want to try and find it on the
    * fly. Once this request is over it should get cached seeing as it thinks
@@ -288,7 +290,8 @@ class Dispatcher
    */
   public function findEntityFromHash($hash)
   {
-    $entities = (new Mapper($this->getConfig()))->findEntities();
+    $entities = (new Mapper($this->getConfig(), $this->getFileSystem()))
+      ->findEntities();
 
     foreach($entities as $entity)
     {

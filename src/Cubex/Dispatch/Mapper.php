@@ -61,7 +61,7 @@ class Mapper extends Dispatcher
 
     foreach($directoryList as $directoryListItem)
     {
-      if(is_dir($directory . DS . $directoryListItem))
+      if($this->getFileSystem()->isDir($directory . DS . $directoryListItem))
       {
         $newEntityPath = $entityPath . DS . $directoryListItem;
         if($directoryListItem === $this->getResourceDirectory())
@@ -128,7 +128,7 @@ class Mapper extends Dispatcher
     foreach($directoryList as $directoryListItem)
     {
       $currentEntity = $entity . DS . $directoryListItem;
-      if(is_dir($directory . DS . $directoryListItem))
+      if($this->getFileSystem()->isDir($directory . DS . $directoryListItem))
       {
         $map = array_merge($map, $this->mapEntity($currentEntity));
       }
@@ -260,7 +260,8 @@ class Mapper extends Dispatcher
     {
       $brandDirectory = $directory . DS . $directoryListItem;
 
-      if(is_dir($brandDirectory) && strncmp($brandDirectory, ".", 1) === 0)
+      if($this->getFileSystem()->isDir($brandDirectory)
+        && strncmp($brandDirectory, ".", 1) === 0)
       {
         $directories[] = $brandDirectory;
       }

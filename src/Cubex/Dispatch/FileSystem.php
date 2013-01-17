@@ -4,8 +4,15 @@
  */
 namespace Cubex\Dispatch;
 
-final class FileSystem
+class FileSystem
 {
+  public function fileExists($path)
+  {
+    $path = $this->resolvePath($path);
+
+    return file_exists($path);
+  }
+
   public function readFile($path)
   {
     $path = $this->resolvePath($path);
@@ -86,5 +93,10 @@ final class FileSystem
   public function resolvePath($path)
   {
     return realpath($path);
+  }
+
+  public function isDir($directory)
+  {
+    return is_dir($directory);
   }
 }
