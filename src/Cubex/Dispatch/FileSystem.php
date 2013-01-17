@@ -63,8 +63,14 @@ class FileSystem
 
   public function normalizePath($path)
   {
-    $isAbsolute = preg_match('/^[A-Z]+:/', $path);
-    $isAbsolute = $isAbsolute ? : strncmp($path, DIRECTORY_SEPARATOR, 1) === 0;
+    if($this->isWindows())
+    {
+      $isAbsolute = preg_match('/^[A-Z]+:/', $path);
+    }
+    else
+    {
+      $isAbsolute = strncmp($path, DIRECTORY_SEPARATOR, 1) === 0;
+    }
 
     $unresolvedPath = $path;
     $path = $this->resolvePath($path);
@@ -98,5 +104,10 @@ class FileSystem
   public function isDir($directory)
   {
     return is_dir($directory);
+  }
+
+  public function isWindows()
+  {
+    return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
   }
 }
