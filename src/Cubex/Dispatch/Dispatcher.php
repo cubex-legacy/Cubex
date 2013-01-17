@@ -32,6 +32,8 @@ class Dispatcher
   ];
   private $_dispatchInis = [];
 
+  private static $_entities;
+
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
    * @param FileSystem                           $fileSystem
@@ -169,7 +171,8 @@ class Dispatcher
     }
     else
     {
-      $path = $this->findEntityFromHash($entityHash);
+      $mapper = new Mapper($this->getConfig(), $this->getFileSystem());
+      $path   = $this->findEntityFromHash($entityHash, $mapper);
 
       if($path === null)
       {
@@ -351,7 +354,10 @@ class Dispatcher
    */
   public function findEntityFromHash($hash, Mapper $mapper)
   {
-    $entities = $mapper->findEntities();
+    if(self::$_entities === null)
+    {
+      self::$_entities = $entities = $mapper->findEntities();
+    }
 
     foreach($entities as $entity)
     {
