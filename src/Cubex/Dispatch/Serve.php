@@ -45,10 +45,12 @@ class Serve extends Dispatcher implements Dispatchable
   {
     $response->addHeader("Vary", "Accept-Encoding");
 
+    $debugString  = $this->getDispatchPath()->getDebugString();
+    $resourceHash = $this->getDispatchPath()->getResourceHash();
+
     if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
-      && $this->getDispatchPath()->getDebugString()
-        !== self::getNocacheDebugString()
-      && $this->getDispatchPath()->getResourceHash() != $this->getNomapHash())
+      && $debugString !== self::getNocacheDebugString()
+      && $resourceHash !== $this->getNomapHash())
     {
       $this->_setCacheHeaders($response);
     }
@@ -74,8 +76,9 @@ class Serve extends Dispatcher implements Dispatchable
    */
   private function _buildResponse(Response $response, $domain)
   {
+    $resourceHash   = $this->getDispatchPath()->getResourceHash();
     $pathToResource = $this->getDispatchPath()->getPathToResource();
-    $resourceType = $this->getResourceExtension($pathToResource);
+    $resourceType   = $this->getResourceExtension($pathToResource);
 
     if(!array_key_exists($resourceType, $this->getSupportedTypes()))
     {
@@ -84,7 +87,7 @@ class Serve extends Dispatcher implements Dispatchable
     }
     else
     {
-      if($pathToResource === "pkg")
+      if($resourceHash === "pkg")
       {
         $data = $this->getPackageData($domain);
       }

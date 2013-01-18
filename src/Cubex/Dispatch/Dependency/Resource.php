@@ -9,16 +9,23 @@ use Cubex\Core\Http\Request;
 use Cubex\Dispatch\Dependency;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Dispatch\Event;
-use Cubex\Dispatch\Path;
 
 class Resource extends Dependency
 {
+  /**
+   * @var array
+   */
   protected static $_requires = array(
     "css" => [],
     "js" => [],
     "packages" => []
   );
 
+  /**
+   * @param Resource\TypeEnum $type
+   *
+   * @return array
+   */
   public static function getResourceUris(TypeEnum $type)
   {
     $resourceUris = [];
@@ -35,6 +42,9 @@ class Resource extends Dependency
     return $resourceUris;
   }
 
+  /**
+   * @param \Cubex\Dispatch\Event $event
+   */
   public function requireResource(Event $event)
   {
     $file = $event->getFile();
@@ -65,6 +75,9 @@ class Resource extends Dependency
     $this->_requireResource($event);
   }
 
+  /**
+   * @param \Cubex\Dispatch\Event $event
+   */
   protected function _requireResource(Event $event)
   {
     $resource = $event->getFile();
@@ -89,11 +102,17 @@ class Resource extends Dependency
     ];
   }
 
+  /**
+   * @param \Cubex\Dispatch\Event $event
+   */
   public function requirePackage(Event $event)
   {
     $this->_requirePackage($event);
   }
 
+  /**
+   * @param \Cubex\Dispatch\Event $event
+   */
   protected function _requirePackage(Event $event)
   {
     $request      = Container::get(Container::REQUEST);
@@ -109,12 +128,18 @@ class Resource extends Dependency
     self::$_requires["packages"][$key] = true;
   }
 
+  /**
+   * @param \Cubex\Dispatch\Event    $event
+   * @param \Cubex\Core\Http\Request $request
+   *
+   * @return \Cubex\Dispatch\Path
+   */
   public function getDispatchPackagePath(Event $event, Request $request)
   {
     $dispatchPackagePath = $this->getDispatchPath($event, $request);
 
     $dispatchPackagePath->setResourceHash("pkg")
-      ->setPathToResource($event->name() . "." . $event->getType())
+      ->setPathToResource($event->getFile() . "." . $event->getType())
       ->getDispatchPath(true);
 
     return $dispatchPackagePath;

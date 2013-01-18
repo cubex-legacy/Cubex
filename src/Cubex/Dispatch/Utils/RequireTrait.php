@@ -15,7 +15,7 @@ trait RequireTrait
   /**
    * Specify a CSS file to include (/css | .css are not required)
    *
-   * @param $file
+   * @param string $file
    */
   public function requireCss($file)
   {
@@ -25,7 +25,7 @@ trait RequireTrait
   /**
    * Specify a JS file to include (/js | .js are not required)
    *
-   * @param $file
+   * @param string $file
    */
   public function requireJs($file)
   {
@@ -34,22 +34,26 @@ trait RequireTrait
 
   /**
    * Specify a CSS Package to include (/css | .css are not required)
+   *
+   * @param string $package
    */
-  public function requireCssPackage()
+  public function requireCssPackage($package)
   {
-    $this->_requirePackage(new TypeEnum(TypeEnum::CSS));
+    $this->_requirePackage($package, new TypeEnum(TypeEnum::CSS));
   }
 
   /**
    * Specify a JS Package to include (/js | .js are not required)
+   *
+   * @param string $package
    */
-  public function requireJsPackage()
+  public function requireJsPackage($package)
   {
-    $this->_requirePackage(new TypeEnum(TypeEnum::JS));
+    $this->_requirePackage($package, new TypeEnum(TypeEnum::JS));
   }
 
   /**
-   * @param          $file
+   * @param string   $file
    * @param TypeEnum $type
    */
   protected function _requireResource($file, TypeEnum $type)
@@ -67,13 +71,15 @@ trait RequireTrait
   }
 
   /**
+   * @param string   $package
    * @param TypeEnum $type
    */
-  protected function _requirePackage(TypeEnum $type)
+  protected function _requirePackage($package, TypeEnum $type)
   {
     $namespace = $this->_getOrFindNamespace();
 
     $event = (new Event(EventManager::DISPATCH_PACKAGE_REQUIRE))
+      ->setFile($package)
       ->setType($type)
       ->setSource($this);
 
@@ -82,6 +88,11 @@ trait RequireTrait
     );
   }
 
+  /**
+   * @param string $file
+   *
+   * @return string
+   */
   public function imgUrl($file)
   {
     $event = (new Event(EventManager::DISPATCH_IMG_URL))
