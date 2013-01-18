@@ -40,6 +40,14 @@ class RecordCollection extends Collection
       $this->clear();
       throw new \Exception("More than one result in loadOneWhere() $pattern");
     }
+    else if(isset($this->_mappers[0]))
+    {
+      return $this->_mappers[0];
+    }
+    else
+    {
+      return false;
+    }
   }
 
   public function loadMatches(SearchObject $search)

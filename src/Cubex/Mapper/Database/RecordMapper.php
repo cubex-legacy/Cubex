@@ -65,7 +65,7 @@ class RecordMapper extends DataMapper
   /**
    * @return string
    */
-  protected function _idPattern()
+  public function idPattern()
   {
     $config = $this->getConfiguration();
     if(!isset($config[static::CONFIG_IDS]))
@@ -95,7 +95,7 @@ class RecordMapper extends DataMapper
      * @var $this self
      */
     $this->setExists(false);
-    $pattern = $this->_idPattern();
+    $pattern = $this->idPattern();
     $pattern = 'SELECT %LC FROM %T WHERE ' . $pattern;
 
     $connection = $this->connection(
@@ -144,7 +144,7 @@ class RecordMapper extends DataMapper
         new ConnectionMode(ConnectionMode::WRITE)
       );
 
-      $pattern = $this->_idPattern();
+      $pattern = $this->idPattern();
       $pattern = 'DELETE FROM %T WHERE ' . $pattern;
 
       $args = array(
@@ -207,7 +207,7 @@ class RecordMapper extends DataMapper
       $table = implode('_', $nsparts);
 
       $table              = strtolower(str_replace('\\', '_', $table));
-      $this->_dbTableName = $table;
+      $this->_dbTableName = $table . 's';
     }
     return $this->_dbTableName;
   }
@@ -344,7 +344,7 @@ class RecordMapper extends DataMapper
       if($this->id() !== null)
       {
         $pattern .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
-        $pattern .= ' WHERE ' . $this->_idPattern();
+        $pattern .= ' WHERE ' . $this->idPattern();
         $args[] = $this->getIDKey();
         $args[] = $this->id();
       }
@@ -355,7 +355,7 @@ class RecordMapper extends DataMapper
     {
       $pattern = 'UPDATE %T SET ' .
       implode(', ', $updates) .
-      ' WHERE ' . $this->_idPattern();
+      ' WHERE ' . $this->idPattern();
 
       $args = array(
         $pattern,
@@ -370,5 +370,50 @@ class RecordMapper extends DataMapper
     Debug::info("Query Executed: " . $query);
 
     return $connection->query($query);
+  }
+
+  public function hasOne(RecordMapper $entity, $foreignKey = null)
+  {
+    if($foreignKey === null)
+    {
+      $foreignKey = strtolower(class_basename($this)) . '_id';
+    }
+
+    $table  = new RecordCollection($entity);
+    $result = $table->loadOneWhere(
+      $this->idPattern(), $foreignKey, $this->id()
+    );
+    return $result;
+  }
+
+  public function hasMany(RecordMapper $entity, $foreignKey = null)
+  {
+    if($foreignKey === null)
+    {
+      $foreignKey = strtolower(class_basename($this)) . '_id';
+    }
+
+    $collection = new RecordCollection($entity);
+    $collection->loadOneWhere($this->idPattern(), $foreignKey, $this->id());
+    return $collection;
+  }
+
+  public function belongsTo(RecordMapper $entity, $foreignKey = null)
+  {
+    if($foreignKey === null)
+    {
+      $foreignKey = strtolower(class_basename($entity)) . '_id';
+    }
+
+    $key = $this->_attribute($foreignKey)->data();
+    if($key !== null)
+    {
+      $result = $entity->load($key);
+    }
+    else
+    {
+      $result = false;
+    }
+    return $result;
   }
 }
