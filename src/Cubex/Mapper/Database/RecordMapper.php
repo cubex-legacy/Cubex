@@ -367,8 +367,6 @@ class RecordMapper extends DataMapper
 
     $query = ParseQuery::parse($connection, $args);
 
-    Debug::info("Query Executed: " . $query);
-
     return $connection->query($query);
   }
 
