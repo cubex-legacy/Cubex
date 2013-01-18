@@ -6,6 +6,7 @@
 namespace Cubex\Database\MySQL;
 
 use Cubex\Database\DatabaseService;
+use Cubex\Events\EventManager;
 use Cubex\ServiceManager\ServiceConfig;
 
 class MySQL implements DatabaseService
@@ -100,7 +101,16 @@ class MySQL implements DatabaseService
    */
   protected function _doQuery($query)
   {
-    return $this->_connection->query($query);
+    $result = $this->_connection->query($query);
+    EventManager::trigger(
+      EventManager::CUBEX_QUERY,
+      [
+      'query'  => $query,
+      'result' => $result,
+      ],
+      $this
+    );
+    return $result;
   }
 
   /**

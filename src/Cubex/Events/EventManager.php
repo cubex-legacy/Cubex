@@ -29,6 +29,8 @@ class EventManager
   const CUBEX_DEBUG = 'cubex.debug';
   const CUBEX_LOG   = 'cubex.log';
 
+  const CUBEX_QUERY   = 'cubex.query';
+
   const DISPATCH_RESOURCE_REQUIRE = 'dispatch.resource.require';
   const DISPATCH_PACKAGE_REQUIRE  = 'dispatch.package.require';
   const DISPATCH_IMG_URL          = 'dispatch.img.url';
