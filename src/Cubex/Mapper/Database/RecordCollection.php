@@ -9,7 +9,7 @@ use Cubex\Database\ConnectionMode;
 use Cubex\Mapper\Collection;
 use Cubex\Sprintf\ParseQuery;
 
-class TableCollection extends Collection
+class RecordCollection extends Collection
 {
   protected $_mapperType;
   protected $_columns = ['*'];
