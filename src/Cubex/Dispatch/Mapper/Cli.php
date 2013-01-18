@@ -22,13 +22,15 @@ class Cli extends Mapper
     echo Shell::colourText("Using Path: ", Shell::COLOUR_FOREGROUND_CYAN);
     echo $this->getProjectPath() . "\n\n";
     echo Shell::colourText(
-      "=======================================\n\n",
+      "============================================================\n\n",
       Shell::COLOUR_FOREGROUND_DARK_GREY
     );
 
     $entities = $this->findEntities();
+    $this->setEntityMapConfigLines($entities);
     $maps = $this->mapEntities($entities);
     $savedMaps = $this->saveMaps($maps);
+    $this->writeConfig();
 
     foreach($this->_output as $outputEntity)
     {
@@ -38,17 +40,7 @@ class Cli extends Mapper
       }
     }
 
-    $recommendedIni = [];
-    foreach($entities as $entity)
-    {
-      $entityHash = $this->generateEntityHash($entity);
-      if(!array_key_exists($entityHash, $this->getEntityMap()))
-      {
-        $recommendedIni[] = "entity_map[$entityHash] = $entity\n";
-      }
-    }
-
-    $this->_completeMapper($recommendedIni);
+    $this->_completeMapper();
   }
 
   public function mapEntity($entity)
@@ -95,6 +87,27 @@ class Cli extends Mapper
     $this->pushLine($entityHash, $this->_getResult($saved) . "\n");
   }
 
+  public function writeConfig()
+  {
+    $this->pushLine(
+      "config",
+      Shell::colourText(
+        "============================================================\n\n",
+        Shell::COLOUR_FOREGROUND_DARK_GREY
+      )
+    );
+    $this->pushLine(
+      "config",
+      Shell::colourText(
+        "Writing Main Config:       ", Shell::COLOUR_FOREGROUND_LIGHT_CYAN
+      )
+    );
+
+    $result = parent::writeConfig();
+
+    $this->pushLine("config", $this->_getResult($result));
+  }
+
   /*****************************************************************************
    * Cli Start and finish methods, and a helper, not mapper specific
    */
@@ -118,37 +131,17 @@ _  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
     echo Shell::colourText("\n$mapper\n\n", Shell::COLOUR_FOREGROUND_LIGHT_RED);
   }
 
-  private function _completeMapper(array $recommendedIni)
+  private function _completeMapper()
   {
-    if(count($recommendedIni))
-    {
-      echo "\n\n";
-
-      echo Shell::colourText("WARNING: ", Shell::COLOUR_FOREGROUND_RED);
-      echo "Your project configuration is incomplete\n\n";
-      echo "It is recommended you add the following lines to\n";
-      echo "the Dispatch section of " . CUBEX_ENV . ".ini\n";
-
-      echo "\n[dispatch]\n";
-      foreach($recommendedIni as $recommendedIniLine)
-      {
-        echo Shell::colourText(
-          $recommendedIniLine, Shell::COLOUR_FOREGROUND_LIGHT_BLUE
-        );
-      }
-    }
-    else
-    {
-      echo Shell::colourText(
-        "\n==============================", Shell::COLOUR_FOREGROUND_GREEN
-      );
-      echo Shell::colourText(
-        "\n|  DISPATCH MAPPER COMPLETE  |", Shell::COLOUR_FOREGROUND_LIGHT_GREEN
-      );
-      echo Shell::colourText(
-        "\n==============================", Shell::COLOUR_FOREGROUND_GREEN
-      );
-    }
+    echo Shell::colourText(
+      "\n==============================", Shell::COLOUR_FOREGROUND_GREEN
+    );
+    echo Shell::colourText(
+      "\n|  DISPATCH MAPPER COMPLETE  |", Shell::COLOUR_FOREGROUND_LIGHT_GREEN
+    );
+    echo Shell::colourText(
+      "\n==============================", Shell::COLOUR_FOREGROUND_GREEN
+    );
     echo "\n";
   }
 

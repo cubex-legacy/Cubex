@@ -5,6 +5,7 @@
  namespace Cubex\Dispatch;
 
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
+use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
 
@@ -30,9 +31,13 @@ class Dispatcher
     'gif' => 'image/gif',
     'swf' => 'application/x-shockwave-flash',
   ];
-  private $_dispatchInis = [];
 
+  private static $_dispatchInis = [];
   private static $_entities;
+  /**
+   * @var \Cubex\Foundation\Config\Config
+   */
+  private static $_dispatchIni;
 
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
@@ -44,12 +49,10 @@ class Dispatcher
 
     $this->configure($configGroup);
 
-    $dispatchConfig = $this->config("dispatch");
-    $projectConfig  = $this->config("project");
-    $cubexConfig    = $this->config("_cubex_");
+    $dispatchConfig    = $this->config("dispatch");
+    $projectConfig     = $this->config("project");
+    $cubexConfig       = $this->config("_cubex_");
 
-    $this->_domainMap  = $dispatchConfig->getArr("domain_map", []);
-    $this->_entityMap  = $dispatchConfig->getArr("entity_map", []);
     $this->_fileSystem = $fileSystem;
 
     $this->_dispatchIniFilename = $dispatchConfig->getStr(
@@ -64,6 +67,12 @@ class Dispatcher
     $this->_projectBase         = $this->getFileSystem()->resolvePath(
       $cubexConfig->getStr("project_base", "..")
     );
+
+    // We do these bits at the end as we need the project base path to get the
+    // correct config file directory
+    $dispatchIniConfig = $this->getBaseDispatchConfig();
+    $this->_domainMap  = $dispatchIniConfig->getArr("domain_map", []);
+    $this->_entityMap  = $dispatchIniConfig->getArr("entity_map", []);
   }
 
   /**
@@ -283,23 +292,49 @@ class Dispatcher
    */
   public function getDispatchIni($entity)
   {
-    if(!array_key_exists($entity, $this->_dispatchInis))
+    if(!array_key_exists($entity, self::$_dispatchInis))
     {
       $fullEntityPath = $this->getProjectBase() . DS . $entity;
-
-      $dispatchIni =  @parse_ini_file(
-        $fullEntityPath . DS . $this->getDispatchIniFilename(), false
-      );
-
-      if($dispatchIni === false)
-      {
-        $dispatchIni = [];
-      }
-
-      $this->_dispatchInis[$entity] = $dispatchIni;
+      self::$_dispatchInis[$entity] = $this->loadDispatchIni($fullEntityPath);
     }
 
-    return $this->_dispatchInis[$entity];
+    return self::$_dispatchInis[$entity];
+  }
+
+  /**
+   * @return \Cubex\Foundation\Config\Config
+   */
+  public function getBaseDispatchConfig()
+  {
+    if(self::$_dispatchIni === null)
+    {
+      $configDir = $this->getFileSystem()->resolvePath(
+        $this->getProjectBase() . "/../conf"
+      );
+      $dispatchIni = $this->loadDispatchIni($configDir);
+      self::$_dispatchIni = new Config($dispatchIni);
+    }
+
+    return self::$_dispatchIni;
+  }
+
+  /**
+   * @param string $directory
+   *
+   * @return array
+   */
+  public function loadDispatchIni($directory)
+  {
+    $path = $directory . DS . $this->getDispatchIniFilename();
+
+    $dispatchIni = @parse_ini_file($path, false);
+
+    if($dispatchIni === false)
+    {
+      $dispatchIni = [];
+    }
+
+    return $dispatchIni;
   }
 
   /**

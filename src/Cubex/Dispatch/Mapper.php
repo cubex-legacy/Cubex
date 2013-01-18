@@ -16,6 +16,8 @@ class Mapper extends Dispatcher
    */
   private $_ignoredFiles = [];
 
+  private $_configLines = [];
+
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
     parent::__construct($configGroup, $fileSystem);
@@ -30,6 +32,8 @@ class Mapper extends Dispatcher
   public function run()
   {
     $entities = $this->findEntities();
+    $this->setEntityMapConfigLines($entities);
+    $this->writeConfig();
     $maps = $this->mapEntities($entities);
     $savedMaps = $this->saveMaps($maps);
 
@@ -292,5 +296,46 @@ class Mapper extends Dispatcher
     }
 
     return $directories;
+  }
+
+  public function writeConfig()
+  {
+    $config = "";
+
+    foreach($this->_configLines as $configLine)
+    {
+      $config .= "$configLine\n";
+    }
+
+    $directory = $this->getFileSystem()->resolvePath(
+      $this->getProjectBase() . "/../conf"
+    );
+
+    $file = $directory  . DS . $this->getDispatchIniFilename();
+
+    try
+    {
+      $this->getFileSystem()->writeFile($file, $config);
+      return true;
+    }
+    catch(\Exception $e)
+    {
+      // Ah well
+      return false;
+    }
+  }
+
+  public function setConfigLine($line)
+  {
+    $this->_configLines[] = $line;
+  }
+
+  public function setEntityMapConfigLines(array $entities)
+  {
+    foreach($entities as $entity)
+    {
+      $entityHash = $this->generateEntityHash($entity);
+      $this->setConfigLine("entity_map[$entityHash] = $entity");
+    }
   }
 }

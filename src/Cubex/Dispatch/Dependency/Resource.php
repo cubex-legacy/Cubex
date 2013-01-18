@@ -125,7 +125,7 @@ class Resource extends Dependency
     ];
 
     $key = $event->getType() . "_" . $dispatchPath->getEntityHash();
-    self::$_requires["packages"][$key] = true;
+    //self::$_requires["packages"][$key] = true;
   }
 
   /**
