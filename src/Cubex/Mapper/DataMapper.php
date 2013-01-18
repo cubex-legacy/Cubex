@@ -12,6 +12,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   protected $_attributes;
   protected $_invalidAttributes;
   protected $_exists = false;
+  protected $_autoTimestamp = true;
 
   /**
    * Automatically add all public properties as attributes
@@ -52,6 +53,19 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
         );
       }
       unset($this->$property);
+    }
+
+    if($this->_autoTimestamp)
+    {
+      if(!$this->_attributeExists($this->_updatedAttribute()))
+      {
+        $this->_addAttribute(new Attribute($this->_updatedAttribute()));
+      }
+
+      if(!$this->_attributeExists($this->_createdAttribute()))
+      {
+        $this->_addAttribute(new Attribute($this->_createdAttribute()));
+      }
     }
   }
 
@@ -445,5 +459,45 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     }
 
     return $this;
+  }
+
+  protected function _updatedAttribute()
+  {
+    return 'updated_at';
+  }
+
+  protected function _createdAttribute()
+  {
+    return 'created_at';
+  }
+
+  protected function _updateTimestamps()
+  {
+    if(!$this->_autoTimestamp)
+    {
+      return false;
+    }
+
+    $updateAttribute = "set" . $this->_updatedAttribute();
+    $this->_doCall($updateAttribute, [$this->currentDateTime()]);
+    if(!$this->exists())
+    {
+      var_dump($this);
+      $createdAttribute = "set" . $this->_createdAttribute();
+      $this->_doCall($createdAttribute, [$this->currentDateTime()]);
+    }
+
+    return true;
+  }
+
+  public function currentDateTime()
+  {
+    return new \DateTime;
+  }
+
+  public function saveChanges()
+  {
+    $this->_updateTimestamps();
+    return false;
   }
 }

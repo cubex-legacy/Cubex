@@ -55,6 +55,14 @@ class RecordMapper extends DataMapper
   }
 
   /**
+   * @return array
+   */
+  public function getConfiguration()
+  {
+    return array(static::CONFIG_IDS => static::ID_AUTOINCREMENT);
+  }
+
+  /**
    * @return string
    */
   protected function _idPattern()
@@ -117,6 +125,7 @@ class RecordMapper extends DataMapper
         $row = $rows[0];
         $this->hydrate((array)$row);
         $this->setExists(true);
+        $this->_unmodifyAttributes();
       }
       else
       {
@@ -271,6 +280,11 @@ class RecordMapper extends DataMapper
   }
 
 
+  public function getDateFormat($attribute = null)
+  {
+    return "Y-m-d H:i:s";
+  }
+
   /**
    * @return mixed
    */
@@ -280,16 +294,32 @@ class RecordMapper extends DataMapper
     $modified   = $this->getModifiedAttributes();
     $updates    = $inserts = array();
 
+    if(!empty($modified))
+    {
+      $this->_updateTimestamps();
+      $modified = $this->getModifiedAttributes();
+    }
+
     foreach($modified as $attr)
     {
       if($attr instanceof Attribute)
       {
         if($attr->isModified())
         {
-          $inserts[$attr->name()] = $attr->serialize();
+          $val = $attr->rawData();
+          if($val instanceof \DateTime)
+          {
+            $val = $val->format($this->getDateFormat($attr->name()));
+          }
+          else
+          {
+            $val = $attr->serialize();
+          }
+
+          $inserts[$attr->name()] = $val;
           $updates[]              = ParseQuery::parse(
             $connection,
-            array("%C = %ns", $attr->name(), $attr->serialize())
+            array("%C = %ns", $attr->name(), $val)
           );
           $attr->unsetModified();
         }
