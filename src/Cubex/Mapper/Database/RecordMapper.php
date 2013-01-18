@@ -416,4 +416,64 @@ class RecordMapper extends DataMapper
     }
     return $result;
   }
+
+  public static function min($key = 'id')
+  {
+    $a = new Aggregate((new static));
+    if(func_num_args() > 1)
+    {
+      $args = func_get_args();
+      array_shift($args);
+      call_user_func_array([$a, 'where'], $args);
+    }
+    return $a->min($key);
+  }
+
+  public static function max($key = 'id')
+  {
+    $a = new Aggregate((new static));
+    if(func_num_args() > 1)
+    {
+      $args = func_get_args();
+      array_shift($args);
+      call_user_func_array([$a, 'where'], $args);
+    }
+    return $a->max($key);
+  }
+
+  public static function avg($key = 'id')
+  {
+    $a = new Aggregate((new static));
+    if(func_num_args() > 1)
+    {
+      $args = func_get_args();
+      array_shift($args);
+      call_user_func_array([$a, 'where'], $args);
+    }
+    return $a->avg($key);
+  }
+
+  public static function sum($key = 'id')
+  {
+    $a = new Aggregate((new static));
+    if(func_num_args() > 1)
+    {
+      $args = func_get_args();
+      array_shift($args);
+      call_user_func_array([$a, 'where'], $args);
+    }
+    return $a->sum($key);
+  }
+
+  public static function count($key = 'id')
+  {
+    $a = new Aggregate((new static));
+    if(func_num_args() > 1)
+    {
+      $args = func_get_args();
+      array_shift($args);
+      call_user_func_array([$a, 'where'], $args);
+    }
+    return $a->count($key);
+  }
 }
