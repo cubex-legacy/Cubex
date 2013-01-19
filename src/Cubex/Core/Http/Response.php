@@ -190,7 +190,10 @@ class Response
   {
     EventManager::trigger(EventManager::CUBEX_RESPONSE_PREPARE, [], $this);
 
-    $this->addHeader("Status", $this->_httpStatus);
+    if($this->_renderType != self::RENDER_REDIRECT)
+    {
+      $this->addHeader("Status", $this->_httpStatus);
+    }
 
     if($this->_httpStatus == 304)
     {
@@ -237,6 +240,14 @@ class Response
         $this->sendHeaders();
         echo $this->_responseObject;
 
+        break;
+      case self::RENDER_REDIRECT:
+        if($this->_responseObject instanceof Redirect)
+        {
+          $this->addHeader("location", $this->_responseObject->destination());
+          $this->addHeader("Status", $this->_responseObject->getHttpStatus());
+          $this->sendHeaders();
+        }
         break;
       default:
         if($this->_responseObject instanceof Response)
