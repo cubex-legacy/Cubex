@@ -35,12 +35,12 @@ class Cache extends BaseFacade
 
   public static function set($key, $value, $expire = 1800)
   {
-    static::_getAccessor()->set($key, $value, $expire);
+    return static::_getAccessor()->set($key, $value, $expire);
   }
 
   public static function forever($key, $value)
   {
-    static::set($key, $value, 0);
+    return static::set($key, $value, 0);
   }
 
   public static function remember($key, \Closure $callback, $expire = 1800)
