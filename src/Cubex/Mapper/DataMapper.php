@@ -494,6 +494,12 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     return new \DateTime;
   }
 
+  public function touch()
+  {
+    $this->_updateTimestamps();
+    return $this;
+  }
+
   public function saveChanges()
   {
     $this->_updateTimestamps();
