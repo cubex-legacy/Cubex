@@ -4,6 +4,7 @@
  */
 namespace Cubex\Core\Response;
 
+use Cubex\Core\Http\DispatchIOTrait;
 use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
@@ -24,6 +25,8 @@ class Webpage implements
   DispatchInjection,
   DispatchableAccess
 {
+  use DispatchIOTrait;
+
   /**
    * @var \Cubex\Core\Http\Response
    */
@@ -53,44 +56,6 @@ class Webpage implements
   public function __toString()
   {
     return $this->render();
-  }
-
-  /**
-   * @param \Cubex\Core\Http\Response $response
-   *
-   * @return $this
-   */
-  public function setResponse(Response $response)
-  {
-    $this->_response = $response;
-    return $this;
-  }
-
-  /**
-   * @param \Cubex\Core\Http\Request $request
-   *
-   * @return $this
-   */
-  public function setRequest(Request $request)
-  {
-    $this->_request = $request;
-    return $this;
-  }
-
-  /**
-   * @return \Cubex\Core\Http\Request
-   */
-  public function request()
-  {
-    return $this->_request;
-  }
-
-  /**
-   * @return \Cubex\Core\Http\Response
-   */
-  public function response()
-  {
-    return $this->_response;
   }
 
   public function setStatusCode($status = 200)
