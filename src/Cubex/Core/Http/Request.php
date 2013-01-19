@@ -24,6 +24,7 @@ class Request implements \IteratorAggregate
   protected $_port = 80;
   protected $_processedHost;
   protected $_definedTlds = array();
+  protected $_headers;
   protected $_knownTlds = array('co', 'com', 'org', 'me', 'gov', 'net', 'edu');
 
 
@@ -311,6 +312,16 @@ class Request implements \IteratorAggregate
   }
 
   /**
+   * SERVER Variables (Excluding __ prefixed used by Cubex)
+   *
+   * @return array
+   */
+  public function serverVariables()
+  {
+    return $this->_getVariables($_SERVER);
+  }
+
+  /**
    * GET Variables (Excluding __ prefixed used by Cubex)
    *
    * @return array
@@ -349,5 +360,31 @@ class Request implements \IteratorAggregate
     }
 
     return $variables;
+  }
+
+  public function headers()
+  {
+    if($this->_headers === null)
+    {
+      foreach($_SERVER as $k => $v)
+      {
+        if(substr($k, 0, 5) == 'HTTP_')
+        {
+          $this->_headers[strtolower(substr($k, 5))] = $v;
+        }
+      }
+    }
+    return $this->_headers;
+  }
+
+  public function header($key, $default = null)
+  {
+    $key     = strtolower($key);
+    $headers = $this->headers();
+    if(isset($headers[$key]))
+    {
+      return $headers[$key];
+    }
+    return $default;
   }
 }
