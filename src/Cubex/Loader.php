@@ -4,6 +4,7 @@
  */
 namespace Cubex;
 
+use Cubex\Cli\Dictionary;
 use Cubex\Core\Http\DispatchInjection;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
@@ -531,15 +532,9 @@ class Loader
 
     $_SERVER['CUBEX_CLI'] = true;
 
-    if(stristr($script, '.'))
-    {
-      $script = str_replace('.', '\\', $script);
-    }
-
-    if(!class_exists($script))
-    {
-      $script = 'Cubex\\' . $script;
-    }
+    $dictionary = new Dictionary();
+    $dictionary->configure($this->_configuration);
+    $script = $dictionary->match($script);
 
     if(class_exists($script))
     {
