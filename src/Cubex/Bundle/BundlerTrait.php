@@ -27,7 +27,14 @@ trait BundlerTrait
     {
       if(!$this->hasBundle($name))
       {
-        $this->addBundle($name, $bundle);
+        if($bundle instanceof BundleInterface)
+        {
+          $this->addBundle($name, $bundle);
+        }
+        else
+        {
+          throw new \Exception("Invalid bundle $name");
+        }
       }
     }
   }
