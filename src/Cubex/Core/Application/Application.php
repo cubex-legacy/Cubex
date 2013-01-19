@@ -4,6 +4,7 @@
  */
 namespace Cubex\Core\Application;
 
+use Cubex\Bundle\BundlerTrait;
 use Cubex\Core\Interfaces\DirectoryAware;
 use Cubex\Core\Interfaces\NamespaceAware;
 use Cubex\Dispatch\Utils\ListenerTrait;
@@ -36,6 +37,7 @@ abstract class Application
   use Translation;
   use ListenerTrait;
   use ServiceManagerAwareTrait;
+  use BundlerTrait;
 
   protected $_namespaceCache;
 
@@ -107,6 +109,9 @@ abstract class Application
     $this->_request  = $request;
     $this->_response = $response;
     $this->_listen();
+    $this->initialiseBundles();
+
+    //TODO: getAllBundleRoutes() and merge into routes
 
     $router = new StdRouter($this->_getRoutes(), $request->requestMethod());
 
@@ -184,6 +189,8 @@ abstract class Application
         "Invalid dispatcher defined " . json_encode($dispatcher)
       );
     }
+
+    $this->shutdownBundles();
 
     return $response;
   }

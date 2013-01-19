@@ -4,14 +4,13 @@
  */
 namespace Cubex\Core\Project;
 
+use Cubex\Bundle\BundlerTrait;
 use Cubex\Core\Application\Application;
-use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Core\Http\Dispatchable;
 use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
-use Cubex\Http\DispatchInjection;
 use Cubex\ServiceManager\ServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
@@ -26,6 +25,7 @@ abstract class Project
 {
   use ServiceManagerAwareTrait;
   use ConfigTrait;
+  use BundlerTrait;
 
   /**
    * Project Name
@@ -135,6 +135,8 @@ abstract class Project
 
     $this->init();
 
+    $this->initialiseBundles();
+
     $app = $this->getApplication($request);
     $app->setServiceManager($this->getServiceManager());
     $app->setProject($this);
@@ -144,8 +146,14 @@ abstract class Project
     {
       throw new \RuntimeException("No configuration has been set");
     }
+
     $app->configure($this->_configuration);
-    return $app->dispatch($request, $response);
+
+    $return = $app->dispatch($request, $response);
+
+    $this->shutdownBundles();
+
+    return $return;
   }
 
   /**
