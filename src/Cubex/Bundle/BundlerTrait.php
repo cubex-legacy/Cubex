@@ -5,6 +5,9 @@
 
 namespace Cubex\Bundle;
 
+use Cubex\Foundation\Config\Configurable;
+use Cubex\ServiceManager\ServiceManagerAware;
+
 trait BundlerTrait
 {
   /**
@@ -14,6 +17,16 @@ trait BundlerTrait
 
   public function addBundle($alias, BundleInterface $bundle)
   {
+    if($bundle instanceof ServiceManagerAware)
+    {
+      $bundle->setServiceManager($this->getServiceManager());
+    }
+
+    if($bundle instanceof Configurable)
+    {
+      $bundle->configure($this->getConfig());
+    }
+
     $this->_bundles[$alias] = $bundle;
     return $this;
   }
