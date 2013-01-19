@@ -9,8 +9,12 @@ interface BundleInterface
 {
   /**
    * Initialise bundle
+   *
+   * @param null $initialiser Object initialising the bundle
+   *
+   * @return bool
    */
-  public function init();
+  public function init($initialiser = null);
 
   /**
    * Shutdown of bundle triggered

@@ -31,7 +31,7 @@ trait BundlerTrait
 
   public function initialiseBundle($alias)
   {
-    return $this->_bundles[$alias]->init();
+    return $this->_bundles[$alias]->init($this);
   }
 
   public function initialiseBundles()
