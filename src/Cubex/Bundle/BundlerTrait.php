@@ -61,7 +61,7 @@ trait BundlerTrait
   public function shutdownBundle($alias)
   {
     $result = $this->_bundles[$alias]->shutdown();
-    $this->removeBundle($this->_bundles[$alias]);
+    $this->removeBundle($alias);
     return $result;
   }
 
