@@ -23,6 +23,7 @@ abstract class Bundle implements BundleInterface
    */
   public function init()
   {
+    return true;
   }
 
   /**
@@ -30,6 +31,7 @@ abstract class Bundle implements BundleInterface
    */
   public function shutdown()
   {
+    return true;
   }
 
   /**
@@ -54,5 +56,13 @@ abstract class Bundle implements BundleInterface
   public function getPath()
   {
     return dirname($this->_reflection()->getFileName());
+  }
+
+  /**
+   * @return array|\Cubex\Routing\Route[]
+   */
+  public function getRoutes()
+  {
+    return [];
   }
 }

@@ -31,4 +31,9 @@ interface BundleInterface
    * @return string Absolute path to bundle
    */
   public function getPath();
+
+  /**
+   * @return array|\Cubex\Routing\Route[]
+   */
+  public function getRoutes();
 }
