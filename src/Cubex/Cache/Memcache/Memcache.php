@@ -83,4 +83,16 @@ class Memcache implements CacheService
   {
     // TODO: Implement set() method.
   }
+
+  /**
+   * Delete key from the cache
+   *
+   * @param $key
+   *
+   * @return mixed
+   */
+  public function delete($key)
+  {
+    //TODO: Implement delete() method.
+  }
 }

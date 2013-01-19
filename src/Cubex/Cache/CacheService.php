@@ -51,4 +51,14 @@ interface CacheService
    * @return mixed
    */
   public function set($key, $data, $expire = 0);
+
+
+  /**
+   * Delete key from the cache
+   *
+   * @param $key
+   *
+   * @return mixed
+   */
+  public function delete($key);
 }
