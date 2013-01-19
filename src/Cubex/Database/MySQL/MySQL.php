@@ -253,9 +253,26 @@ class MySQL implements DatabaseService
   public function getColumns($query)
   {
     $this->_prepareConnection('r');
-    $result = $this->getKeyedRows($query);
+    $result  = $this->_doQuery($query);
+    $columns = array();
+    if($result->num_rows > 0)
+    {
+      $row     = $result->fetch_object();
+      $columns = array_keys(get_object_vars($row));
+    }
 
-    return array_keys($result);
+    try
+    {
+      if($result)
+      {
+        $result->close();
+      }
+    }
+    catch(\Exception $e)
+    {
+    }
+
+    return $columns;
   }
 
   /**
