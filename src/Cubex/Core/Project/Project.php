@@ -135,6 +135,7 @@ abstract class Project
 
     $this->init();
 
+    $this->addDefaultBundles();
     $this->initialiseBundles();
 
     $app = $this->getApplication($request);

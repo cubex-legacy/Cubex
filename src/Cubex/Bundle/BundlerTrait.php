@@ -15,6 +15,28 @@ trait BundlerTrait
    */
   protected $_bundles = [];
 
+  public function getBundles()
+  {
+    return [];
+  }
+
+  public function addDefaultBundles()
+  {
+    $bundles = $this->getBundles();
+    foreach($bundles as $name => $bundle)
+    {
+      if(!$this->hasBundle($name))
+      {
+        $this->addBundle($name, $bundle);
+      }
+    }
+  }
+
+  public function getRegisteredBundles()
+  {
+    return $this->_bundles;
+  }
+
   public function addBundle($alias, BundleInterface $bundle)
   {
     if($bundle instanceof ServiceManagerAware)

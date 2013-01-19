@@ -109,6 +109,7 @@ abstract class Application
     $this->_request  = $request;
     $this->_response = $response;
     $this->_listen();
+    $this->addDefaultBundles();
     $this->initialiseBundles();
 
     //TODO: getAllBundleRoutes() and merge into routes
