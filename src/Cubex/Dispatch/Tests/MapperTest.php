@@ -45,6 +45,11 @@ class MapperTest extends TestCase
       ["Project/Applications/Www/res", "Project/res"], $entities
     );
 
+    $mapper     = new Mapper($this->_configGroup, new FileSystem());
+    $noEntities = $mapper->findEntities("idontexist");
+
+    $this->assertEquals([], $noEntities);
+
     return current($entities);
   }
 
@@ -63,9 +68,9 @@ class MapperTest extends TestCase
       ["listDirectory", "isDir", "fileExists", "readFile"]
     );
 
-    $fileSystemMock->expects($this->exactly(2))
+    $fileSystemMock->expects($this->exactly(4))
       ->method("listDirectory")
-      ->will($this->onConsecutiveCalls(["test.css"], []));
+      ->will($this->onConsecutiveCalls(["test.css"], [], ["test.css"], []));
 
     $fileSystemMock->expects($this->any())
       ->method("fileExists")
@@ -75,9 +80,10 @@ class MapperTest extends TestCase
       ->method("isDir")
       ->will($this->returnValue(false));
 
-    $fileSystemMock->expects($this->exactly(3))
+    $fileSystemMock->expects($this->exactly(6))
       ->method("readFile")
       ->will($this->onConsecutiveCalls(
+        $cssContentsArr[0], $cssContentsArr[1], $cssContentsArr[2],
         $cssContentsArr[0], $cssContentsArr[1], $cssContentsArr[2]
       ));
 
@@ -88,5 +94,18 @@ class MapperTest extends TestCase
     $this->assertEquals(
       md5(implode("", $cssContentsArr)), $entityMap["$entity/test.css"]
     );
+
+    // Test map entities
+    $entitiesMaps = $mapper->mapEntities([$entity]);
+    $this->assertArrayHasKey("$entity", $entitiesMaps);
+    $this->assertArrayHasKey("$entity/test.css", current($entitiesMaps));
+
+    // Test bad dir
+    $mapper      = new Mapper($this->_configGroup, new FileSystem());
+    $noEntityMap = $mapper->mapEntity("idontexist");
+
+    $this->assertEquals([], $noEntityMap);
+
+    return current($entities);
   }
 }
