@@ -319,6 +319,14 @@ class Dispatcher
   }
 
   /**
+   * @param array $config
+   */
+  public static function setBaseDispatchConfig(array $config)
+  {
+    self::$_dispatchIni = new Config($config);
+  }
+
+  /**
    * @param string $directory
    *
    * @return array

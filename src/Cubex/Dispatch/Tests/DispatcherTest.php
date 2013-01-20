@@ -39,8 +39,6 @@ class DispatcherTest extends TestCase
     $this->_configGroup = ConfigGroup::fromArray(
       array(
         "dispatch"  => array(
-          "domain_map"            => $this->_domainMap,
-          "entity_map"            => $this->_entityMap,
           "dispatch_ini_filename" => $this->_dispatchIniFilename,
           "resource_directory"    => $this->_resourceDirectory
         ),
@@ -51,6 +49,13 @@ class DispatcherTest extends TestCase
           "project_base" => $this->_projectBase
         )
       )
+    );
+
+    Dispatcher::setBaseDispatchConfig(
+      [
+        "domain_map" => $this->_domainMap,
+        "entity_map" => $this->_entityMap,
+      ]
     );
 
     $this->_dispatcher = new Dispatcher($this->_configGroup, new FileSystem());
