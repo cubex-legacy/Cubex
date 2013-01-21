@@ -98,6 +98,13 @@ abstract class Application
   }
 
   /**
+   * Custom dispatch hook
+   */
+  public function dispatching()
+  {
+  }
+
+  /**
    * @param \Cubex\Core\Http\Request  $request
    * @param \Cubex\Core\Http\Response $response
    *
@@ -111,6 +118,7 @@ abstract class Application
     $this->_listen();
     $this->addDefaultBundles();
     $this->initialiseBundles();
+    $this->dispatching();
 
     //TODO: getAllBundleRoutes() and merge into routes
 
