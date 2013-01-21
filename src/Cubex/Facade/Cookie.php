@@ -52,18 +52,15 @@ class Cookie
     }
   }
 
-  private static function _listen()
+  public static function _listen()
   {
     EventManager::listen(
       EventManager::CUBEX_RESPONSE_PREPARE,
-      function()
-      {
-        self::_write();
-      }
+      [__NAMESPACE__ . "\\Cookie", "write"]
     );
   }
 
-  private static function _write()
+  public static function write()
   {
     self::$_written = true;
     if(!headers_sent())
