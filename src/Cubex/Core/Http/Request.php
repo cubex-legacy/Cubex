@@ -25,7 +25,15 @@ class Request implements \IteratorAggregate
   protected $_processedHost;
   protected $_definedTlds = array();
   protected $_headers;
-  protected $_knownTlds = array('co', 'com', 'org', 'me', 'gov', 'net', 'edu');
+  protected $_knownTlds = array(
+    'co',
+    'com',
+    'org',
+    'me',
+    'gov',
+    'net',
+    'edu'
+  );
 
 
   /**
@@ -34,7 +42,7 @@ class Request implements \IteratorAggregate
    */
   public function __construct($path = null, $host = null)
   {
-    $this->_host          = $host === null ? $_SERVER['HTTP_HOST'] : $host; //SERVER_NAME
+    $this->_host          = $host === null ? $_SERVER['HTTP_HOST'] : $host;
     $this->_path          = $path === null ? $_SERVER['REQUEST_URI'] : $path;
     $this->_requestMethod = $_SERVER['REQUEST_METHOD'];
   }
@@ -105,11 +113,11 @@ class Request implements \IteratorAggregate
       return $this;
     }
 
-    $parts = \array_reverse(\explode('.', $host));
+    $parts = array_reverse(explode('.', strtolower($host)));
 
-    if(\strstr($parts[0], ':') !== false)
+    if(strstr($parts[0], ':') !== false)
     {
-      list($parts[0], $this->_port) = \explode(':', $parts[0], 2);
+      list($parts[0], $this->_port) = explode(':', $parts[0], 2);
     }
 
     foreach($parts as $i => $part)
@@ -121,9 +129,9 @@ class Request implements \IteratorAggregate
       else if(empty($this->_domain))
       {
         if($i < 2
-        && (\strlen($part) == 2
-        || \in_array($part . '.' . $this->_tld, $this->_definedTlds)
-        || \in_array($part, $this->_knownTlds))
+        && (strlen($part) == 2
+        || in_array($part . '.' . $this->_tld, $this->_definedTlds)
+        || in_array($part, $this->_knownTlds))
         )
         {
           $this->_tld = $part . '.' . $this->_tld;
@@ -232,7 +240,7 @@ class Request implements \IteratorAggregate
     {
       return false;
     }
-    else if(!\strcasecmp($_SERVER["HTTPS"], "off"))
+    else if(!strcasecmp($_SERVER["HTTPS"], "off"))
     {
       return false;
     }
@@ -266,7 +274,7 @@ class Request implements \IteratorAggregate
    */
   public function is($method)
   {
-    return strtoupper($method) == strtoupper($this->requestMethod());
+    return !strcasecmp($method, $this->requestMethod());
   }
 
   /**
@@ -276,7 +284,7 @@ class Request implements \IteratorAggregate
   {
     if(isset($_SERVER['HTTP_X_REQUESTED_WITH']))
     {
-      if(strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+      if(!strcasecmp($_SERVER['HTTP_X_REQUESTED_WITH'], 'xmlhttprequest'))
       {
         return true;
       }
