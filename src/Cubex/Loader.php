@@ -6,6 +6,10 @@ namespace Cubex;
 
 use Cubex\Cli\Dictionary;
 use Cubex\Core\Http\DispatchInjection;
+use Cubex\Dispatch\Dispatcher;
+use Cubex\Dispatch\FileSystem;
+use Cubex\Dispatch\Path;
+use Cubex\Dispatch\Serve;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
@@ -272,16 +276,17 @@ class Loader
         "/", $trimmedPath, 2
       );
 
-      $dispatchServe = new \Cubex\Dispatch\Serve(
-        $this->getConfig(),
-        new \Cubex\Dispatch\FileSystem(),
-        new \Cubex\Dispatch\Path($this->request()->path())
+      $dispatch = new Dispatcher(
+        $this->getConfig(), new FileSystem()
       );
 
-      if($dispatchServe->getResourceDirectory()
-      === $potentialDispatcherDirectory
-      )
+      if($dispatch->getResourceDirectory() === $potentialDispatcherDirectory)
       {
+        $dispatchServe = new Serve(
+          $this->getConfig(),
+          new FileSystem(),
+          new Path($this->request()->path())
+        );
         $this->setDispatchable($dispatchServe);
       }
     }
