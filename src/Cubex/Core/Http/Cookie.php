@@ -30,7 +30,7 @@ class Cookie
    * @param bool                 $httponly
    * @param string               $mode
    */
-  protected function __construct($name, $value = null, $expire = 0,
+  public function __construct($name, $value = null, $expire = 0,
                                  $path = null, $domain = null, $secure = false,
                                  $httponly = false, $mode = "w")
   {
@@ -196,13 +196,13 @@ class Cookie
   }
 
   /**
-   * @param string|null $path
+   * @param string $path
    *
    * @return Cookie
    */
   public function setPath($path)
   {
-    $this->_path = $path;
+    $this->_path = empty($path) ? "/" : $path;
     $this->_setMode(self::MODE_WRITE);
 
     return $this;
@@ -293,5 +293,47 @@ class Cookie
     $this->_setMode(self::MODE_WRITE);
 
     return $this;
+  }
+
+  public function __toString()
+  {
+    $str = urlencode($this->getName()) ."=";
+
+    if((string) $this->getValue() === "")
+    {
+      $str .= "deleted; expires=" .
+        gmdate("D, d-M-Y H:i:s T", time() - 31536001);
+    }
+    else
+    {
+      $str .= urlencode($this->getValue());
+
+      if($this->getExpire() !== 0)
+      {
+        $str .= "; expires=".gmdate("D, d-M-Y H:i:s T", $this->getExpire());
+      }
+    }
+
+    if($this->getPath() !== "/")
+    {
+      $str .= "; path=".$this->getPath();
+    }
+
+    if($this->getDomain() !== null)
+    {
+      $str .= "; domain=".$this->getDomain();
+    }
+
+    if($this->isSecure() === true)
+    {
+      $str .= "; secure";
+    }
+
+    if($this->isHttpOnly() === true)
+    {
+      $str .= "; httponly";
+    }
+
+    return $str;
   }
 }
