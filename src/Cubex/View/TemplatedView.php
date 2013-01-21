@@ -37,7 +37,7 @@ class TemplatedView implements Renderable, NamespaceAware
       );
     }
 
-    $this->_entity    = $entity;
+    $this->_entity = $entity;
     $this->_directory = $entity->containingDirectory();
     $this->_directory .= '/Templates/';
     $this->setTemplate($template);
@@ -53,8 +53,8 @@ class TemplatedView implements Renderable, NamespaceAware
       }
       else if($this->_entity !== null)
       {
-        $class                 = get_class($this->_entity);
-        $reflect               = new \ReflectionClass($class);
+        $class = get_class($this->_entity);
+        $reflect = new \ReflectionClass($class);
         $this->_namespaceCache = $reflect->getNamespaceName();
       }
       else
@@ -88,5 +88,11 @@ class TemplatedView implements Renderable, NamespaceAware
   public function getFilePath()
   {
     return $this->_directory . '/' . $this->_template . '.phtml';
+  }
+
+  public function getRenderFiles()
+  {
+    $brander = new Branding\TemplateBranding($this->_directory);
+    return $brander->buildFileList($this->_template, '.phtml');
   }
 }

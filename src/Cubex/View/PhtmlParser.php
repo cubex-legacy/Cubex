@@ -9,17 +9,23 @@ trait PhtmlParser
 {
   abstract public function getFilePath();
 
+  public function getRenderFiles()
+  {
+    return [$this->getFilePath()];
+  }
+
   /**
+   * @param $file
+   * @param bool $checkExists
    * @return string
    */
-  public function render()
+  protected function _renderFile($file, $checkExists = false)
   {
     $rendered = '';
 
-    $layout = $this->getFilePath();
-    if(file_exists($layout))
+    if(!$checkExists || file_exists($file))
     {
-      $raw = \file_get_contents($layout);
+      $raw = \file_get_contents($file);
       $raw = $this->processRaw($raw);
       \ob_start();
       try //Make sure the view does not cause the entire render to fail
@@ -33,6 +39,28 @@ trait PhtmlParser
       }
 
       $rendered = \ob_get_clean();
+    }
+
+    return $rendered;
+  }
+
+  /**
+   * @return string
+   */
+  public function render()
+  {
+    $files = $this->getRenderFiles();
+    $rendered = '';
+
+    foreach($files as $file)
+    {
+      $checkExists = true;
+      if(is_array($file))
+      {
+        $checkExists = $file['check'];
+        $file = $file['file'];
+      }
+      $rendered .= $this->_renderFile($file, $checkExists);
     }
 
     return $rendered;

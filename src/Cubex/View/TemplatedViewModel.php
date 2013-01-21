@@ -9,9 +9,10 @@ class TemplatedViewModel extends ViewModel
   use PhtmlParser;
 
   protected $_filePath;
+  protected $_fileExt = 'phtml';
   protected $_baseDirectory;
 
-  public function getFilePath()
+  protected function _calculate()
   {
     if($this->_baseDirectory === null && $this->_filePath === null)
     {
@@ -26,8 +27,20 @@ class TemplatedViewModel extends ViewModel
     {
       $this->_calculateFilePath();
     }
+    return $this;
+  }
 
-    return $this->_baseDirectory . DIRECTORY_SEPARATOR . $this->_filePath;
+  public function getRenderFiles()
+  {
+    $this->_calculate();
+    $brander = new Branding\TemplateBranding($this->_baseDirectory);
+    return $brander->buildFileList($this->_filePath, $this->_fileExt);
+  }
+
+  public function getFilePath()
+  {
+    $this->_calculate();
+    return $this->_baseDirectory . DS . $this->_filePath . '.' . $this->_fileExt;
   }
 
   public function setTemplateDirectory($directory)
@@ -43,7 +56,8 @@ class TemplatedViewModel extends ViewModel
 
   public function setTemplateFile($file, $ext = 'phtml')
   {
-    $this->_filePath = $file . '.' . $ext;
+    $this->_filePath = $file;
+    $this->_fileExt = $ext;
   }
 
   protected function _calculateFilePath()
@@ -55,17 +69,22 @@ class TemplatedViewModel extends ViewModel
 
   protected function _calculateTemplate()
   {
-    $class     = get_called_class();
+    $class = get_called_class();
     $reflector = new \ReflectionClass($class);
-    $ns        = ltrim($reflector->getName(), "\\");
-    $nsParts   = explode('\\', $ns);
+    $ns = ltrim($reflector->getName(), "\\");
+    $nsParts = explode('\\', $ns);
 
     foreach($nsParts as $part)
     {
       array_shift($nsParts);
       $part = \strtolower($part);
       if(
-        \in_array($part, ['controllers', 'views'])
+        \in_array(
+          $part, [
+                 'controllers',
+                 'views'
+                 ]
+        )
         || \substr($part, -10) == 'controller'
       )
       {
@@ -74,15 +93,18 @@ class TemplatedViewModel extends ViewModel
     }
 
     $templatesPath = dirname($reflector->getFileName());
-    $partCount     = count($nsParts);
+    $partCount = count($nsParts);
     for($ii = 0; $ii < $partCount; $ii++)
     {
       $templatesPath = dirname($templatesPath);
     }
 
     $directory = $templatesPath . DIRECTORY_SEPARATOR . 'Templates';
-    $file      = implode('\\', $nsParts);
+    $file = implode('\\', $nsParts);
 
-    return array('directory' => $directory, 'file' => $file);
+    return array(
+      'directory' => $directory,
+      'file' => $file
+    );
   }
 }
