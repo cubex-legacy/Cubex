@@ -363,6 +363,6 @@ class BaseController
    */
   public function defaultAction()
   {
-    return null;
+    return "index";
   }
 }
