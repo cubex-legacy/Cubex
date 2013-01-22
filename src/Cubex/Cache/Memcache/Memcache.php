@@ -13,7 +13,15 @@ use Cubex\ServiceManager\ServiceConfig;
 
 class Memcache implements CacheService
 {
-  protected $_connection = null;
+  /**
+   * @var \Memcache
+   */
+  protected $_connection;
+
+  /**
+   * @var \Cubex\ServiceManager\ServiceConfig
+   */
+  protected $_config;
 
   /**
    * Create new memcache connection
@@ -24,16 +32,16 @@ class Memcache implements CacheService
    */
   public function configure(ServiceConfig $config)
   {
+    $this->_config     = $config;
     $this->_connection = new \Memcache();
     $this->_connection->addserver($config->getStr("hostname"));
   }
 
-  /**
-   * @param string $mode Either 'r' (reading) or 'w' (reading and writing)
-   */
   public function connect($mode = 'w')
   {
-    // TODO: Implement connect() method.
+    return $this->_connection->connect(
+      $this->_config->getStr("hostname", 'localhost')
+    );
   }
 
   /**
@@ -43,7 +51,7 @@ class Memcache implements CacheService
    */
   public function disconnect()
   {
-    // TODO: Implement disconnect() method.
+    return $this->_connection->close();
   }
 
   /**
@@ -55,7 +63,7 @@ class Memcache implements CacheService
    */
   public function get($key)
   {
-    // TODO: Implement get() method.
+    return $this->_connection->get($key);
   }
 
   /**
@@ -67,7 +75,7 @@ class Memcache implements CacheService
    */
   public function multi(array $keys)
   {
-    // TODO: Implement multi() method.
+    return $this->_connection->get($keys);
   }
 
   /**
@@ -81,7 +89,13 @@ class Memcache implements CacheService
    */
   public function set($key, $data, $expire = 0)
   {
-    // TODO: Implement set() method.
+    $compress = !(is_bool($data) || is_int($data) || is_float($data));
+    return $this->_connection->set(
+      $key,
+      $data,
+      $compress ? MEMCACHE_COMPRESSED : false,
+      $expire
+    );
   }
 
   /**
@@ -93,6 +107,6 @@ class Memcache implements CacheService
    */
   public function delete($key)
   {
-    //TODO: Implement delete() method.
+    return $this->_connection->delete($key);
   }
 }
