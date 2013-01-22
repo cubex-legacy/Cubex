@@ -21,14 +21,14 @@ if(!function_exists("cubex_run_time"))
   }
 }
 
-if(!function_exists("class_basename"))
+if(!function_exists("class_shortname"))
 {
   /**
    * @param $class
    *
    * @return string
    */
-  function class_basename($class)
+  function class_shortname($class)
   {
     $class = is_object($class) ? get_class($class) : $class;
 
