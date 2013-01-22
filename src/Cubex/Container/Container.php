@@ -13,6 +13,7 @@ class Container
   const SERVICE_MANAGER = 'cubex.servicemanager';
   const REQUEST         = 'cubex.request';
   const RESPONSE        = 'cubex.response';
+  const AUTHED_USER     = 'cubex.authuser';
 
   public static function bind($name, $object)
   {
