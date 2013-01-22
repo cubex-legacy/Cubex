@@ -105,7 +105,5 @@ class MapperTest extends TestCase
     $noEntityMap = $mapper->mapEntity("idontexist");
 
     $this->assertEquals([], $noEntityMap);
-
-    return current($entities);
   }
 }
