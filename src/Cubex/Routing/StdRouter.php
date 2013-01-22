@@ -38,15 +38,48 @@ class StdRouter implements Router
    */
   public function getRoute($pattern)
   {
+    $routeMatches = [];
     foreach($this->_routes as $route)
     {
       $result = $this->_tryRoute($route, $pattern);
       if($result instanceof StdRoute)
       {
-        return $result;
+        $routeMatches[] = $result;
       }
     }
-    return null;
+
+    if(empty($routeMatches))
+    {
+      return null;
+    }
+    else
+    {
+      usort(
+        $routeMatches,
+        [
+        $this,
+        '_sortRoutes'
+        ]
+      );
+      return array_shift($routeMatches);
+    }
+  }
+
+  protected function _sortRoutes(StdRoute $a, StdRoute $b)
+  {
+    $aparts = (int)substr_count($a->pattern(), "/");
+    $bparts = (int)substr_count($b->pattern(), "/");
+
+    if($aparts == $bparts)
+    {
+      $aparts = strlen($a->pattern());
+      $bparts = strlen($b->pattern());
+      if($aparts == $bparts)
+      {
+        return 0;
+      }
+    }
+    return ($aparts < $bparts) ? 1 : -1;
   }
 
   /**
