@@ -22,6 +22,11 @@ trait TranslateTraits
       EventManager::CUBEX_TRANSLATE_T, ['text' => $message], $this
     );
 
+    if($result === null)
+    {
+      $result = $message;
+    }
+
     if(func_num_args() > 1)
     {
       $args = func_get_args();
@@ -29,14 +34,7 @@ trait TranslateTraits
       $result = vsprintf($result, $args);
     }
 
-    if($result === null)
-    {
-      return $message;
-    }
-    else
-    {
-      return $result;
-    }
+    return $result;
   }
 
   /**
