@@ -98,8 +98,8 @@ class StdRouter implements Router
       }
     }
     $routePattern = $route->pattern();
-    if(\substr($pattern, -1) != '/') $pattern = $pattern . '/';
-    if(\substr($routePattern, -1) != '/') $routePattern = $routePattern . '/';
+    if(substr($pattern, -1) != '/') $pattern = $pattern . '/';
+    if(substr($routePattern, -1) != '/') $routePattern = $routePattern . '/';
 
     $routePattern = $this->convertSimpleRoute($routePattern);
 
@@ -108,30 +108,33 @@ class StdRouter implements Router
 
     if($match)
     {
-      foreach($matches as $k => $v)
+      if($route->hasSubRoutes())
       {
-        //Strip out all non declared matches
-        if(!\is_numeric($k))
+        $subRoutes = $route->subRoutes();
+        foreach($subRoutes as $subRoute)
         {
-          $route->addRouteData($k, $v);
-        }
-      }
-      return $route;
-    }
-    else if($route->hasSubRoutes())
-    {
-      $subRoutes = $route->subRoutes();
-      foreach($subRoutes as $subRoute)
-      {
-        if($subRoute instanceof StdRoute)
-        {
-          $result = $this->_tryRoute($subRoute, $pattern);
-          if($result instanceof StdRoute)
+          if($subRoute instanceof StdRoute)
           {
-            return $subRoute;
+            $result = $this->_tryRoute($subRoute, $pattern);
+            if($result instanceof StdRoute)
+            {
+              return $subRoute;
+            }
           }
         }
       }
+      else
+      {
+        foreach($matches as $k => $v)
+        {
+          //Strip out all non declared matches
+          if(!\is_numeric($k))
+          {
+            $route->addRouteData($k, $v);
+          }
+        }
+      }
+      return $route;
     }
 
     return false;
