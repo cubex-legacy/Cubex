@@ -66,7 +66,10 @@ class ServiceManager
       throw new \Exception("Service already exists");
     }
 
-    $this->_services[$name] = array('config' => $config, 'shared' => $shared);
+    $this->_services[$name] = array(
+      'config' => $config,
+      'shared' => $shared
+    );
     return $this;
   }
 
@@ -102,6 +105,11 @@ class ServiceManager
         else
         {
           throw new \Exception("Invalid service created by '$factoryClass'");
+        }
+
+        if($service instanceof ServiceManagerAware)
+        {
+          $service->setServiceManager($this);
         }
 
         if($this->_services[$name]['shared'])
