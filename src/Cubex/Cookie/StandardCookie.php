@@ -4,9 +4,9 @@
  *
  * @author  gareth.evans
  */
-namespace Cubex\Core\Http;
+namespace Cubex\Cookie;
 
-class Cookie
+class StandardCookie implements CookieInterface
 {
   protected $_name;
   protected $_value;
@@ -28,11 +28,10 @@ class Cookie
    * @param string|null          $domain
    * @param bool                 $secure
    * @param bool                 $httponly
-   * @param string               $mode
    */
   public function __construct($name, $value = null, $expire = 0,
-                                 $path = null, $domain = null, $secure = false,
-                                 $httponly = false, $mode = "w")
+                              $path = null, $domain = null, $secure = false,
+                              $httponly = false)
   {
     $this->_setName($name)
       ->setValue($value)
@@ -40,14 +39,13 @@ class Cookie
       ->setPath($path)
       ->setDomain($domain)
       ->setSecure($secure)
-      ->setHttponly($httponly)
-      ->_setMode($mode);
+      ->setHttponly($httponly);
   }
 
   /**
    * @return bool
    */
-  protected function _isRead()
+  public function isRead()
   {
     return $this->_mode === self::MODE_READ;
   }
@@ -55,9 +53,9 @@ class Cookie
   /**
    * @return bool
    */
-  protected function _isWrite()
+  public function isWrite()
   {
-    return !$this->_isRead();
+    return !$this->isRead();
   }
 
   /**
@@ -65,7 +63,7 @@ class Cookie
    *
    * @throws \InvalidArgumentException
    */
-  protected function _setMode($mode)
+  public function setMode($mode)
   {
     $modeArr = [self::MODE_READ => true, self::MODE_WRITE => true];
     if(!array_key_exists($mode, $modeArr))
@@ -89,7 +87,7 @@ class Cookie
   /**
    * @param string $name
    *
-   * @return Cookie
+   * @return StandardCookie
    * @throws \InvalidArgumentException
    */
   protected function _setName($name)
@@ -107,7 +105,7 @@ class Cookie
     }
 
     $this->_name = $name;
-    $this->_setMode(self::MODE_WRITE);
+    $this->setMode(self::MODE_WRITE);
 
     return $this;
   }
@@ -123,12 +121,12 @@ class Cookie
   /**
    * @param string|null $value
    *
-   * @return Cookie
+   * @return StandardCookie
    */
   public function setValue($value)
   {
     $this->_value = $value;
-    $this->_setMode(self::MODE_WRITE);
+    $this->setMode(self::MODE_WRITE);
 
     return $this;
   }
@@ -139,7 +137,7 @@ class Cookie
    */
   public function getExpire()
   {
-    if($this->_isRead())
+    if($this->isRead())
     {
       throw new \BadMethodCallException(
         "getExpire() is only available in write mode."
@@ -152,7 +150,7 @@ class Cookie
   /**
    * @param int|string|\DateTime $expire
    *
-   * @return Cookie
+   * @return StandardCookie
    * @throws \InvalidArgumentException
    */
   public function setExpire($expire)
@@ -174,7 +172,7 @@ class Cookie
     }
 
     $this->_expire = $expire;
-    $this->_setMode(self::MODE_WRITE);
+    $this->setMode(self::MODE_WRITE);
 
     return $this;
   }
@@ -185,7 +183,7 @@ class Cookie
    */
   public function getPath()
   {
-    if($this->_isRead())
+    if($this->isRead())
     {
       throw new \BadMethodCallException(
         "getPath() is only available in write mode."
@@ -198,12 +196,12 @@ class Cookie
   /**
    * @param string $path
    *
-   * @return Cookie
+   * @return StandardCookie
    */
   public function setPath($path)
   {
     $this->_path = empty($path) ? "/" : $path;
-    $this->_setMode(self::MODE_WRITE);
+    $this->setMode(self::MODE_WRITE);
 
     return $this;
   }
@@ -214,7 +212,7 @@ class Cookie
    */
   public function getDomain()
   {
-    if($this->_isRead())
+    if($this->isRead())
     {
       throw new \BadMethodCallException(
         "getDomain() is only available in write mode."
@@ -227,12 +225,12 @@ class Cookie
   /**
    * @param string|null$domain
    *
-   * @return Cookie
+   * @return StandardCookie
    */
   public function setDomain($domain)
   {
     $this->_domain = $domain;
-    $this->_setMode(self::MODE_WRITE);
+    $this->setMode(self::MODE_WRITE);
 
     return $this;
   }
@@ -243,7 +241,7 @@ class Cookie
    */
   public function isSecure()
   {
-    if($this->_isRead())
+    if($this->isRead())
     {
       throw new \BadMethodCallException(
         "isSecure() is only available in write mode."
@@ -256,12 +254,12 @@ class Cookie
   /**
    * @param bool $secure
    *
-   * @return Cookie
+   * @return StandardCookie
    */
   public function setSecure($secure)
   {
     $this->_secure = $secure;
-    $this->_setMode(self::MODE_WRITE);
+    $this->setMode(self::MODE_WRITE);
 
     return $this;
   }
@@ -272,7 +270,7 @@ class Cookie
    */
   public function isHttponly()
   {
-    if($this->_isRead())
+    if($this->isRead())
     {
       throw new \BadMethodCallException(
         "isHttponly() is only available in write mode."
@@ -285,21 +283,30 @@ class Cookie
   /**
    * @param bool $httponly
    *
-   * @return Cookie
+   * @return StandardCookie
    */
   public function setHttponly($httponly)
   {
     $this->_httponly = $httponly;
-    $this->_setMode(self::MODE_WRITE);
+    $this->setMode(self::MODE_WRITE);
 
     return $this;
   }
 
+  public function delete()
+  {
+    $this->setExpire(time() - 31536001);
+    $this->setValue("");
+  }
+
+  /**
+   * @return string
+   */
   public function __toString()
   {
     $str = urlencode($this->getName()) ."=";
 
-    if((string) $this->getValue() === "")
+    if((string)$this->getValue() === "")
     {
       $str .= "deleted; expires=" .
         gmdate("D, d-M-Y H:i:s T", time() - 31536001);
