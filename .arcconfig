@@ -1,4 +1,6 @@
 {
     "project_id" : "Cubex",
-    "conduit_uri" : "http://phabricator.cubex.io/"
+    "conduit_uri" : "http://phabricator.cubex.io/",
+    "unit_engine" : "PhpunitTestEngine",
+    "phpunit_config" : "phpunit.xml.dist"
 }
