@@ -193,7 +193,12 @@ class RecordMapper extends DataMapper
   {
     if($this->_dbTableName === null)
     {
-      $excludeParts = ['mappers', 'applications', 'modules', 'components'];
+      $excludeParts = [
+        'mappers',
+        'applications',
+        'modules',
+        'components'
+      ];
       $nsparts      = explode('\\', strtolower(get_class($this)));
 
       foreach($nsparts as $i => $part)
@@ -242,7 +247,10 @@ class RecordMapper extends DataMapper
     {
       return in_array(
         $config[self::CONFIG_IDS],
-        [self::ID_COMPOSITE, self::ID_COMPOSITE_SPLIT]
+        [
+        self::ID_COMPOSITE,
+        self::ID_COMPOSITE_SPLIT
+        ]
       );
     }
 
@@ -319,7 +327,11 @@ class RecordMapper extends DataMapper
           $inserts[$attr->name()] = $val;
           $updates[]              = ParseQuery::parse(
             $connection,
-            array("%C = %ns", $attr->name(), $val)
+            array(
+                 "%C = %ns",
+                 $attr->name(),
+                 $val
+            )
           );
           $attr->unsetModified();
         }
@@ -367,7 +379,18 @@ class RecordMapper extends DataMapper
 
     $query = ParseQuery::parse($connection, $args);
 
-    return $connection->query($query);
+    $result = $connection->query($query);
+
+    if(!$this->exists())
+    {
+      $newId = $connection->insertId();
+      if($newId !== null)
+      {
+        $this->setId($newId);
+      }
+    }
+
+    return $result;
   }
 
   public function hasOne(RecordMapper $entity, $foreignKey = null)
@@ -422,7 +445,12 @@ class RecordMapper extends DataMapper
     {
       $args = func_get_args();
       array_shift($args);
-      call_user_func_array([$a, 'where'], $args);
+      call_user_func_array(
+        [
+        $a,
+        'where'
+        ], $args
+      );
     }
     return $a->min($key);
   }
@@ -434,7 +462,12 @@ class RecordMapper extends DataMapper
     {
       $args = func_get_args();
       array_shift($args);
-      call_user_func_array([$a, 'where'], $args);
+      call_user_func_array(
+        [
+        $a,
+        'where'
+        ], $args
+      );
     }
     return $a->max($key);
   }
@@ -446,7 +479,12 @@ class RecordMapper extends DataMapper
     {
       $args = func_get_args();
       array_shift($args);
-      call_user_func_array([$a, 'where'], $args);
+      call_user_func_array(
+        [
+        $a,
+        'where'
+        ], $args
+      );
     }
     return $a->avg($key);
   }
@@ -458,7 +496,12 @@ class RecordMapper extends DataMapper
     {
       $args = func_get_args();
       array_shift($args);
-      call_user_func_array([$a, 'where'], $args);
+      call_user_func_array(
+        [
+        $a,
+        'where'
+        ], $args
+      );
     }
     return $a->sum($key);
   }
@@ -470,7 +513,12 @@ class RecordMapper extends DataMapper
     {
       $args = func_get_args();
       array_shift($args);
-      call_user_func_array([$a, 'where'], $args);
+      call_user_func_array(
+        [
+        $a,
+        'where'
+        ], $args
+      );
     }
     return $a->count($key);
   }
