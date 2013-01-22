@@ -374,7 +374,7 @@ class RecordMapper extends DataMapper
   {
     if($foreignKey === null)
     {
-      $foreignKey = strtolower(class_basename($this)) . '_id';
+      $foreignKey = strtolower(class_shortname($this)) . '_id';
     }
 
     $table  = new RecordCollection($entity);
@@ -388,7 +388,7 @@ class RecordMapper extends DataMapper
   {
     if($foreignKey === null)
     {
-      $foreignKey = strtolower(class_basename($this)) . '_id';
+      $foreignKey = strtolower(class_shortname($this)) . '_id';
     }
 
     $collection = new RecordCollection($entity);
@@ -400,7 +400,7 @@ class RecordMapper extends DataMapper
   {
     if($foreignKey === null)
     {
-      $foreignKey = strtolower(class_basename($entity)) . '_id';
+      $foreignKey = strtolower(class_shortname($entity)) . '_id';
     }
 
     $key = $this->_attribute($foreignKey)->data();
