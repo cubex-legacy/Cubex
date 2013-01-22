@@ -1,6 +1,11 @@
 {
     "project_id" : "Cubex",
     "conduit_uri" : "http://phabricator.cubex.io/",
+
     "unit_engine" : "PhpunitTestEngine",
-    "phpunit_config" : "phpunit.xml.dist"
+    "phpunit_config" : "phpunit.xml.dist",
+
+    "lint.engine" : "ArcanistSingleLintEngine",
+    "lint.engine.single.linter" : "ArcanistPhpcsLinter",
+    "lint.phpcs.standard" : "cubex_code_standards"
 }
