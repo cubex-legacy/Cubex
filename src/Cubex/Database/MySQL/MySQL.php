@@ -300,4 +300,14 @@ class MySQL implements DatabaseService
 
     return $rows;
   }
+
+  /**
+   * Last Inserted ID
+   *
+   * @return null|mixed
+   */
+  public function insertId()
+  {
+    return $this->_connection->insert_id;
+  }
 }

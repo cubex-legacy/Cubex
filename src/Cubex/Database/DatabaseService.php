@@ -103,4 +103,11 @@ interface DatabaseService extends Service
    * @return mixed
    */
   public function escapeString($string);
+
+  /**
+   * Last Inserted ID
+   *
+   * @return null|mixed
+   */
+  public function insertId();
 }

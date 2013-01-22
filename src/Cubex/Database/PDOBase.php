@@ -281,4 +281,14 @@ abstract class PDOBase implements DatabaseService
 
     return $rows;
   }
+
+  /**
+   * Last Inserted ID
+   *
+   * @return null|mixed
+   */
+  public function insertId()
+  {
+    return $this->_connection->lastInsertId();
+  }
 }
