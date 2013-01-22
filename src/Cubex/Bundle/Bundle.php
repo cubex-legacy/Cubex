@@ -18,6 +18,11 @@ abstract class Bundle implements BundleInterface
     return $this->_reflect;
   }
 
+  public function defaultHandle()
+  {
+    return null;
+  }
+
   /**
    * Initialise bundle
    *

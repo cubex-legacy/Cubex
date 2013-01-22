@@ -100,11 +100,12 @@ class StdRouter implements Router
     $routePattern = $route->pattern();
     if(substr($pattern, -1) != '/') $pattern = $pattern . '/';
     if(substr($routePattern, -1) != '/') $routePattern = $routePattern . '/';
+    if(substr($routePattern, 0, 1) != '/') $routePattern = '/' . $routePattern;
 
     $routePattern = $this->convertSimpleRoute($routePattern);
 
     $matches = array();
-    $match   = \preg_match("#^$routePattern#", $pattern, $matches);
+    $match   = preg_match("#^$routePattern$#", $pattern, $matches);
 
     if($match)
     {
@@ -115,6 +116,7 @@ class StdRouter implements Router
         {
           if($subRoute instanceof StdRoute)
           {
+            $subRoute->setPattern($route->pattern() . $subRoute->pattern());
             $result = $this->_tryRoute($subRoute, $pattern);
             if($result instanceof StdRoute)
             {

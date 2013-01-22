@@ -14,6 +14,7 @@ trait BundlerTrait
    * @var BundleInterface[]
    */
   protected $_bundles = [];
+  protected $_handles = [];
 
   public function getBundles()
   {
@@ -44,7 +45,7 @@ trait BundlerTrait
     return $this->_bundles;
   }
 
-  public function addBundle($alias, BundleInterface $bundle)
+  public function addBundle($alias, BundleInterface $bundle, $handles = null)
   {
     if($bundle instanceof ServiceManagerAware)
     {
@@ -56,7 +57,18 @@ trait BundlerTrait
       $bundle->configure($this->getConfig());
     }
 
+    if($handles === null && method_exists($bundle, 'defaultHandle'))
+    {
+      $handles = $bundle->defaultHandle();
+    }
+
     $this->_bundles[$alias] = $bundle;
+
+    if($handles !== null)
+    {
+      $this->_handles[$handles] = $alias;
+    }
+
     return $this;
   }
 
@@ -112,11 +124,14 @@ trait BundlerTrait
 
   public function getAllBundleRoutes()
   {
-    $result  = [];
-    $bundles = array_keys($this->_bundles);
-    foreach($bundles as $bundle)
+    $result = [];
+    foreach($this->_handles as $handle => $bundle)
     {
-      $result[$bundle] = $this->getBundleRoutes($bundle);
+      $result[$handle] = $this->getBundleRoutes($bundle);
+      if($result[$handle] === null || empty($result[$handle]))
+      {
+        unset($result[$handle]);
+      }
     }
     return $result;
   }

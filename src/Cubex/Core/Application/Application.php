@@ -120,8 +120,6 @@ abstract class Application
     $this->initialiseBundles();
     $this->dispatching();
 
-    //TODO: getAllBundleRoutes() and merge into routes
-
     $router = new StdRouter($this->_getRoutes(), $request->requestMethod());
 
     $dispatcherRoute = $router->getRoute($request->path());
@@ -257,8 +255,11 @@ abstract class Application
    */
   protected function _getRoutes()
   {
-    $finalRoutes = array();
-    $routes      = $this->getRoutes();
+    $finalRoutes   = array();
+    $interalRoutes = $this->getRoutes();
+    $bundleRoutes  = $this->getAllBundleRoutes();
+    $routes        = array_merge((array)$interalRoutes, (array)$bundleRoutes);
+
     if(!empty($routes))
     {
       foreach($routes as $routePattern => $routeResult)
@@ -283,6 +284,7 @@ abstract class Application
         }
       }
     }
+
     return $finalRoutes;
   }
 
@@ -337,7 +339,12 @@ abstract class Application
           $args = array_merge($args, $e->getArr("args", []));
         }
 
-        return call_user_func_array([$this, 't'], $args);
+        return call_user_func_array(
+          [
+          $this,
+          't'
+          ], $args
+        );
       },
       $this->getNamespace()
     );
@@ -352,7 +359,12 @@ abstract class Application
           $e->getInt("number"),
         ];
 
-        return call_user_func_array([$this, 'p'], $args);
+        return call_user_func_array(
+          [
+          $this,
+          'p'
+          ], $args
+        );
       },
       $this->getNamespace()
     );
