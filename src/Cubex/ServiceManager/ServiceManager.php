@@ -87,15 +87,29 @@ class ServiceManager
       $config = $this->_services[$name]['config'];
       if($config instanceof ServiceConfig)
       {
-        $factoryClass = $config->getFactory();
-        $factory      = new $factoryClass();
-        if($factory instanceof ServiceFactory)
+        $service = null;
+
+        $provider = $config->getStr("service_provider");
+        if($provider)
         {
-          $service = $factory->createService($config);
+          $factoryClass = $provider;
+          if(class_exists($provider))
+          {
+            $service = new $provider();
+          }
         }
         else
         {
-          throw new \Exception("Invalid service factory");
+          $factoryClass = $config->getFactory();
+          $factory      = new $factoryClass();
+          if($factory instanceof ServiceFactory)
+          {
+            $service = $factory->createService($config);
+          }
+          else
+          {
+            throw new \Exception("Invalid service factory");
+          }
         }
 
         if($service instanceof Service)
