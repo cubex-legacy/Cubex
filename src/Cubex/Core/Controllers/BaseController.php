@@ -203,7 +203,7 @@ class BaseController
       $action = $route->result();
       $params = $route->routeData();
     }
-    $this->hydrate($params);
+    $this->appendData($params);
 
     ob_start(); //Stop any naughty output making a mess of our response
     $result   = $this->runAction($action, $params);
