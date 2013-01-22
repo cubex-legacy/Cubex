@@ -33,7 +33,12 @@ class RecordCollection extends Collection
 
   public function loadOneWhere($pattern /* , $arg, $arg, $arg ... */)
   {
-    call_user_func_array(array($this, 'loadWhere'), func_get_args());
+    call_user_func_array(
+      array(
+           $this,
+           'loadWhere'
+      ), func_get_args()
+    );
 
     if(count($this->_mappers) > 1)
     {
@@ -81,7 +86,7 @@ class RecordCollection extends Collection
         foreach($rows as $row)
         {
           $map = clone $this->_mapperType;
-          $map->hydrate((array)$row);
+          $map->hydrate((array)$row, true);
           $map->setExists(true);
           $this->addMapper($map);
         }

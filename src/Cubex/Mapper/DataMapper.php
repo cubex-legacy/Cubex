@@ -444,10 +444,10 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
   /**
    * @param array $data
-   *
+   * @param bool $setUnmodified
    * @return DataMapper
    */
-  public function hydrate(array $data)
+  public function hydrate(array $data, $setUnmodified = false)
   {
     foreach($data as $k => $v)
     {
@@ -455,6 +455,10 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
       {
         $set = "set$k";
         $this->$set($this->_attribute($k)->unserialize($v));
+        if($setUnmodified)
+        {
+          $this->_attribute($k)->unsetModified();
+        }
       }
     }
 
