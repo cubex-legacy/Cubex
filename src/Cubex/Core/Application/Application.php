@@ -333,17 +333,12 @@ abstract class Application
       EventManager::CUBEX_TRANSLATE_T,
       function (Event $e)
       {
-        $args = [$e->getStr("text")];
-        if($e->getExists('args'))
-        {
-          $args = array_merge($args, $e->getArr("args", []));
-        }
-
-        return call_user_func_array(
+        return call_user_func(
           [
           $this,
           't'
-          ], $args
+          ],
+          $e->getStr("text")
         );
       },
       $this->getNamespace()

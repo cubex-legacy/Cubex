@@ -18,22 +18,15 @@ trait TranslateTraits
    */
   public function t($message)
   {
+    $result = EventManager::triggerUntil(
+      EventManager::CUBEX_TRANSLATE_T, ['text' => $message], $this
+    );
+
     if(func_num_args() > 1)
     {
       $args = func_get_args();
       array_shift($args);
-
-      $result = EventManager::triggerUntil(
-        EventManager::CUBEX_TRANSLATE_T,
-        ['text' => $message, 'args' => $args],
-        $this
-      );
-    }
-    else
-    {
-      $result = EventManager::triggerUntil(
-        EventManager::CUBEX_TRANSLATE_T, ['text' => $message], $this
-      );
+      $result = vsprintf($result, $args);
     }
 
     if($result === null)
