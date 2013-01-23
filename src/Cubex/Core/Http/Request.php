@@ -340,6 +340,16 @@ class Request implements \IteratorAggregate
   }
 
   /**
+   * FILES Variables (Excluding __ prefixed used by Cubex)
+   *
+   * @return array
+   */
+  public function fileVariables()
+  {
+    return $this->_getVariables($_FILES);
+  }
+
+  /**
    * POST Variables (Excluding __ prefixed used by Cubex)
    *
    * @return array
