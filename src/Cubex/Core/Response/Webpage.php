@@ -39,6 +39,7 @@ class Webpage implements
   protected $_meta;
   protected $_bodyAttributes = [];
   protected $_renderables = [];
+  protected $_headerElements = [];
 
   /**
    * @var \Cubex\View\Layout
@@ -96,7 +97,12 @@ class Webpage implements
 
   public function registerPageTitleListener()
   {
-    EM::listen(EM::CUBEX_PAGE_TITLE, array($this, "setTitle"));
+    EM::listen(
+      EM::CUBEX_PAGE_TITLE, array(
+                                 $this,
+                                 "setTitle"
+                            )
+    );
     return $this;
   }
 
@@ -143,6 +149,25 @@ class Webpage implements
     return $html;
   }
 
+  public function addHeaderElement($element = '', $alias = null)
+  {
+    if($alias === null)
+    {
+      $this->_headerElements[] = $element;
+    }
+    else
+    {
+      $this->_headerElements[$alias] = $element;
+    }
+    return $this;
+  }
+
+  public function removeAliasedHeaderElement($alias)
+  {
+    unset($this->_headerElements[$alias]);
+    return $this;
+  }
+
   /**
    * Get CSS
    *
@@ -160,7 +185,12 @@ class Webpage implements
       $cssHeaders->addElements($cssUris);
     }
 
-    return $cssHeaders . $this->metaHTML();
+    $head = '';
+    $head .= $cssHeaders;
+    $head .= implode('', $this->_headerElements);
+    $head .= $this->metaHTML();
+
+    return $head;
   }
 
   /**
@@ -375,9 +405,12 @@ class Webpage implements
     ); //Strip HTML Comments
 
     $search  = array(
-      '/\>[^\S ]+/s', //strip whitespaces after tags, except space
-      '/[^\S ]+\</s', //strip whitespaces before tags, except space
-      '/(\s)+/s' // shorten multiple whitespace sequences
+      '/\>[^\S ]+/s',
+      //strip whitespaces after tags, except space
+      '/[^\S ]+\</s',
+      //strip whitespaces before tags, except space
+      '/(\s)+/s'
+      // shorten multiple whitespace sequences
     );
     $replace = array(
       '>',
