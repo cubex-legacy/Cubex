@@ -18,7 +18,7 @@ class DetectionTest extends TestCase
   public function setUp()
   {
     $this->_detectionMock = $this->getMock(
-      "\\Cubex\\Platform\\DetectionInterface"
+      "\\Cubex\\Platform\\Detection\\DetectionService"
     );
   }
 
@@ -36,59 +36,11 @@ class DetectionTest extends TestCase
       ->will($this->returnValue(true));
 
     /**
-     * @var \Cubex\Platform\DetectionInterface $detectionMock
+     * @var \Cubex\Platform\Detection\DetectionService $detectionMock
      */
-    $detection = new Detection($detectionMock);
 
-    $this->assertFalse($detection->isMobile());
-    $this->assertFalse($detection->isTablet());
-    $this->assertTrue($detection->isDesktop());
-  }
-
-  public function testExceptionsThrownWhenConfigMissingOrClassIsIncorrect()
-  {
-    $this->setExpectedException(
-      "\\RuntimeException",
-      "No platform detection class is set in your config<br />\n".
-      "Please set<br />\n".
-      "[project]<br />\n".
-      Detection::DETECTION_CLASS_KEY.
-      "={{Prefered Platform Detection Class}}"
-    );
-    Detection::loadFromConfig(ConfigGroup::fromArray(["project" => []]));
-
-    $this->setExpectedException(
-      "\\RuntimeException",
-      "The detection class does not implement the correct interface;<br />\n".
-      "\\Cubex\\Platform\\DetectionInterface"
-    );
-    Detection::loadFromConfig(
-      ConfigGroup::fromArray(
-        [
-          "project" =>
-          [
-            Detection::DETECTION_CLASS_KEY => "random"
-          ]
-        ]
-      )
-    );
-  }
-
-  public function testExceptionThrownWhenSetUserAgentNotAvailable()
-  {
-    $detectionMock = $this->_detectionMock;
-    $detectionMock->expects($this->once())
-      ->method("canSetUserAgent")
-      ->will($this->returnValue(false));
-
-    $this->setExpectedException(
-      "\\BadMethodCallException",
-      "This detection class does not support the setUserAgent() method"
-    );
-
-    /**
-     * @var \Cubex\Platform\DetectionInterface $detectionMock
-     */
-    (new Detection($detectionMock))->setUserAgent([]);
+    $this->assertFalse($detectionMock->isMobile());
+    $this->assertFalse($detectionMock->isTablet());
+    $this->assertTrue($detectionMock->isDesktop());
   }
 }
