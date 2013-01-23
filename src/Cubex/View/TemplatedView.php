@@ -93,6 +93,6 @@ class TemplatedView implements Renderable, NamespaceAware
   public function getRenderFiles()
   {
     $brander = new Branding\TemplateBranding($this->_directory);
-    return $brander->buildFileList($this->_template, '.phtml');
+    return $brander->buildFileList($this->_template, 'phtml');
   }
 }
