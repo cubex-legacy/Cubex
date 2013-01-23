@@ -57,7 +57,7 @@ class TemplatedViewModel extends ViewModel
   public function setTemplateFile($file, $ext = 'phtml')
   {
     $this->_filePath = $file;
-    $this->_fileExt = $ext;
+    $this->_fileExt  = $ext;
   }
 
   protected function _calculateFilePath()
@@ -69,23 +69,23 @@ class TemplatedViewModel extends ViewModel
 
   protected function _calculateTemplate()
   {
-    $class = get_called_class();
+    $class     = get_called_class();
     $reflector = new \ReflectionClass($class);
-    $ns = ltrim($reflector->getName(), "\\");
-    $nsParts = explode('\\', $ns);
+    $ns        = ltrim($reflector->getName(), "\\");
+    $nsParts   = explode('\\', $ns);
 
     foreach($nsParts as $part)
     {
       array_shift($nsParts);
-      $part = \strtolower($part);
+      $part = strtolower($part);
       if(
-        \in_array(
+        in_array(
           $part, [
                  'controllers',
                  'views'
                  ]
         )
-        || \substr($part, -10) == 'controller'
+        || substr($part, -10) == 'controller'
       )
       {
         break;
@@ -93,18 +93,18 @@ class TemplatedViewModel extends ViewModel
     }
 
     $templatesPath = dirname($reflector->getFileName());
-    $partCount = count($nsParts);
+    $partCount     = count($nsParts);
     for($ii = 0; $ii < $partCount; $ii++)
     {
       $templatesPath = dirname($templatesPath);
     }
 
     $directory = $templatesPath . DIRECTORY_SEPARATOR . 'Templates';
-    $file = implode('\\', $nsParts);
+    $file      = implode('\\', $nsParts);
 
     return array(
       'directory' => $directory,
-      'file' => $file
+      'file'      => $file
     );
   }
 }
