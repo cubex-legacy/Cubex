@@ -416,6 +416,7 @@ class RecordMapper extends DataMapper
 
     $collection = new RecordCollection($entity);
     $collection->loadWhere($this->idPattern(), $foreignKey, $this->id());
+    $collection->setCreateData([$foreignKey => $this->id()]);
     return $collection;
   }
 

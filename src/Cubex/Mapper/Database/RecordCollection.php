@@ -13,6 +13,7 @@ class RecordCollection extends Collection
 {
   protected $_mapperType;
   protected $_columns = ['*'];
+  protected $_populate = [];
 
   public function __construct(RecordMapper $map, array $columns = ['*'])
   {
@@ -92,5 +93,26 @@ class RecordCollection extends Collection
         }
       }
     }
+  }
+
+  public function setCreateData(array $data)
+  {
+    $this->_populate = $data;
+  }
+
+  /**
+   * @return RecordMapper
+   */
+  public function create()
+  {
+    $map = clone $this->_mapperType;
+    if(!empty($this->_populate))
+    {
+      foreach($this->_populate as $k => $v)
+      {
+        $map->$k = $v;
+      }
+    }
+    return $map;
   }
 }
