@@ -10,6 +10,7 @@ namespace Cubex\ServiceManager;
 use Cubex\Cache\CacheService;
 use Cubex\Database\DatabaseService;
 use Cubex\Session\SessionService;
+use Psr\Log\InvalidArgumentException;
 
 class ServiceManager
 {
@@ -70,6 +71,7 @@ class ServiceManager
       'config' => $config,
       'shared' => $shared
     );
+
     return $this;
   }
 
@@ -82,7 +84,7 @@ class ServiceManager
    */
   protected function _create($name)
   {
-    if(isset($this->_services[$name]))
+    if($this->exists($name))
     {
       $config = $this->_services[$name]['config'];
       if($config instanceof ServiceConfig)
@@ -139,6 +141,33 @@ class ServiceManager
       {
         throw new \Exception("Invalid service details");
       }
+    }
+    else
+    {
+      throw new \InvalidArgumentException("Service does not exist");
+    }
+  }
+
+  /**
+   * @param string        $name
+   * @param ServiceConfig $config
+   * @param bool          $shared
+   *
+   * @return $this
+   * @throws \InvalidArgumentException
+   */
+  public function reBind($name, ServiceConfig $config, $shared = true)
+  {
+    if($this->exists($name))
+    {
+      $this->_services[$name] = array(
+        'config' => $config,
+        'shared' => $shared
+      );
+
+      $this->_create($name);
+
+      return $this;
     }
     else
     {
