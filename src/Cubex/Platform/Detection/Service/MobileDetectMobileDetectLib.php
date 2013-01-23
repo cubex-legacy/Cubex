@@ -2,19 +2,13 @@
 /**
  * @author: gareth.evans
  */
-namespace Cubex\Platform\Detection;
+namespace Cubex\Platform\Detection\Service;
 
-use Cubex\Platform\DetectionAbstract;
-use Cubex\Platform\DetectionInterface;
+use Cubex\Platform\Detection\DetectionService;
+use Cubex\ServiceManager\ServiceConfig;
 
-class MobileDetectMobileDetectLib
-  extends DetectionAbstract
-  implements DetectionInterface
+class MobileDetectMobileDetectLib implements DetectionService
 {
-  const CLASS_NAME = "\\Mobile_Detect";
-  const CLASS_DIR  = "mobiledetect/mobiledetectlib";
-  const FILE_NAME  = "Mobile_Detect.php";
-
   /**
    * @var \Mobile_Detect
    */
@@ -22,7 +16,11 @@ class MobileDetectMobileDetectLib
 
   public function __construct()
   {
-    parent::__construct(self::CLASS_NAME, self::CLASS_DIR, self::FILE_NAME);
+    $this->_detection = new \Mobile_Detect();
+  }
+
+  public function configure(ServiceConfig $config)
+  {
   }
 
   public function isMobile()
@@ -48,5 +46,7 @@ class MobileDetectMobileDetectLib
   public function setUserAgent(array $userAgent)
   {
     $this->_detection->setUserAgent($userAgent);
+
+    return $this;
   }
 }
