@@ -12,9 +12,7 @@ class Encryption extends BaseFacade
    */
   protected static function _getAccessor()
   {
-    $serviceManager = static::getServiceManager();
-
-    return $serviceManager->get("encryption");
+    return static::getServiceManager()->get("encryption");
   }
 
   /**
@@ -25,9 +23,7 @@ class Encryption extends BaseFacade
    */
   public static function encrypt($value, array $options = [])
   {
-    $accessor = static::_getAccessor();
-
-    return $accessor->encrypt($value, $options);
+    return static::_getAccessor()->encrypt($value, $options);
   }
 
   /**
@@ -38,8 +34,6 @@ class Encryption extends BaseFacade
    */
   public static function decrypt($value, array $options = [])
   {
-    $accessor = static::_getAccessor();
-
-    return $accessor->decrypt($value, $options);
+    return static::_getAccessor()->decrypt($value, $options);
   }
 }
