@@ -52,7 +52,7 @@ class RecordCollection extends Collection
     }
     else
     {
-      return false;
+      return null;
     }
   }
 

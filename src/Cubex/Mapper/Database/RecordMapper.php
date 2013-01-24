@@ -523,4 +523,20 @@ abstract class RecordMapper extends DataMapper
     }
     return $a->count($key);
   }
+
+  /**
+   * @return static|null
+   * @throws \Exception
+   */
+  public static function loadWhere()
+  {
+    $collection = new RecordCollection(new static());
+    return call_user_func_array(
+      [
+      $collection,
+      'loadOneWhere'
+      ],
+      func_get_args()
+    );
+  }
 }
