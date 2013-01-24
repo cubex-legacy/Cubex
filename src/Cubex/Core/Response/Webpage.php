@@ -116,7 +116,7 @@ class Webpage implements
     return 'UTF-8';
   }
 
-  public function addMeta($name,$content)
+  public function addMeta($name, $content)
   {
     $this->_meta[$name] = $content;
     return $this;
@@ -274,7 +274,7 @@ class Webpage implements
     . "\n"
     . '<head><meta charset="' . $charset . '" />'
     . '<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">'
-    . '<meta name="viewport" content="width=device-width">'
+    . '<meta name="viewport" content="width=device-width,initial-scale=1.0">'
     . '<script>function envPop(a){function b(c) {for (var d in a)c[d] = a[d];};'
     . 'window.Env = Env = window.Env || {};b(Env);};'
     . "!function(d){d.className=d.className.replace('no-js', '');}"
