@@ -43,6 +43,12 @@ class BaseController
    */
   protected $_application;
 
+  /**
+   * This is the result from the routeRequest() call (not the returned object)
+   * @var string|null
+   */
+  protected $_routeResult;
+
 
   /**
    * @param \Cubex\Core\Application\Application f$app
@@ -203,7 +209,9 @@ class BaseController
       $action = $route->result();
       $params = $route->routeData();
     }
+
     $this->appendData($params);
+    $this->setRouteResult($action);
 
     ob_start(); //Stop any naughty output making a mess of our response
     $result   = $this->runAction($action, $params);
@@ -364,5 +372,25 @@ class BaseController
   public function defaultAction()
   {
     return "index";
+  }
+
+  /**
+   * @param string $routeResult
+   *
+   * @return $this
+   */
+  public function setRouteResult($routeResult)
+  {
+    $this->_routeResult = $routeResult;
+
+    return $this;
+  }
+
+  /**
+   * @return null|string
+   */
+  public function getReouteResult()
+  {
+    return $this->_routeResult;
   }
 }
