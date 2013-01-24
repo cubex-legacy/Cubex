@@ -395,7 +395,7 @@ class BaseController
   /**
    * @return null|string
    */
-  public function getReouteResult()
+  public function getRouteResult()
   {
     return $this->_routeResult;
   }
