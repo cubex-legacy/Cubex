@@ -24,10 +24,14 @@ class Cli implements CliTask
 
   public function init()
   {
+    $conf           = $this->config("i18n");
+    $translator     = $conf->getStr(
+      "translator", '\Cubex\I18n\Translator\NoTranslator'
+    );
     $this->_builder = new Build(
       $this->getConfig()->get("_cubex_")->getStr(
         'project_base'
-      ), new Jumbler()
+      ), new $translator()
     );
 
     $this->_builder->addArea(
@@ -39,15 +43,31 @@ class Cli implements CliTask
       $this->setMsgfmt();
     }
 
-    $this->addLanguage('it');
-    $this->addLanguage('de');
+    $languages = $conf->getArr("languages", []);
+
+    if(empty($languages))
+    {
+      return "No Languages Set";
+    }
+
+    foreach($languages as $language)
+    {
+      $this->addLanguage($language);
+    }
 
     $this->run();
   }
 
   public function run()
   {
-    $this->_builder->run();
+    try
+    {
+      $this->_builder->run();
+    }
+    catch(\Exception $e)
+    {
+      print_r($e);
+    }
     return $this;
   }
 

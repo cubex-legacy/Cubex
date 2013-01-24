@@ -65,6 +65,7 @@ class Dictionary implements Configurable
     return [
       'dispatch' => '\Cubex\Dispatch\Mapper\CliInit',
       'branding' => '\Cubex\View\Branding\ViewMapper',
+      'translate' => '\Cubex\I18n\Processor\Cli',
     ];
   }
 

@@ -84,11 +84,19 @@ class Build
 
     $dirs   = [];
     $runDir = $this->_projectDir . DS . $directory;
-    if($handle = \opendir($runDir))
+    if($handle = opendir($runDir))
     {
-      while(false !== ($entry = \readdir($handle)))
+      while(false !== ($entry = readdir($handle)))
       {
-        if(\in_array($entry, array('.', '..', 'locale')))
+        if(in_array(
+          $entry, array(
+                       '.',
+                       '..',
+                       'locale',
+                       'res'
+                  )
+        )
+        )
         {
           continue;
         }
@@ -122,17 +130,17 @@ class Build
     }
     $runDir = $this->_projectDir . DS . $directory;
 
-    if(\is_dir($runDir))
+    if(is_dir($runDir))
     {
-      $mfile   = \md5($directory);
+      $mfile   = md5($directory);
       $analyse = new Analyse();
       $analyse->processDirectory($this->_projectDir . DS, $directory);
       $localeDir = $runDir . DS . 'locale';
-      if(!\file_exists($localeDir))
+      if(!file_exists($localeDir))
       {
-        \mkdir($localeDir);
+        mkdir($localeDir);
       }
-      \file_put_contents(
+      file_put_contents(
         $localeDir . DS . 'messages.po',
         $analyse->generatePO('', new Notranslator())
       );
@@ -141,18 +149,18 @@ class Build
       {
         $languageDir = $localeDir . DS . $language . DS . 'LC_MESSAGES';
 
-        if(!\file_exists($languageDir))
+        if(!file_exists($languageDir))
         {
-          \mkdir($languageDir, 0777, true);
+          mkdir($languageDir, 0777, true);
         }
 
-        \file_put_contents(
+        file_put_contents(
           $languageDir . DS . $mfile . '.po',
           $analyse->generatePO($language, $this->_translator)
         );
 
         $tfile = $languageDir . DS . $mfile;
-        \shell_exec(
+        shell_exec(
           $this->_msgFmt . ' -o "' . $tfile . '.mo" "' . $tfile . '.po"'
         );
 

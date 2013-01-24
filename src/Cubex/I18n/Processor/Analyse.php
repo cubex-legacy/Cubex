@@ -16,7 +16,10 @@ class Analyse
   /**
    * @var array
    */
-  protected $_translations = array('single' => array(), 'plural' => array());
+  protected $_translations = array(
+    'single' => array(),
+    'plural' => array()
+  );
 
   /**
    * @param $base
@@ -24,31 +27,39 @@ class Analyse
    */
   public function processDirectory($base, $directory)
   {
-    if($handle = \opendir($base . $directory))
+    if($handle = opendir($base . $directory))
     {
-      while(false !== ($entry = \readdir($handle)))
+      while(false !== ($entry = readdir($handle)))
       {
-        if(\in_array($entry, array('.', '..', 'locale')))
+        if(in_array(
+          $entry, array(
+                       '.',
+                       '..',
+                       'locale',
+                       'res'
+                  )
+        )
+        )
         {
           continue;
         }
 
-        if(\is_dir($base . $directory . DIRECTORY_SEPARATOR . $entry))
+        if(is_dir($base . $directory . DIRECTORY_SEPARATOR . $entry))
         {
           $this->processDirectory(
             $base, $directory . DIRECTORY_SEPARATOR . $entry
           );
         }
-        else if(\substr($entry, -4) == '.php' || \substr(
-          $entry, -6
-        ) == '.phtml'
+        else if(
+          substr($entry, -4) == '.php'
+          || substr($entry, -6) == '.phtml'
         )
         {
           $this->processFile($base, $directory . DIRECTORY_SEPARATOR . $entry);
         }
       }
 
-      \closedir($handle);
+      closedir($handle);
     }
   }
 
@@ -58,9 +69,9 @@ class Analyse
    */
   public function processFile($base, $path)
   {
-    $content   = \file_get_contents($base . $path);
-    $path      = \ltrim($path, DIRECTORY_SEPARATOR);
-    $tokens    = \token_get_all($content);
+    $content   = file_get_contents($base . $path);
+    $path      = ltrim($path, DIRECTORY_SEPARATOR);
+    $tokens    = token_get_all($content);
     $startLine = $building = 0;
     $msgId     = $type = $msgIdPlural = '';
     $started   = false;
@@ -99,16 +110,22 @@ class Analyse
         $building = 1;
       }
 
-      if($started && \is_scalar($token) && $token == ')')
+      if($started && is_scalar($token) && $token == ')')
       {
         if($type == 'plural')
         {
           $this->_translations[$type][md5(
             $msgId . $msgIdPlural
-          )]['data']    = array($msgId, $msgIdPlural);
+          )]['data']    = array(
+            $msgId,
+            $msgIdPlural
+          );
           $this->_translations[$type][md5(
             $msgId . $msgIdPlural
-          )]['options'] = array($path, $startLine);
+          )]['options'] = array(
+            $path,
+            $startLine
+          );
         }
         else if($type == 'singleplural')
         {
@@ -117,14 +134,23 @@ class Analyse
 
           $this->_translations['plural'][md5(
             $msgId . $msgIdPlural
-          )]['data']    = array($msgId, $msgIdPlural);
+          )]['data']    = array(
+            $msgId,
+            $msgIdPlural
+          );
           $this->_translations['plural'][md5(
             $msgId . $msgIdPlural
-          )]['options'] = array($path, $startLine);
+          )]['options'] = array(
+            $path,
+            $startLine
+          );
         }
         else
         {
-          $this->_translations[$type][$msgId][] = array($path, $startLine);
+          $this->_translations[$type][$msgId][] = array(
+            $path,
+            $startLine
+          );
         }
 
         $started = false;
@@ -134,11 +160,11 @@ class Analyse
       {
         if($building == 0)
         {
-          $msgId .= \substr($token[1], 1, -1);
+          $msgId .= substr($token[1], 1, -1);
         }
         else
         {
-          $msgIdPlural .= \substr($token[1], 1, -1);
+          $msgIdPlural .= substr($token[1], 1, -1);
         }
       }
     }
@@ -169,7 +195,7 @@ class Analyse
 
         foreach($appearances as $appearance)
         {
-          $result .= "\n#: " . \implode(":", $appearance);
+          $result .= "\n#: " . implode(":", $appearance);
         }
 
         $result .= "\n";
@@ -178,7 +204,7 @@ class Analyse
           $translated = $translator->translate(
             $message, $sourceLanguage, $language
           );
-          if(\strlen($message) < 80)
+          if(strlen($message) < 80)
           {
             $result .= 'msgid "' . $this->slash($message) . '"';
           }
@@ -190,7 +216,7 @@ class Analyse
             ) . '"';
           }
           $result .= "\n";
-          if(\strlen($translated) < 80)
+          if(strlen($translated) < 80)
           {
             $result .= 'msgstr "' . $this->slash($translated) . '"';
           }
@@ -212,7 +238,7 @@ class Analyse
             $message[1], $sourceLanguage, $language
           );
 
-          if(\strlen($message[0]) < 80)
+          if(strlen($message[0]) < 80)
           {
             $result .= 'msgid "' . $this->slash($message[0]) . '"';
           }
@@ -226,7 +252,7 @@ class Analyse
 
           $result .= "\n";
 
-          if(\strlen($message[1]) < 80)
+          if(strlen($message[1]) < 80)
           {
             $result .= 'msgid_plural "' . $this->slash($message[1]) . '"';
           }
@@ -263,10 +289,10 @@ class Analyse
   public function iconvWordwrap($string, $width = 75, $break = "\n",
                                 $cut = false, $charset = 'utf-8')
   {
-    $stringWidth = \iconv_strlen($string, $charset);
-    $breakWidth  = \iconv_strlen($break, $charset);
+    $stringWidth = iconv_strlen($string, $charset);
+    $breakWidth  = iconv_strlen($break, $charset);
 
-    if(\strlen($string) === 0)
+    if(strlen($string) === 0)
     {
       return '';
     }
@@ -284,7 +310,7 @@ class Analyse
 
     for($current = 0; $current < $stringWidth; $current++)
     {
-      $char = \iconv_substr($string, $current, 1, $charset);
+      $char = iconv_substr($string, $current, 1, $charset);
 
       if($breakWidth === 1)
       {
@@ -292,14 +318,14 @@ class Analyse
       }
       else
       {
-        $possibleBreak = \iconv_substr(
+        $possibleBreak = iconv_substr(
           $string, $current, $breakWidth, $charset
         );
       }
 
       if($possibleBreak === $break)
       {
-        $result .= \iconv_substr(
+        $result .= iconv_substr(
           $string, $lastStart, $current - $lastStart + $breakWidth, $charset
         );
         $current += $breakWidth - 1;
@@ -310,7 +336,7 @@ class Analyse
         if($current - $lastStart >= $width)
         {
           $result .= $this->slash(
-            \iconv_substr($string, $lastStart, $current - $lastStart, $charset)
+            iconv_substr($string, $lastStart, $current - $lastStart, $charset)
           ) . $break;
           $lastStart = $current + 1;
         }
@@ -320,14 +346,14 @@ class Analyse
       elseif($current - $lastStart >= $width && $cut && $lastStart >= $lastSpace)
       {
         $result .= $this->slash(
-          \iconv_substr($string, $lastStart, $current - $lastStart, $charset)
+          iconv_substr($string, $lastStart, $current - $lastStart, $charset)
         ) . $break;
         $lastStart = $lastSpace = $current;
       }
       elseif($current - $lastStart >= $width && $lastStart < $lastSpace)
       {
         $result .= $this->slash(
-          \iconv_substr($string, $lastStart, $lastSpace - $lastStart, $charset)
+          iconv_substr($string, $lastStart, $lastSpace - $lastStart, $charset)
         ) . $break;
         $lastStart = $lastSpace = $lastSpace + 1;
       }
@@ -336,7 +362,7 @@ class Analyse
     if($lastStart !== $current)
     {
       $result .= $this->slash(
-        \iconv_substr($string, $lastStart, $current - $lastStart, $charset)
+        iconv_substr($string, $lastStart, $current - $lastStart, $charset)
       );
     }
 
@@ -364,8 +390,8 @@ class Analyse
   public function slash($text)
   {
     $pattern = '/<span class="notranslate">([^<]*)<\/span>/';
-    $text    = \preg_replace($pattern, '$1', \urldecode($text));
-    return \str_replace('"', '\"', $text);
+    $text    = preg_replace($pattern, '$1', \urldecode($text));
+    return str_replace('"', '\"', $text);
   }
 }
 
