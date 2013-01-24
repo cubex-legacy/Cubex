@@ -244,7 +244,7 @@ class Serve extends Dispatcher implements Dispatchable
   {
     $data = preg_replace_callback(
       '@url\s*\((\s*[\'"]?.*?)\)@s',
-      array($this, "dispatchUrlWrappedUri"),
+      array($this, "dispatchUrlWrappedImgUri"),
       $data
     );
 
@@ -258,10 +258,20 @@ class Serve extends Dispatcher implements Dispatchable
    *
    * @return string
    */
-  public function dispatchUrlWrappedUri($data)
+  public function dispatchUrlWrappedImgUri($data)
   {
+    $imgPath = $data[1];
+    if(substr($imgPath, 0, 1) === "/")
+    {
+      $imgPath = "/img$imgPath";
+    }
+    else
+    {
+      $imgPath = "img/$imgPath";
+    }
+
     $uri = $this->dispatchUri(
-      $data[1],
+      $imgPath,
       $this->getDispatchPath()->getEntityHash(),
       $this->getDispatchPath()->getDomainHash()
     );
