@@ -4,6 +4,8 @@
  */
 namespace Cubex\Container;
 
+use Cubex\Foundation\Config\ConfigGroup;
+
 class Container
 {
   protected static $_bound;
@@ -49,5 +51,46 @@ class Container
     {
       return $default;
     }
+  }
+
+  /**
+   * @return \Cubex\Foundation\Config\ConfigGroup
+   */
+  public static function config()
+  {
+    return static::get(self::CONFIG, new ConfigGroup());
+  }
+
+  /**
+   * @return \Cubex\ServiceManager\ServiceManager|null
+   */
+  public static function servicemanager()
+  {
+    return static::get(self::SERVICE_MANAGER);
+  }
+
+  /**
+   * @return \Cubex\Core\Http\Request|null
+   */
+  public static function request()
+  {
+    return static::get(self::REQUEST);
+  }
+
+  /**
+   * @return \Cubex\Core\Http\Response|null
+   */
+  public static function response()
+  {
+    return static::get(self::RESPONSE);
+  }
+
+
+  /**
+   * @return \Cubex\Auth\AuthedUser|null
+   */
+  public static function authedUser()
+  {
+    return static::get(self::AUTHED_USER);
   }
 }
