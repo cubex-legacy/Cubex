@@ -98,9 +98,14 @@ class StdRouter implements Router
       }
     }
     $routePattern = $route->pattern();
-    if(substr($pattern, -1) != '/') $pattern = $pattern . '/';
-    if(substr($routePattern, -1) != '/') $routePattern = $routePattern . '/';
-    if(substr($routePattern, 0, 1) != '/') $routePattern = '/' . $routePattern;
+    if(substr($pattern, -1) !== '/') $pattern = $pattern . '/';
+    if(substr($routePattern, -1) !== '/') $routePattern = $routePattern . '/';
+    if(substr($routePattern, 0, 1) !== '/') $routePattern = '/' . $routePattern;
+
+    // This looks strange but actually fixes a bug when trying to match nothing
+    // using a regex pattern.
+    if(strlen($pattern) === 1) $pattern .= "/";
+    if(strlen($routePattern) === 1) $routePattern .= "/";
 
     $routePattern = $this->convertSimpleRoute($routePattern);
 
