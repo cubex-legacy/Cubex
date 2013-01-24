@@ -20,6 +20,12 @@ class Session extends BaseFacade
     return $sessionManager->session();
   }
 
+  public static function id()
+  {
+    $accessor = static::_getAccessor();
+    return $accessor->id();
+  }
+
   public static function set($key, $value)
   {
     $accessor = static::_getAccessor();
