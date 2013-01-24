@@ -12,7 +12,7 @@ use Cubex\Log\Debug;
 use Cubex\Mapper\DataMapper;
 use Cubex\Sprintf\ParseQuery;
 
-class RecordMapper extends DataMapper
+abstract class RecordMapper extends DataMapper
 {
   const CONFIG_IDS = 'id-mechanism';
 
