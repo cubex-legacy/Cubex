@@ -213,6 +213,8 @@ class BaseController
     $this->appendData($params);
     $this->setRouteResult($action);
 
+    $this->preRender();
+
     ob_start(); //Stop any naughty output making a mess of our response
     $result   = $this->runAction($action, $params);
     $buffered = ob_get_clean();
@@ -223,6 +225,10 @@ class BaseController
     }
 
     return $result;
+  }
+
+  public function preRender()
+  {
   }
 
   /**
