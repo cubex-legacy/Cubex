@@ -491,15 +491,17 @@ class Dispatcher
       $entityMap = $this->getDispatchIni($entity);
     }
 
+    $pathToResource = $this->addRootResourceDirectory($uri);
+
     if($entityMap)
     {
-      if(isset($entityMap[$uri]))
+      if(isset($entityMap[$pathToResource]))
       {
-        $resourceHash = $this->generateResourceHash($entityMap[$uri]);
+        $resourceHash = $this->generateResourceHash(
+          $entityMap[$pathToResource]
+        );
       }
     }
-
-    $pathToResource = $this->addRootResourceDirectory($uri);
 
     $dispatchPath = Path::fromParams(
       $this->getResourceDirectory(),

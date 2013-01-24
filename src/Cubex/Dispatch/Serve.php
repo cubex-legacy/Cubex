@@ -260,16 +260,6 @@ class Serve extends Dispatcher implements Dispatchable
    */
   public function dispatchUrlWrappedImgUri($data)
   {
-    $imgPath = $data[1];
-    if(substr($imgPath, 0, 1) === "/")
-    {
-      $imgPath = "/img$imgPath";
-    }
-    else
-    {
-      $imgPath = "img/$imgPath";
-    }
-
     $uri = $this->dispatchUri(
       $imgPath,
       $this->getDispatchPath()->getEntityHash(),
