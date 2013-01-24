@@ -457,6 +457,15 @@ class Loader
   public function respondToWebRequest()
   {
     $this->init();
+
+    if($this->getConfig()->get("project")->getBool("gzip", false))
+    {
+      if(extension_loaded("zlib"))
+      {
+        ini_set('zlib.output_compression', 'On');
+      }
+    }
+
     $this->setLocale();
 
     if(!$this->_failed)
