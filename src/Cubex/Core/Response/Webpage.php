@@ -116,6 +116,12 @@ class Webpage implements
     return 'UTF-8';
   }
 
+  public function addMeta($name,$content)
+  {
+    $this->_meta[$name] = $content;
+    return $this;
+  }
+
   /**
    * Get defined meta tags
    *

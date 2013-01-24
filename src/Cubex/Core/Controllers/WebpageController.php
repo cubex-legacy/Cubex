@@ -40,6 +40,23 @@ class WebpageController extends BaseController
     return $this->_webpage;
   }
 
+  public function setTitle($title)
+  {
+    $this->webpage()->setTitle($title);
+    return $this;
+  }
+
+  public function addMeta($name, $value)
+  {
+    $this->webpage()->addMeta($name, $value);
+    return $this;
+  }
+
+  public function layout()
+  {
+    return $this->webpage()->layout();
+  }
+
   /**
    * @return string
    */
@@ -83,7 +100,10 @@ class WebpageController extends BaseController
     {
       EventManager::listen(
         EventManager::CUBEX_WEBPAGE_RENDER_BODY,
-        [$this->_webpage, "minifyHtml"]
+        [
+        $this->_webpage,
+        "minifyHtml"
+        ]
       );
     }
 
