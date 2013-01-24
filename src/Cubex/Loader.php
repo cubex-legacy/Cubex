@@ -121,11 +121,14 @@ class Loader
         if(stristr($section, '\\'))
         {
           $parent = current(explode('\\', $section));
-          foreach($this->_configuration->get($parent) as $k => $v)
+          if($this->_configuration->get($parent) !== null)
           {
-            if(!$conf->getExists($k))
+            foreach($this->_configuration->get($parent) as $k => $v)
             {
-              $conf->setData($k, $v);
+              if(!$conf->getExists($k))
+              {
+                $conf->setData($k, $v);
+              }
             }
           }
         }
