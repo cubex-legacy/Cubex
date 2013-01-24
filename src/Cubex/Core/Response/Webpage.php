@@ -271,16 +271,15 @@ class Webpage implements
     . '<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8"><![endif]-->'
     . '<!--[if IE 8]><html class="no-js lt-ie9"><![endif]-->'
     . '<!--[if gt IE 8]><!--><html class="no-js"><!--<![endif]-->'
-    . "\n"
-    . '<head><meta charset="' . $charset . '" />'
+    . "\n" . '<head><meta charset="' . $charset . '" />'
     . '<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">'
     . '<meta name="viewport" content="width=device-width,initial-scale=1.0">'
     . '<script>function envPop(a){function b(c) {for (var d in a)c[d] = a[d];};'
     . 'window.Env = Env = window.Env || {};b(Env);};'
     . "!function(d){d.className=d.className.replace('no-js', '');}"
     . "(document.documentElement);"
-    . 'envPop({"method":"' . $method . '"});</script><noscript>'
-    . $noscript . '</noscript>'
+    . 'envPop({"method":"' . $method . '"});</script>'
+    . '<noscript>' . $noscript . '</noscript>'
     . '<title>' . $title . '</title>' . $head . '</head>'
     . '<body' . $this->_bodyAttributes() . '>';
 
