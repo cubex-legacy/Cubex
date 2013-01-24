@@ -312,72 +312,95 @@ class Request implements \IteratorAggregate
   /**
    * REQUEST Variables (Excluding __ prefixed used by Cubex)
    *
-   * @return array
+   * @param null $variable
+   * @param null $default
+   * @return array|null
    */
-  public function requestVariables()
+  public function requestVariables($variable = null, $default = null)
   {
-    return $this->_getVariables($_REQUEST);
+    return $this->_getVariables($_REQUEST, $variable, $default);
   }
 
   /**
    * SERVER Variables (Excluding __ prefixed used by Cubex)
    *
-   * @return array
+   * @param null $variable
+   * @param null $default
+   * @return array|null
    */
-  public function serverVariables()
+  public function serverVariables($variable = null, $default = null)
   {
-    return $this->_getVariables($_SERVER);
+    return $this->_getVariables($_SERVER, $variable, $default);
   }
 
   /**
    * GET Variables (Excluding __ prefixed used by Cubex)
    *
-   * @return array
+   * @param null $variable
+   * @param null $default
+   * @return array|null
    */
-  public function getVariables()
+  public function getVariables($variable = null, $default = null)
   {
-    return $this->_getVariables($_GET);
+    return $this->_getVariables($_GET, $variable, $default);
   }
 
   /**
    * FILES Variables (Excluding __ prefixed used by Cubex)
    *
-   * @return array
+   * @param null $variable
+   * @param null $default
+   * @return array|null
    */
-  public function fileVariables()
+  public function fileVariables($variable = null, $default = null)
   {
-    return $this->_getVariables($_FILES);
+    return $this->_getVariables($_FILES, $variable, $default);
   }
 
   /**
    * POST Variables (Excluding __ prefixed used by Cubex)
    *
-   * @return array
+   * @param null $variable
+   * @param null $default
+   * @return array|null
    */
-  public function postVariables()
+  public function postVariables($variable = null, $default = null)
   {
-    return $this->_getVariables($_POST);
+    return $this->_getVariables($_POST, $variable, $default);
   }
 
   /**
    * Get possible variables from array excluding __ prefixed keys, used by Cubex
    *
    * @param $array
-   *
-   * @return array
+   * @param null $variable
+   * @param null $default
+   * @return array|null
    */
-  protected function _getVariables($array)
+  protected function _getVariables($array, $variable = null, $default = null)
   {
     $variables = array();
     foreach($array as $k => $v)
     {
-      if(\substr($k, 0, 2) !== '__')
+      if(substr($k, 0, 2) !== '__')
       {
         $variables[$k] = $v;
       }
     }
 
-    return $variables;
+    if($variable === null)
+    {
+      return $variables;
+    }
+
+    if(isset($variables[$variable]))
+    {
+      return $variables[$variable];
+    }
+    else
+    {
+      return $default;
+    }
   }
 
   public function headers()
