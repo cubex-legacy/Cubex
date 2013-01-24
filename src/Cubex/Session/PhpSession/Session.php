@@ -20,8 +20,13 @@ class Session implements SessionService
 
   public function init()
   {
-    \session_start();
+    session_start();
     if(!isset($_SESSION['cubex'])) $_SESSION['cubex'] = array();
+  }
+
+  public function id()
+  {
+    return session_id();
   }
 
   /**

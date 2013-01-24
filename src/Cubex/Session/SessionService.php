@@ -18,6 +18,13 @@ interface SessionService extends Service
   public function init();
 
   /**
+   * Session ID
+   *
+   * @return mixed
+   */
+  public function id();
+
+  /**
    * @param $key
    * @param $data
    *
