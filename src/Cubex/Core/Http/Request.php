@@ -393,9 +393,33 @@ class Request implements \IteratorAggregate
       return $variables;
     }
 
-    if(isset($variables[$variable]))
+    if(is_scalar($variable) && isset($variables[$variable]))
     {
       return $variables[$variable];
+    }
+    else if(is_array($variable))
+    {
+      $res = [];
+      foreach($variable as $i => $k)
+      {
+        if(isset($variables[$k]))
+        {
+          $res[$k] = $variables[$k];
+        }
+        else if(isset($default[$k]))
+        {
+          $res[$k] = $default[$k];
+        }
+        else if(isset($default[$i]))
+        {
+          $res[$k] = $default[$i];
+        }
+        else
+        {
+          $res[$k] = null;
+        }
+      }
+      return $res;
     }
     else
     {
