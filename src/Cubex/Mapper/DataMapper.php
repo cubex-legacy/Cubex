@@ -335,12 +335,18 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
                           $failFirst = false)
   {
     $valid = true;
-    if($attributes === null)
+
+    if(is_scalar($attributes))
     {
-      $attributes = \array_keys($this->_attributes);
+      $attributes = [$attributes];
     }
 
-    if(\is_array($attributes))
+    if($attributes === null)
+    {
+      $attributes = array_keys($this->_attributes);
+    }
+
+    if(is_array($attributes))
     {
       foreach($attributes as $attribute)
       {
