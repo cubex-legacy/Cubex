@@ -4,6 +4,8 @@
  */
 namespace Cubex\Foundation\Config;
 
+use Cubex\Container\Container;
+
 trait ConfigTrait
 {
   /**
@@ -28,6 +30,10 @@ trait ConfigTrait
    */
   public function getConfig()
   {
+    if($this->_configuration === null)
+    {
+      $this->_configuration = Container::get(Container::CONFIG);
+    }
     return $this->_configuration;
   }
 
