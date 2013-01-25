@@ -122,11 +122,11 @@ class StdRouter implements Router
 
     $matchedOn = 1;
     $matches   = array();
-    $match     = preg_match("#^$routePattern$#", $pattern, $matches);
+    $match     = preg_match("#^$routePattern#", $pattern, $matches);
     if(!$match)
     {
       $routePattern = $this->convertSimpleRoute($routePattern);
-      $match        = preg_match("#^$routePattern$#", $pattern, $matches);
+      $match        = preg_match("#^$routePattern#", $pattern, $matches);
       $matchedOn    = 2;
     }
 
