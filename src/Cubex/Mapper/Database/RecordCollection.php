@@ -12,12 +12,21 @@ use Cubex\Sprintf\ParseQuery;
 class RecordCollection extends Collection
 {
   protected $_mapperType;
+  protected $_limit;
+  protected $_offset = 0;
   protected $_columns = ['*'];
   protected $_populate = [];
 
   public function __construct(RecordMapper $map, array $columns = ['*'])
   {
     $this->_mapperType = $map;
+  }
+
+  public function setLimit($limit = 100, $offset = 0)
+  {
+    $this->_offset = (int)$offset;
+    $this->_limit  = (int)$limit;
+    return $this;
   }
 
   public function setColumns(array $columns = ['*'])
@@ -71,6 +80,12 @@ class RecordCollection extends Collection
     array_unshift($args, $this->_columns);
 
     $pattern = 'SELECT %LC FROM %T WHERE ' . $pattern;
+
+    if($this->_limit !== null)
+    {
+      $pattern .= " LIMIT $this->_limit,$this->_offset";
+    }
+
     array_unshift($args, $pattern);
 
     $connection = $this->_mapperType->connection(
