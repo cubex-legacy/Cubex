@@ -340,7 +340,7 @@ class BaseController
    */
   protected function _getRoutes(array $routes)
   {
-    if($this->_baseUri !== null)
+    if(!empty($routes) && $this->_baseUri !== null)
     {
       $routes = array($this->_baseUri => $routes);
     }

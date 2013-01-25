@@ -47,6 +47,8 @@ abstract class Application
   protected $_project;
   protected $_layout = 'Default';
 
+  protected $_baseUri;
+
   /**
    * @var \Cubex\Core\Http\Request
    */
@@ -183,7 +185,7 @@ abstract class Application
         if($matchRoute !== null)
         {
           $matchedUri = $matchRoute->pattern();
-          $dispatcher->setBaseUri($matchedUri);
+          $dispatcher->setBaseUri($this->baseUri() . $matchedUri);
         }
         $dispatcher->setApplication($this);
       }
@@ -206,6 +208,17 @@ abstract class Application
     $this->shutdownBundles();
 
     return $response;
+  }
+
+  public function baseUri()
+  {
+    return $this->_baseUri;
+  }
+
+  public function setBaseUri($uri)
+  {
+    $this->_baseUri = $uri;
+    return $this;
   }
 
   /**
@@ -265,6 +278,11 @@ abstract class Application
     $interalRoutes = $this->getRoutes();
     $bundleRoutes  = $this->getAllBundleRoutes();
     $routes        = array_merge((array)$interalRoutes, (array)$bundleRoutes);
+
+    if(!empty($routes) && $this->_baseUri !== null)
+    {
+      $routes = array($this->_baseUri => $routes);
+    }
 
     if(!empty($routes))
     {
