@@ -17,10 +17,11 @@ class FormElementRender implements Renderable
   protected $_labelPosition;
   protected $_template;
 
-  public function __construct(FormElement $element)
+  public function __construct(FormElement $element, $template = null)
   {
     $this->_element       = $element;
     $this->_labelPosition = $element->labelPosition();
+    $this->_template      = $template;
   }
 
   public function setTemplate($template)
@@ -29,7 +30,7 @@ class FormElementRender implements Renderable
     return $this;
   }
 
-  protected function getTemplate()
+  public function getTemplate()
   {
     if($this->_template === null)
     {
@@ -38,7 +39,7 @@ class FormElementRender implements Renderable
     return $this->_template;
   }
 
-  public function _buildTemplate()
+  protected function _buildTemplate()
   {
     $template = '{{input}}';
     $type     = $this->_element->type();

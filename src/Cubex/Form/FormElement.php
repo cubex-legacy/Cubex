@@ -58,6 +58,7 @@ class FormElement extends Attribute implements Renderable
       throw new \Exception("Invalid form element type set " . $type);
     }
     $this->_type = $type;
+    return $this;
   }
 
   public function attributes()
@@ -74,6 +75,7 @@ class FormElement extends Attribute implements Renderable
   public function setLabelPosition($position)
   {
     $this->_labelPosition = $position;
+    return $this;
   }
 
   public function labelPosition()

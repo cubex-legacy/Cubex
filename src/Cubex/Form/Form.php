@@ -79,11 +79,13 @@ class Form extends DataMapper implements Renderable
   public function setElementLabelPosition($element, $position)
   {
     $this->_attribute($element)->setLabelPosition($position);
+    return $this;
   }
 
   public function setLabelPosition($position)
   {
     $this->_labelPosition = $position;
+    return $this;
   }
 
   public function labelPosition()
@@ -222,6 +224,7 @@ class Form extends DataMapper implements Renderable
 
   /**
    * @param FormElement $attribute
+   * @return $this|void
    */
   protected function _addAttribute(FormElement $attribute)
   {
@@ -234,6 +237,7 @@ class Form extends DataMapper implements Renderable
       $attribute->setLabelPosition($this->labelPosition());
     }
     $this->_attributes[strtolower($attribute->name())] = $attribute;
+    return $this;
   }
 
   /**
