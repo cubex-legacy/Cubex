@@ -22,11 +22,13 @@ class Form extends DataMapper implements Renderable
   protected $_elementAttributes;
   protected $_name;
   protected $_enctype;
-  protected $_labelPosition;
+  protected $_labelPosition = self::LABEL_BEFORE;
   protected $_validatedHour;
+  protected $_autoTimestamp = false;
 
   public function __construct($name, $action, $method = 'POST')
   {
+    $this->_buildAttributes(__NAMESPACE__ . '\FormElement');
     $this->setName($name);
     $this->_elementAttributes['method'] = $method;
     $this->_elementAttributes['action'] = $action;

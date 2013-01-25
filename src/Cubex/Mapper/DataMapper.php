@@ -40,7 +40,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     return $this;
   }
 
-  protected function _buildAttributes()
+  protected function _buildAttributes($type = '\Cubex\Data\Attribute')
   {
     $class = new \ReflectionClass(get_class($this));
     foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
@@ -49,7 +49,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
       if(!$this->_attributeExists($property))
       {
         $this->_addAttribute(
-          new Attribute($property, false, null, $p->getValue($this))
+          new $type($property, false, null, $p->getValue($this))
         );
       }
       unset($this->$property);
@@ -59,12 +59,12 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     {
       if(!$this->_attributeExists($this->_updatedAttribute()))
       {
-        $this->_addAttribute(new Attribute($this->_updatedAttribute()));
+        $this->_addAttribute(new $type($this->_updatedAttribute()));
       }
 
       if(!$this->_attributeExists($this->_createdAttribute()))
       {
-        $this->_addAttribute(new Attribute($this->_createdAttribute()));
+        $this->_addAttribute(new $type($this->_createdAttribute()));
       }
     }
   }
