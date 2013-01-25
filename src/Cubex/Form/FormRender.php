@@ -16,20 +16,29 @@ class FormRender implements Renderable
     $this->_form = $form;
   }
 
-  public function render()
+  protected function _renderOpening()
   {
     $frm = $this->_form;
     $out = '';
     $out .= $frm->open();
     $out .= $frm->token();
-    $out .= '<input type="hidden" name="_cubex_form_" value="'
-    . $frm->id() . '"/>';
+    $out .= $frm->formNameInput();
+    return $out;
+  }
 
-    foreach($frm->elements() as $element)
+  protected function _renderClosing()
+  {
+    return $this->_form->close();
+  }
+
+  public function render()
+  {
+    $out = $this->_renderOpening();
+    foreach($this->_form->elements() as $element)
     {
       $out .= (new FormElementRender($element))->render();
     }
-    $out .= $frm->close();
+    $out .= $this->_renderClosing();
     return $out;
   }
 

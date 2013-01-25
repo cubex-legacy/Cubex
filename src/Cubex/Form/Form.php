@@ -99,6 +99,14 @@ class Form extends DataMapper implements Renderable
     return '<form ' . implode(' ', $attributes) . '>';
   }
 
+  public function formNameInput()
+  {
+    $out = '';
+    $out .= '<input type="hidden" name="_cubex_form_"';
+    $out .= 'value="' . $this->id() . '"/>';
+    return $out;
+  }
+
   protected static function _secureId()
   {
     return Session::id();
@@ -247,6 +255,15 @@ class Form extends DataMapper implements Renderable
   public function addTextElement($name, $default = '', $labelPosition = null)
   {
     $this->addElement($name, FormElement::TEXT, $default, [], $labelPosition);
+    return $this;
+  }
+
+  public function addTextareaElement($name, $default = '',
+                                     $labelPosition = null)
+  {
+    $this->addElement(
+      $name, FormElement::TEXTAREA, $default, [], $labelPosition
+    );
     return $this;
   }
 
