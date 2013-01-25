@@ -35,3 +35,16 @@ if(!function_exists("class_shortname"))
     return basename(str_replace('\\', '/', $class));
   }
 }
+
+if(!function_exists("feature_enabled"))
+{
+  /**
+   * @param $featureName
+   *
+   * @return bool
+   */
+  function feature_enabled($featureName)
+  {
+    return \Cubex\Facade\FeatureSwitch::isEnabled($featureName);
+  }
+}
