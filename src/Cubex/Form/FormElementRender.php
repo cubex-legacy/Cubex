@@ -15,6 +15,7 @@ class FormElementRender implements Renderable
    */
   protected $_element;
   protected $_labelPosition;
+  protected $_template;
 
   public function __construct(FormElement $element)
   {
@@ -22,10 +23,25 @@ class FormElementRender implements Renderable
     $this->_labelPosition = $element->labelPosition();
   }
 
-  public function render()
+  public function setTemplate($template)
   {
-    $out  = '';
-    $type = $this->_element->type();
+    $this->_template = $template;
+    return $this;
+  }
+
+  protected function getTemplate()
+  {
+    if($this->_template === null)
+    {
+      $this->_template = $this->_buildTemplate();
+    }
+    return $this->_template;
+  }
+
+  public function _buildTemplate()
+  {
+    $template = '{{input}}';
+    $type     = $this->_element->type();
 
     $noLabelElements = [
       FormElement::RADIO,
@@ -36,35 +52,45 @@ class FormElementRender implements Renderable
 
     if($renderLabel && $this->_labelPosition == Form::LABEL_BEFORE)
     {
-      $out .= $this->renderLabel();
+      $template = '{{label}}{{input}}';
     }
+    else if($renderLabel && $this->_labelPosition == Form::LABEL_AFTER)
+    {
+      $template = '{{input}}{{label}}';
+    }
+
+    return $template;
+  }
+
+  public function render()
+  {
+    $out  = $this->getTemplate();
+    $type = $this->_element->type();
 
     switch($type)
     {
       case FormElement::TEXTAREA:
-        $out .= $this->renderTextarea();
+        $input = $this->renderTextarea();
         break;
       case FormElement::SELECT:
-        $out .= $this->renderSelect();
+        $input = $this->renderSelect();
         break;
       case FormElement::RADIO:
-        $out .= $this->renderMultiInput($type, true);
+        $input = $this->renderMultiInput($type, true);
         break;
       case FormElement::CHECKBOX:
-        $out .= $this->renderMultiInput($type);
+        $input = $this->renderMultiInput($type);
         break;
       case FormElement::MULTI_CHECKBOX:
-        $out .= $this->renderMultiInput(FormElement::CHECKBOX, true);
+        $input = $this->renderMultiInput(FormElement::CHECKBOX, true);
         break;
       default:
-        $out .= $this->renderInput($type);
+        $input = $this->renderInput($type);
         break;
     }
 
-    if($renderLabel && $this->_labelPosition == Form::LABEL_AFTER)
-    {
-      $out .= $this->renderLabel();
-    }
+    $out = str_replace('{{input}}', $input, $out);
+    $out = str_replace('{{label}}', $this->renderLabel(), $out);
 
     return $out;
   }
