@@ -445,8 +445,7 @@ class Form extends DataMapper implements Renderable
 
   public function render()
   {
-    $render = new FormRender($this);
-    return $render->render();
+    return (new FormRender($this))->render();
   }
 
   public function __toString()
