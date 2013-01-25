@@ -35,7 +35,7 @@ class Form extends DataMapper implements Renderable
     $this->_configure();
   }
 
-  public function addAttribute($name, $value)
+  public function addAttribute($name, $value = null)
   {
     $this->_elementAttributes[$name] = $value;
     return $this;
@@ -98,7 +98,14 @@ class Form extends DataMapper implements Renderable
     $attributes = array();
     foreach($this->_elementAttributes as $attr => $val)
     {
-      $attributes[] = "$attr=\"$val\"";
+      if($val === null)
+      {
+        $attributes[] = "$attr";
+      }
+      else
+      {
+        $attributes[] = "$attr=\"$val\"";
+      }
     }
 
     if($this->_enctype !== null)
@@ -199,14 +206,14 @@ class Form extends DataMapper implements Renderable
     $token .= "/" . md5($token . $projectHash);
 
     $element = new FormElement("cubex_csrf_token", true, null, $token);
-    $element->setType("hidden");
+    $element->setType("hidden")->setLabelPosition(Form::LABEL_NONE);
 
     $csrf     = $this->_makeCsrf(date("H"));
     $sElement = new FormElement("cubex_csrf", true, null, $csrf);
-    $sElement->setType("hidden");
+    $sElement->setType("hidden")->setLabelPosition(Form::LABEL_NONE);
 
-    $tokenF = (new FormElementRender($element, self::LABEL_NONE))->render();
-    $sessF  = (new FormElementRender($sElement, self::LABEL_NONE))->render();
+    $tokenF = (new FormElementRender($element))->render();
+    $sessF  = (new FormElementRender($sElement))->render();
 
     return $tokenF . $sessF;
   }

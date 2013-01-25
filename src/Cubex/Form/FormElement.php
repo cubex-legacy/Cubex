@@ -66,7 +66,7 @@ class FormElement extends Attribute implements Renderable
     return $this->_attributes;
   }
 
-  public function addAttribute($name, $value)
+  public function addAttribute($name, $value = null)
   {
     $this->_attributes[$name] = $value;
     return $this;

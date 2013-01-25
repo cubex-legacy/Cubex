@@ -114,7 +114,14 @@ class FormElementRender implements Renderable
     $out = '';
     foreach($attributes as $k => $v)
     {
-      $out .= " $k=\"$v\"";
+      if($v === null)
+      {
+        $out .= " $k";
+      }
+      else
+      {
+        $out .= " $k=\"$v\"";
+      }
     }
     return $out;
   }
