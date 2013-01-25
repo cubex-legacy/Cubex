@@ -267,6 +267,15 @@ class Form extends DataMapper implements Renderable
     return $this->_attribute($name);
   }
 
+  /**
+   * @param $name
+   * @return FormElement
+   */
+  public function getElement($name)
+  {
+    return $this->_attribute($name);
+  }
+
   public function add(FormElement $element)
   {
     $this->_addAttribute($element);
