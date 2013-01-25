@@ -21,7 +21,11 @@ class FormElementRender implements Renderable
   {
     $this->_element       = $element;
     $this->_labelPosition = $element->labelPosition();
-    $this->_template      = $template;
+    if($template === null)
+    {
+      $template = $element->getRenderTemplate();
+    }
+    $this->_template = $template;
   }
 
   public function setTemplate($template)

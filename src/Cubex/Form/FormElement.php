@@ -42,6 +42,7 @@ class FormElement extends Attribute implements Renderable
   protected $_type = 'text';
   protected $_attributes;
   protected $_labelPosition;
+  protected $_renderTemplate;
   protected $_selectedValue;
 
   public function type()
@@ -59,6 +60,17 @@ class FormElement extends Attribute implements Renderable
     }
     $this->_type = $type;
     return $this;
+  }
+
+  public function setRenderTemplate($template)
+  {
+    $this->_renderTemplate = $template;
+    return $this;
+  }
+
+  public function getRenderTemplate()
+  {
+    return $this->_renderTemplate;
   }
 
   public function attributes()

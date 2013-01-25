@@ -25,6 +25,7 @@ class Form extends DataMapper implements Renderable
   protected $_labelPosition = self::LABEL_BEFORE;
   protected $_validatedHour;
   protected $_autoTimestamp = false;
+  protected $_elementRenderTemplate;
 
   public function __construct($name, $action, $method = 'POST')
   {
@@ -33,6 +34,12 @@ class Form extends DataMapper implements Renderable
     $this->_elementAttributes['method'] = $method;
     $this->_elementAttributes['action'] = $action;
     $this->_configure();
+  }
+
+  public function setDefaultElementTemplate($template)
+  {
+    $this->_elementRenderTemplate = $template;
+    return $this;
   }
 
   public function addAttribute($name, $value = null)
@@ -242,6 +249,10 @@ class Form extends DataMapper implements Renderable
     if($attribute->labelPosition() === null)
     {
       $attribute->setLabelPosition($this->labelPosition());
+    }
+    if($attribute->getRenderTemplate() === null)
+    {
+      $attribute->setRenderTemplate($this->_elementRenderTemplate);
     }
     $this->_attributes[strtolower($attribute->name())] = $attribute;
     return $this;
