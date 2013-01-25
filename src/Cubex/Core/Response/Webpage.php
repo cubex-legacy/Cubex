@@ -349,7 +349,8 @@ class Webpage implements
    */
   public function render()
   {
-    return $this->renderHead() . $this->renderBody() . $this->renderClosing();
+    $body = $this->renderBody();
+    return $this->renderHead() . $body . $this->renderClosing();
   }
 
   public function addRenderable(Renderable $render, $name = null)
