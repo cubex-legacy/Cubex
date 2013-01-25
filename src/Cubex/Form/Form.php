@@ -250,6 +250,19 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
+  public function addFileElement($name, $default = '', $labelPosition = null)
+  {
+    $this->addElement($name, FormElement::FILE, $default, [], $labelPosition);
+    return $this;
+  }
+
+  public function addImageElement($name, $src = '', $labelPosition = null)
+  {
+    $this->addElement($name, FormElement::FILE, null, [], $labelPosition);
+    $this->_attribute($name)->addAttribute("src", $src);
+    return $this;
+  }
+
   public function addPasswordElement($name, $default = '',
                                      $labelPosition = null)
   {
@@ -265,9 +278,9 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
-  public function addFileElement($name, $default, $labelPosition = null)
+  public function addResetElement($name, $default, $labelPosition = null)
   {
-    $this->addElement($name, FormElement::FILE, $default, [], $labelPosition);
+    $this->addElement($name, FormElement::RESET, $default, [], $labelPosition);
     return $this;
   }
 
@@ -296,6 +309,82 @@ class Form extends DataMapper implements Renderable
       $name, FormElement::CHECKBOX, $default, [], $labelPosition, $selectedValue
     );
     return $this;
+  }
+
+  protected function _addInputElement($type, array $args = [])
+  {
+    list($name, $default, $labelPosition) = $args;
+    $this->addElement($name, $type, $default, [], $labelPosition);
+    return $this;
+  }
+
+  public function addColourElement($name, $default = '', $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::COLOUR, func_get_args());
+  }
+
+  public function addDateElement($name, $default = '', $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::DATE, func_get_args());
+  }
+
+  public function addDateTimeElement($name, $default = '',
+                                     $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::DATETIME, func_get_args());
+  }
+
+  public function addDateTimeLocalElement($name, $default = '',
+                                          $labelPosition = null)
+  {
+    return $this->_addInputElement(
+      FormElement::DATETIME_LOCAL, func_get_args()
+    );
+  }
+
+  public function addEmailElement($name, $default = '', $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::EMAIL, func_get_args());
+  }
+
+  public function addMonthElement($name, $default = '', $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::MONTH, func_get_args());
+  }
+
+  public function addNumberElement($name, $default = '', $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::NUMBER, func_get_args());
+  }
+
+  public function addRangeElement($name, $default = '', $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::RANGE, func_get_args());
+  }
+
+  public function addSearchElement($name, $default = '', $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::SEARCH, func_get_args());
+  }
+
+  public function addTelElement($name, $default = '', $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::TEL, func_get_args());
+  }
+
+  public function addTimeElement($name, $default = '', $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::TIME, func_get_args());
+  }
+
+  public function addUrlElement($name, $default = '', $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::URL, func_get_args());
+  }
+
+  public function addWeekElement($name, $default = '', $labelPosition = null)
+  {
+    return $this->_addInputElement(FormElement::WEEK, func_get_args());
   }
 
   public function elements()
