@@ -72,11 +72,21 @@ class StdRouter implements Router
 
     if($aparts == $bparts)
     {
-      $aparts = strlen($a->pattern());
-      $bparts = strlen($b->pattern());
+      $aparts = $a->matchedOn();
+      $bparts = $b->matchedOn();
+
       if($aparts == $bparts)
       {
-        return 0;
+        $aparts = strlen($a->pattern());
+        $bparts = strlen($b->pattern());
+        if($aparts == $bparts)
+        {
+          return 0;
+        }
+      }
+      else
+      {
+        return ($aparts < $bparts) ? -1 : 1;
       }
     }
     return ($aparts < $bparts) ? 1 : -1;
@@ -107,13 +117,19 @@ class StdRouter implements Router
     if(strlen($pattern) === 1) $pattern .= "/";
     if(strlen($routePattern) === 1) $routePattern .= "/";
 
-    $routePattern = $this->convertSimpleRoute($routePattern);
-
-    $matches = array();
-    $match   = preg_match("#^$routePattern$#", $pattern, $matches);
+    $matchedOn = 1;
+    $matches   = array();
+    $match     = preg_match("#^$routePattern$#", $pattern, $matches);
+    if(!$match)
+    {
+      $routePattern = $this->convertSimpleRoute($routePattern);
+      $match        = preg_match("#^$routePattern$#", $pattern, $matches);
+      $matchedOn    = 2;
+    }
 
     if($match)
     {
+      $route->setMatchedOn($matchedOn);
       if($route->hasSubRoutes())
       {
         $subRoutes = $route->subRoutes();

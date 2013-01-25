@@ -14,6 +14,7 @@ class StdRoute implements Route, HandlerInterface
   protected $_pattern;
   protected $_result;
   protected $_verbs;
+  protected $_matchOn = 0;
   /**
    * @var Route[]
    */
@@ -222,6 +223,17 @@ class StdRoute implements Route, HandlerInterface
   public function addRouteData($key, $value)
   {
     $this->setData($key, $value);
+    return $this;
+  }
+
+  public function matchedOn()
+  {
+    return $this->_matchOn;
+  }
+
+  public function setMatchedOn($number)
+  {
+    $this->_matchOn = $number;
     return $this;
   }
 }
