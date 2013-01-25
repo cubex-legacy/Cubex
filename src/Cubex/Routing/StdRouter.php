@@ -77,11 +77,14 @@ class StdRouter implements Router
 
       if($aparts == $bparts)
       {
-        $aparts = strlen($a->pattern());
-        $bparts = strlen($b->pattern());
-        if($aparts == $bparts)
+        if($a->matchedOn() < 2)
         {
-          return 0;
+          $aparts = strlen($a->pattern());
+          $bparts = strlen($b->pattern());
+          if($aparts == $bparts)
+          {
+            return 0;
+          }
         }
       }
       else
