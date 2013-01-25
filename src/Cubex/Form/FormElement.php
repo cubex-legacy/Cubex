@@ -6,8 +6,9 @@
 namespace Cubex\Form;
 
 use Cubex\Data\Attribute;
+use Cubex\Foundation\Renderable;
 
-class FormElement extends Attribute
+class FormElement extends Attribute implements Renderable
 {
 
   const TEXT           = 'text';
@@ -89,5 +90,16 @@ class FormElement extends Attribute
   public function selectedValue()
   {
     return $this->_selectedValue;
+  }
+
+  public function render()
+  {
+    $render = new FormElementRender($this);
+    return $render->render();
+  }
+
+  public function __toString()
+  {
+    return $this->render();
   }
 }
