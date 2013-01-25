@@ -24,6 +24,8 @@ if(!function_exists("cubex_run_time"))
 if(!function_exists("class_shortname"))
 {
   /**
+   * Class name
+   *
    * @param $class
    *
    * @return string
@@ -39,6 +41,8 @@ if(!function_exists("class_shortname"))
 if(!function_exists("feature_enabled"))
 {
   /**
+   * Check feature availability
+   *
    * @param $featureName
    *
    * @return bool
@@ -46,5 +50,20 @@ if(!function_exists("feature_enabled"))
   function feature_enabled($featureName)
   {
     return \Cubex\Facade\FeatureSwitch::isEnabled($featureName);
+  }
+}
+
+if(!function_exists("esc"))
+{
+  /**
+   * Escape HTML String
+   *
+   * @param $string
+   *
+   * @return string
+   */
+  function esc($string)
+  {
+    return \Cubex\View\HtmlElement::escape($string);
   }
 }
