@@ -22,7 +22,7 @@ class RecordCollection extends Collection
     $this->_mapperType = $map;
   }
 
-  public function setLimit($limit = 100, $offset = 0)
+  public function setLimit($offset = 0, $limit = 100)
   {
     $this->_offset = (int)$offset;
     $this->_limit  = (int)$limit;
@@ -83,7 +83,7 @@ class RecordCollection extends Collection
 
     if($this->_limit !== null)
     {
-      $pattern .= " LIMIT $this->_limit,$this->_offset";
+      $pattern .= " LIMIT $this->_offset,$this->_limit";
     }
 
     array_unshift($args, $pattern);
