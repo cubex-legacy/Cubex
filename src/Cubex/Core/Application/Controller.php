@@ -19,4 +19,10 @@ interface Controller extends Dispatchable
    * @return \Cubex\Core\Application\Application
    */
   public function application();
+
+  /**
+   * @param $uri
+   * @return mixed
+   */
+  public function setBaseUri($uri);
 }

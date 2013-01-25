@@ -179,6 +179,12 @@ abstract class Application
     {
       if($dispatcher instanceof Controller)
       {
+        $matchRoute = $router->getMatchedRoute();
+        if($matchRoute !== null)
+        {
+          $matchedUri = $matchRoute->pattern();
+          $dispatcher->setBaseUri($matchedUri);
+        }
         $dispatcher->setApplication($this);
       }
 

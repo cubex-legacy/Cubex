@@ -8,6 +8,7 @@ class StdRouter implements Router
 {
   protected $_routes;
   protected $_verbMatch;
+  protected $_matchedRoute;
 
   /**
    * Initiate Router
@@ -29,6 +30,14 @@ class StdRouter implements Router
   public function addRoutes(array $route)
   {
     $this->_routes = $this->_routes + $route;
+  }
+
+  /**
+   * @return StdRoute
+   */
+  public function getMatchedRoute()
+  {
+    return $this->_matchedRoute;
   }
 
   /**
@@ -61,8 +70,10 @@ class StdRouter implements Router
         '_sortRoutes'
         ]
       );
-      return array_shift($routeMatches);
+      $this->_matchedRoute = array_shift($routeMatches);
     }
+
+    return $this->_matchedRoute;
   }
 
   protected function _sortRoutes(StdRoute $a, StdRoute $b)

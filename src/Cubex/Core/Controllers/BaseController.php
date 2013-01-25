@@ -49,6 +49,11 @@ class BaseController
    */
   protected $_routeResult;
 
+  /**
+   * Base URI for routes to stem from
+   */
+  protected $_baseUri;
+
 
   /**
    * @param \Cubex\Core\Application\Application f$app
@@ -268,7 +273,12 @@ class BaseController
     $attempt = 'render' . \ucfirst($action);
     if(\method_exists($this, $attempt))
     {
-      return call_user_func_array([$this, $attempt], $params);
+      return call_user_func_array(
+        [
+        $this,
+        $attempt
+        ], $params
+      );
     }
 
     if(is_callable($action))
@@ -312,6 +322,16 @@ class BaseController
     $this->_configuration = $configuration;
   }
 
+  public function baseUri()
+  {
+    return $this->_baseUri;
+  }
+
+  public function setBaseUri($uri)
+  {
+    $this->_baseUri = $uri;
+    return $this;
+  }
 
   /**
    * @param array $routes
@@ -320,6 +340,11 @@ class BaseController
    */
   protected function _getRoutes(array $routes)
   {
+    if($this->_baseUri !== null)
+    {
+      $routes = array($this->_baseUri => $routes);
+    }
+
     $finalRoutes = array();
     if(!empty($routes))
     {
@@ -345,6 +370,7 @@ class BaseController
         }
       }
     }
+
     return $finalRoutes;
   }
 
