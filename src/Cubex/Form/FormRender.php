@@ -27,8 +27,7 @@ class FormRender implements Renderable
 
     foreach($frm->elements() as $element)
     {
-      $out .= (new FormElementRender($element, $frm->labelPosition()))->render(
-      );
+      $out .= (new FormElementRender($element))->render();
     }
     $out .= $frm->close();
     return $out;

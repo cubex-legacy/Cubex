@@ -12,12 +12,16 @@ use Cubex\Mapper\DataMapper;
 
 class Form extends DataMapper implements Renderable
 {
-  const LABEL_AFTER  = 'after';
-  const LABEL_BEFORE = 'before';
-  const LABEL_NONE   = 'none';
+  const LABEL_AFTER          = 'after';
+  const LABEL_BEFORE         = 'before';
+  const LABEL_NONE           = 'none';
+  const LABEL_SURROUND       = 'surround.left';
+  const LABEL_SURROUND_LEFT  = 'surround.left';
+  const LABEL_SURROUND_RIGHT = 'surround.right';
 
   protected $_elementAttributes;
   protected $_name;
+  protected $_enctype;
   protected $_labelPosition;
   protected $_validatedHour;
 
@@ -54,6 +58,21 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
+  /**
+   * @param $name
+   *
+   * @return FormElement
+   */
+  protected function _attribute($name)
+  {
+    return isset($this->_attributes[$name]) ? $this->_attributes[$name] : null;
+  }
+
+  public function setElementLabelPosition($element, $position)
+  {
+    $this->_attribute($element)->setLabelPosition($position);
+  }
+
   public function setLabelPosition($position)
   {
     $this->_labelPosition = $position;
@@ -71,6 +90,12 @@ class Form extends DataMapper implements Renderable
     {
       $attributes[] = "$attr=\"$val\"";
     }
+
+    if($this->_enctype !== null)
+    {
+      $attributes[] = 'enctype="' . $this->_enctype . '"';
+    }
+
     return '<form ' . implode(' ', $attributes) . '>';
   }
 
@@ -173,35 +198,103 @@ class Form extends DataMapper implements Renderable
     return '</form>';
   }
 
+  public function setEncType($type = 'multipart/form-data')
+  {
+    $this->_enctype = $type;
+    return $this;
+  }
+
+  /**
+   * @param FormElement $attribute
+   */
+  protected function _addAttribute(FormElement $attribute)
+  {
+    if($attribute->type() == FormElement::FILE)
+    {
+      $this->setEncType();
+    }
+    if($attribute->labelPosition() === null)
+    {
+      $attribute->setLabelPosition($this->labelPosition());
+    }
+    $this->_attributes[strtolower($attribute->name())] = $attribute;
+  }
+
   public function add(FormElement $element)
   {
     $this->_addAttribute($element);
     return $this;
   }
 
-  public function addElement($name, $type, $default = null, array $options = [])
+  public function addElement($name, $type, $default = null, array $options = [],
+                             $labelPosition = null, $selectedValue = null)
   {
+    if($type == FormElement::FILE)
+    {
+      $this->setEncType();
+    }
     $element = new FormElement($name, false, $options, $default);
     $element->setType($type);
+    $element->setSelectedValue($selectedValue);
+    if($labelPosition !== null)
+    {
+      $element->setLabelPosition($labelPosition);
+    }
     $this->_addAttribute($element);
     return $this;
   }
 
-  public function addTextElement($name, $default)
+  public function addTextElement($name, $default = '', $labelPosition = null)
   {
-    $this->addElement($name, "text", $default);
+    $this->addElement($name, FormElement::TEXT, $default, [], $labelPosition);
     return $this;
   }
 
-  public function addPasswordElement($name, $default)
+  public function addPasswordElement($name, $default = '',
+                                     $labelPosition = null)
   {
-    $this->addElement($name, "password", $default);
+    $this->addElement(
+      $name, FormElement::PASSWORD, $default, [], $labelPosition
+    );
     return $this;
   }
 
-  public function addSubmitElement($name, $default)
+  public function addSubmitElement($name, $default, $labelPosition = null)
   {
-    $this->addElement($name, "submit", $default);
+    $this->addElement($name, FormElement::SUBMIT, $default, [], $labelPosition);
+    return $this;
+  }
+
+  public function addFileElement($name, $default, $labelPosition = null)
+  {
+    $this->addElement($name, FormElement::FILE, $default, [], $labelPosition);
+    return $this;
+  }
+
+  public function addRadioElements($name, $default, array $options = [],
+                                   $labelPosition = null)
+  {
+    $this->addElement(
+      $name, FormElement::RADIO, $default, $options, $labelPosition
+    );
+    return $this;
+  }
+
+  public function addCheckboxElements($name, $default, array $options = [],
+                                      $labelPosition = null)
+  {
+    $this->addElement(
+      $name, FormElement::MULTI_CHECKBOX, $default, $options, $labelPosition
+    );
+    return $this;
+  }
+
+  public function addCheckboxElement($name, $default, $selectedValue = 'true',
+                                     $labelPosition = null)
+  {
+    $this->addElement(
+      $name, FormElement::CHECKBOX, $default, [], $labelPosition, $selectedValue
+    );
     return $this;
   }
 

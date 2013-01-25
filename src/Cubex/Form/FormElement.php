@@ -15,9 +15,8 @@ class FormElement extends Attribute
   const PASSWORD       = 'password';
   const RADIO          = 'radio';
   const CHECKBOX       = 'checkbox';
-  const MULTI_CHECKBOX = 'multicheckbox';
+  const MULTI_CHECKBOX = 'multi.checkbox';
   const SELECT         = 'select';
-  const MULTI_SELECT   = 'multiselect';
   const TEXTAREA       = 'textarea';
   const FILE           = 'file';
   const IMAGE          = 'image';
@@ -25,8 +24,24 @@ class FormElement extends Attribute
   const RESET          = 'reset';
   const SUBMIT         = 'submit';
 
+  const COLOUR         = 'color';
+  const DATE           = 'date';
+  const DATETIME       = 'datetime';
+  const DATETIME_LOCAL = 'datetime-local';
+  const EMAIL          = 'email';
+  const MONTH          = 'month';
+  const NUMBER         = 'number';
+  const RANGE          = 'range';
+  const SEARCH         = 'search';
+  const TEL            = 'tel';
+  const TIME           = 'time';
+  const URL            = 'url';
+  const WEEK           = 'week';
+
   protected $_type = 'text';
   protected $_attributes;
+  protected $_labelPosition;
+  protected $_selectedValue;
 
   public function type()
   {
@@ -53,5 +68,26 @@ class FormElement extends Attribute
   {
     $this->_attributes[$name] = $value;
     return $this;
+  }
+
+  public function setLabelPosition($position)
+  {
+    $this->_labelPosition = $position;
+  }
+
+  public function labelPosition()
+  {
+    return $this->_labelPosition;
+  }
+
+  public function setSelectedValue($value)
+  {
+    $this->_selectedValue = $value;
+    return $this;
+  }
+
+  public function selectedValue()
+  {
+    return $this->_selectedValue;
   }
 }
