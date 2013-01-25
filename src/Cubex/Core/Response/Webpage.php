@@ -202,7 +202,7 @@ class Webpage implements
   /**
    * Render body content or captured content
    *
-   * @return mixed
+   * @return Renderable
    */
   public function body()
   {
@@ -293,7 +293,7 @@ class Webpage implements
    */
   public function renderBody()
   {
-    $body = $this->body();
+    $body = $this->body()->render();
 
     $processed = EM::triggerUntil(
       EM::CUBEX_WEBPAGE_RENDER_BODY, ["content" => $body], $this
