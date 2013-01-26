@@ -51,10 +51,12 @@ class Partial implements Renderable
    * Switch escaping of input
    *
    * @param $escape
+   * @return $this
    */
   public function escapeInput($escape)
   {
     $this->_escapeInput = (bool)$escape;
+    return $this;
   }
 
   /**
@@ -69,6 +71,7 @@ class Partial implements Renderable
 
   /**
    * @param $args
+   * @return $this
    */
   protected function _addItem($args)
   {
@@ -105,6 +108,7 @@ class Partial implements Renderable
         $this->_elements[] = \sprintf($element, $args);
       }
     }
+    return $this;
   }
 
   /**
@@ -158,6 +162,7 @@ class Partial implements Renderable
   public function clearElements()
   {
     $this->_elements = array();
+    return $this;
   }
 
   /**
