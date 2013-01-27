@@ -7,6 +7,7 @@ namespace Cubex\View;
 class TemplatedViewModel extends ViewModel
 {
   use PhtmlParser;
+  use Yielder;
 
   protected $_filePath;
   protected $_fileExt = 'phtml';
