@@ -47,18 +47,21 @@ class TemplatedViewModel extends ViewModel
   public function setTemplateDirectory($directory)
   {
     $this->_baseDirectory = $directory;
+    return $this;
   }
 
   protected function _calculateBaseDirectory()
   {
     $directory = $this->_calculateTemplate()['directory'];
     $this->setTemplateDirectory($directory);
+    return $this;
   }
 
   public function setTemplateFile($file, $ext = 'phtml')
   {
     $this->_filePath = $file;
     $this->_fileExt  = $ext;
+    return $this;
   }
 
   protected function _calculateFilePath()

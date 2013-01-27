@@ -32,10 +32,12 @@ class Impart implements Renderable
 
   /**
    * @param $content
+   * @return $this
    */
   public function setContent($content)
   {
     $this->_content = $content;
+    return $this;
   }
 
   /**
