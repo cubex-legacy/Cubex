@@ -177,12 +177,14 @@ abstract class RecordMapper extends DataMapper
    *
    * @return \Cubex\Database\DatabaseService
    */
-  public function connection(ConnectionMode $mode)
+  public function connection(ConnectionMode $mode = null)
   {
-    /**
-     * @var $sm \Cubex\ServiceManager\ServiceManager
-     */
-    $sm = Container::get(Container::SERVICE_MANAGER);
+    if($mode === null)
+    {
+      $mode = new ConnectionMode(ConnectionMode::READ);
+    }
+
+    $sm = Container::servicemanager();
     return $sm->db($this->_dbServiceName, $mode);
   }
 
