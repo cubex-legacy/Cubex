@@ -28,7 +28,7 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
  */
 class Loader
   implements Configurable, DispatchableAccess,
-  DispatchInjection, ServiceManagerAware
+             DispatchInjection, ServiceManagerAware
 {
   use ConfigTrait;
   use ServiceManagerAwareTrait;
