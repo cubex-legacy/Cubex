@@ -7,7 +7,7 @@ namespace Cubex\Dispatch\Tests;
 use Cubex\Dispatch\FileSystem;
 use Cubex\Dispatch\Mapper;
 use Cubex\Tests\TestCase;
-use Cubex\Tests\Transport;
+use Cubex\Container\Container;
 
 class MapperTest extends TestCase
 {
@@ -18,7 +18,7 @@ class MapperTest extends TestCase
 
   public function setUp()
   {
-    $this->_configGroup = Transport::$data[Transport::CONFIG_GROUP];
+    $this->_configGroup = Container::get(Container::CONFIG);
   }
 
   public function testFindEntities()

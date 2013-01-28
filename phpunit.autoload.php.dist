@@ -21,14 +21,4 @@ $configArray = \Cubex\Foundation\Config\ConfigGroup::fromArray(
 );
 
 $cubex->configure($configArray);
-
-class Transport
-{
-  const CUBEX = "cubex";
-  const CONFIG_GROUP = "config.group";
-
-  public static $data;
-}
-
-Transport::$data[Transport::CUBEX] = $cubex;
-Transport::$data[Transport::CONFIG_GROUP] = $cubex->getConfig();
+$cubex->init();

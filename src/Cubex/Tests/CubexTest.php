@@ -5,6 +5,7 @@
 namespace Cubex\Tests;
 
 use Cubex\Loader;
+use Cubex\Container\Container;
 
 class CubexTest extends TestCase
 {
@@ -18,7 +19,7 @@ class CubexTest extends TestCase
 
   public function testCubexHasInstantiated()
   {
-    $cubex = Transport::$data[Transport::CUBEX];
+    $cubex = Container::get(Container::LOADER);
     $this->assertInstanceOf('Cubex\Loader', $cubex);
 
     return $cubex;
