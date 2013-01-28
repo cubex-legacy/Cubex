@@ -40,4 +40,9 @@ class ServiceManager extends \Cubex\ServiceManager\ServiceManager
       $this->clearTemp($name);
     }
   }
+
+  public function exists($name)
+  {
+    return isset($this->_shared[$name]);
+  }
 }

@@ -8,6 +8,7 @@ namespace Cubex\Cookie\Tests;
 use Cubex\Container\Container;
 use Cubex\Cookie\EncryptedCookie;
 use Cubex\Cookie\StandardCookie;
+use Cubex\Encryption\Service\TestEncryption;
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\Tests\TestCase;
 
@@ -17,26 +18,13 @@ class CookieTest extends TestCase
 
   public function setUp()
   {
-    $serviceConfig = new ServiceConfig();
-    $serviceConfig->setData(
-      "service_provider", "Cubex\\Encryption\\Service\\TestEncryption"
-    );
-
     // We setup a mock encryption object so we can test encrypted cookies
     $sm = Container::get(Container::SERVICE_MANAGER);
 
     /**
-     * @var \Cubex\ServiceManager\ServiceManager $sm
+     * @var \Cubex\Tests\ServiceManager $sm
      */
-    if($sm->exists("encryption"))
-    {
-      $this->_oldEncryptionConfig = $sm->getServiceConfig("encryption");
-      $sm->reBind("encryption", $serviceConfig);
-    }
-    else
-    {
-      $sm->register("encryption", $serviceConfig);
-    }
+    $sm->tempBind("encryption", new TestEncryption());
   }
 
   public function tearDown()
@@ -44,14 +32,9 @@ class CookieTest extends TestCase
     $sm = Container::get(Container::SERVICE_MANAGER);
 
     /**
-     * @var \Cubex\ServiceManager\ServiceManager $sm
+     * @var \Cubex\Tests\ServiceManager $sm
      */
-    $sm->unRegister("encryption");
-
-    if($this->_oldEncryptionConfig !== null)
-    {
-      $sm->register("encryption", $this->_oldEncryptionConfig);
-    }
+    $sm->clearTemp("encryption");
   }
 
   public function testCookieSetAndGet()
