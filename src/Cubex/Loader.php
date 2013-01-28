@@ -3,7 +3,7 @@
  * @author  brooke.bryan
  */
 namespace Cubex;
-de
+
 use Cubex\Cli\Dictionary;
 use Cubex\Core\Http\DispatchInjection;
 use Cubex\Dispatch\Dispatcher;
