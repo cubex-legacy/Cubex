@@ -63,6 +63,7 @@ class Loader
   protected $_failed = false;
 
   protected $_projectSourceRoot;
+  protected $_smClass = '\Cubex\ServiceManager\ServiceManager';
 
   /**
    * Initiate Cubex
@@ -111,9 +112,15 @@ class Loader
     );
   }
 
+  public function setServiceManagerClass($serviceManager)
+  {
+    $this->_smClass = $serviceManager;
+    return $this;
+  }
+
   public function init()
   {
-    $sm = new ServiceManager();
+    $sm = new $this->_smClass();
     foreach($this->_configuration as $section => $conf)
     {
       if($conf instanceof Config)
