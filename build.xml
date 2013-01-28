@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="name-of-project" default="build">
+<project name="cubex" default="build">
   <target name="build"
           depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdox,phpunit,phpcb"/>
 
@@ -21,7 +21,6 @@
   </target>
 
   <target name="clean" description="Cleanup build artifacts">
-    <delete dir="${basedir}/build/api"/>
     <delete dir="${basedir}/build/code-browser"/>
     <delete dir="${basedir}/build/coverage"/>
     <delete dir="${basedir}/build/logs"/>
@@ -31,7 +30,6 @@
   </target>
 
   <target name="prepare" depends="clean" description="Prepare for build">
-    <mkdir dir="${basedir}/build/api"/>
     <mkdir dir="${basedir}/build/code-browser"/>
     <mkdir dir="${basedir}/build/coverage"/>
     <mkdir dir="${basedir}/build/logs"/>
@@ -124,10 +122,6 @@
       <arg value="${basedir}/build/logs/pmd-cpd.xml"/>
       <arg path="${basedir}/src"/>
     </exec>
-  </target>
-
-  <target name="phpdox" description="Generate API documentation using phpDox">
-    <exec executable="phpdox"/>
   </target>
 
   <target name="phpunit" description="Run unit tests with PHPUnit">
