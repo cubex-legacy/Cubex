@@ -8,6 +8,5 @@ use Cubex\Type\Enum;
 
 class EnumNoConstants extends Enum
 {
-  const TRUE = "1";
-  const FALSE = "0";
+  const __default = "1";
 }

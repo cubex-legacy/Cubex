@@ -13,9 +13,11 @@ class EnumTest extends TestCase
 {
   public function testSomething()
   {
-    $this->setExpectedException('UnexpectedValueException');
+    $this->setExpectedException(
+      "UnexpectedValueException", "Enum 'non_value' does not exist"
+    );
 
-    new Bool('non_value');
+    new Bool("non_value");
   }
 
   public function testSetAndToString()
@@ -26,14 +28,18 @@ class EnumTest extends TestCase
 
   public function testExcptionThrownWhenNoDefaultSet()
   {
-    $this->setExpectedException('UnexpectedValueException');
+    $this->setExpectedException(
+      "UnexpectedValueException", "No default enum set"
+    );
 
     new EnumNoDefault();
   }
 
   public function testExcptionThrownWhenNoConstantsSet()
   {
-    $this->setExpectedException('UnexpectedValueException');
+    $this->setExpectedException(
+      "UnexpectedValueException", "No constants set"
+    );
 
     new EnumNoConstants();
   }
@@ -42,5 +48,19 @@ class EnumTest extends TestCase
   {
     $enum = new Bool();
     $this->assertEquals($enum, Bool::__default);
+  }
+
+  public function testGetConstList()
+  {
+    $enum = new Bool();
+
+    $constants = [
+      "TRUE"  => "1",
+      "FALSE" => "0"
+    ];
+    $this->assertEquals($constants, $enum->getConstList());
+
+    $constantsWithDefault = array_merge($constants, ["__default" => "1"]);
+    $this->assertEquals($constantsWithDefault, $enum->getConstList(true));
   }
 }
