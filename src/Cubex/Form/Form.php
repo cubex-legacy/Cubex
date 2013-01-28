@@ -42,6 +42,18 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
+  public function setElementTemplate($template, array $exclude = [])
+  {
+    foreach($this->_attributes as $name => $attribute)
+    {
+      if(!in_array($name, $exclude))
+      {
+        $this->_attribute($name)->setRenderTemplate($template);
+      }
+    }
+    return $this;
+  }
+
   public function addAttribute($name, $value = null)
   {
     $this->_elementAttributes[$name] = $value;
