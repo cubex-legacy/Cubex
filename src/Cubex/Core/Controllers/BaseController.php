@@ -54,6 +54,9 @@ class BaseController
    */
   protected $_baseUri;
 
+  protected $_actionFiltersBefore = [];
+  protected $_actionFiltersAfter = [];
+
 
   /**
    * @param \Cubex\Core\Application\Application f$app
@@ -218,7 +221,16 @@ class BaseController
     $this->appendData($params);
     $this->setRouteResult($action);
 
+    $result = $this->_processAction($action, $params);
+
+    return $result;
+  }
+
+  protected function _processAction($action, $params)
+  {
     $this->preRender();
+
+    $this->_processFilters($action, $this->_actionFiltersBefore);
 
     ob_start(); //Stop any naughty output making a mess of our response
     $result   = $this->runAction($action, $params);
@@ -228,6 +240,8 @@ class BaseController
     {
       $result = $buffered;
     }
+
+    $this->_processFilters($action, $this->_actionFiltersAfter);
 
     return $result;
   }
@@ -424,5 +438,50 @@ class BaseController
   public function getRouteResult()
   {
     return $this->_routeResult;
+  }
+
+  public function addFilterBefore(callable $filter, array $actions = null)
+  {
+    if($actions === null)
+    {
+      $actions = ['*'];
+    }
+
+    foreach($actions as $action)
+    {
+      $this->_actionFiltersBefore[$action][] = $filter;
+    }
+
+    return $this;
+  }
+
+  public function addFilterAfter(callable $filter, array $actions = null)
+  {
+    if($actions === null)
+    {
+      $actions = ['*'];
+    }
+
+    foreach($actions as $action)
+    {
+      $this->_actionFiltersAfter[$action][] = $filter;
+    }
+
+    return $this;
+  }
+
+  protected function _processFilters($action, array $filterGroup)
+  {
+    foreach($filterGroup as $act => $filters)
+    {
+      if($act === '*' || strcasecmp($act, $action) === 0)
+      {
+        foreach($filters as $filter)
+        {
+          $filter();
+        }
+      }
+    }
+    return $this;
   }
 }
