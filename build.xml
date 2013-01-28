@@ -25,6 +25,7 @@
     <delete dir="${basedir}/build/code-browser"/>
     <delete dir="${basedir}/build/coverage"/>
     <delete dir="${basedir}/build/logs"/>
+    <delete dir="${basedir}/vendor"/>
     <delete dir="${basedir}/build/pdepend"/>
     <delete file="${basedir}/composer.phar"/>
   </target>
