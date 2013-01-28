@@ -79,6 +79,11 @@ abstract class Application
     return "";
   }
 
+ public function _configure()
+ {
+   return $this;
+ }
+
   /**
    * @param \Cubex\Core\Project\Project $project
    */
@@ -387,6 +392,9 @@ abstract class Application
       },
       $this->getNamespace()
     );
+
+    $this->_configure();
+
   }
 
   public function projectBase()

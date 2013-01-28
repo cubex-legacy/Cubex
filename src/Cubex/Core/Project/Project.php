@@ -134,6 +134,7 @@ abstract class Project
     $this->_response = $response;
 
     $this->init();
+    $this->_configure();
 
     $this->addDefaultBundles();
     $this->initialiseBundles();
@@ -178,5 +179,11 @@ abstract class Project
    */
   public function init()
   {
+    return $this;
+  }
+
+  public function _configure()
+  {
+    return $this;
   }
 }
