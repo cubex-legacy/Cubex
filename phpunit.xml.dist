@@ -25,5 +25,14 @@
          logIncompleteSkipped="false"/>
   </logging>
 
+  <filter>
+    <whitelist>
+      <directory suffix=".php">./src/Cubex/</directory>
+      <exclude>
+        <directory suffix=".php">./src/Cubex/Tests</directory>
+        <directory suffix=".php">./src/Cubex/*/Tests</directory>
+      </exclude>
+    </whitelist>
+  </filter>
 </phpunit>
 
