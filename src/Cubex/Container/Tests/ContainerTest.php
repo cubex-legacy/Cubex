@@ -60,4 +60,39 @@ class ContainerTest extends TestCase
       Container::get("containertest.bound")
     );
   }
+
+  public function testHelpers()
+  {
+    $this->assertInstanceOf(
+      "\\Cubex\\Foundation\\Config\\ConfigGroup",
+      Container::config()
+    );
+
+    $serviceManager = Container::servicemanager();
+    $request = Container::request();
+    $response = Container::response();
+    $authedUser = Container::authedUser();
+
+    if($serviceManager !== null)
+    {
+      $this->assertInstanceOf(
+        "\\Cubex\\ServiceManager\\ServiceManager", $serviceManager
+      );
+    }
+
+    if($request !== null)
+    {
+      $this->assertInstanceOf("\\Cubex\\Core\\Http\\Request", $request);
+    }
+
+    if($response !== null)
+    {
+      $this->assertInstanceOf("\\Cubex\\Core\\Http\\Response", $response);
+    }
+
+    if($authedUser !== null)
+    {
+      $this->assertInstanceOf("\\Cubex\\Auth\\AuthedUser", $authedUser);
+    }
+  }
 }
