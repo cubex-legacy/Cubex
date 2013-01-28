@@ -21,4 +21,5 @@ $configArray = \Cubex\Foundation\Config\ConfigGroup::fromArray(
 );
 
 $cubex->configure($configArray);
+$cubex->setServiceManagerClass("\\Cubex\\Tests\\ServiceManager");
 $cubex->init();
