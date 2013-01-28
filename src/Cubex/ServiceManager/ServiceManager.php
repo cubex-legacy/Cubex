@@ -76,6 +76,24 @@ class ServiceManager
   }
 
   /**
+   * @param string $name
+   *
+   * @return $this
+   * @throws \InvalidArgumentException
+   */
+  public function unRegister($name)
+  {
+    if(!$this->exists($name))
+    {
+      throw new \InvalidArgumentException("Service does not exist");
+    }
+
+    unset($this->_services[$name]);
+
+    return $this;
+  }
+
+  /**
    * @param $name
    *
    * @return Service
