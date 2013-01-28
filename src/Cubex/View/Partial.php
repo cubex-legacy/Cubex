@@ -64,7 +64,7 @@ class Partial implements Renderable
    */
   public function addElement( /*$element,$element,...*/)
   {
-    $this->_addItem(\func_get_args());
+    $this->_addItem(func_get_args());
 
     return $this;
   }
@@ -81,31 +81,32 @@ class Partial implements Renderable
 
     foreach($this->_variables as $arg => $key)
     {
-      $element = \str_replace('{#' . $key . '}', $args[$arg], $element);
+      $element = str_replace('{#' . $key . '}', $args[$arg], $element);
+      $element = str_replace('{{' . $key . '}}', $args[$arg], $element);
     }
-    if(\is_array($args))
+    if(is_array($args))
     {
       if($this->_escapeInput)
       {
-        $this->_elements[] = \vsprintf(
+        $this->_elements[] = vsprintf(
           $element,
-          \array_map(array('\Cubex\View\HtmlElement', 'escape'), $args)
+          array_map(array('\Cubex\View\HtmlElement', 'escape'), $args)
         );
       }
       else
       {
-        $this->_elements[] = \vsprintf($element, $args);
+        $this->_elements[] = vsprintf($element, $args);
       }
     }
     else
     {
       if($this->_escapeInput)
       {
-        $this->_elements[] = \sprintf($element, HtmlElement::escape($args));
+        $this->_elements[] = sprintf($element, HtmlElement::escape($args));
       }
       else
       {
-        $this->_elements[] = \sprintf($element, $args);
+        $this->_elements[] = sprintf($element, $args);
       }
     }
     return $this;
@@ -143,7 +144,7 @@ class Partial implements Renderable
    */
   public function render()
   {
-    return \implode(
+    return implode(
       $this->_glue === null ? '' : $this->_glue, $this->_elements
     );
   }
@@ -173,8 +174,8 @@ class Partial implements Renderable
   public static function single($template /*$element,$element,...*/)
   {
     $partial = new Partial($template);
-    $args    = \func_get_args();
-    \array_shift($args);
+    $args    = func_get_args();
+    array_shift($args);
     $partial->_addItem($args);
     return $partial;
   }
