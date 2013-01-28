@@ -126,9 +126,9 @@
 
   <target name="phpunit" description="Run unit tests with PHPUnit">
     <exec executable="phpunit" failonerror="true">
-      <arg value="--coverage-html build/coverage"/>
-      <arg value="--coverage-clover build/logs/clover.sml"/>
-      <arg value="--log-junit build/logs/junit.xml"/>
+      <arg line="--coverage-html build/coverage
+      --coverage-clover build/logs/clover.sml
+      --log-junit build/logs/junit.xml"/>
     </exec>
   </target>
 
