@@ -43,6 +43,24 @@ class ServiceManager
   }
 
   /**
+   * @param string $name
+   *
+   * @return ServiceConfig
+   * @throws \InvalidArgumentException
+   */
+  public function getServiceConfig($name)
+  {
+    if($this->exists($name))
+    {
+      return $this->_services[$name]["config"];
+    }
+    else
+    {
+      throw new \InvalidArgumentException("Service does not exist");
+    }
+  }
+
+  /**
    * @param $name
    *
    * @return bool
