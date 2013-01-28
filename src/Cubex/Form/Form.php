@@ -27,7 +27,7 @@ class Form extends DataMapper implements Renderable
   protected $_autoTimestamp = false;
   protected $_elementRenderTemplate;
 
-  public function __construct($name, $action, $method = 'POST')
+  public function __construct($name, $action, $method = 'post')
   {
     $this->_buildAttributes(__NAMESPACE__ . '\FormElement');
     $this->setName($name);
@@ -152,7 +152,7 @@ class Form extends DataMapper implements Renderable
   {
     $form = new Form('', '');
     $req  = Container::request();
-    if($req->is("POST"))
+    if($req->is("post"))
     {
       $valid = $form->validateCsrf($req->postVariables('cubex_csrf'));
     }
@@ -163,7 +163,7 @@ class Form extends DataMapper implements Renderable
 
     if($valid && $strongCheck)
     {
-      if($req->is("POST"))
+      if($req->is("post"))
       {
         $token  = $req->postVariables('cubex_csrf_token');
         $cbform = $req->postVariables('_cubex_form_');
