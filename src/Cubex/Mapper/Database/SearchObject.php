@@ -17,12 +17,14 @@ class SearchObject
   public function __set($field, $value)
   {
     $this->addSearch($field, $value);
+    return $this;
   }
 
   public function addSearch($field, $value, $match = self::MATCH_EXACT)
   {
     $this->$field          = $value;
     $this->_fields[$field] = $match;
+    return $this;
   }
 
   public function getMatchType($field)
@@ -34,5 +36,6 @@ class SearchObject
   public function setMatchType($field, $type)
   {
     $this->_fields[$field] = $type;
+    return $this;
   }
 }

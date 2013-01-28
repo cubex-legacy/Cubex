@@ -67,11 +67,13 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
         $this->_addAttribute(new $type($this->_createdAttribute()));
       }
     }
+    return $this;
   }
 
   protected function _configure()
   {
     //Add Filters & Validators
+    return $this;
   }
 
   /**
@@ -246,11 +248,13 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   }
 
   /**
-   * @param Attribute $attribute
+   * @param \Cubex\Data\Attribute $attribute
+   * @return $this
    */
   protected function _addAttribute(Attribute $attribute)
   {
     $this->_attributes[strtolower($attribute->name())] = $attribute;
+    return $this;
   }
 
   /**
@@ -389,9 +393,6 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   }
 
 
-  /**
-   *
-   */
   protected function _unmodifyAttributes()
   {
     foreach($this->_attributes as $attr)
@@ -401,6 +402,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
         $attr->unsetModified();
       }
     }
+    return $this;
   }
 
   /**

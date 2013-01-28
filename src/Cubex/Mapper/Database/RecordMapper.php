@@ -52,6 +52,7 @@ abstract class RecordMapper extends DataMapper
     {
       $this->_addAttribute(new Attribute($this->getIDKey()));
     }
+    return $this;
   }
 
   /**

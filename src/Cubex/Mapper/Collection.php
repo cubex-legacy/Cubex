@@ -44,6 +44,7 @@ class Collection
         $this->addMapper($mapper);
       }
     }
+    return $this;
   }
 
   public function addMapper(DataMapper $mapper)

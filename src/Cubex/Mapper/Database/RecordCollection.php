@@ -108,11 +108,13 @@ class RecordCollection extends Collection
         }
       }
     }
+    return $this;
   }
 
   public function setCreateData(array $data)
   {
     $this->_populate = $data;
+    return $this;
   }
 
   /**
