@@ -418,8 +418,10 @@ class Loader
 
   public function buildResponse()
   {
+    /*
+     * $response->addHeader("X-Frame-Options", "deny");
+     */
     $response = new Response();
-    $response->addHeader("X-Frame-Options", "deny");
     return $response;
   }
 
