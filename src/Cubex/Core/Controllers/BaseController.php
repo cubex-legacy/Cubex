@@ -99,22 +99,24 @@ class BaseController
     try
     {
       $canProcess = $this->canProcess();
-      if(!$canProcess)
+      if($canProcess === false)
       {
         throw new \Exception("Unable to process request");
       }
-
-      $this->preProcess();
-      $actionResponse = $this->processRequest();
-      $this->postProcess();
     }
     catch(\Exception $e)
     {
       $actionResponse = $this->failedProcess($e);
     }
 
-    $this->_response = $this->_getResponseFromActionResponse($actionResponse);
+    if(!isset($actionResponse))
+    {
+      $this->preProcess();
+      $actionResponse = $this->processRequest();
+      $this->postProcess();
+    }
 
+    $this->_response = $this->_getResponseFromActionResponse($actionResponse);
     return $this->_response;
   }
 
