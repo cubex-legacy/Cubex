@@ -25,20 +25,12 @@ trait PhtmlParser
 
     if(!$checkExists || file_exists($file))
     {
-      $raw = \file_get_contents($file);
+      $raw = file_get_contents($file);
       $raw = $this->processRaw($raw);
-      \ob_start();
-      try //Make sure the view does not cause the entire render to fail
-      {
-        /* Close PHP tags to allow for html and opening tags */
-        eval('?>' . $raw);
-      }
-      catch(\Exception $e)
-      {
-        \ob_get_clean();
-      }
-
-      $rendered = \ob_get_clean();
+      ob_start();
+      /* Close PHP tags to allow for html and opening tags */
+      eval('?>' . $raw);
+      $rendered = ob_get_clean();
     }
 
     return $rendered;
@@ -49,7 +41,7 @@ trait PhtmlParser
    */
   public function render()
   {
-    $files = $this->getRenderFiles();
+    $files    = $this->getRenderFiles();
     $rendered = '';
 
     foreach($files as $file)
@@ -58,7 +50,7 @@ trait PhtmlParser
       if(is_array($file))
       {
         $checkExists = $file['check'];
-        $file = $file['file'];
+        $file        = $file['file'];
       }
       $rendered .= $this->_renderFile($file, $checkExists);
     }
@@ -76,13 +68,6 @@ trait PhtmlParser
    */
   public function __toString()
   {
-    try
-    {
-      return $this->render();
-    }
-    catch(\Exception $e)
-    {
-      return $e->getMessage();
-    }
+    return $this->render();
   }
 }
