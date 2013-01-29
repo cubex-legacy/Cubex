@@ -13,14 +13,4 @@ class ConnectionMode extends Enum
 
   const READ  = "r";
   const WRITE = "w";
-
-  public static function read()
-  {
-    return new static(static::READ);
-  }
-
-  public static function write()
-  {
-    return new static(static::WRITE);
-  }
 }

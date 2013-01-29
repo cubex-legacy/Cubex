@@ -38,12 +38,14 @@ else
   }
 }
 
-
 /**
  * @method Enum __toString()
  * @method Enum getConstList()
  */
 abstract class Enum extends EnumWrapper
 {
-
+  public static function __callStatic($name, $arguments)
+  {
+    return new static(constant(get_called_class() . '::' . strtoupper($name)));
+  }
 }
