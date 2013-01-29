@@ -19,6 +19,7 @@ use Cubex\View\Layout;
 use Cubex\View\Partial;
 use Cubex\View\RenderGroup;
 use Cubex\View\ResponseAwareRenderable;
+use Cubex\View\Templates\Exceptions\ExceptionView;
 
 class Webpage implements
   ResponseAwareRenderable,
@@ -293,7 +294,14 @@ class Webpage implements
    */
   public function renderBody()
   {
-    $body = $this->body()->render();
+    try
+    {
+      $body = $this->body()->render();
+    }
+    catch(\Exception $e)
+    {
+      $body = (new ExceptionView($e))->render();
+    }
 
     $processed = EM::triggerUntil(
       EM::CUBEX_WEBPAGE_RENDER_BODY, ["content" => $body], $this
