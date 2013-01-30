@@ -9,6 +9,9 @@ use Cubex\Data\Attribute;
 abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 {
   protected $_id;
+  /**
+   * @var \Cubex\Data\Attribute
+   */
   protected $_attributes;
   protected $_invalidAttributes;
   protected $_exists = false;
@@ -521,23 +524,53 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
   public function getValidators()
   {
-    return $this->_validators;
+    $validators = [];
+    foreach($this->_attributes as $attr)
+    {
+      if($attr instanceof Attribute)
+      {
+        $validators[$attr->name()] = $attr->getValidators();
+      }
+    }
+    return $validators;
   }
 
   public function getFilters()
   {
-    return $this->_filters;
+    $filters = [];
+    foreach($this->_attributes as $attr)
+    {
+      if($attr instanceof Attribute)
+      {
+        $filters[$attr->name()] = $attr->getFilters();
+      }
+    }
+    return $filters;
   }
 
   public function importValidators(DataMapper $from)
   {
-    $this->_validators = $from->getValidators();
+    $validators = $from->getValidators();
+    foreach($validators as $attr => $validatorArray)
+    {
+      if($this->_attributeExists($attr))
+      {
+        $this->_attribute($attr)->setValidators($validatorArray);
+      }
+    }
     return $this;
   }
 
   public function importFilters(DataMapper $from)
   {
-    $this->_filters = $from->getFilters();
+    $filters = $from->getFilters();
+    foreach($filters as $attr => $filterArray)
+    {
+      if($this->_attributeExists($attr))
+      {
+        $this->_attribute($attr)->setFilters($filterArray);
+      }
+    }
     return $this;
   }
 }

@@ -25,6 +25,17 @@ trait ValidatableTrait
     return $this;
   }
 
+  public function setValidators($validators)
+  {
+    $this->_validators = $validators;
+    return $this;
+  }
+
+  public function getValidators()
+  {
+    return $this->_validators;
+  }
+
   public function removeValidatorByAlias($alias)
   {
     unset($this->_validators[$alias]);

@@ -24,6 +24,17 @@ trait FilterableTrait
     return $this;
   }
 
+  public function setFilters($filters)
+  {
+    $this->_filters = $filters;
+    return $this;
+  }
+
+  public function getFilters()
+  {
+    return $this->_filters;
+  }
+
   public function removeFilterByAlias($alias)
   {
     unset($this->_filters[$alias]);
