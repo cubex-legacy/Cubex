@@ -145,6 +145,15 @@ class Attribute implements Validatable, Filterable
     return $this;
   }
 
+  public function addOptions(array $option)
+  {
+    foreach($option as $k => $v)
+    {
+      $this->_options[$k] = $v;
+    }
+    return $this;
+  }
+
   public function options()
   {
     return $this->_options;

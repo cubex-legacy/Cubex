@@ -319,6 +319,15 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
+  public function addSelectElement($name, $default = '', $options = [],
+                                   $labelPosition = null)
+  {
+    $this->addElement(
+      $name, FormElement::SELECT, $default, $options, $labelPosition
+    );
+    return $this;
+  }
+
   public function addTextareaElement($name, $default = '',
                                      $labelPosition = null)
   {
