@@ -222,7 +222,7 @@ abstract class RecordMapper extends DataMapper
 
   public function id()
   {
-    if($this->isCompositeID())
+    if($this->isCompositeId())
     {
       return $this->_getCompositeID();
     }
@@ -243,7 +243,7 @@ abstract class RecordMapper extends DataMapper
   /**
    * @return bool
    */
-  public function isCompositeID()
+  public function isCompositeId()
   {
     $config = $this->getConfiguration();
     if(isset($config[self::CONFIG_IDS]))
