@@ -52,6 +52,18 @@ trait ValidatableTrait
     $this->_validationErrors = [];
     $result                  = true;
 
+    if($value === null || empty($value))
+    {
+      if(method_exists($this, 'required'))
+      {
+        if($this->required())
+        {
+          $this->_validationErrors[] = 'Required';
+          $result                    = false;
+        }
+      }
+    }
+
     foreach($this->_validators as $validatable)
     {
       $validator = $validatable['validator'];
@@ -73,7 +85,7 @@ trait ValidatableTrait
         catch(\Exception $e)
         {
           $this->_validationErrors[] = $e->getMessage();
-          $result = false;
+          $result                    = false;
         }
         continue;
       }
