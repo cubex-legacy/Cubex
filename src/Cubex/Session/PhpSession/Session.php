@@ -36,7 +36,7 @@ class Session implements SessionService
    */
   public function get($key)
   {
-    return $_SESSION['cubex'][$key];
+    return $this->exists($key) ? $_SESSION['cubex'][$key] : null;
   }
 
   /**
