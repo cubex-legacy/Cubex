@@ -40,7 +40,7 @@ class Collection
     $result = [];
     foreach($this->_mappers as $mapper)
     {
-      $result[] = [$mapper->$keyField => $mapper->$valueField];
+      $result[$mapper->$keyField] = $mapper->$valueField;
     }
     return $result;
   }
