@@ -11,8 +11,8 @@ class Request implements \IteratorAggregate
 {
   use HandlerTrait;
 
-  const TYPE_AJAX     = '_cubex_ajax_';
-  const TYPE_FORM     = '_cubex_form_';
+  const TYPE_AJAX     = '__cubex_ajax__';
+  const TYPE_FORM     = '__cubex_form__';
   const NO_JAVASCRIPT = '__noscript__';
 
   protected $_requestMethod;
@@ -382,7 +382,11 @@ class Request implements \IteratorAggregate
     $variables = array();
     foreach($array as $k => $v)
     {
-      if(substr($k, 0, 2) !== '__')
+      if($variable === $k || (is_array($variable) && in_array($k, $variable)))
+      {
+        $variables[$k] = $v;
+      }
+      else if(substr($k, 0, 7) !== '__cubex')
       {
         $variables[$k] = $v;
       }
