@@ -35,7 +35,7 @@ class Collection
     return $this;
   }
 
-  public function createArray($keyField, $valueField)
+  public function getKeyPair($keyField, $valueField)
   {
     $result = [];
     foreach($this->_mappers as $mapper)
