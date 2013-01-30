@@ -61,4 +61,11 @@ interface CacheService
    * @return mixed
    */
   public function delete($key);
+
+  /**
+   * Check that we're connected to something.
+   *
+   * @return bool
+   */
+  public function isConnected();
 }

@@ -34,7 +34,7 @@ class Memcache implements CacheService
   {
     $this->_config     = $config;
     $this->_connection = new \Memcache();
-    $this->_connection->addserver($config->getStr("hostname"));
+    $this->_connection->addserver($config->getStr("hostname", "localhost"));
   }
 
   public function connect($mode = 'w')
@@ -108,5 +108,28 @@ class Memcache implements CacheService
   public function delete($key)
   {
     return $this->_connection->delete($key);
+  }
+
+  /**
+   * @return bool
+   */
+  public function isConnected()
+  {
+    try
+    {
+      if($this->_connection === null)
+      {
+        throw new \Exception();
+      }
+      $return = $this->_connection->getServerStatus(
+        $this->_config->getStr("hostname", 'localhost')
+      );
+    }
+    catch(\Exception $e)
+    {
+      $return = false;
+    }
+
+    return (bool)$return;
   }
 }
