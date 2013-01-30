@@ -79,7 +79,7 @@ abstract class LogicComponent implements Component, NamespaceAware
   abstract public function init();
 
   protected $_namespaceCache;
-  protected static $_interfaces = [];
+  protected static $_interfaces;
   /**
    * @var \Cubex\ServiceManager\ServiceManager
    */
