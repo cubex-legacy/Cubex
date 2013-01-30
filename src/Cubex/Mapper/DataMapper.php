@@ -518,4 +518,26 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $this->_updateTimestamps();
     return false;
   }
+
+  public function getValidators()
+  {
+    return $this->_validators;
+  }
+
+  public function getFilters()
+  {
+    return $this->_filters;
+  }
+
+  public function importValidators(DataMapper $from)
+  {
+    $this->_validators = $from->getValidators();
+    return $this;
+  }
+
+  public function importFilters(DataMapper $from)
+  {
+    $this->_filters = $from->getFilters();
+    return $this;
+  }
 }
