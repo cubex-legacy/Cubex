@@ -31,4 +31,12 @@ trait ServiceManagerAwareTrait
   {
     return $this->_serviceManager;
   }
+
+  /**
+   * @return ServiceManager
+   */
+  public function sm()
+  {
+    return $this->_serviceManager;
+  }
 }
