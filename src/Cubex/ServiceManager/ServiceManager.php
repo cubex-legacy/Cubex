@@ -37,6 +37,10 @@ class ServiceManager
         return $this->_create($name);
       }
     }
+    else if(class_exists($name))
+    {
+      return $this->_buildClass($name);
+    }
     else
     {
       throw new \InvalidArgumentException("Service does not exist");
