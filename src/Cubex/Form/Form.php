@@ -319,7 +319,7 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
-  public function addSelectElement($name, $default = '', $options = [],
+  public function addSelectElement($name, $options = [], $default = '',
                                    $labelPosition = null)
   {
     $this->addElement(
