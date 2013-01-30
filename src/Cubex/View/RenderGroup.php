@@ -23,11 +23,15 @@ class RenderGroup implements Renderable
     }
   }
 
-  public function add(Renderable $item /*, $item, $item */)
+  public function add($item /*, $item, $item */)
   {
     $items = \func_get_args();
     foreach($items as $itm)
     {
+      if(is_scalar($itm))
+      {
+        $itm = new Impart($itm);
+      }
       if($itm instanceof Renderable)
       {
         $this->_items[] = $itm;
