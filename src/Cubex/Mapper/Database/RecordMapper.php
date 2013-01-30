@@ -48,9 +48,9 @@ abstract class RecordMapper extends DataMapper
 
   protected function _addIdAttribute()
   {
-    if(!$this->_attributeExists($this->getIDKey()))
+    if(!$this->_attributeExists($this->getIdKey()))
     {
-      $this->_addAttribute(new Attribute($this->getIDKey()));
+      $this->_addAttribute(new Attribute($this->getIdKey()));
     }
     return $this;
   }
@@ -107,7 +107,7 @@ abstract class RecordMapper extends DataMapper
       $pattern,
       $columns,
       $this->getTableName(),
-      $this->getIDKey(),
+      $this->getIdKey(),
       $id,
     );
 
@@ -116,7 +116,7 @@ abstract class RecordMapper extends DataMapper
     $rows = $connection->getRows($query);
     if(!$rows)
     {
-      $set = "set" . $this->getIDKey();
+      $set = "set" . $this->getIdKey();
       $this->$set($id);
     }
     else
@@ -151,7 +151,7 @@ abstract class RecordMapper extends DataMapper
       $args = array(
         $pattern,
         $this->getTableName(),
-        $this->getIDKey(),
+        $this->getIdKey(),
         $this->id(),
       );
 
@@ -168,7 +168,7 @@ abstract class RecordMapper extends DataMapper
    *
    * @return string Name of ID column
    */
-  public function getIDKey()
+  public function getIdKey()
   {
     return 'id';
   }
@@ -228,7 +228,7 @@ abstract class RecordMapper extends DataMapper
     }
     else
     {
-      $attr = $this->_attribute($this->getIDKey());
+      $attr = $this->_attribute($this->getIdKey());
       if($attr !== null)
       {
         return $attr->rawData();
@@ -360,7 +360,7 @@ abstract class RecordMapper extends DataMapper
       {
         $pattern .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
         $pattern .= ' WHERE ' . $this->idPattern();
-        $args[] = $this->getIDKey();
+        $args[] = $this->getIdKey();
         $args[] = $this->id();
       }
 
@@ -375,7 +375,7 @@ abstract class RecordMapper extends DataMapper
       $args = array(
         $pattern,
         $this->getTableName(),
-        $this->getIDKey(),
+        $this->getIdKey(),
         $this->id(),
       );
     }
