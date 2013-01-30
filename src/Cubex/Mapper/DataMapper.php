@@ -459,6 +459,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   {
     foreach($data as $k => $v)
     {
+      $k = strtolower($k);
       if($this->_attributeExists($k))
       {
         $set = "set$k";
