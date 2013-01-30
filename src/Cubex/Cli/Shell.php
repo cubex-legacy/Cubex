@@ -134,7 +134,7 @@ class Shell
    */
   public static function columns()
   {
-    return exec('/usr/bin/env tput cols');
+    return (int)exec('/usr/bin/env tput cols');
   }
 
   /**
