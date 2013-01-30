@@ -35,6 +35,16 @@ class Collection
     return $this;
   }
 
+  public function createArray($keyField, $valueField)
+  {
+    $result = [];
+    foreach($this->_mappers as $mapper)
+    {
+      $result[] = [$mapper->$keyField => $mapper->$valueField];
+    }
+    return $result;
+  }
+
   public function hydrate(array $mappers = [])
   {
     foreach($mappers as $mapper)
