@@ -8,6 +8,7 @@ namespace Cubex\View;
 use Cubex\Core\Interfaces\DirectoryAware;
 use Cubex\Core\Interfaces\NamespaceAware;
 use Cubex\Dispatch\Utils\RequireTrait;
+use Cubex\Foundation\DataHandler\HandlerTrait;
 use Cubex\Foundation\Renderable;
 use Cubex\I18n\TranslateTraits;
 
@@ -17,6 +18,7 @@ class Layout implements Renderable, NamespaceAware
   use TranslateTraits;
   use RequireTrait;
   use Yielder;
+  use HandlerTrait;
 
   protected $_layoutTemplate = 'Default';
   protected $_layoutDirectory = '';
