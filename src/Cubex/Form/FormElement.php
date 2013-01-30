@@ -40,6 +40,7 @@ class FormElement extends Attribute implements Renderable
   const WEEK           = 'week';
 
   protected $_type = 'text';
+  protected $_label;
   protected $_attributes;
   protected $_labelPosition;
   protected $_renderTemplate;
@@ -60,6 +61,28 @@ class FormElement extends Attribute implements Renderable
     }
     $this->_type = $type;
     return $this;
+  }
+
+  public function setLabel($label)
+  {
+    $this->_label = $label;
+    return $this;
+  }
+
+  public function label()
+  {
+    if($this->_label === null)
+    {
+      $label = str_replace(['_', '-'], ' ', $this->name());
+      $label = preg_replace(
+        "/(([a-z])([A-Z])|([A-Z])([A-Z][a-z]))/", "\\2\\4 \\3\\5", $label
+      );
+      return ucwords($label);
+    }
+    else
+    {
+      return $this->_label;
+    }
   }
 
   public function setRenderTemplate($template)

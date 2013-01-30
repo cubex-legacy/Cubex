@@ -20,7 +20,7 @@ class Form extends DataMapper implements Renderable
   const LABEL_SURROUND_RIGHT = 'surround.right';
 
   protected $_elementAttributes;
-  protected $_name;
+  protected $_formName;
   protected $_enctype;
   protected $_labelPosition = self::LABEL_BEFORE;
   protected $_validatedHour;
@@ -30,7 +30,7 @@ class Form extends DataMapper implements Renderable
   public function __construct($name, $action, $method = 'post')
   {
     $this->_buildAttributes(__NAMESPACE__ . '\FormElement');
-    $this->setName($name);
+    $this->setFormName($name);
     $this->_elementAttributes['method'] = $method;
     $this->_elementAttributes['action'] = $action;
     $this->_configure();
@@ -60,9 +60,9 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
-  public function setName($name)
+  public function setFormName($name)
   {
-    $this->_name                      = $name;
+    $this->_formName                  = $name;
     $this->_elementAttributes['name'] = $name;
     if($this->_id === null)
     {
@@ -92,6 +92,7 @@ class Form extends DataMapper implements Renderable
    */
   protected function _attribute($name)
   {
+    $name = strtolower($name);
     return isset($this->_attributes[$name]) ? $this->_attributes[$name] : null;
   }
 
@@ -138,7 +139,7 @@ class Form extends DataMapper implements Renderable
   public function formNameInput()
   {
     $out = '';
-    $out .= '<input type="hidden" name="_cubex_form_"';
+    $out .= '<input type="hidden" name="__cubex_form__"';
     $out .= 'value="' . $this->id() . '"/>';
     return $out;
   }
@@ -154,24 +155,24 @@ class Form extends DataMapper implements Renderable
     $req  = Container::request();
     if($req->is("post"))
     {
-      $valid = $form->validateCsrf($req->postVariables('cubex_csrf'));
+      $valid = $form->validateCsrf($req->postVariables('__cubex_csrf__'));
     }
     else
     {
-      $valid = $form->validateCsrf($req->getVariables('cubex_csrf'));
+      $valid = $form->validateCsrf($req->getVariables('__cubex_csrf__'));
     }
 
     if($valid && $strongCheck)
     {
       if($req->is("post"))
       {
-        $token  = $req->postVariables('cubex_csrf_token');
-        $cbform = $req->postVariables('_cubex_form_');
+        $token  = $req->postVariables('__cubex_csrf_token__');
+        $cbform = $req->postVariables('__cubex_form__');
       }
       else
       {
-        $token  = $req->getVariables('cubex_csrf_token');
-        $cbform = $req->getVariables('_cubex_form_');
+        $token  = $req->getVariables('__cubex_csrf_token__');
+        $cbform = $req->getVariables('__cubex_form__');
       }
 
       if(!is_bool($strongCheck))
@@ -221,14 +222,14 @@ class Form extends DataMapper implements Renderable
   public function token()
   {
     $projectHash = static::_projectHash();
-    $token       = md5(static::_secureId() . $this->_name);
+    $token       = md5(static::_secureId() . $this->_formName);
     $token .= "/" . md5($token . $projectHash);
 
-    $element = new FormElement("cubex_csrf_token", true, null, $token);
+    $element = new FormElement("__cubex_csrf_token__", true, null, $token);
     $element->setType("hidden")->setLabelPosition(Form::LABEL_NONE);
 
     $csrf     = $this->_makeCsrf(date("H"));
-    $sElement = new FormElement("cubex_csrf", true, null, $csrf);
+    $sElement = new FormElement("__cubex_csrf__", true, null, $csrf);
     $sElement->setType("hidden")->setLabelPosition(Form::LABEL_NONE);
 
     $tokenF = (new FormElementRender($element))->render();

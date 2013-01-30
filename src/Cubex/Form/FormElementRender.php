@@ -154,7 +154,7 @@ class FormElementRender implements Renderable
     }
     if($text === null)
     {
-      $text = $this->_element->name();
+      $text = $this->_element->label();
     }
     return '<label for="' . $id . '">' . $text . '</label>';
   }
