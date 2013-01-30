@@ -26,7 +26,14 @@ class MemcacheTest extends TestCase
       $memcache->addserver("localhost");
       if(0 !== $memcache->getServerStatus("localhost"))
       {
-        $skip = false;
+        try
+        {
+          $skip = !$memcache->connect("localhost");
+        }
+        catch(\Exception $e)
+        {
+          $skip = true;
+        }
       }
     }
 
