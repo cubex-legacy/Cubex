@@ -10,7 +10,7 @@ namespace Cubex\Mapper;
  */
 class Collection
   implements \ArrayAccess, \Countable, \Iterator,
-  \JsonSerializable, \Serializable
+             \JsonSerializable, \Serializable
 {
   /**
    * @var DataMapper[]
@@ -76,6 +76,8 @@ class Collection
   }
 
   /**
+   * Get a selection from the entire result set
+   *
    * @param int $offset
    * @param int $length
    *
