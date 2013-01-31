@@ -36,10 +36,11 @@ class RecordCollection extends Collection
   public function setOrderBy($field, $order = 'ASC')
   {
     $this->_orderBy = ParseQuery::parse(
-      $this->connection(), [
-                           "%C $order",
-                           $field
-                           ]
+      $this->connection(),
+      [
+      "%C $order",
+      $field
+      ]
     );
     return $this;
   }
@@ -59,10 +60,11 @@ class RecordCollection extends Collection
     else
     {
       $this->_groupBy = ParseQuery::parse(
-        $this->connection(), [
-                             "%C",
-                             $groupBy
-                             ]
+        $this->connection(),
+        [
+        "%C",
+        $groupBy
+        ]
       );
     }
     return $this;
@@ -89,13 +91,19 @@ class RecordCollection extends Collection
     return parent::all();
   }
 
+  public function currentQuery()
+  {
+    return $this->_query;
+  }
+
   public function loadOneWhere($pattern /* , $arg, $arg, $arg ... */)
   {
     call_user_func_array(
       array(
            $this,
            'loadWhere'
-      ), func_get_args()
+      ),
+      func_get_args()
     );
 
     $this->get();
@@ -124,16 +132,7 @@ class RecordCollection extends Collection
   public function loadWhere($pattern /* , $arg, $arg, $arg ... */)
   {
     $this->clear();
-    $args = func_get_args();
-    array_shift($args);
-    array_unshift($args, $this->_mapperType->getTableName());
-    array_unshift($args, $this->_columns);
-
-    $pattern = 'SELECT %LC FROM %T WHERE ' . $pattern;
-
-    array_unshift($args, $pattern);
-
-    $this->_query = ParseQuery::parse($this->connection(), $args);
+    $this->_query = ParseQuery::parse($this->connection(), func_get_args());
 
     return $this;
   }
@@ -189,7 +188,17 @@ class RecordCollection extends Collection
       $this->_query .= " LIMIT $this->_offset,$this->_limit";
     }
 
-    $rows = $this->connection()->getRows($this->_query);
+    $query = 'SELECT %LC FROM %T WHERE ' . $this->_query;
+    $query = ParseQuery::parse(
+      $this->connection(),
+      [
+      $query,
+      $this->_columns,
+      $this->_mapperType->getTableName(),
+      ]
+    );
+
+    $rows = $this->connection()->getRows($query);
     if($rows)
     {
       foreach($rows as $row)
