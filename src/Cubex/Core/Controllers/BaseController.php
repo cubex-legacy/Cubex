@@ -243,7 +243,7 @@ class BaseController
     $this->_processFilters($action, $this->_actionFiltersBefore);
 
     ob_start(); //Stop any naughty output making a mess of our response
-    $result = $this->runAction($action, $params);
+    $result   = $this->runAction($action, $params);
     $buffered = ob_get_clean();
 
     if($result === null)
