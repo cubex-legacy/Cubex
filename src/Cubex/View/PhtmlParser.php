@@ -18,6 +18,7 @@ trait PhtmlParser
    * @param $file
    * @param bool $checkExists
    * @return string
+   * @throws \Exception
    */
   protected function _renderFile($file, $checkExists = false)
   {
@@ -29,7 +30,15 @@ trait PhtmlParser
       $raw = $this->processRaw($raw);
       ob_start();
       /* Close PHP tags to allow for html and opening tags */
-      eval('?>' . $raw);
+      try
+      {
+        eval('?>' . $raw);
+      }
+      catch(\Exception $e)
+      {
+        ob_get_clean();
+        throw $e;
+      }
       $rendered = ob_get_clean();
     }
 
