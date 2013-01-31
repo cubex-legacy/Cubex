@@ -573,4 +573,11 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     }
     return $this;
   }
+
+  public function importFiltersAndValidators(DataMapper $from)
+  {
+    $this->importFilters($from);
+    $this->importValidators($from);
+    return $this;
+  }
 }
