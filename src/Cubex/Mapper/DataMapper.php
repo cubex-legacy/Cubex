@@ -28,6 +28,16 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $this->_configure();
   }
 
+  /**
+   * Column Name for ID field
+   *
+   * @return string Name of ID column
+   */
+  public function getIdKey()
+  {
+    return 'id';
+  }
+
   public function id()
   {
     return $this->_id;
@@ -35,9 +45,9 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
   public function setId($id)
   {
-    if($this->_attributeExists('id'))
+    if($this->_attributeExists($this->getIdKey()))
     {
-      $this->_doCall("setId", [$id]);
+      $this->_doCall("set" . $this->getIdKey(), [$id]);
     }
     $this->_id = $id;
     return $this;

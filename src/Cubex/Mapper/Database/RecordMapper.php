@@ -164,16 +164,6 @@ abstract class RecordMapper extends DataMapper
   }
 
   /**
-   * Column Name for ID field
-   *
-   * @return string Name of ID column
-   */
-  public function getIdKey()
-  {
-    return 'id';
-  }
-
-  /**
    * @param \Cubex\Database\ConnectionMode $mode
    *
    * @return \Cubex\Database\DatabaseService
