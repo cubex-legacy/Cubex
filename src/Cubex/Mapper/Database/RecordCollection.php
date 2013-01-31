@@ -96,6 +96,12 @@ class RecordCollection extends Collection
     return $this->_query;
   }
 
+  public function setWhereQuery($query)
+  {
+    $this->_query = $query;
+    return $this;
+  }
+
   public function loadOneWhere($pattern /* , $arg, $arg, $arg ... */)
   {
     call_user_func_array(
