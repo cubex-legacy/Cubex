@@ -562,7 +562,15 @@ class Loader
       }
       else if($argi > 1)
       {
-        list($k, $v) = explode('=', $arg, 2);
+        if(strstr($arg, "=") !== false)
+        {
+          list($k, $v) = explode('=', $arg, 2);
+        }
+        else
+        {
+          $k = $arg;
+          $v = null;
+        }
         $arguments[$k] = $_REQUEST[$k] = $_GET[$k] = $v;
       }
     }
