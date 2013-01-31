@@ -30,8 +30,8 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
  */
 abstract class Application
   implements Dispatchable, DispatchableAccess,
-  DirectoryAware, Translatable, TranslatorAccess,
-  NamespaceAware, ServiceManagerAware
+             DirectoryAware, Translatable, TranslatorAccess,
+             NamespaceAware, ServiceManagerAware
 {
   use ConfigTrait;
   use Translation;
@@ -79,10 +79,10 @@ abstract class Application
     return "";
   }
 
- public function _configure()
- {
-   return $this;
- }
+  public function _configure()
+  {
+    return $this;
+  }
 
   /**
    * @param \Cubex\Core\Project\Project $project
@@ -149,7 +149,7 @@ abstract class Application
       $dispatcherResult = $dispatcherRoute;
     }
 
-    $dispatcher = null;
+    $dispatcher = $action = null;
 
     if(is_scalar($dispatcherResult))
     {
@@ -159,25 +159,36 @@ abstract class Application
       }
       else
       {
-        $try   = [];
-        $try[] = $this->getNamespace() . '\Controllers\\' . $dispatcherResult;
-        $try[] = $this->getNamespace() . '\\' . $dispatcherResult;
-
-        foreach($try as $controller)
+        $attempted = $this->_attemptClass($dispatcherResult);
+        if($attempted !== null)
         {
-          if(class_exists($controller))
+          $dispatcher = new $attempted;
+        }
+      }
+
+      if($dispatcher === null)
+      {
+        if(stristr($dispatcherResult, ','))
+        {
+          $dispatcherResult = explode(',', $dispatcherResult);
+        }
+        else if(stristr($dispatcherResult, '@'))
+        {
+          list($dispatcherResult, $action) = explode('@', $dispatcherResult);
+          $attempted = $this->_attemptClass($dispatcherResult);
+          if($attempted !== null)
           {
-            $dispatcher = new $controller;
-            break;
+            $dispatcher = new $attempted;
           }
         }
       }
     }
-    else if(is_callable($dispatcherResult))
+
+    if(is_callable($dispatcherResult))
     {
       $dispatcher = $dispatcherResult();
     }
-    else
+    else if($dispatcher === null)
     {
       $dispatcher = $dispatcherResult;
     }
@@ -186,6 +197,7 @@ abstract class Application
     {
       if($dispatcher instanceof Controller)
       {
+        $dispatcher->forceAction($action);
         $matchRoute = $router->getMatchedRoute();
         if($matchRoute !== null)
         {
@@ -213,6 +225,25 @@ abstract class Application
     $this->shutdownBundles();
 
     return $response;
+  }
+
+  protected function _attemptClass($dispatcherResult)
+  {
+    $ns    = $this->getNamespace();
+    $try   = [];
+    $try[] = $ns . '\Controllers\\' . $dispatcherResult;
+    $try[] = $ns . '\\' . $dispatcherResult;
+    $try[] = $ns . '\Controllers\\' . $dispatcherResult . "Controller";
+    $try[] = $ns . '\\' . $dispatcherResult . "Controller";
+
+    foreach($try as $controller)
+    {
+      if(class_exists($controller))
+      {
+        return $controller;
+      }
+    }
+    return null;
   }
 
   public function baseUri()
@@ -394,7 +425,6 @@ abstract class Application
     );
 
     $this->_configure();
-
   }
 
   public function projectBase()

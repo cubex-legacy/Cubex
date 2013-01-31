@@ -192,38 +192,46 @@ class BaseController
    */
   public function routeRequest()
   {
-    $route = null;
-
-    if($this->request()->isAjax())
+    $params = [];
+    if($this->_routeResult === null)
     {
-      $route = $this->_attemptRoutes($this->_getRoutes($this->getAjaxRoutes()));
+      $route = null;
+
+      if($this->request()->isAjax())
+      {
+        $route = $this->_attemptRoutes(
+          $this->_getRoutes($this->getAjaxRoutes())
+        );
+      }
+
+      if($route === null && $this->request()->is('POST'))
+      {
+        $route = $this->_attemptRoutes(
+          $this->_getRoutes($this->getPostRoutes())
+        );
+      }
+
+      if($route === null)
+      {
+        $route = $this->_attemptRoutes($this->_getRoutes($this->getRoutes()));
+      }
+
+      if($route === null)
+      {
+        $action = $this->defaultAction();
+        $params = [];
+      }
+      else
+      {
+        $action = $route->result();
+        $params = $route->routeData();
+      }
+
+      $this->appendData($params);
+      $this->setRouteResult($action);
     }
 
-    if($route === null && $this->request()->is('POST'))
-    {
-      $route = $this->_attemptRoutes($this->_getRoutes($this->getPostRoutes()));
-    }
-
-    if($route === null)
-    {
-      $route = $this->_attemptRoutes($this->_getRoutes($this->getRoutes()));
-    }
-
-    if($route === null)
-    {
-      $action = $this->defaultAction();
-      $params = [];
-    }
-    else
-    {
-      $action = $route->result();
-      $params = $route->routeData();
-    }
-
-    $this->appendData($params);
-    $this->setRouteResult($action);
-
-    $result = $this->_processAction($action, $params);
+    $result = $this->_processAction($this->_routeResult, $params);
 
     return $result;
   }
@@ -235,7 +243,7 @@ class BaseController
     $this->_processFilters($action, $this->_actionFiltersBefore);
 
     ob_start(); //Stop any naughty output making a mess of our response
-    $result   = $this->runAction($action, $params);
+    $result = $this->runAction($action, $params);
     $buffered = ob_get_clean();
 
     if($result === null)
@@ -268,33 +276,42 @@ class BaseController
       );
     }
 
+    $attempts = [];
+
     if($this->request()->isAjax())
     {
-      $attempt = 'ajax' . \ucfirst($action);
-      if(\method_exists($this, $attempt))
-      {
-        return $this->$attempt();
-      }
+      $attempts[] = 'ajax' . \ucfirst($action);
     }
 
     if($this->request()->is('POST'))
     {
-      $attempt = 'post' . \ucfirst($action);
-      if(\method_exists($this, $attempt))
+      $attempts[] = 'post' . \ucfirst($action);
+    }
+
+    $attempts[] = 'render' . ucfirst($action);
+    $attempts[] = 'action' . ucfirst($action);
+    $attempts[] = $action;
+
+    foreach($attempts as $attempt)
+    {
+      if(method_exists($this, $attempt))
       {
-        return $this->$attempt();
+        return call_user_func_array(
+          [
+          $this,
+          $attempt
+          ], $params
+        );
       }
     }
 
-    $attempt = 'render' . \ucfirst($action);
-    if(\method_exists($this, $attempt))
+    if(stristr($action, ','))
     {
-      return call_user_func_array(
-        [
-        $this,
-        $attempt
-        ], $params
-      );
+      $action = explode(',', $action);
+    }
+    else if(stristr($action, '@'))
+    {
+      $action = explode('@', $action);
     }
 
     if(is_callable($action))
@@ -484,6 +501,12 @@ class BaseController
         }
       }
     }
+    return $this;
+  }
+
+  public function forceAction($action)
+  {
+    $this->_routeResult = $action;
     return $this;
   }
 }
