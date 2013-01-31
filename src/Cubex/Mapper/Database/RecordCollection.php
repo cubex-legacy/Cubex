@@ -36,7 +36,10 @@ class RecordCollection extends Collection
   public function setOrderBy($field, $order = 'ASC')
   {
     $this->_orderBy = ParseQuery::parse(
-      $this->_connection(), ["%C $order", $field]
+      $this->connection(), [
+                           "%C $order",
+                           $field
+                           ]
     );
     return $this;
   }
@@ -56,7 +59,10 @@ class RecordCollection extends Collection
     else
     {
       $this->_groupBy = ParseQuery::parse(
-        $this->_connection(), ["%C", $groupBy]
+        $this->connection(), [
+                             "%C",
+                             $groupBy
+                             ]
       );
     }
     return $this;
@@ -127,7 +133,7 @@ class RecordCollection extends Collection
 
     array_unshift($args, $pattern);
 
-    $this->_query = ParseQuery::parse($this->_connection(), $args);
+    $this->_query = ParseQuery::parse($this->connection(), $args);
 
     return $this;
   }
@@ -154,7 +160,7 @@ class RecordCollection extends Collection
     return $map;
   }
 
-  protected function _connection()
+  public function connection()
   {
     return $this->_mapperType->connection(
       new ConnectionMode(ConnectionMode::READ)
@@ -183,7 +189,7 @@ class RecordCollection extends Collection
       $this->_query .= " LIMIT $this->_offset,$this->_limit";
     }
 
-    $rows = $this->_connection()->getRows($this->_query);
+    $rows = $this->connection()->getRows($this->_query);
     if($rows)
     {
       foreach($rows as $row)
