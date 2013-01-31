@@ -29,6 +29,14 @@ trait PhtmlParser
       $raw = file_get_contents($file);
       $raw = $this->processRaw($raw);
       ob_start();
+      set_error_handler(
+        function ($num, $msg, $file, $line, $context)
+        {
+          echo new Templates\Errors\PhpErrorHandler(
+            $num, $msg, $file, $line, $context
+          );
+        }
+      );
       /* Close PHP tags to allow for html and opening tags */
       try
       {
@@ -37,8 +45,10 @@ trait PhtmlParser
       catch(\Exception $e)
       {
         ob_get_clean();
+        restore_error_handler();
         throw $e;
       }
+      restore_error_handler();
       $rendered = ob_get_clean();
     }
 
