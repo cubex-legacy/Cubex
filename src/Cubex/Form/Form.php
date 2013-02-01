@@ -38,6 +38,7 @@ class Form extends DataMapper implements Renderable
 
   public function buildFromMapper(DataMapper $mapper)
   {
+    $this->importFiltersAndValidators($mapper);
     $attr = $mapper->getRawAttributes();
     foreach($attr as $a)
     {
