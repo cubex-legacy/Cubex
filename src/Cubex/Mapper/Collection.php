@@ -10,7 +10,7 @@ namespace Cubex\Mapper;
  */
 class Collection
   implements \ArrayAccess, \Countable, \Iterator,
-             \JsonSerializable, \Serializable
+  \JsonSerializable, \Serializable
 {
   /**
    * @var DataMapper[]
@@ -18,13 +18,22 @@ class Collection
   protected $_mappers = [];
   protected $_dictionary = [];
   protected $_position = 0;
+  protected $_mapperType;
+  protected $_loaded;
 
-  /**
-   * @param array $mappers
-   */
-  public function __construct(array $mappers = [])
+  public function __construct(DataMapper $map, array $mappers = null)
   {
-    $this->hydrate($mappers);
+    $this->_mapperType = $map;
+
+    if($mappers !== null)
+    {
+      $this->hydrate($mappers);
+    }
+  }
+
+  public function isLoaded()
+  {
+    return (bool)$this->_loaded;
   }
 
   public function clear()
@@ -53,12 +62,22 @@ class Collection
       {
         $this->addMapper($mapper);
       }
+      else
+      {
+        $instance = new $this->_mapperType;
+        if($instance instanceof DataMapper)
+        {
+          $instance->hydrate((array)$mapper);
+          $this->addMapper($instance);
+        }
+      }
     }
     return $this;
   }
 
   public function addMapper(DataMapper $mapper)
   {
+    $this->_loaded    = true;
     $this->_mappers[] = $mapper;
     if($mapper->id() !== null)
     {

@@ -11,19 +11,17 @@ use Cubex\Sprintf\ParseQuery;
 
 class RecordCollection extends Collection
 {
-  protected $_mapperType;
   protected $_limit;
   protected $_query;
-  protected $_loaded;
   protected $_offset = 0;
   protected $_columns = ['*'];
   protected $_populate = [];
   protected $_orderBy;
   protected $_groupBy;
 
-  public function __construct(RecordMapper $map, array $columns = ['*'])
+  public function __construct(RecordMapper $map, array $mappers = null)
   {
-    $this->_mapperType = $map;
+    parent::__construct($map, $mappers);
   }
 
   public function setLimit($offset = 0, $limit = 100)
@@ -170,11 +168,6 @@ class RecordCollection extends Collection
     return $this->_mapperType->connection(
       new ConnectionMode(ConnectionMode::READ)
     );
-  }
-
-  public function isLoaded()
-  {
-    return (bool)$this->_loaded;
   }
 
   public function get()

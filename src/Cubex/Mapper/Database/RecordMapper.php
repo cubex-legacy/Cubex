@@ -165,6 +165,26 @@ abstract class RecordMapper extends DataMapper
 
   /**
    * @param \Cubex\Database\ConnectionMode $mode
+   * @return \Cubex\Database\DatabaseService
+   */
+  public static function conn(ConnectionMode $mode = null)
+  {
+    $a = new static;
+    /**
+     * @var $a self
+     */
+    if($mode === null)
+    {
+      return $a->connection();
+    }
+    else
+    {
+      return $a->connection($mode);
+    }
+  }
+
+  /**
+   * @param \Cubex\Database\ConnectionMode $mode
    *
    * @return \Cubex\Database\DatabaseService
    */
