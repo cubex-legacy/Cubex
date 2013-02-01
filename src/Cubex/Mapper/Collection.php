@@ -54,6 +54,11 @@ class Collection
     return $result;
   }
 
+  public function getMapperType()
+  {
+    return $this->_mapperType;
+  }
+
   public function hydrate(array $mappers = [])
   {
     foreach($mappers as $mapper)
