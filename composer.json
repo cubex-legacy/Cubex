@@ -29,7 +29,8 @@
   },
   "autoload":          {
     "files": [
-      "src/Cubex/Foundation/Generics/_Helper.php"
+      "src/Cubex/Foundation/Generics/_Helper.php",
+      "src/Cubex/Foundation/Generics/_Phutil.php"
     ],
     "psr-0": {
       "Cubex\\": "src/"
