@@ -67,3 +67,29 @@ if(!function_exists("esc"))
     return \Cubex\View\HtmlElement::escape($string);
   }
 }
+
+if(!function_exists("psort"))
+{
+  /**
+   * Returns an array of objects ordered by the property param
+   *
+   * @param array $list
+   * @param       $property
+   *
+   * @return array
+   */
+  function psort(array $list, $property)
+  {
+    $surrogate = ppull($list, $property);
+
+    asort($surrogate);
+
+    $result = array();
+    foreach($surrogate as $key => $value)
+    {
+      $result[$key] = $list[$key];
+    }
+
+    return $result;
+  }
+}
