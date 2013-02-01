@@ -216,15 +216,20 @@ class BaseController
         $route = $this->_attemptRoutes($this->_getRoutes($this->getRoutes()));
       }
 
-      if($route === null || trim($route) === '')
+      if($route === null)
       {
         $action = $this->defaultAction();
         $params = [];
       }
       else
       {
-        $action = $route->result();
+        $action = trim($route->result());
         $params = $route->routeData();
+      }
+
+      if($action == '')
+      {
+        $action = $this->defaultAction();
       }
 
       $this->appendData($params);
