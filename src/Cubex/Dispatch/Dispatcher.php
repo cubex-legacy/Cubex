@@ -202,10 +202,15 @@ class Dispatcher
    */
   public function getResourceExtension($resource)
   {
-    $resourceParts = explode(".", $resource);
-    $resoruceEnd   = end($resourceParts);
+    $resourceEnd = $resource;
 
-    return $resoruceEnd;
+    foreach([".", "?", "#"] as $seperator)
+    {
+      $resourceParts = explode($seperator, $resourceEnd);
+      $resourceEnd   = end($resourceParts);
+    }
+
+    return $resourceEnd;
   }
 
   /**
@@ -560,6 +565,9 @@ class Dispatcher
       case "dfont":
       case "pfa":
       case "afm":
+      case "svg":
+      case "eot":
+      case "woff":
         $uri = "fonts/$uri";
         break;
       default:
