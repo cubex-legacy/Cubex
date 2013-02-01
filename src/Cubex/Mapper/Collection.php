@@ -96,13 +96,40 @@ class Collection
 
   public function addMapper(DataMapper $mapper)
   {
-    $this->_loaded    = true;
-    $this->_mappers[] = $mapper;
+    $this->_loaded                 = true;
+    $this->_mappers[$mapper->id()] = $mapper;
     if($mapper->id() !== null)
     {
       $this->_dictionary[$mapper->id()] = true;
     }
     return $this;
+  }
+
+  /**
+   * @param $id
+   * @param bool $import
+   * @return DataMapper
+   */
+  public function getById($id, $import = true)
+  {
+    if($this->contains($id) && isset($this->_mappers[$id]))
+    {
+      return $this->_mappers[$id];
+    }
+    else
+    {
+      $mapper = new $this->_mapperType;
+      if(method_exists($mapper, "load"))
+      {
+        $mapper->load($id);
+      }
+
+      if($import)
+      {
+        $this->addMapper($mapper);
+      }
+      return $mapper;
+    }
   }
 
   public function __isset($id)
