@@ -36,6 +36,35 @@ class Form extends DataMapper implements Renderable
     $this->_configure();
   }
 
+  public function buildFromMapper(DataMapper $mapper)
+  {
+    $attr = $mapper->getRawAttributes();
+    foreach($attr as $a)
+    {
+      if($mapper->maintainsTimestamps())
+      {
+        $autoKeys = [
+          $mapper->updatedAttribute(),
+          $mapper->createdAttribute()
+        ];
+        if(in_array($a->name(), $autoKeys))
+        {
+          continue;
+        }
+      }
+
+      if($mapper->getIdKey() == $a->name())
+      {
+        $this->addHiddenElement($a->name(), $a->data());
+      }
+      else
+      {
+        $this->addTextElement($a->name(), $a->data());
+      }
+    }
+    return $this;
+  }
+
   public function setDefaultElementTemplate($template)
   {
     $this->_elementRenderTemplate = $template;
@@ -324,6 +353,14 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
+  public function addHiddenElement($name, $default = '')
+  {
+    $this->addElement(
+      $name, FormElement::HIDDEN, $default, [], Form::LABEL_NONE
+    );
+    return $this;
+  }
+
   public function addSelectElement($name, $options = [], $default = '',
                                    $labelPosition = null)
   {
@@ -364,7 +401,8 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
-  public function addSubmitElement($name, $default, $labelPosition = null)
+  public function addSubmitElement($name = 'submit', $default = 'Submit Form',
+                                   $labelPosition = Form::LABEL_NONE)
   {
     $this->addElement($name, FormElement::SUBMIT, $default, [], $labelPosition);
     return $this;
