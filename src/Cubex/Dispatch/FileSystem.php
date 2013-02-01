@@ -55,7 +55,7 @@ class FileSystem
 
   public function normalizePath($path)
   {
-    if($this->isWindows())
+    if(\Cubex\Helpers\System::isWindows())
     {
       $isAbsolute = preg_match('/^[A-Z]+:/', $path);
     }
@@ -65,7 +65,7 @@ class FileSystem
     }
 
     $unresolvedPath = $path;
-    $path = $this->resolvePath($path);
+    $path           = $this->resolvePath($path);
     if($path === false)
     {
       $path = $unresolvedPath;
@@ -96,10 +96,5 @@ class FileSystem
   public function isDir($directory)
   {
     return is_dir($directory);
-  }
-
-  public function isWindows()
-  {
-    return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
   }
 }

@@ -38,7 +38,7 @@ class Cli implements CliTask
       $this->getConfig()->get("project")->getStr('namespace', 'Project'), 2
     );
 
-    if(PHP_WINDOWS_VERSION_MAJOR >= 6)
+    if(\Cubex\Helpers\System::isWindows())
     {
       $this->setMsgfmt();
     }
