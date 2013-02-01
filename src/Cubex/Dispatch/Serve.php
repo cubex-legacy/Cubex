@@ -244,7 +244,7 @@ class Serve extends Dispatcher implements Dispatchable
   {
     $data = preg_replace_callback(
       '@url\s*\((\s*[\'"]?.*?)\)@s',
-      array($this, "dispatchUrlWrappedImgUri"),
+      array($this, "dispatchUrlWrappedUrl"),
       $data
     );
 
@@ -258,7 +258,7 @@ class Serve extends Dispatcher implements Dispatchable
    *
    * @return string
    */
-  public function dispatchUrlWrappedImgUri($data)
+  public function dispatchUrlWrappedUrl($data)
   {
     $uri = $this->dispatchUri(
       $data[1],

@@ -552,6 +552,16 @@ class Dispatcher
         break;
       case "ico":
         break;
+      case "ttf":
+      case "ttc":
+      case "pfb":
+      case "pfm":
+      case "otf":
+      case "dfont":
+      case "pfa":
+      case "afm":
+        $uri = "fonts/$uri";
+        break;
       default:
         $uri = "img/$uri";
         break;
