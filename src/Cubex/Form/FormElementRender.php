@@ -89,6 +89,8 @@ class FormElementRender implements Renderable
       case FormElement::MULTI_CHECKBOX:
         $input = $this->renderMultiInput(FormElement::CHECKBOX, true);
         break;
+      case FormElement::HIDDEN:
+        return $this->renderInput($type);
       default:
         $input = $this->renderInput($type);
         break;
@@ -148,6 +150,11 @@ class FormElementRender implements Renderable
 
   public function renderLabel($text = null, $id = null)
   {
+    if($this->_labelPosition == Form::LABEL_NONE)
+    {
+      return '';
+    }
+
     if($id === null)
     {
       $id = $this->_element->id();
