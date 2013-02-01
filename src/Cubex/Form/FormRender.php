@@ -34,10 +34,12 @@ class FormRender implements Renderable
   public function render()
   {
     $out = $this->_renderOpening();
+    $out .= '<dl class="cubexform">';
     foreach($this->_form->elements() as $element)
     {
       $out .= (new FormElementRender($element))->render();
     }
+    $out .= '</dl>';
     $out .= $this->_renderClosing();
     return $out;
   }

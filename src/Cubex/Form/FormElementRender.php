@@ -45,7 +45,7 @@ class FormElementRender implements Renderable
 
   protected function _buildTemplate()
   {
-    $template = '{{input}}';
+    $template = '<dd>{{input}}</dd>';
     $type     = $this->_element->type();
 
     $noLabelElements = [
@@ -57,11 +57,11 @@ class FormElementRender implements Renderable
 
     if($renderLabel && $this->_labelPosition == Form::LABEL_BEFORE)
     {
-      $template = '{{label}}{{input}}';
+      $template = '<dt>{{label}}</dt><dd>{{input}}</dd>';
     }
     else if($renderLabel && $this->_labelPosition == Form::LABEL_AFTER)
     {
-      $template = '{{input}}{{label}}';
+      $template = '<dd>{{input}}</dd><dt>{{label}}</dt>';
     }
 
     return $template;
