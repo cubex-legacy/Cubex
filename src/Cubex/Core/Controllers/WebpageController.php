@@ -12,6 +12,7 @@ use Cubex\Events\EventManager;
 use Cubex\Foundation\Renderable;
 use Cubex\View\Impart;
 use Cubex\View\Layout;
+use Cubex\View\Templates\Exceptions\ExceptionView;
 
 class WebpageController extends BaseController
 {
@@ -134,5 +135,19 @@ class WebpageController extends BaseController
     }
 
     return $this->_response->fromRenderable($this->_webpage);
+  }
+
+  protected function _processAction($action, $params)
+  {
+    try
+    {
+      $result = parent::_processAction($action, $params);
+    }
+    catch(\Exception $e)
+    {
+      return new ExceptionView($e);
+    }
+
+    return $result;
   }
 }
