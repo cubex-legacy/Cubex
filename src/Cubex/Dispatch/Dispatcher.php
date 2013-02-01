@@ -207,7 +207,14 @@ class Dispatcher
     foreach([".", "?", "#"] as $seperator)
     {
       $resourceParts = explode($seperator, $resourceEnd);
-      $resourceEnd   = end($resourceParts);
+      if($seperator === ".")
+      {
+        $resourceEnd = end($resourceParts);
+      }
+      else
+      {
+        $resourceEnd = current($resourceParts);
+      }
     }
 
     return $resourceEnd;
