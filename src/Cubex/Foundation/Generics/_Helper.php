@@ -21,6 +21,19 @@ if(!function_exists("cubex_run_time"))
   }
 }
 
+if(!function_exists("var_dump_json"))
+{
+  /**
+   * @param $object
+   *
+   * @return string
+   */
+  function var_dump_json($object)
+  {
+    var_dump(json_encode($object, JSON_PRETTY_PRINT));
+  }
+}
+
 if(!function_exists("class_shortname"))
 {
   /**
