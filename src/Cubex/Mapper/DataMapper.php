@@ -10,7 +10,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 {
   protected $_id;
   /**
-   * @var \Cubex\Data\Attribute
+   * @var \Cubex\Data\Attribute[]
    */
   protected $_attributes;
   protected $_invalidAttributes;
@@ -70,14 +70,14 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
     if($this->_autoTimestamp)
     {
-      if(!$this->_attributeExists($this->_updatedAttribute()))
+      if(!$this->_attributeExists($this->updatedAttribute()))
       {
-        $this->_addAttribute(new $type($this->_updatedAttribute()));
+        $this->_addAttribute(new $type($this->updatedAttribute()));
       }
 
-      if(!$this->_attributeExists($this->_createdAttribute()))
+      if(!$this->_attributeExists($this->createdAttribute()))
       {
-        $this->_addAttribute(new $type($this->_createdAttribute()));
+        $this->_addAttribute(new $type($this->createdAttribute()));
       }
     }
     return $this;
@@ -106,6 +106,14 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
         $this->_addAttribute(clone $attr);
       }
     }
+  }
+
+  /**
+   * @return \Cubex\Data\Attribute[]
+   */
+  public function getRawAttributes()
+  {
+    return $this->_attributes;
   }
 
   protected function _cloneSetup()
@@ -487,12 +495,17 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     return $this;
   }
 
-  protected function _updatedAttribute()
+  public function maintainsTimestamps()
+  {
+    return $this->_autoTimestamp;
+  }
+
+  public function updatedAttribute()
   {
     return 'updated_at';
   }
 
-  protected function _createdAttribute()
+  public function createdAttribute()
   {
     return 'created_at';
   }
@@ -504,11 +517,11 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
       return false;
     }
 
-    $updateAttribute = "set" . $this->_updatedAttribute();
+    $updateAttribute = "set" . $this->updatedAttribute();
     $this->_doCall($updateAttribute, [$this->currentDateTime()]);
     if(!$this->exists())
     {
-      $createdAttribute = "set" . $this->_createdAttribute();
+      $createdAttribute = "set" . $this->createdAttribute();
       $this->_doCall($createdAttribute, [$this->currentDateTime()]);
     }
 
