@@ -216,7 +216,7 @@ class BaseController
         $route = $this->_attemptRoutes($this->_getRoutes($this->getRoutes()));
       }
 
-      if($route === null)
+      if($route === null || trim($route) === '')
       {
         $action = $this->defaultAction();
         $params = [];
@@ -269,6 +269,8 @@ class BaseController
    */
   public function runAction($action, $params)
   {
+    $action = trim($action);
+
     if($action === null)
     {
       throw new \BadMethodCallException(
