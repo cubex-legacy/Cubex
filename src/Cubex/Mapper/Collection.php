@@ -54,6 +54,20 @@ class Collection
     return $result;
   }
 
+  public function getKeyedArray($keyField, array $fields)
+  {
+    $result = [];
+    foreach($this->_mappers as $mapper)
+    {
+      $result[$mapper->$keyField] = [];
+      foreach($fields as $field)
+      {
+        $result[$mapper->$keyField][$field] = $mapper->$field;
+      }
+    }
+    return $result;
+  }
+
   public function getMapperType()
   {
     return $this->_mapperType;
