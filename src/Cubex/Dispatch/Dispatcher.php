@@ -23,13 +23,24 @@ class Dispatcher
   private $_baseHash = "esabot";
   private $_nomapHash = "pamon";
   private $_supportedTypes = [
-    'ico' => 'image/x-icon',
-    'css' => 'text/css; charset=utf-8',
-    'js'  => 'text/javascript; charset=utf-8',
-    'png' => 'image/png',
-    'jpg' => 'image/jpg',
-    'gif' => 'image/gif',
-    'swf' => 'application/x-shockwave-flash',
+    "ico"   => "image/x-icon",
+    "css"   => "text/css; charset=utf-8",
+    "js"    => "text/javascript; charset=utf-8",
+    "png"   => "image/png",
+    "jpg"   => "image/jpg",
+    "gif"   => "image/gif",
+    "swf"   => "application/x-shockwave-flash",
+    "ttf"   => "application/x-font-ttf",
+    "ttc"   => "application/x-font-ttc",
+    "pfb"   => "application/x-font-pfb",
+    "pfm"   => "application/x-font-pfm",
+    "otf"   => "application/x-font-opentype",
+    "dfont" => "application/x-font-dfont",
+    "pfa"   => "application/x-font-pfa",
+    "afm"   => "application/x-font-afm",
+    "svg"   => "image/svg+xml",
+    "eot"   => "application/vnd.ms-fontobject",
+    "woff"  => "application/x-font-woff"
   ];
 
   private static $_dispatchInis = [];
