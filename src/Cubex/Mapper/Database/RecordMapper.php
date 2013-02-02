@@ -46,6 +46,9 @@ abstract class RecordMapper extends DataMapper
   protected $_idType = self::ID_AUTOINCREMENT;
   protected $_schemaType = self::SCHEMA_UNDERSCORE;
 
+  protected $_loadPending;
+  protected $_loadDetails;
+
   public function __construct($id = null, $columns = ['*'])
   {
     parent::__construct();
@@ -54,6 +57,18 @@ abstract class RecordMapper extends DataMapper
     {
       $this->load($id, $columns);
     }
+  }
+
+  public function getData($attribute)
+  {
+    $this->_load();
+    return parent::getData($attribute);
+  }
+
+  public function forceLoad()
+  {
+    $this->_load();
+    return $this;
   }
 
   protected function _addIdAttribute()
@@ -112,15 +127,17 @@ abstract class RecordMapper extends DataMapper
     }
   }
 
-  /**
-   * @param       $id
-   * @param array $columns
-   *
-   * @return static
-   * @throws \Exception
-   */
-  public function load($id, $columns = ['*'])
+  protected function _load()
   {
+    if(!$this->_loadPending)
+    {
+      return false;
+    }
+    $this->_loadPending = false;
+
+    $id      = $this->_loadDetails['id'];
+    $columns = $this->_loadDetails['columns'];
+
     /**
      * @var $this self
      */
@@ -163,11 +180,26 @@ abstract class RecordMapper extends DataMapper
       }
     }
 
+    return true;
+  }
+
+  /**
+   * @param       $id
+   * @param array $columns
+   *
+   * @return static
+   * @throws \Exception
+   */
+  public function load($id, $columns = ['*'])
+  {
+    $this->_loadPending = true;
+    $this->_loadDetails = ['id' => $id, 'columns' => $columns];
     return $this;
   }
 
   public function delete()
   {
+    $this->_load();
     if($this->exists())
     {
       $connection = $this->connection(
@@ -262,6 +294,7 @@ abstract class RecordMapper extends DataMapper
 
   public function id()
   {
+    $this->_load();
     if($this->isCompositeId())
     {
       return $this->_getCompositeId();
@@ -304,6 +337,7 @@ abstract class RecordMapper extends DataMapper
    */
   protected function _getCompositeId()
   {
+    $this->_load();
     $result = array();
     foreach($this->_getCompositeKeys() as $key)
     {
@@ -340,6 +374,7 @@ abstract class RecordMapper extends DataMapper
    */
   public function saveChanges()
   {
+    $this->_load();
     $connection = $this->connection(new ConnectionMode(ConnectionMode::WRITE));
     $modified   = $this->getModifiedAttributes();
     $updates    = $inserts = array();
@@ -436,9 +471,11 @@ abstract class RecordMapper extends DataMapper
 
   public function hasOne(RecordMapper $entity, $foreignKey = null)
   {
+    $this->_load();
     if($foreignKey === null)
     {
       $foreignKey = strtolower(class_shortname($this)) . '_id';
+      $foreignKey = $this->stringToColumnName($foreignKey);
     }
 
     $table  = new RecordCollection($entity);
@@ -450,9 +487,11 @@ abstract class RecordMapper extends DataMapper
 
   public function hasMany(RecordMapper $entity, $foreignKey = null)
   {
+    $this->_load();
     if($foreignKey === null)
     {
       $foreignKey = strtolower(class_shortname($this)) . '_id';
+      $foreignKey = $this->stringToColumnName($foreignKey);
     }
 
     $collection = new RecordCollection($entity);
@@ -463,9 +502,11 @@ abstract class RecordMapper extends DataMapper
 
   public function belongsTo(RecordMapper $entity, $foreignKey = null)
   {
+    $this->_load();
     if($foreignKey === null)
     {
       $foreignKey = strtolower(class_shortname($entity)) . '_id';
+      $foreignKey = $this->stringToColumnName($foreignKey);
     }
 
     $key = $this->_attribute($foreignKey)->data();
