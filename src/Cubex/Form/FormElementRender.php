@@ -163,7 +163,19 @@ class FormElementRender implements Renderable
     {
       $text = $this->_element->label();
     }
-    return '<label for="' . $id . '" id="' . $id . '-label">' . $text . '</label>';
+    $out = '<label for="' . $id . '" id="' . $id . '-label">';
+    $out .= $text;
+    if($this->_element->required())
+    {
+      $out .= $this->requiredField();
+    }
+    $out .= '</label>';
+    return $out;
+  }
+
+  public function requiredField()
+  {
+    return ' <span class="form-required" title="Required">*</span>';
   }
 
   public function renderSelect()
@@ -236,8 +248,8 @@ class FormElementRender implements Renderable
       $input .= $this->_renderAttributes(
         [
         "type"  => $type,
-        "name"  => $this->_element->name() .
-        ($multi && !$type == 'radio' ? '[]' : ''),
+        "name"  => $this->_element->name(
+        ) . ($multi && !$type == 'radio' ? '[]' : ''),
         "id"    => $id,
         "value" => ($multi ? $k : $this->_element->selectedValue()),
         ]
