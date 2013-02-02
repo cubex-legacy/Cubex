@@ -46,13 +46,11 @@ class MySQL implements DatabaseService
       $hostname = current($slaves);
     }
 
-    $this->_connection = new \mysqli(
-      $hostname,
-      $this->_config->getStr('username', 'root'),
-      $this->_config->getStr('password', ''),
-      $this->_config->getStr('database', 'test'),
-      $this->_config->getStr('port', 3306)
-    );
+    $this->_connection = new \mysqli($hostname, $this->_config->getStr(
+        'username', 'root'
+      ), $this->_config->getStr('password', ''), $this->_config->getStr(
+        'database', 'test'
+      ), $this->_config->getStr('port', 3306));
 
     $this->_connected = true;
 
@@ -103,12 +101,10 @@ class MySQL implements DatabaseService
   {
     $result = $this->_connection->query($query);
     EventManager::trigger(
-      EventManager::CUBEX_QUERY,
-      [
-      'query'  => $query,
-      'result' => $result,
-      ],
-      $this
+      EventManager::CUBEX_QUERY, [
+                                 'query'  => $query,
+                                 'result' => $result,
+                                 ], $this
     );
     return $result;
   }
@@ -172,6 +168,11 @@ class MySQL implements DatabaseService
     $this->_prepareConnection('r');
     $result = $this->_doQuery($query);
     $rows   = array();
+    if(!$result)
+    {
+      return $rows;
+    }
+
     if($result->num_rows > 0)
     {
       while($row = $result->fetch_object())
