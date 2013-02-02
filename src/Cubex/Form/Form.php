@@ -6,6 +6,8 @@
 namespace Cubex\Form;
 
 use Cubex\Container\Container;
+use Cubex\Data\Attribute;
+use Cubex\Data\Validator\Validator;
 use Cubex\Facade\Session;
 use Cubex\Foundation\Renderable;
 use Cubex\Mapper\DataMapper;
@@ -59,7 +61,7 @@ class Form extends DataMapper implements Renderable
       }
       else
       {
-        $this->addTextElement($a->name(), $a->data());
+        $this->_addElementFromAttribute($a);
       }
     }
 
@@ -67,6 +69,52 @@ class Form extends DataMapper implements Renderable
     $this->importRequires($mapper);
 
     return $this;
+  }
+
+  protected function _addElementFromAttribute(Attribute $a)
+  {
+    $name = $a->name();
+    $data = $a->data();
+    if($name == 'password')
+    {
+      $this->addPasswordElement($name, $data);
+    }
+    else if($name == 'description')
+    {
+      $this->addTextareaElement($name, $data);
+    }
+    else if($name == 'email' || $a->validatorExists(Validator::VALIDATE_EMAIL))
+    {
+      $this->addEmailElement($name, $data);
+    }
+    else if($a->validatorExists(Validator::VALIDATE_INT))
+    {
+      $this->_addInputElement(FormElement::NUMBER, [$name, $data]);
+    }
+    else if($a->validatorExists(Validator::VALIDATE_BOOL))
+    {
+      $this->addCheckboxElement($name, $data);
+    }
+    else if($a->validatorExists(Validator::VALIDATE_URL))
+    {
+      $this->_addInputElement(FormElement::URL, [$name, $data]);
+    }
+    else if($a->validatorExists(Validator::VALIDATE_DATE))
+    {
+      $this->_addInputElement(FormElement::DATE, [$name, $data]);
+    }
+    else if($a->validatorExists(Validator::VALIDATE_TIME))
+    {
+      $this->_addInputElement(FormElement::TIME, [$name, $data]);
+    }
+    else if($a->validatorExists(Validator::VALIDATE_PERCENTAGE))
+    {
+      $this->_addInputElement(FormElement::RANGE, [$name, $data]);
+    }
+    else
+    {
+      $this->addTextElement($name, $data);
+    }
   }
 
   public function setDefaultElementTemplate($template)
@@ -444,6 +492,10 @@ class Form extends DataMapper implements Renderable
 
   protected function _addInputElement($type, array $args = [])
   {
+    if(!isset($args[2]))
+    {
+      $args[2] = $this->_labelPosition;
+    }
     list($name, $default, $labelPosition) = $args;
     $this->addElement($name, $type, $default, [], $labelPosition);
     return $this;
