@@ -18,6 +18,9 @@ class Collection
   protected $_mappers = [];
   protected $_dictionary = [];
   protected $_position = 0;
+  /**
+   * @var DataMapper
+   */
   protected $_mapperType;
   protected $_loaded;
 

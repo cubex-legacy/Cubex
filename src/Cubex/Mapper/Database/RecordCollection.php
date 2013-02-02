@@ -19,6 +19,11 @@ class RecordCollection extends Collection
   protected $_orderBy;
   protected $_groupBy;
 
+  /**
+   * @var RecordMapper
+   */
+  protected $_mapperType;
+
   public function __construct(RecordMapper $map, array $mappers = null)
   {
     parent::__construct($map, $mappers);
@@ -34,11 +39,7 @@ class RecordCollection extends Collection
   public function setOrderBy($field, $order = 'ASC')
   {
     $this->_orderBy = ParseQuery::parse(
-      $this->connection(),
-      [
-      "%C $order",
-      $field
-      ]
+      $this->connection(), ["%C $order", $field]
     );
     return $this;
   }
@@ -58,11 +59,7 @@ class RecordCollection extends Collection
     else
     {
       $this->_groupBy = ParseQuery::parse(
-        $this->connection(),
-        [
-        "%C",
-        $groupBy
-        ]
+        $this->connection(), ["%C", $groupBy]
       );
     }
     return $this;
@@ -103,11 +100,7 @@ class RecordCollection extends Collection
   public function loadOneWhere($pattern /* , $arg, $arg, $arg ... */)
   {
     call_user_func_array(
-      array(
-           $this,
-           'loadWhere'
-      ),
-      func_get_args()
+      array($this, 'loadWhere'), func_get_args()
     );
 
     $this->get();
@@ -187,15 +180,14 @@ class RecordCollection extends Collection
       $this->_query .= " LIMIT $this->_offset,$this->_limit";
     }
 
-    $query = 'SELECT %LC FROM %T WHERE ' . $this->_query;
+    $query = 'SELECT %LC FROM %T WHERE ';
     $query = ParseQuery::parse(
-      $this->connection(),
-      [
-      $query,
-      $this->_columns,
-      $this->_mapperType->getTableName(),
-      ]
-    );
+      $this->connection(), [
+                           $query,
+                           $this->_columns,
+                           $this->_mapperType->getTableName(),
+                           ]
+    ) . $this->_query;
 
     $rows = $this->connection()->getRows($query);
     if($rows)
