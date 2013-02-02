@@ -7,6 +7,7 @@ namespace Cubex\Mapper\Database;
 
 use Cubex\Container\Container;
 use Cubex\Data\Attribute;
+use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Database\ConnectionMode;
 use Cubex\Helpers\Strings;
 use Cubex\Log\Debug;
@@ -158,9 +159,16 @@ abstract class RecordMapper extends DataMapper
     }
     $this->_loadPending = null;
 
-    $id      = $this->_loadDetails['id'];
-    $columns = $this->_loadDetails['columns'];
+    $id                 = $this->_loadDetails['id'];
+    $columns            = $this->_loadDetails['columns'];
     $this->_loadPending = null;
+
+    if(EphemeralCache::inCache($id, $this))
+    {
+      $row = EphemeralCache::getCache($id, $this);
+      $this->_fromRow($row);
+      return $this;
+    }
 
     /**
      * @var $this self
@@ -194,9 +202,11 @@ abstract class RecordMapper extends DataMapper
       if(count($rows) == 1)
       {
         $row = $rows[0];
-        $this->hydrate((array)$row);
-        $this->setExists(true);
-        $this->_unmodifyAttributes();
+        if($columns == ['*'])
+        {
+          EphemeralCache::storeCache($id, $row, $this);
+        }
+        $this->_fromRow($row);
       }
       else
       {
@@ -205,6 +215,14 @@ abstract class RecordMapper extends DataMapper
     }
 
     return true;
+  }
+
+  protected function _fromRow($row)
+  {
+    $this->hydrate((array)$row);
+    $this->setExists(true);
+    $this->_unmodifyAttributes();
+    return $this;
   }
 
   /**
