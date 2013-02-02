@@ -297,6 +297,15 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     return isset($this->_attributes[$attribute]);
   }
 
+  protected function _setRequired($attribute,$required=true)
+  {
+    if($this->_attributeExists($attribute))
+    {
+      $this->_attribute($attribute)->setRequired($required);
+    }
+    return $this;
+  }
+
   protected function _addFilter($attribute, $filter, array $options = [])
   {
     if(!isset($this->_attributes[$attribute]))
