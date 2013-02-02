@@ -9,8 +9,8 @@ namespace Cubex\Mapper;
  * @var Collection DataMapper[]
  */
 class Collection
-  implements \ArrayAccess, \Countable, \Iterator,
-  \JsonSerializable, \Serializable
+  implements \ArrayAccess, \Countable, \Iterator, \JsonSerializable,
+             \Serializable
 {
   /**
    * @var DataMapper[]
@@ -109,8 +109,9 @@ class Collection
   }
 
   /**
-   * @param $id
+   * @param      $id
    * @param bool $import
+   *
    * @return DataMapper
    */
   public function getById($id, $import = true)
@@ -150,7 +151,12 @@ class Collection
    */
   public function all()
   {
+    $this-> _preCheckMappers();
     return $this->_mappers;
+  }
+
+  protected function _preCheckMappers()
+  {
   }
 
   /**

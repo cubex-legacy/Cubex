@@ -77,13 +77,12 @@ class RecordCollection extends Collection
     return $this;
   }
 
-  public function all()
+  protected function _preCheckMappers()
   {
     if(!$this->isLoaded())
     {
       $this->get();
     }
-    return parent::all();
   }
 
   public function currentQuery()
