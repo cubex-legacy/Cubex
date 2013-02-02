@@ -523,4 +523,24 @@ class BaseController
     $this->_routeResult = $action;
     return $this;
   }
+
+  public function postVariables($variable = null, $default = null)
+  {
+    return $this->request()->postVariables($variable, $default);
+  }
+
+  public function fileVariables($variable = null, $default = null)
+  {
+    return $this->request()->fileVariables($variable, $default);
+  }
+
+  public function getVariables($variable = null, $default = null)
+  {
+    return $this->request()->getVariables($variable, $default);
+  }
+
+  public function remoteIp()
+  {
+    return $this->request()->remoteIp();
+  }
 }
