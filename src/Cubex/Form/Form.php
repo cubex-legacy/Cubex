@@ -10,7 +10,6 @@ use Cubex\Data\Attribute;
 use Cubex\Data\Validator\Validator;
 use Cubex\Facade\Session;
 use Cubex\Foundation\Renderable;
-use Cubex\Mapper\Collection;
 use Cubex\Mapper\DataMapper;
 use Cubex\Mapper\Database\RecordMapper;
 
