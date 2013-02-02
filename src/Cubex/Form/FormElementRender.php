@@ -163,7 +163,7 @@ class FormElementRender implements Renderable
     {
       $text = $this->_element->label();
     }
-    return '<label for="' . $id . '">' . $text . '</label>';
+    return '<label for="' . $id . '" id="' . $id . '-label">' . $text . '</label>';
   }
 
   public function renderSelect()

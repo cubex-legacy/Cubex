@@ -102,6 +102,7 @@ class Form extends DataMapper implements Renderable
     if($this->_id === null)
     {
       $this->setId(
+        "form-" .
         str_replace(
           [
           '_',
@@ -175,7 +176,7 @@ class Form extends DataMapper implements Renderable
   {
     $out = '';
     $out .= '<input type="hidden" name="__cubex_form__"';
-    $out .= 'value="' . $this->id() . '"/>';
+    $out .= 'value="' . $this->_formName . '"/>';
     return $out;
   }
 
@@ -290,6 +291,7 @@ class Form extends DataMapper implements Renderable
    */
   protected function _addAttribute(FormElement $attribute)
   {
+    $attribute->setId('form-' . $this->id() . '-' . $attribute->id());
     if($attribute->type() == FormElement::FILE)
     {
       $this->setEncType();

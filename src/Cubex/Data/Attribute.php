@@ -74,7 +74,16 @@ class Attribute implements Validatable, Filterable
   {
     if($this->_id === null)
     {
-      $this->setId(str_replace(' ', '-', str_replace('_', '-', $this->name())));
+      if(substr($this->name(), 0, 7) != '__cubex')
+      {
+        $this->setId(
+          str_replace(' ', '-', str_replace('_', '-', $this->name()))
+        );
+      }
+      else
+      {
+        return md5($this->name() . time());
+      }
     }
     return $this->_id;
   }
