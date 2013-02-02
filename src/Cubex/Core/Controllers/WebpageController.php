@@ -86,6 +86,23 @@ class WebpageController extends BaseController
     return $this;
   }
 
+  public function renderBefore($name, Renderable $item)
+  {
+    $this->webpage()->layout()->renderBefore($name, $item);
+    return $this;
+  }
+
+  public function renderAfter($name, Renderable $item)
+  {
+    $this->webpage()->layout()->renderAfter($name, $item);
+    return $this;
+  }
+
+  public function isNested($name)
+  {
+    return $this->webpage()->layout()->isNested($name);
+  }
+
   /**
    * @param \Cubex\Core\Http\Request  $request
    * @param \Cubex\Core\Http\Response $response
