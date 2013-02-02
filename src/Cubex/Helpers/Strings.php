@@ -13,4 +13,9 @@ class Strings
       "/(([a-z])([A-Z])|([A-Z])([A-Z][a-z]))/", "\\2\\4 \\3\\5", $string
     );
   }
+
+  public static function underWords($string)
+  {
+    return str_replace('_', ' ', $string);
+  }
 }
