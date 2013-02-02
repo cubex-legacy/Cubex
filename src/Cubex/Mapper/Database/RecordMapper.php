@@ -368,13 +368,16 @@ abstract class RecordMapper extends DataMapper
 
           $inserts[$this->stringToColumnName($attr->name())] = $val;
 
-          $updates[] = ParseQuery::parse(
-            $connection, [
-                         "%C = %ns",
-                         $this->stringToColumnName($attr->name()),
-                         $val
-                         ]
-          );
+          if($attr->name() != $this->createdAttribute())
+          {
+            $updates[] = ParseQuery::parse(
+              $connection, [
+                           "%C = %ns",
+                           $this->stringToColumnName($attr->name()),
+                           $val
+                           ]
+            );
+          }
           $attr->unsetModified();
         }
       }
