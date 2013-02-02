@@ -47,7 +47,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   {
     if($this->_attributeExists($this->getIdKey()))
     {
-      $this->_doCall("set" . $this->getIdKey(), [$id]);
+      $this->setData($this->getIdKey(), $id);
     }
     $this->_id = $id;
     return $this;
@@ -200,31 +200,39 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     switch(substr($method, 0, 3))
     {
       case 'set':
-        $attribute = strtolower(substr($method, 3));
-        if($this->_attributeExists($attribute))
-        {
-          $this->_attribute($attribute)->setData($args[0]);
-
-          return $this;
-        }
-        else
-        {
-          throw new \Exception("Invalid Attribute " . $attribute);
-        }
+        $this->setData(substr($method, 3), $args[0]);
         break;
       case 'get':
-        $attribute = strtolower(substr($method, 3));
-        if($this->_attributeExists($attribute))
-        {
-          return $this->_attribute($attribute)->data();
-        }
-        else
-        {
-          throw new \Exception("Invalid Attribute " . $attribute);
-        }
+        $this->getData(substr($method, 3));
         break;
     }
     return true;
+  }
+
+  public function setData($attribute, $value)
+  {
+    if($this->_attributeExists($attribute))
+    {
+      $this->_attribute($attribute)->setData($value);
+
+      return $this;
+    }
+    else
+    {
+      throw new \Exception("Invalid Attribute " . $attribute);
+    }
+  }
+
+  public function getData($attribute)
+  {
+    if($this->_attributeExists($attribute))
+    {
+      return $this->_attribute($attribute)->data();
+    }
+    else
+    {
+      throw new \Exception("Invalid Attribute " . $attribute);
+    }
   }
 
   /**
@@ -234,7 +242,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
    */
   public function __get($name)
   {
-    return $this->_doCall("get" . \ucwords($name), null);
+    return $this->getData($name);
   }
 
   /**
@@ -245,7 +253,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
    */
   public function __set($name, $value)
   {
-    return $this->_doCall("set" . \ucwords($name), array($value));
+    return $this->setData($name, $value);
   }
 
 
@@ -270,6 +278,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
   /**
    * @param \Cubex\Data\Attribute $attribute
+   *
    * @return $this
    */
   protected function _addAttribute(Attribute $attribute)
@@ -375,8 +384,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     {
       foreach($attributes as $attribute)
       {
-        $attr = isset($this->_attributes[$attribute])
-        ? $this->_attributes[$attribute] : null;
+        $attr = isset($this->_attributes[$attribute]) ? $this->_attributes[$attribute] : null;
         if($attr instanceof Attribute)
         {
           unset($this->_invalidAttributes[$attribute]);
@@ -473,7 +481,8 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
   /**
    * @param array $data
-   * @param bool $setUnmodified
+   * @param bool  $setUnmodified
+   *
    * @return DataMapper
    */
   public function hydrate(array $data, $setUnmodified = false)
@@ -517,12 +526,10 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
       return false;
     }
 
-    $updateAttribute = "set" . $this->updatedAttribute();
-    $this->_doCall($updateAttribute, [$this->currentDateTime()]);
+    $this->setData($this->updatedAttribute(), $this->currentDateTime());
     if(!$this->exists())
     {
-      $createdAttribute = "set" . $this->createdAttribute();
-      $this->_doCall($createdAttribute, [$this->currentDateTime()]);
+      $this->setData($this->createdAttribute(), $this->currentDateTime());
     }
 
     return true;
