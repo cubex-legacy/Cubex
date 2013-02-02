@@ -41,6 +41,9 @@ abstract class RecordMapper extends DataMapper
   const SCHEMA_PASCALCASE = 'pascal';
   const SCHEMA_AS_IS      = 'asis';
 
+  const RELATIONSHIP_BELONGSTO = 'belongsto';
+  const RELATIONSHIP_HASONE    = 'hasone';
+
   protected $_dbServiceName = 'db';
   protected $_dbTableName;
   protected $_idType = self::ID_AUTOINCREMENT;
@@ -48,6 +51,7 @@ abstract class RecordMapper extends DataMapper
 
   protected $_loadPending;
   protected $_loadDetails;
+  protected $_fromRelationship;
 
   public function __construct($id = null, $columns = ['*'])
   {
@@ -59,10 +63,20 @@ abstract class RecordMapper extends DataMapper
     }
   }
 
-  public function getData($attribute)
+  public function setFromRelationshipType($rel)
+  {
+    $this->_fromRelationship = $rel;
+    return $this;
+  }
+
+  public function fromRelationshipType()
+  {
+    return $this->_fromRelationship;
+  }
+
+  protected function _checkAttributes()
   {
     $this->_load();
-    return parent::getData($attribute);
   }
 
   public function forceLoad()
@@ -127,16 +141,26 @@ abstract class RecordMapper extends DataMapper
     }
   }
 
+  public function setExists($bool = true)
+  {
+    if($bool)
+    {
+      $this->_loadPending = null;
+    }
+    parent::setExists($bool);
+  }
+
   protected function _load()
   {
-    if(!$this->_loadPending)
+    if($this->_loadPending === null)
     {
       return false;
     }
-    $this->_loadPending = false;
+    $this->_loadPending = null;
 
     $id      = $this->_loadDetails['id'];
     $columns = $this->_loadDetails['columns'];
+    $this->_loadPending = null;
 
     /**
      * @var $this self
@@ -482,6 +506,10 @@ abstract class RecordMapper extends DataMapper
     $result = $table->loadOneWhere(
       $this->idPattern(), $foreignKey, $this->id()
     );
+    if($result !== null && $result instanceof RecordMapper)
+    {
+      $result->setFromRelationshipType(self::RELATIONSHIP_HASONE);
+    }
     return $result;
   }
 
@@ -512,6 +540,7 @@ abstract class RecordMapper extends DataMapper
     $key = $this->_attribute($foreignKey)->data();
     if($key !== null)
     {
+      $entity->setFromRelationshipType(self::RELATIONSHIP_BELONGSTO);
       $result = $entity->load($key);
     }
     else

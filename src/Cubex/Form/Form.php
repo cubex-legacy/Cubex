@@ -10,7 +10,9 @@ use Cubex\Data\Attribute;
 use Cubex\Data\Validator\Validator;
 use Cubex\Facade\Session;
 use Cubex\Foundation\Renderable;
+use Cubex\Mapper\Collection;
 use Cubex\Mapper\DataMapper;
+use Cubex\Mapper\Database\RecordMapper;
 
 class Form extends DataMapper implements Renderable
 {
@@ -38,7 +40,13 @@ class Form extends DataMapper implements Renderable
     $this->_configure();
   }
 
-  public function buildFromMapper(DataMapper $mapper)
+  /**
+   * @param \Cubex\Mapper\DataMapper $mapper
+   * @param bool                     $relations Build Belongs To Dropdowns
+   *
+   * @return $this
+   */
+  public function buildFromMapper(DataMapper $mapper, $relations = false)
   {
     $attr = $mapper->getRawAttributes();
     foreach($attr as $a)
@@ -61,6 +69,29 @@ class Form extends DataMapper implements Renderable
       }
       else
       {
+
+        if($relations && strtolower(substr($a->name(), -2)) == 'id')
+        {
+          $methodname = substr($a->name(), 0, -2);
+          $methodname = trim($methodname, '_');
+          if(method_exists($mapper, $methodname . 's'))
+          {
+            $methodname = $methodname . 's';
+          }
+
+          if(method_exists($mapper, $methodname))
+          {
+            $rel     = $mapper->$methodname();
+            $options = (new OptionBuilder($rel))->getOptions();
+            if(!empty($options))
+            {
+              $this->addSelectElement($a->name(), $options, $a->data());
+              $this->get($a->name())->setLabel(ucwords($methodname));
+              continue;
+            }
+          }
+        }
+
         $this->_addElementFromAttribute($a);
       }
     }
@@ -335,7 +366,7 @@ class Form extends DataMapper implements Renderable
    */
   protected function _addAttribute(FormElement $attribute)
   {
-    $attribute->setId('form-' . $this->id() . '-' . $attribute->id());
+    $attribute->setId($this->id() . '-' . $attribute->id());
     if($attribute->type() == FormElement::FILE)
     {
       $this->setEncType();
