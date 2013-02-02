@@ -151,7 +151,7 @@ class Collection
    */
   public function all()
   {
-    $this-> _preCheckMappers();
+    $this->_preCheckMappers();
     return $this->_mappers;
   }
 
@@ -180,7 +180,8 @@ class Collection
    */
   public function current()
   {
-    return $this->all()[$this->_position];
+    $this->_preCheckMappers();
+    return $this->_mappers[$this->_position];
   }
 
   /**
@@ -214,7 +215,8 @@ class Collection
    */
   public function valid()
   {
-    return isset($this->all()[$this->_position]);
+    $this->_preCheckMappers();
+    return isset($this->_mappers[$this->_position]);
   }
 
   /**
@@ -241,7 +243,8 @@ class Collection
    */
   public function offsetExists($offset)
   {
-    return array_key_exists($offset, $this->all());
+    $this->_preCheckMappers();
+    return array_key_exists($offset, $this->_mappers);
   }
 
   /**
@@ -255,7 +258,8 @@ class Collection
    */
   public function offsetGet($offset)
   {
-    return $this->all()[$offset];
+    $this->_preCheckMappers();
+    return $this->_mappers[$offset];
   }
 
   /**
@@ -270,6 +274,7 @@ class Collection
    */
   public function offsetSet($offset, $value)
   {
+    $this->_preCheckMappers();
     $this->_mappers[$offset] = $value;
   }
 
@@ -284,6 +289,7 @@ class Collection
    */
   public function offsetUnset($offset)
   {
+    $this->_preCheckMappers();
     unset($this->_mappers[$offset]);
   }
 
@@ -295,7 +301,8 @@ class Collection
    */
   public function count()
   {
-    return count($this->all());
+    $this->_preCheckMappers();
+    return count($this->_mappers);
   }
 
   /**
