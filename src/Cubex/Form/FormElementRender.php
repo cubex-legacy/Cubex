@@ -222,8 +222,11 @@ class FormElementRender implements Renderable
 
   public function renderMultiInput($type = 'radio', $multi = false)
   {
-    $out                  = '';
-    $this->_labelPosition = Form::LABEL_SURROUND_RIGHT;
+    $out = '';
+    if($multi === true)
+    {
+      $this->_labelPosition = Form::LABEL_SURROUND_RIGHT;
+    }
 
     $options = $this->_element->options();
     if(!$multi)
@@ -236,10 +239,15 @@ class FormElementRender implements Renderable
       }
     }
 
+    if(!$multi && $this->_labelPosition == Form::LABEL_BEFORE)
+    {
+      $out .= $this->renderLabel();
+    }
+
     foreach($options as $k => $v)
     {
       $id = $this->_element->id() . '-' . md5($k);
-      if($this->_labelPosition == Form::LABEL_BEFORE)
+      if($multi && $this->_labelPosition == Form::LABEL_BEFORE)
       {
         $out .= $this->renderLabel($v, $id);
       }
@@ -298,9 +306,13 @@ class FormElementRender implements Renderable
         $out .= $input;
       }
 
-      if($this->_labelPosition == Form::LABEL_AFTER)
+      if($multi && $this->_labelPosition == Form::LABEL_AFTER)
       {
         $out .= $this->renderLabel($v, $id);
+      }
+      else if($this->_labelPosition == Form::LABEL_AFTER)
+      {
+        $out .= $this->renderLabel();
       }
     }
 
