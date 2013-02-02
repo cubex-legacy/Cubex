@@ -7,6 +7,7 @@ namespace Cubex\Form;
 
 use Cubex\Data\Attribute;
 use Cubex\Foundation\Renderable;
+use Cubex\Helpers\Strings;
 
 class FormElement extends Attribute implements Renderable
 {
@@ -74,9 +75,7 @@ class FormElement extends Attribute implements Renderable
     if($this->_label === null)
     {
       $label = str_replace(['_', '-'], ' ', $this->name());
-      $label = preg_replace(
-        "/(([a-z])([A-Z])|([A-Z])([A-Z][a-z]))/", "\\2\\4 \\3\\5", $label
-      );
+      $label = Strings::camelWords($label);
       return ucwords($label);
     }
     else
