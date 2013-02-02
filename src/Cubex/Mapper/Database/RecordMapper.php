@@ -165,6 +165,7 @@ abstract class RecordMapper extends DataMapper
 
   /**
    * @param \Cubex\Database\ConnectionMode $mode
+   *
    * @return \Cubex\Database\DatabaseService
    */
   public static function conn(ConnectionMode $mode = null)
@@ -259,11 +260,10 @@ abstract class RecordMapper extends DataMapper
     if(isset($config[self::CONFIG_IDS]))
     {
       return in_array(
-        $config[self::CONFIG_IDS],
-        [
-        self::ID_COMPOSITE,
-        self::ID_COMPOSITE_SPLIT
-        ]
+        $config[self::CONFIG_IDS], [
+                                   self::ID_COMPOSITE,
+                                   self::ID_COMPOSITE_SPLIT
+                                   ]
       );
     }
 
@@ -338,13 +338,13 @@ abstract class RecordMapper extends DataMapper
           }
 
           $inserts[$attr->name()] = $val;
-          $updates[]              = ParseQuery::parse(
-            $connection,
-            array(
-                 "%C = %ns",
-                 $attr->name(),
-                 $val
-            )
+
+          $updates[] = ParseQuery::parse(
+            $connection, [
+                         "%C = %ns",
+                         $attr->name(),
+                         $val
+                         ]
           );
           $attr->unsetModified();
         }
@@ -369,18 +369,14 @@ abstract class RecordMapper extends DataMapper
       if($this->id() !== null)
       {
         $pattern .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
-        $pattern .= ' WHERE ' . $this->idPattern();
-        $args[] = $this->getIdKey();
-        $args[] = $this->id();
       }
 
       array_unshift($args, $pattern);
     }
     else
     {
-      $pattern = 'UPDATE %T SET ' .
-      implode(', ', $updates) .
-      ' WHERE ' . $this->idPattern();
+      $pattern = 'UPDATE %T SET ' . implode(', ', $updates);
+      $pattern .= ' WHERE ' . $this->idPattern();
 
       $args = array(
         $pattern,
@@ -548,8 +544,7 @@ abstract class RecordMapper extends DataMapper
       [
       $collection,
       'loadOneWhere'
-      ],
-      func_get_args()
+      ], func_get_args()
     );
   }
 }
