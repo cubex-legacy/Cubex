@@ -5,6 +5,7 @@
 
 namespace Cubex\Mapper\Database;
 
+use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Database\ConnectionMode;
 use Cubex\Mapper\Collection;
 use Cubex\Sprintf\ParseQuery;
@@ -203,6 +204,14 @@ class RecordCollection extends Collection
         $map->hydrate((array)$row, true);
         $map->setExists(true);
         $this->addMapper($map);
+
+        if($this->_columns == ['*'])
+        {
+          if(!EphemeralCache::inCache($map->id(), $map))
+          {
+            EphemeralCache::storeCache($map->id(), $row, $map);
+          }
+        }
       }
     }
 
