@@ -9,8 +9,7 @@ namespace Cubex\Mapper;
  * @var Collection DataMapper[]
  */
 class Collection
-  implements \ArrayAccess, \Countable, \Iterator, \JsonSerializable,
-             \Serializable
+  implements \Countable, \JsonSerializable, \Serializable, \IteratorAggregate
 {
   /**
    * @var DataMapper[]
@@ -32,6 +31,11 @@ class Collection
     {
       $this->hydrate($mappers);
     }
+  }
+
+  public function load()
+  {
+    return $this;
   }
 
   public function isLoaded()
@@ -172,125 +176,11 @@ class Collection
     return array_slice($this->_mappers, $offset, $length);
   }
 
-  /**
-   * Return the current element
-   *
-   * @link http://php.net/manual/en/iterator.current.php
-   * @return DataMapper
-   */
-  public function current()
+
+  public function getIterator()
   {
     $this->_preCheckMappers();
-    return $this->_mappers[$this->_position];
-  }
-
-  /**
-   * Move forward to next element
-   *
-   * @link http://php.net/manual/en/iterator.next.php
-   * @return void Any returned value is ignored.
-   */
-  public function next()
-  {
-    ++$this->_position;
-  }
-
-  /**
-   * Return the key of the current element
-   *
-   * @link http://php.net/manual/en/iterator.key.php
-   * @return mixed scalar on success, or null on failure.
-   */
-  public function key()
-  {
-    return $this->_position;
-  }
-
-  /**
-   * Checks if current position is valid
-   *
-   * @link http://php.net/manual/en/iterator.valid.php
-   * @return boolean The return value will be casted to boolean
-   *       and then evaluated.
-   */
-  public function valid()
-  {
-    $this->_preCheckMappers();
-    return isset($this->_mappers[$this->_position]);
-  }
-
-  /**
-   * Rewind the Iterator to the first element
-   *
-   * @link http://php.net/manual/en/iterator.rewind.php
-   * @return void Any returned value is ignored.
-   */
-  public function rewind()
-  {
-    $this->_position = 0;
-  }
-
-  /**
-   * Whether a offset exists
-   *
-   * @link http://php.net/manual/en/arrayaccess.offsetexists.php
-   *
-   * @param mixed $offset An offset to check for.
-   *
-   * @return boolean true on success or false on failure.
-   *
-   * The return value will be casted to boolean if non-boolean was returned.
-   */
-  public function offsetExists($offset)
-  {
-    $this->_preCheckMappers();
-    return array_key_exists($offset, $this->_mappers);
-  }
-
-  /**
-   * Offset to retrieve
-   *
-   * @link http://php.net/manual/en/arrayaccess.offsetget.php
-   *
-   * @param mixed $offset The offset to retrieve.
-   *
-   * @return DataMapper
-   */
-  public function offsetGet($offset)
-  {
-    $this->_preCheckMappers();
-    return $this->_mappers[$offset];
-  }
-
-  /**
-   * Offset to set
-   *
-   * @link http://php.net/manual/en/arrayaccess.offsetset.php
-   *
-   * @param mixed $offset The offset to assign the value to.
-   * @param mixed $value  The value to set.
-   *
-   * @return void
-   */
-  public function offsetSet($offset, $value)
-  {
-    $this->_preCheckMappers();
-    $this->_mappers[$offset] = $value;
-  }
-
-  /**
-   * Offset to unset
-   *
-   * @link http://php.net/manual/en/arrayaccess.offsetunset.php
-   *
-   * @param mixed $offset The offset to unset.
-   *
-   * @return void
-   */
-  public function offsetUnset($offset)
-  {
-    $this->_preCheckMappers();
-    unset($this->_mappers[$offset]);
+    return new \ArrayIterator($this->_mappers);
   }
 
   /**
