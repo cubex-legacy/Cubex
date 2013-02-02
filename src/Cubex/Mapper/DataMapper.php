@@ -504,6 +504,18 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     return $this;
   }
 
+  public function hydrateFromMapper(DataMapper $mapper)
+  {
+    foreach($mapper->getRawAttributes() as $attr)
+    {
+      if($this->_attributeExists($attr->name()))
+      {
+        $this->setData($attr->name(), $attr->data());
+      }
+    }
+    return $this;
+  }
+
   public function maintainsTimestamps()
   {
     return $this->_autoTimestamp;
