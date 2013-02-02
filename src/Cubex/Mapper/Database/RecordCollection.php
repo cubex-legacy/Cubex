@@ -176,7 +176,7 @@ class RecordCollection extends Collection
     $this->_query = trim($this->_query);
     if(!empty($this->_query) && $this->_query != '1=1')
     {
-      $query .= ' ' . $this->_query;
+      $query .= ' WHERE ' . $this->_query;
     }
 
     if($this->_groupBy !== null)
