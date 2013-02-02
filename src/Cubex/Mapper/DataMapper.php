@@ -539,7 +539,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     }
 
     $this->setData($this->updatedAttribute(), $this->currentDateTime());
-    if(!$this->exists())
+    if($this->id() === null)
     {
       $this->setData($this->createdAttribute(), $this->currentDateTime());
     }
