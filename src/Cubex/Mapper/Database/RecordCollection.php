@@ -164,29 +164,35 @@ class RecordCollection extends Collection
 
   public function get()
   {
-    if($this->_groupBy !== null)
-    {
-      $this->_query .= " GROUP BY $this->_groupBy";
-    }
-
-    if($this->_orderBy !== null)
-    {
-      $this->_query .= " ORDER BY $this->_orderBy";
-    }
-
-    if($this->_limit !== null)
-    {
-      $this->_query .= " LIMIT $this->_offset,$this->_limit";
-    }
-
-    $query = 'SELECT %LC FROM %T WHERE ';
+    $query = 'SELECT %LC FROM %T';
     $query = ParseQuery::parse(
       $this->connection(), [
                            $query,
                            $this->_columns,
                            $this->_mapperType->getTableName(),
                            ]
-    ) . $this->_query;
+    );
+
+    $this->_query = trim($this->_query);
+    if(!empty($this->_query) && $this->_query != '1=1')
+    {
+      $query .= ' ' . $this->_query;
+    }
+
+    if($this->_groupBy !== null)
+    {
+      $query .= " GROUP BY $this->_groupBy";
+    }
+
+    if($this->_orderBy !== null)
+    {
+      $query .= " ORDER BY $this->_orderBy";
+    }
+
+    if($this->_limit !== null)
+    {
+      $query .= " LIMIT $this->_offset,$this->_limit";
+    }
 
     $rows = $this->connection()->getRows($query);
     if($rows)
