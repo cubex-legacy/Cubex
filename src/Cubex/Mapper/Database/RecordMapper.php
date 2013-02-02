@@ -8,13 +8,15 @@ namespace Cubex\Mapper\Database;
 use Cubex\Container\Container;
 use Cubex\Data\Attribute;
 use Cubex\Database\ConnectionMode;
+use Cubex\Helpers\Strings;
 use Cubex\Log\Debug;
 use Cubex\Mapper\DataMapper;
 use Cubex\Sprintf\ParseQuery;
 
 abstract class RecordMapper extends DataMapper
 {
-  const CONFIG_IDS = 'id-mechanism';
+  const CONFIG_IDS    = 'id-mechanism';
+  const CONFIG_SCHEMA = 'schema-type';
 
   /**
    * Auto Incrementing ID
@@ -33,8 +35,16 @@ abstract class RecordMapper extends DataMapper
    */
   const ID_COMPOSITE_SPLIT = 'compositesplit';
 
+
+  const SCHEMA_UNDERSCORE = 'underscore';
+  const SCHEMA_CAMELCASE  = 'camel';
+  const SCHEMA_PASCALCASE = 'pascal';
+  const SCHEMA_AS_IS      = 'asis';
+
   protected $_dbServiceName = 'db';
   protected $_dbTableName;
+  protected $_idType = self::ID_AUTOINCREMENT;
+  protected $_schemaType = self::SCHEMA_UNDERSCORE;
 
   public function __construct($id = null, $columns = ['*'])
   {
@@ -60,7 +70,10 @@ abstract class RecordMapper extends DataMapper
    */
   public function getConfiguration()
   {
-    return array(static::CONFIG_IDS => static::ID_AUTOINCREMENT);
+    return array(
+      static::CONFIG_IDS    => $this->_idType,
+      static::CONFIG_SCHEMA => $this->_schemaType,
+    );
   }
 
   /**
@@ -80,6 +93,22 @@ abstract class RecordMapper extends DataMapper
     else
     {
       return "%C = %s";
+    }
+  }
+
+  /**
+   * @return string
+   */
+  public function schemaType()
+  {
+    $config = $this->getConfiguration();
+    if(!isset($config[static::CONFIG_SCHEMA]))
+    {
+      return self::SCHEMA_AS_IS;
+    }
+    else
+    {
+      return $config[static::CONFIG_SCHEMA];
     }
   }
 
@@ -235,7 +264,7 @@ abstract class RecordMapper extends DataMapper
   {
     if($this->isCompositeId())
     {
-      return $this->_getCompositeID();
+      return $this->_getCompositeId();
     }
     else
     {
@@ -273,7 +302,7 @@ abstract class RecordMapper extends DataMapper
   /**
    * @return string
    */
-  protected function _getCompositeID()
+  protected function _getCompositeId()
   {
     $result = array();
     foreach($this->_getCompositeKeys() as $key)
@@ -295,7 +324,7 @@ abstract class RecordMapper extends DataMapper
   /**
    * @return string
    */
-  public function composeID( /*$key1,$key2*/)
+  public function composeId( /*$key1,$key2*/)
   {
     return implode("|", func_get_args());
   }
@@ -337,12 +366,12 @@ abstract class RecordMapper extends DataMapper
             $val = $attr->serialize();
           }
 
-          $inserts[$attr->name()] = $val;
+          $inserts[$this->stringToColumnName($attr->name())] = $val;
 
           $updates[] = ParseQuery::parse(
             $connection, [
                          "%C = %ns",
-                         $attr->name(),
+                         $this->stringToColumnName($attr->name()),
                          $val
                          ]
           );
@@ -446,6 +475,32 @@ abstract class RecordMapper extends DataMapper
       $result = false;
     }
     return $result;
+  }
+
+  public function stringToColumnName($string)
+  {
+    switch($this->schemaType())
+    {
+      case self::SCHEMA_UNDERSCORE:
+        $words = Strings::camelWords($string);
+        $words = str_replace(' ', '_', $words);
+        return strtolower($words);
+      case self::SCHEMA_PASCALCASE:
+      case self::SCHEMA_CAMELCASE:
+        $words = Strings::camelWords($string);
+        $words = Strings::underWords($words);
+        $words = strtolower($words);
+        $words = ucwords($words);
+        if($this->schemaType() == self::SCHEMA_CAMELCASE)
+        {
+          $words = lcfirst($words);
+        }
+        $words = str_replace(' ', '', $words);
+        return $words;
+      case self::SCHEMA_AS_IS:
+        return $string;
+    }
+    return $string;
   }
 
   public static function min($key = 'id')
