@@ -38,7 +38,6 @@ class Form extends DataMapper implements Renderable
 
   public function buildFromMapper(DataMapper $mapper)
   {
-    $this->importFiltersAndValidators($mapper);
     $attr = $mapper->getRawAttributes();
     foreach($attr as $a)
     {
@@ -63,6 +62,10 @@ class Form extends DataMapper implements Renderable
         $this->addTextElement($a->name(), $a->data());
       }
     }
+
+    $this->importFiltersAndValidators($mapper);
+    $this->importRequires($mapper);
+
     return $this;
   }
 
@@ -101,15 +104,7 @@ class Form extends DataMapper implements Renderable
     $this->_elementAttributes['name'] = $name;
     if($this->_id === null)
     {
-      $this->setId(
-        "form-" .
-        str_replace(
-          [
-          '_',
-          ' '
-          ], '-', $name
-        )
-      );
+      $this->setId("form-" . str_replace(['_', ' '], '-', $name));
     }
     return $this;
   }
@@ -287,6 +282,7 @@ class Form extends DataMapper implements Renderable
 
   /**
    * @param FormElement $attribute
+   *
    * @return $this|void
    */
   protected function _addAttribute(FormElement $attribute)
@@ -310,6 +306,7 @@ class Form extends DataMapper implements Renderable
 
   /**
    * @param $name
+   *
    * @return FormElement|null
    */
   public function get($name)
@@ -319,6 +316,7 @@ class Form extends DataMapper implements Renderable
 
   /**
    * @param $name
+   *
    * @return FormElement
    */
   public function getElement($name)

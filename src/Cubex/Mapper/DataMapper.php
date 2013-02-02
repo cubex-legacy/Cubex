@@ -297,7 +297,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     return isset($this->_attributes[$attribute]);
   }
 
-  protected function _setRequired($attribute,$required=true)
+  protected function _setRequired($attribute, $required = true)
   {
     if($this->_attributeExists($attribute))
     {
@@ -629,6 +629,19 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   {
     $this->importFilters($from);
     $this->importValidators($from);
+    return $this;
+  }
+
+  public function importRequires(DataMapper $from)
+  {
+    $attributes = $from->getRawAttributes();
+    foreach($attributes as $attr)
+    {
+      if($this->_attributeExists($attr->name()))
+      {
+        $this->_attribute($attr->name())->setRequired($attr->required());
+      }
+    }
     return $this;
   }
 }
