@@ -25,6 +25,25 @@ trait ValidatableTrait
     return $this;
   }
 
+  public function validatorExists($identify)
+  {
+    if(isset($this->_validators[$identify]))
+    {
+      return true;
+    }
+    else
+    {
+      foreach($this->_validators as $validator)
+      {
+        if($identify === $validator['validator'])
+        {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   public function setValidators($validators)
   {
     $this->_validators = $validators;

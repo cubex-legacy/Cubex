@@ -24,6 +24,25 @@ trait FilterableTrait
     return $this;
   }
 
+  public function filterExists($identify)
+  {
+    if(isset($this->_filters[$identify]))
+    {
+      return true;
+    }
+    else
+    {
+      foreach($this->_filters as $filter)
+      {
+        if($identify === $filter['filter'])
+        {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   public function setFilters($filters)
   {
     $this->_filters = $filters;
