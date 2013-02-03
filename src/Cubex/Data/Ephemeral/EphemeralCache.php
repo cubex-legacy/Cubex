@@ -36,4 +36,10 @@ class EphemeralCache
   {
     return static::$_storage[static::_storageKey($source)][$id];
   }
+
+  public static function deleteCache($id, $source)
+  {
+    unset(static::$_storage[static::_storageKey($source)][$id]);
+    return true;
+  }
 }

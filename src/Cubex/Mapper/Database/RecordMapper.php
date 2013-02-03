@@ -151,6 +151,20 @@ abstract class RecordMapper extends DataMapper
     parent::setExists($bool);
   }
 
+  public function deleteEphemeralCache()
+  {
+    EphemeralCache::deleteCache($this->id(), $this);
+    return $this;
+  }
+
+  public function reload()
+  {
+    $this->deleteEphemeralCache();
+    $this->load($this->id());
+    $this->forceLoad();
+    return $this;
+  }
+
   protected function _load()
   {
     if($this->_loadPending === null)
