@@ -573,21 +573,11 @@ abstract class RecordMapper extends DataMapper
     switch($this->schemaType())
     {
       case self::SCHEMA_UNDERSCORE:
-        $words = Strings::camelWords($string);
-        $words = str_replace(' ', '_', $words);
-        return strtolower($words);
+        return Strings::variableToUnderScore($string);
       case self::SCHEMA_PASCALCASE:
+        return Strings::variableToPascalCase($string);
       case self::SCHEMA_CAMELCASE:
-        $words = Strings::camelWords($string);
-        $words = Strings::underWords($words);
-        $words = strtolower($words);
-        $words = ucwords($words);
-        if($this->schemaType() == self::SCHEMA_CAMELCASE)
-        {
-          $words = lcfirst($words);
-        }
-        $words = str_replace(' ', '', $words);
-        return $words;
+        return Strings::variableToCamelCase($string);
       case self::SCHEMA_AS_IS:
         return $string;
     }
