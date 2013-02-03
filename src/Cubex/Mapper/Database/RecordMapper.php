@@ -54,6 +54,8 @@ abstract class RecordMapper extends DataMapper
   protected $_loadDetails;
   protected $_fromRelationship;
 
+  protected $_newOnFailedRelationship;
+
   public function __construct($id = null, $columns = ['*'])
   {
     parent::__construct();
@@ -62,6 +64,17 @@ abstract class RecordMapper extends DataMapper
     {
       $this->load($id, $columns);
     }
+  }
+
+  public function createsNewInstanceOnFailedRelation()
+  {
+    return (bool)$this->_newOnFailedRelationship;
+  }
+
+  public function newInstanceOnFailedRelation($bool)
+  {
+    $this->_newOnFailedRelationship = (bool)$bool;
+    return $this;
   }
 
   public function setFromRelationshipType($rel)
@@ -541,8 +554,18 @@ abstract class RecordMapper extends DataMapper
     if($result !== null && $result instanceof RecordMapper)
     {
       $result->setFromRelationshipType(self::RELATIONSHIP_HASONE);
+      return $result;
     }
-    return $result;
+    else if($this->createsNewInstanceOnFailedRelation())
+    {
+      $entity->setData($foreignKey, $this->id());
+      $entity->touch();
+      return $entity;
+    }
+    else
+    {
+      return null;
+    }
   }
 
   public function hasMany(RecordMapper $entity, $foreignKey = null)
@@ -573,13 +596,21 @@ abstract class RecordMapper extends DataMapper
     if($key !== null)
     {
       $entity->setFromRelationshipType(self::RELATIONSHIP_BELONGSTO);
-      $result = $entity->load($key);
+      return $entity->load($key);
     }
     else
     {
-      $result = false;
+      if($this->createsNewInstanceOnFailedRelation())
+      {
+        $entity->setData($foreignKey, $this->id());
+        $entity->touch();
+        return $entity;
+      }
+      else
+      {
+        return false;
+      }
     }
-    return $result;
   }
 
   public function stringToColumnName($string)
