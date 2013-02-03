@@ -25,10 +25,6 @@ class RecordCollection extends Collection
    * @var RecordMapper
    */
   protected $_mapperType;
-
-  /**
-   * @var RecordCollection[]
-   */
   protected $_preFetches;
 
   public function __construct(RecordMapper $map, array $mappers = null)
@@ -111,18 +107,17 @@ class RecordCollection extends Collection
 
     $this->get();
 
-    if(count($this->_mappers) > 1)
+    switch(count($this->_mappers))
     {
-      $this->clear();
-      throw new \Exception("More than one result in loadOneWhere() $pattern");
-    }
-    else if(isset($this->_mappers[0]))
-    {
-      return $this->_mappers[0];
-    }
-    else
-    {
-      return null;
+      case 1:
+        return \head($this->_mappers);
+        break;
+      case 0:
+        return null;
+      default:
+        $this->clear();
+        throw new \Exception("More than one result in loadOneWhere() $pattern");
+        break;
     }
   }
 
@@ -171,8 +166,8 @@ class RecordCollection extends Collection
 
   public function get()
   {
-    $query = 'SELECT %LC FROM %T';
-    $query = ParseQuery::parse(
+    $query      = 'SELECT %LC FROM %T';
+    $tableQuery = $query = ParseQuery::parse(
       $this->connection(), [
                            $query,
                            $this->_columns,
@@ -201,7 +196,38 @@ class RecordCollection extends Collection
       $query .= " LIMIT $this->_offset,$this->_limit";
     }
 
-    $rows = $this->connection()->getRows($query);
+    $rows = [];
+
+    if($this->_columns == ['*'] && $this->_limit === null && $this->_groupBy == null)
+    {
+      $queries = EphemeralCache::getCache("sqlqueries", $this, []);
+      $matches = array();
+      preg_match_all("/`\\w+` = \\w+/", $this->_query, $matches);
+      if(count($matches[0]) == 1)
+      {
+        preg_match_all("/\\w+/", $this->_query, $matches);
+        $match = "`{$matches[0][0]}` IN (\\(|.*){$matches[0][1]}(\\)|,.*\\))$";
+        $match = str_replace('*', '\\*', $tableQuery) . ' WHERE ' . $match;
+        if(!empty($queries))
+        {
+          foreach($queries as $q)
+          {
+            if(preg_match("/$match/", $q))
+            {
+              $rows = $this->_populateFromCache(
+                $matches[0][0], $matches[0][1], $q
+              );
+            }
+          }
+        }
+      }
+    }
+
+    if(empty($rows))
+    {
+      $rows = $this->connection()->getRows($query);
+    }
+
     if($rows)
     {
       foreach($rows as $row)
@@ -221,14 +247,25 @@ class RecordCollection extends Collection
       }
     }
 
+    if($this->_columns == ['*'] && $this->_limit === null && $this->_groupBy == null)
+    {
+      $queries   = EphemeralCache::getCache("sqlqueries", $this, []);
+      $queries[] = $query;
+      EphemeralCache::storeCache("sqlqueries", $queries, $this);
+      EphemeralCache::storeCache($query, $rows, $this);
+    }
+
     $this->_loaded = true;
 
     if($this->_preFetches !== null)
     {
       foreach($this->_preFetches as $prefetch)
       {
-        $prefetch->loadIds($this->loadedIds());
-        $prefetch->get();
+        /** @var $collection RecordCollection */
+        $collection = $prefetch['collection'];
+        $idkey      = $prefetch['idkey'];
+        $collection->loadIds($this->loadedIds(), $idkey);
+        $collection->get();
       }
       $this->_preFetches = null;
     }
@@ -236,13 +273,31 @@ class RecordCollection extends Collection
     return $this;
   }
 
+  protected function _populateFromCache($column, $id, $cacheKey)
+  {
+    $rows = [];
+    $raw  = EphemeralCache::getCache($cacheKey, $this);
+    foreach($raw as $row)
+    {
+      if($row->$column == $id)
+      {
+        $rows[] = $row;
+      }
+    }
+    return $rows;
+  }
+
   public function loadedIds()
   {
     return array_keys($this->_mappers);
   }
 
-  public function loadIds($ids)
+  public function loadIds($ids, $idKey = null)
   {
+    if($idKey === null)
+    {
+      $idKey = $this->_mapperType->getIdKey();
+    }
     try
     {
       Validator::isArray($ids, "ints");
@@ -253,7 +308,7 @@ class RecordCollection extends Collection
       $pattern = '%C IN (%Ls)';
     }
 
-    $this->loadWhere($pattern, $this->_mapperType->getIdKey(), $ids);
+    $this->loadWhere($pattern, $idKey, $ids);
     return $this;
   }
 
@@ -278,8 +333,16 @@ class RecordCollection extends Collection
 
         if($result instanceof RecordMapper)
         {
+          $idk = $result->getIdKey();
+          switch($result->fromRelationshipType())
+          {
+            case RecordMapper::RELATIONSHIP_HASONE:
+              $idk = $result->recentRelationKey();
+              break;
+          }
+
           $collection          = $result::collection();
-          $this->_preFetches[] = $collection;
+          $this->_preFetches[] = ['collection' => $collection, 'idkey' => $idk];
         }
       }
     }

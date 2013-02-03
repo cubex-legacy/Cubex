@@ -55,6 +55,7 @@ abstract class RecordMapper extends DataMapper
 
   protected $_fromRelationship;
   protected $_newOnFailedRelationship;
+  protected $_recentRelationKey;
 
   public function __construct($id = null, $columns = ['*'])
   {
@@ -74,6 +75,17 @@ abstract class RecordMapper extends DataMapper
   public function newInstanceOnFailedRelation($bool)
   {
     $this->_newOnFailedRelationship = (bool)$bool;
+    return $this;
+  }
+
+  public function recentRelationKey()
+  {
+    return $this->_recentRelationKey;
+  }
+
+  public function setRecentRelationKey($key)
+  {
+    $this->_recentRelationKey = $key;
     return $this;
   }
 
@@ -547,10 +559,20 @@ abstract class RecordMapper extends DataMapper
       $foreignKey = $this->stringToColumnName($foreignKey);
     }
 
-    $table  = new RecordCollection($entity);
-    $result = $table->loadOneWhere(
-      $this->idPattern(), $foreignKey, $this->id()
-    );
+    $this->_recentRelationKey = $foreignKey;
+
+    if($this->id() !== null)
+    {
+      $table  = new RecordCollection($entity);
+      $result = $table->loadOneWhere(
+        $this->idPattern(), $foreignKey, $this->id()
+      );
+    }
+    else
+    {
+      $result = null;
+    }
+
     if($result !== null && $result instanceof RecordMapper)
     {
       $result->setFromRelationshipType(self::RELATIONSHIP_HASONE);
@@ -558,6 +580,8 @@ abstract class RecordMapper extends DataMapper
     }
     else if($this->createsNewInstanceOnFailedRelation())
     {
+      $entity->setRecentRelationKey($foreignKey);
+      $entity->setFromRelationshipType(self::RELATIONSHIP_HASONE);
       $entity->setData($foreignKey, $this->id());
       $entity->touch();
       return $entity;
@@ -593,10 +617,11 @@ abstract class RecordMapper extends DataMapper
       $foreignKey = $this->stringToColumnName($foreignKey);
     }
 
+    $entity->setFromRelationshipType(self::RELATIONSHIP_BELONGSTO);
+
     $key = $this->_attribute($foreignKey)->data();
     if($key !== null)
     {
-      $entity->setFromRelationshipType(self::RELATIONSHIP_BELONGSTO);
       return $entity->load($key);
     }
     else
@@ -608,6 +633,8 @@ abstract class RecordMapper extends DataMapper
           $localKey = strtolower(class_shortname($this)) . '_id';
           $localKey = $this->stringToColumnName($localKey);
         }
+
+        $this->_recentRelationKey = $localKey;
 
         $entity->setData($localKey, $this->id());
         $entity->touch();

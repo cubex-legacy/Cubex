@@ -32,9 +32,13 @@ class EphemeralCache
     return isset(static::$_storage[static::_storageKey($source)][$id]);
   }
 
-  public static function getCache($id, $source)
+  public static function getCache($id, $source, $default = null)
   {
-    return static::$_storage[static::_storageKey($source)][$id];
+    if(static::inCache($id, $source))
+    {
+      return static::$_storage[static::_storageKey($source)][$id];
+    }
+    return $default;
   }
 
   public static function deleteCache($id, $source)
