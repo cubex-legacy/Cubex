@@ -594,6 +594,18 @@ abstract class RecordMapper extends DataMapper
     return $string;
   }
 
+  public static function schema()
+  {
+    /**
+     * @var $source self
+     */
+    $source = new static;
+    $schema = $source->conn()->getKeyedRows(
+      "DESCRIBE `" . $source->getTableName() . '`'
+    );
+    return $schema;
+  }
+
   public static function min($key = 'id')
   {
     $a = new Aggregate((new static));
