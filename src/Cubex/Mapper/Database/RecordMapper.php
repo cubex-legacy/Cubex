@@ -709,4 +709,9 @@ abstract class RecordMapper extends DataMapper
       ], func_get_args()
     );
   }
+
+  public static function collection()
+  {
+    return new RecordCollection(new static);
+  }
 }
