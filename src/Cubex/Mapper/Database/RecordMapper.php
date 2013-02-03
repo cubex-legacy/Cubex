@@ -52,8 +52,8 @@ abstract class RecordMapper extends DataMapper
 
   protected $_loadPending;
   protected $_loadDetails;
-  protected $_fromRelationship;
 
+  protected $_fromRelationship;
   protected $_newOnFailedRelationship;
 
   public function __construct($id = null, $columns = ['*'])

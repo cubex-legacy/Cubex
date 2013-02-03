@@ -6,6 +6,7 @@
 namespace Cubex\Mapper\Database;
 
 use Cubex\Data\Ephemeral\EphemeralCache;
+use Cubex\Data\Validator\Validator;
 use Cubex\Database\ConnectionMode;
 use Cubex\Mapper\Collection;
 use Cubex\Sprintf\ParseQuery;
@@ -24,6 +25,11 @@ class RecordCollection extends Collection
    * @var RecordMapper
    */
   protected $_mapperType;
+
+  /**
+   * @var RecordCollection[]
+   */
+  protected $_preFetches;
 
   public function __construct(RecordMapper $map, array $mappers = null)
   {
@@ -216,6 +222,67 @@ class RecordCollection extends Collection
     }
 
     $this->_loaded = true;
+
+    if($this->_preFetches !== null)
+    {
+      foreach($this->_preFetches as $prefetch)
+      {
+        $prefetch->loadIds($this->loadedIds());
+        $prefetch->get();
+      }
+      $this->_preFetches = null;
+    }
+
+    return $this;
+  }
+
+  public function loadedIds()
+  {
+    return array_keys($this->_mappers);
+  }
+
+  public function loadIds($ids)
+  {
+    try
+    {
+      Validator::isArray($ids, "ints");
+      $pattern = '%C IN (%Ld)';
+    }
+    catch(\Exception $e)
+    {
+      $pattern = '%C IN (%Ls)';
+    }
+
+    $this->loadWhere($pattern, $this->_mapperType->getIdKey(), $ids);
+    return $this;
+  }
+
+  public function preFetch($methods)
+  {
+    if(!is_array($methods))
+    {
+      $methods = [$methods];
+    }
+
+    foreach($methods as $method)
+    {
+      if(method_exists($this->_mapperType, $method))
+      {
+        $this->_mapperType->newInstanceOnFailedRelation(true);
+        $result = $this->_mapperType->$method();
+
+        if($result instanceof RecordCollection)
+        {
+          $result = $result->getMapperType();
+        }
+
+        if($result instanceof RecordMapper)
+        {
+          $collection          = $result::collection();
+          $this->_preFetches[] = $collection;
+        }
+      }
+    }
 
     return $this;
   }
