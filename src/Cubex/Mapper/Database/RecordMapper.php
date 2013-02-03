@@ -583,7 +583,8 @@ abstract class RecordMapper extends DataMapper
     return $collection;
   }
 
-  public function belongsTo(RecordMapper $entity, $foreignKey = null)
+  public function belongsTo(RecordMapper $entity, $foreignKey = null,
+                            $localKey = null)
   {
     $this->_load();
     if($foreignKey === null)
@@ -602,7 +603,13 @@ abstract class RecordMapper extends DataMapper
     {
       if($this->createsNewInstanceOnFailedRelation())
       {
-        $entity->setData($foreignKey, $this->id());
+        if($localKey === null)
+        {
+          $localKey = strtolower(class_shortname($this)) . '_id';
+          $localKey = $this->stringToColumnName($localKey);
+        }
+
+        $entity->setData($localKey, $this->id());
         $entity->touch();
         return $entity;
       }
