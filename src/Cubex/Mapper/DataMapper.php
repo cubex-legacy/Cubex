@@ -56,7 +56,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
   public function setId($id)
   {
-    if($this->_attributeExists($this->getIdKey()))
+    if($this->attributeExists($this->getIdKey()))
     {
       $this->setData($this->getIdKey(), $id);
     }
@@ -70,7 +70,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
     {
       $property = $p->getName();
-      if(!$this->_attributeExists($property))
+      if(!$this->attributeExists($property))
       {
         $this->_addAttribute(
           new $type($property, false, null, $p->getValue($this))
@@ -81,12 +81,12 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
     if($this->_autoTimestamp)
     {
-      if(!$this->_attributeExists($this->updatedAttribute()))
+      if(!$this->attributeExists($this->updatedAttribute()))
       {
         $this->_addAttribute(new $type($this->updatedAttribute()));
       }
 
-      if(!$this->_attributeExists($this->createdAttribute()))
+      if(!$this->attributeExists($this->createdAttribute()))
       {
         $this->_addAttribute(new $type($this->createdAttribute()));
       }
@@ -225,12 +225,12 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
   public function hasAttribute($attribute)
   {
-    return $this->_attributeExists($attribute);
+    return $this->attributeExists($attribute);
   }
 
   public function setData($attribute, $value)
   {
-    if($this->_attributeExists($attribute))
+    if($this->attributeExists($attribute))
     {
       $this->_attribute($attribute)->setData($value);
 
@@ -245,7 +245,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   public function getData($attribute)
   {
     $this->_checkAttributes();
-    if($this->_attributeExists($attribute))
+    if($this->attributeExists($attribute))
     {
       return $this->_attribute($attribute)->data();
     }
@@ -314,7 +314,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
    *
    * @return bool
    */
-  protected function _attributeExists($attribute)
+  public function attributeExists($attribute)
   {
     $attribute = $this->_cleanAttributeName($attribute);
     return isset($this->_attributes[$attribute]);
@@ -322,7 +322,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
   protected function _setRequired($attribute, $required = true)
   {
-    if($this->_attributeExists($attribute))
+    if($this->attributeExists($attribute))
     {
       $this->_attribute($attribute)->setRequired($required);
     }
@@ -532,7 +532,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     foreach($data as $k => $v)
     {
       $k = strtolower($k);
-      if($this->_attributeExists($k))
+      if($this->attributeExists($k))
       {
         $set = "set$k";
         $this->$set($this->_attribute($k)->unserialize($v));
@@ -550,7 +550,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   {
     foreach($mapper->getRawAttributes() as $attr)
     {
-      if($this->_attributeExists($attr->name()))
+      if($this->attributeExists($attr->name()))
       {
         $this->setData($attr->name(), $attr->data());
       }
@@ -639,7 +639,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $validators = $from->getValidators();
     foreach($validators as $attr => $validatorArray)
     {
-      if($this->_attributeExists($attr))
+      if($this->attributeExists($attr))
       {
         $this->_attribute($attr)->setValidators($validatorArray);
       }
@@ -652,7 +652,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $filters = $from->getFilters();
     foreach($filters as $attr => $filterArray)
     {
-      if($this->_attributeExists($attr))
+      if($this->attributeExists($attr))
       {
         $this->_attribute($attr)->setFilters($filterArray);
       }
@@ -672,7 +672,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $attributes = $from->getRawAttributes();
     foreach($attributes as $attr)
     {
-      if($this->_attributeExists($attr->name()))
+      if($this->attributeExists($attr->name()))
       {
         $this->_attribute($attr->name())->setRequired($attr->required());
       }

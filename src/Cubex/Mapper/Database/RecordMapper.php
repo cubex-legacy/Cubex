@@ -114,7 +114,7 @@ abstract class RecordMapper extends DataMapper
 
   protected function _addIdAttribute()
   {
-    if(!$this->_attributeExists($this->getIdKey()))
+    if(!$this->attributeExists($this->getIdKey()))
     {
       $this->_addAttribute(new Attribute($this->getIdKey()));
     }

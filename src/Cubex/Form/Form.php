@@ -171,11 +171,6 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
-  public function attributeExists($attribute)
-  {
-    return $this->_attributeExists($attribute);
-  }
-
   public function setFormName($name)
   {
     $this->_formName                  = $name;
