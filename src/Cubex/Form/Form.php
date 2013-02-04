@@ -52,6 +52,11 @@ class Form extends DataMapper implements Renderable
    */
   public function buildFromMapper(DataMapper $mapper, $relations = false)
   {
+    if($mapper instanceof RecordMapper)
+    {
+      $mapper->newInstanceOnFailedRelation(true);
+    }
+
     $attr = $mapper->getRawAttributes();
     foreach($attr as $a)
     {
@@ -98,6 +103,11 @@ class Form extends DataMapper implements Renderable
 
         $this->_addElementFromAttribute($a);
       }
+    }
+
+    if($mapper instanceof RecordMapper)
+    {
+      $mapper->newInstanceOnFailedRelation(true);
     }
 
     $name = class_shortname($mapper);
@@ -420,8 +430,10 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
-  public function addElement($name, $type, $default = null, array $options = [],
-                             $labelPosition = null, $selectedValue = null)
+  public function addElement(
+    $name, $type, $default = null, array $options = [],
+    $labelPosition = null, $selectedValue = null
+  )
   {
     if($type == FormElement::FILE)
     {
@@ -447,25 +459,41 @@ class Form extends DataMapper implements Renderable
   public function addHiddenElement($name, $default = '')
   {
     $this->addElement(
-      $name, FormElement::HIDDEN, $default, [], Form::LABEL_NONE
+      $name,
+      FormElement::HIDDEN,
+      $default,
+      [],
+      Form::LABEL_NONE
     );
     return $this;
   }
 
-  public function addSelectElement($name, $options = [], $default = '',
-                                   $labelPosition = null)
+  public function addSelectElement(
+    $name, $options = [], $default = '',
+    $labelPosition = null
+  )
   {
     $this->addElement(
-      $name, FormElement::SELECT, $default, $options, $labelPosition
+      $name,
+      FormElement::SELECT,
+      $default,
+      $options,
+      $labelPosition
     );
     return $this;
   }
 
-  public function addTextareaElement($name, $default = '',
-                                     $labelPosition = null)
+  public function addTextareaElement(
+    $name, $default = '',
+    $labelPosition = null
+  )
   {
     $this->addElement(
-      $name, FormElement::TEXTAREA, $default, [], $labelPosition
+      $name,
+      FormElement::TEXTAREA,
+      $default,
+      [],
+      $labelPosition
     );
     return $this;
   }
@@ -483,17 +511,25 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
-  public function addPasswordElement($name, $default = '',
-                                     $labelPosition = null)
+  public function addPasswordElement(
+    $name, $default = '',
+    $labelPosition = null
+  )
   {
     $this->addElement(
-      $name, FormElement::PASSWORD, $default, [], $labelPosition
+      $name,
+      FormElement::PASSWORD,
+      $default,
+      [],
+      $labelPosition
     );
     return $this;
   }
 
-  public function addSubmitElement($text = 'Submit Form', $name = 'submit',
-                                   $labelPosition = Form::LABEL_NONE)
+  public function addSubmitElement(
+    $text = 'Submit Form', $name = 'submit',
+    $labelPosition = Form::LABEL_NONE
+  )
   {
     $this->addElement($name, FormElement::SUBMIT, $text, [], $labelPosition);
     return $this;
@@ -505,29 +541,48 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
-  public function addRadioElements($name, $default, array $options = [],
-                                   $labelPosition = null)
+  public function addRadioElements(
+    $name, $default, array $options = [],
+    $labelPosition = null
+  )
   {
     $this->addElement(
-      $name, FormElement::RADIO, $default, $options, $labelPosition
+      $name,
+      FormElement::RADIO,
+      $default,
+      $options,
+      $labelPosition
     );
     return $this;
   }
 
-  public function addCheckboxElements($name, $default, array $options = [],
-                                      $labelPosition = null)
+  public function addCheckboxElements(
+    $name, $default, array $options = [],
+    $labelPosition = null
+  )
   {
     $this->addElement(
-      $name, FormElement::MULTI_CHECKBOX, $default, $options, $labelPosition
+      $name,
+      FormElement::MULTI_CHECKBOX,
+      $default,
+      $options,
+      $labelPosition
     );
     return $this;
   }
 
-  public function addCheckboxElement($name, $default, $selectedValue = 'true',
-                                     $labelPosition = null)
+  public function addCheckboxElement(
+    $name, $default, $selectedValue = 'true',
+    $labelPosition = null
+  )
   {
     $this->addElement(
-      $name, FormElement::CHECKBOX, $default, [], $labelPosition, $selectedValue
+      $name,
+      FormElement::CHECKBOX,
+      $default,
+      [],
+      $labelPosition,
+      $selectedValue
     );
     return $this;
   }
@@ -553,17 +608,22 @@ class Form extends DataMapper implements Renderable
     return $this->_addInputElement(FormElement::DATE, func_get_args());
   }
 
-  public function addDateTimeElement($name, $default = '',
-                                     $labelPosition = null)
+  public function addDateTimeElement(
+    $name, $default = '',
+    $labelPosition = null
+  )
   {
     return $this->_addInputElement(FormElement::DATETIME, func_get_args());
   }
 
-  public function addDateTimeLocalElement($name, $default = '',
-                                          $labelPosition = null)
+  public function addDateTimeLocalElement(
+    $name, $default = '',
+    $labelPosition = null
+  )
   {
     return $this->_addInputElement(
-      FormElement::DATETIME_LOCAL, func_get_args()
+      FormElement::DATETIME_LOCAL,
+      func_get_args()
     );
   }
 
