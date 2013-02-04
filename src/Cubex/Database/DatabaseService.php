@@ -110,4 +110,18 @@ interface DatabaseService extends Service
    * @return null|mixed
    */
   public function insertId();
+
+  /**
+   * Last Error Number
+   *
+   * @return mixed
+   */
+  public function errorNo();
+
+  /**
+   * Last Error Message
+   *
+   * @return mixed
+   */
+  public function errorMsg();
 }

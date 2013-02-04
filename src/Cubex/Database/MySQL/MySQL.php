@@ -21,6 +21,9 @@ class MySQL implements DatabaseService
   protected $_config;
   protected $_connected = false;
 
+  protected $_errorno;
+  protected $_errormsg;
+
   /**
    * @param \Cubex\ServiceManager\ServiceConfig $config
    *
@@ -47,10 +50,12 @@ class MySQL implements DatabaseService
     }
 
     $this->_connection = new \mysqli($hostname, $this->_config->getStr(
-        'username', 'root'
-      ), $this->_config->getStr('password', ''), $this->_config->getStr(
-        'database', 'test'
-      ), $this->_config->getStr('port', 3306));
+      'username',
+      'root'
+    ), $this->_config->getStr('password', ''), $this->_config->getStr(
+      'database',
+      'test'
+    ), $this->_config->getStr('port', 3306));
 
     $this->_connected = true;
 
@@ -94,18 +99,38 @@ class MySQL implements DatabaseService
     return $this->_connection->real_escape_string($string);
   }
 
+  public function errorNo()
+  {
+    return $this->_errorno;
+  }
+
+  public function errorMsg()
+  {
+    return $this->_errormsg;
+  }
+
   /**
    * @returns \mysqli_result
    */
   protected function _doQuery($query)
   {
     $result = $this->_connection->query($query);
+    if(!$result)
+    {
+      $this->_errorno  = $this->_connection->errno;
+      $this->_errormsg = $this->_connection->error;
+    }
+
     EventManager::trigger(
-      EventManager::CUBEX_QUERY, [
-                                 'query'  => $query,
-                                 'result' => $result,
-                                 ], $this
+      EventManager::CUBEX_QUERY,
+      [
+      'query'  => $query,
+      'result' => $result,
+      'error'  => ['num' => $this->_errorno, 'msg' => $this->_errormsg]
+      ],
+      $this
     );
+
     return $result;
   }
 
