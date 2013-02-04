@@ -18,7 +18,10 @@ trait Translation
    */
   public function getTranslator()
   {
-    $this->_translator = new GetText();
+    if($this->_translator === null)
+    {
+      $this->_translator = new GetText();
+    }
 
     return $this->_translator;
   }
@@ -71,7 +74,10 @@ trait Translation
   public function p($singular, $plural = null, $number = 0)
   {
     $translated = $this->getTranslator()->p(
-      $this->textDomain(), $singular, $plural, $number
+      $this->textDomain(),
+      $singular,
+      $plural,
+      $number
     );
 
     if(\substr_count($translated, '%d') == 1)
@@ -92,7 +98,10 @@ trait Translation
 
     $this->_textdomain = \md5($path);
 
-    if(!$this->_boundTd) $this->bindLanguage();
+    if(!$this->_boundTd)
+    {
+      $this->bindLanguage();
+    }
 
     return $this->_textdomain;
   }
@@ -102,7 +111,8 @@ trait Translation
     $this->_boundTd = true;
 
     return $this->getTranslator()->bindLanguage(
-      $this->textDomain(), $this->filePath() . DS . 'locale'
+      $this->textDomain(),
+    $this->filePath() . DS . 'locale'
     );
   }
 
