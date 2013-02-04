@@ -278,9 +278,17 @@ abstract class RecordMapper extends DataMapper
     return $this;
   }
 
+  /**
+   * Before Delete from DB
+   */
+  protected function _preDelete()
+  {
+  }
+
   public function delete()
   {
     $this->_load();
+    $this->_preDelete();
     $this->deleteEphemeralCache();
     if($this->exists())
     {
@@ -453,10 +461,33 @@ abstract class RecordMapper extends DataMapper
   }
 
   /**
+   * Before object creation within DB
+   */
+  protected function _prePersist()
+  {
+  }
+
+  /**
+   * Before object update within DB
+   */
+  protected function _preUpdate()
+  {
+  }
+
+  /**
    * @return mixed
    */
   public function saveChanges()
   {
+    if(!$this->exists())
+    {
+      $this->_prePersist();
+    }
+    else
+    {
+      $this->_preUpdate();
+    }
+
     $connection = $this->connection(new ConnectionMode(ConnectionMode::WRITE));
     $modified   = $this->getModifiedAttributes();
     $updates    = $inserts = array();
