@@ -12,10 +12,16 @@ use Cubex\Helpers\Strings;
 
 class DBBuilder
 {
+  /**
+   * @var RecordMapper
+   */
   protected $_mapper;
+  /**
+   * @var RecordMapper
+   */
   protected $_emptyMapper;
   /**
-   * @var Column
+   * @var Column[]
    */
   protected $_columns = [];
   protected $_tableName;
@@ -131,7 +137,7 @@ class DBBuilder
 
   public function createDB()
   {
-    $columns = $this->columnSqls();
+    $columns = $this->_columnSqls();
 
     $sql = "CREATE TABLE ";
     $sql .= "`" . $this->_database . "`.`" . $this->_tableName . "`" .
@@ -140,7 +146,7 @@ class DBBuilder
     return $sql;
   }
 
-  protected function columnSqls()
+  protected function _columnSqls()
   {
     $cols = [];
 
