@@ -10,6 +10,7 @@ use Cubex\Data\Attribute;
 use Cubex\Data\Validator\Validator;
 use Cubex\Facade\Session;
 use Cubex\Foundation\Renderable;
+use Cubex\Helpers\Strings;
 use Cubex\Mapper\DataMapper;
 use Cubex\Mapper\Database\RecordMapper;
 
@@ -97,6 +98,18 @@ class Form extends DataMapper implements Renderable
 
         $this->_addElementFromAttribute($a);
       }
+    }
+
+    $name = class_shortname($mapper);
+    $name = ucwords(Strings::variableToUnderScore($name));
+
+    if($mapper->exists())
+    {
+      $this->addSubmitElement("Update " . $name);
+    }
+    else
+    {
+      $this->addSubmitElement("Create " . $name);
     }
 
     $this->importFiltersAndValidators($mapper);
@@ -479,10 +492,10 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
-  public function addSubmitElement($name = 'submit', $default = 'Submit Form',
+  public function addSubmitElement($text = 'Submit Form', $name = 'submit',
                                    $labelPosition = Form::LABEL_NONE)
   {
-    $this->addElement($name, FormElement::SUBMIT, $default, [], $labelPosition);
+    $this->addElement($name, FormElement::SUBMIT, $text, [], $labelPosition);
     return $this;
   }
 
