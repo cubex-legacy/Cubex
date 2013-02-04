@@ -154,15 +154,16 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   public function jsonSerialize()
   {
     $this->_checkAttributes();
-    return $this->_getRawAttributesArr($this->_attributes);
+    return $this->_getRawAttributesArr($this->_attributes, false);
   }
 
   /**
    * @param array $attributes
+   * @param bool  $hidden
    *
    * @return array
    */
-  protected function _getRawAttributesArr(array $attributes)
+  protected function _getRawAttributesArr(array $attributes, $hidden = true)
   {
     $this->_checkAttributes();
     $rawAttributes = [];
@@ -170,6 +171,10 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     {
       if($attribute instanceof Attribute)
       {
+        if(!$hidden && $attribute->isHidden())
+        {
+          continue;
+        }
         $rawAttributes[$attribute->name()] = $attribute->data();
       }
     }
@@ -330,6 +335,15 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     return $this;
   }
 
+  protected function _setHidden($attribute, $hidden = true)
+  {
+    if($this->attributeExists($attribute))
+    {
+      $this->_attribute($attribute)->setHidden($hidden);
+    }
+    return $this;
+  }
+
   protected function _addFilter($attribute, $filter, array $options = [])
   {
     $this->_checkAttributes();
@@ -342,7 +356,8 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     if($attr instanceof Attribute)
     {
       $this->_attributes[$attribute] = $attr->addFilter(
-        $filter, $options
+        $filter,
+        $options
       );
 
       return true;
@@ -363,7 +378,8 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     if($attr instanceof Attribute)
     {
       $this->_attributes[$attribute] = $attr->addValidator(
-        $validator, $options
+        $validator,
+        $options
       );
 
       return true;
@@ -404,8 +420,10 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
    *
    * @return bool
    */
-  public function isValid($attributes = null, $processAllValidators = false,
-                          $failFirst = false)
+  public function isValid(
+    $attributes = null, $processAllValidators = false,
+    $failFirst = false
+  )
   {
     $this->_checkAttributes();
     $valid = true;

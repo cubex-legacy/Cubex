@@ -28,12 +28,15 @@ class Attribute implements Validatable, Filterable
   protected $_data;
   protected $_originalData;
   protected $_populated = false;
+  protected $_hidden = false;
 
-  public function __construct($name,
-                              $required = false,
-                              $options = null,
-                              $data = null,
-                              $serializer = self::SERIALIZATION_NONE)
+  public function __construct(
+    $name,
+    $required = false,
+    $options = null,
+    $data = null,
+    $serializer = self::SERIALIZATION_NONE
+  )
   {
     $this->setName($name);
     $this->setRequired($required);
@@ -51,6 +54,17 @@ class Attribute implements Validatable, Filterable
   public function populated()
   {
     return $this->_populated ? true : false;
+  }
+
+  public function setHidden($hidden)
+  {
+    $this->_hidden = (bool)$hidden;
+    return $this;
+  }
+
+  public function isHidden()
+  {
+    return (bool)$this->_hidden;
   }
 
   public function setName($name)

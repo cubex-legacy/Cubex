@@ -221,7 +221,13 @@ class Collection
    */
   public function jsonSerialize()
   {
-    return $this->all();
+    $response = [];
+    $mappers = $this->all();
+    foreach($mappers as $mapper)
+    {
+      $response[] = $mapper->jsonSerialize();
+    }
+    return $response;
   }
 
   /**
