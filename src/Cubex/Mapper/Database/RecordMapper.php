@@ -68,6 +68,12 @@ abstract class RecordMapper extends DataMapper
     }
   }
 
+  public function disableLoading()
+  {
+    $this->_loadPending = null;
+    return $this;
+  }
+
   public function createsNewInstanceOnFailedRelation()
   {
     return (bool)$this->_newOnFailedRelationship;

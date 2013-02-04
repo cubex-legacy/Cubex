@@ -42,7 +42,8 @@ class RecordCollection extends Collection
   public function setOrderBy($field, $order = 'ASC')
   {
     $this->_orderBy = ParseQuery::parse(
-      $this->connection(), ["%C $order", $field]
+      $this->connection(),
+      ["%C $order", $field]
     );
     return $this;
   }
@@ -62,7 +63,8 @@ class RecordCollection extends Collection
     else
     {
       $this->_groupBy = ParseQuery::parse(
-        $this->connection(), ["%C", $groupBy]
+        $this->connection(),
+        ["%C", $groupBy]
       );
     }
     return $this;
@@ -102,7 +104,8 @@ class RecordCollection extends Collection
   public function loadOneWhere($pattern /* , $arg, $arg, $arg ... */)
   {
     call_user_func_array(
-      array($this, 'loadWhere'), func_get_args()
+      array($this, 'loadWhere'),
+      func_get_args()
     );
 
     $this->get();
@@ -166,11 +169,12 @@ class RecordCollection extends Collection
   {
     $query      = 'SELECT %LC FROM %T';
     $tableQuery = $query = ParseQuery::parse(
-      $this->connection(), [
-                           $query,
-                           $this->_columns,
-                           $this->_mapperType->getTableName(),
-                           ]
+      $this->connection(),
+      [
+      $query,
+      $this->_columns,
+      $this->_mapperType->getTableName(),
+      ]
     );
 
     $this->_query = trim($this->_query);
@@ -214,7 +218,9 @@ class RecordCollection extends Collection
             if(preg_match("/$match/", $q))
             {
               $rows = $this->_populateFromCache(
-                $matches[0][0], $matches[0][1], $q
+                $matches[0][0],
+                $matches[0][1],
+                $q
               );
             }
           }
@@ -227,11 +233,30 @@ class RecordCollection extends Collection
       $rows = $this->connection()->getRows($query);
     }
 
+    $allowLimit = $this->_limit === null;
+    if($this->_offset == 0)
+    {
+      if($this->_limit > count($rows))
+      {
+        $allowLimit = true;
+        $query      = trim(str_replace(" LIMIT 0,$this->_limit", '', $query));
+      }
+    }
+
     if($rows)
     {
+      if($this->_columns == ['*'] && $allowLimit && $this->_groupBy == null)
+      {
+        $queries   = EphemeralCache::getCache("sqlqueries", $this, []);
+        $queries[] = $query;
+        EphemeralCache::storeCache("sqlqueries", $queries, $this);
+        EphemeralCache::storeCache($query, $rows, $this);
+      }
+
       foreach($rows as $row)
       {
         $map = clone $this->_mapperType;
+        $map->disableLoading();
         $map->hydrate((array)$row, true);
         $map->setExists(true);
         $this->addMapper($map);
@@ -244,14 +269,6 @@ class RecordCollection extends Collection
           }
         }
       }
-    }
-
-    if($this->_columns == ['*'] && $this->_limit === null && $this->_groupBy == null)
-    {
-      $queries   = EphemeralCache::getCache("sqlqueries", $this, []);
-      $queries[] = $query;
-      EphemeralCache::storeCache("sqlqueries", $queries, $this);
-      EphemeralCache::storeCache($query, $rows, $this);
     }
 
     $this->_loaded = true;
