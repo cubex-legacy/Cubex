@@ -234,8 +234,7 @@ abstract class RecordMapper extends DataMapper
     $rows = $connection->getRows($query);
     if(!$rows)
     {
-      $set = "set" . $this->getIdKey();
-      $this->$set($id);
+      $this->setData($this->getIdKey(), $id);
     }
     else
     {
@@ -456,7 +455,6 @@ abstract class RecordMapper extends DataMapper
    */
   public function saveChanges()
   {
-    $this->_load();
     $connection = $this->connection(new ConnectionMode(ConnectionMode::WRITE));
     $modified   = $this->getModifiedAttributes();
     $updates    = $inserts = array();

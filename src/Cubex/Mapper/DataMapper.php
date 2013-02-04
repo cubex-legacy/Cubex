@@ -232,6 +232,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   {
     if($this->attributeExists($attribute))
     {
+      $this->_checkAttributes();
       $this->_attribute($attribute)->setData($value);
 
       return $this;
@@ -534,8 +535,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
       $k = strtolower($k);
       if($this->attributeExists($k))
       {
-        $set = "set$k";
-        $this->$set($this->_attribute($k)->unserialize($v));
+        $this->setData($k, $this->_attribute($k)->unserialize($v));
         if($setUnmodified)
         {
           $this->_attribute($k)->unsetModified();
