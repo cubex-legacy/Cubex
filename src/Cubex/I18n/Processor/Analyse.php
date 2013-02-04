@@ -16,10 +16,7 @@ class Analyse
   /**
    * @var array
    */
-  protected $_translations = array(
-    'single' => array(),
-    'plural' => array()
-  );
+  protected $_translations = ['single' => [], 'plural' => []];
 
   /**
    * @param $base
@@ -31,15 +28,7 @@ class Analyse
     {
       while(false !== ($entry = readdir($handle)))
       {
-        if(in_array(
-          $entry, array(
-                       '.',
-                       '..',
-                       'locale',
-                       'res'
-                  )
-        )
-        )
+        if(in_array($entry, array('.', '..', 'locale', 'res')))
         {
           continue;
         }
@@ -47,7 +36,8 @@ class Analyse
         if(is_dir($base . $directory . DIRECTORY_SEPARATOR . $entry))
         {
           $this->processDirectory(
-            $base, $directory . DIRECTORY_SEPARATOR . $entry
+            $base,
+            ($directory . DIRECTORY_SEPARATOR . $entry)
           );
         }
         else if(
@@ -177,9 +167,13 @@ class Analyse
    *
    * @return string
    */
-  public function generatePO($language, Translator $translator,
-                             $sourceLanguage = 'en')
+  public function generatePO(
+    $language, Translator $translator,
+    $sourceLanguage = 'en'
+  )
   {
+    $wrapat = 76;
+    $wrapon = 80;
     $result = '';
 
     foreach($this->_translations as $buildType => $translations)
@@ -202,66 +196,64 @@ class Analyse
         if($buildType == 'single')
         {
           $translated = $translator->translate(
-            $message, $sourceLanguage, $language
+            $message,
+            $sourceLanguage,
+            $language
           );
-          if(strlen($message) < 80)
+          if(strlen($message) < $wrapon)
           {
             $result .= 'msgid "' . $this->slash($message) . '"';
           }
           else
           {
             $result .= 'msgid ""' . "\n";
-            $result .= '"' . $this->iconvWordwrap(
-              $message, 76, " \"\n\""
-            ) . '"';
+            $result .= $this->wrap($message, $wrapat);
           }
           $result .= "\n";
-          if(strlen($translated) < 80)
+          if(strlen($translated) < $wrapon)
           {
             $result .= 'msgstr "' . $this->slash($translated) . '"';
           }
           else
           {
             $result .= 'msgstr ""' . "\n";
-            $result .= '"' . $this->iconvWordwrap(
-              $translated, 76, " \"\n\""
-            ) . '"';
+            $result .= $this->wrap($translated, $wrapat);
           }
           $result .= "\n\n";
         }
         else if($buildType == 'plural')
         {
           $singular = $translator->translate(
-            $message[0], $sourceLanguage, $language
+            $message[0],
+            $sourceLanguage,
+            $language
           );
           $plural   = $translator->translate(
-            $message[1], $sourceLanguage, $language
+            $message[1],
+            $sourceLanguage,
+            $language
           );
 
-          if(strlen($message[0]) < 80)
+          if(strlen($message[0]) < $wrapon)
           {
             $result .= 'msgid "' . $this->slash($message[0]) . '"';
           }
           else
           {
             $result .= 'msgid ""' . "\n";
-            $result .= '"' . $this->iconvWordwrap(
-              $message[0], 76, " \"\n\""
-            ) . '"';
+            $result .= $this->wrap($message[0], $wrapat);
           }
 
           $result .= "\n";
 
-          if(strlen($message[1]) < 80)
+          if(strlen($message[1]) < $wrapon)
           {
             $result .= 'msgid_plural "' . $this->slash($message[1]) . '"';
           }
           else
           {
             $result .= 'msgid_plural ""' . "\n";
-            $result .= '"' . $this->iconvWordwrap(
-              $message[1], 76, " \"\n\""
-            ) . '"';
+            $result .= $this->wrap($message[1], $wrapat);
           }
 
           $result .= "\n";
@@ -276,6 +268,32 @@ class Analyse
     return $result;
   }
 
+  public function wrap($message, $at)
+  {
+    $messages   = explode("\n", $message);
+    $msgs       = count($messages);
+    $lineappend = $msgs > 1 ? "\\n" : '';
+
+    foreach($messages as $i => $result)
+    {
+      if($i != ($msgs - 1))
+      {
+        $result .= $lineappend;
+      }
+      if(strlen($result) > $at)
+      {
+        $result = $this->iconvWordwrap($result, $at, " \n");
+      }
+      $result = explode("\n", $result);
+      foreach($result as $p)
+      {
+        $parts[] = $this->slash($p);
+      }
+    }
+
+    return '"' . implode("\"\n\"", $parts) . '"';
+  }
+
   /**
    * @param        $string
    * @param int    $width
@@ -286,8 +304,10 @@ class Analyse
    * @return string
    * @throws \Exception
    */
-  public function iconvWordwrap($string, $width = 75, $break = "\n",
-                                $cut = false, $charset = 'utf-8')
+  public function iconvWordwrap(
+    $string, $width = 75, $break = "\n",
+    $cut = false, $charset = 'utf-8'
+  )
   {
     $stringWidth = iconv_strlen($string, $charset);
     $breakWidth  = iconv_strlen($break, $charset);
@@ -319,14 +339,20 @@ class Analyse
       else
       {
         $possibleBreak = iconv_substr(
-          $string, $current, $breakWidth, $charset
+          $string,
+          $current,
+          $breakWidth,
+          $charset
         );
       }
 
       if($possibleBreak === $break)
       {
         $result .= iconv_substr(
-          $string, $lastStart, $current - $lastStart + $breakWidth, $charset
+          $string,
+          $lastStart,
+          ($current - $lastStart + $breakWidth),
+          $charset
         );
         $current += $breakWidth - 1;
         $lastStart = $lastSpace = $current + 1;
@@ -365,20 +391,6 @@ class Analyse
         iconv_substr($string, $lastStart, $current - $lastStart, $charset)
       );
     }
-
-    $match  = array();
-    $result = str_replace("\n\n", "\n", $result);
-    preg_match("/.+[^\"]\n/", $result, $match);
-    if($match)
-    {
-      foreach($match as $m)
-      {
-        $result = str_replace(
-          $m, str_replace("\n", "", $m) . "\\n\"\n\"", $result
-        );
-      }
-    }
-
     return $result;
   }
 

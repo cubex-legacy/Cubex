@@ -88,15 +88,7 @@ class Build
     {
       while(false !== ($entry = readdir($handle)))
       {
-        if(in_array(
-          $entry, array(
-                       '.',
-                       '..',
-                       'locale',
-                       'res'
-                  )
-        )
-        )
+        if(in_array($entry, array('.', '..', 'locale', 'res')))
         {
           continue;
         }
