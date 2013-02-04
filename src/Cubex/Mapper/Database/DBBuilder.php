@@ -48,7 +48,7 @@ class DBBuilder
 
     foreach($attrs as $attr)
     {
-      $name = $attr->name();
+      $name = $this->_mapper->stringToColumnName($attr->name());
       if($this->_mapper->getIdKey() == $name)
       {
         continue;
@@ -62,13 +62,39 @@ class DBBuilder
       $dataType  = DataType::VARCHAR;
       try
       {
-        $comment  = $reflect->getProperty($name)->getDocComment();
-        $comment  = substr($comment, 3, -2);
-        $comments = explode("\n", $comment);
-        $comment  = '';
-        foreach($comments as $comm)
+        $comment = $reflect->getProperty($attr->name())->getDocComment();
+        if(!empty($comment))
         {
-          $comment .= trim(ltrim(trim($comm), '*'));
+          $comment  = substr($comment, 3, -2);
+          $comments = explode("\n", $comment);
+          $comment  = '';
+          foreach($comments as $comm)
+          {
+            $comm = trim(ltrim(trim($comm), '*'));
+            if(substr($comm, 0, 1) == '@')
+            {
+              if(substr($comm, 0, 8) !== '@comment')
+              {
+                continue;
+              }
+              else
+              {
+                $comm = substr($comm, 8);
+              }
+            }
+            if(!empty($comm))
+            {
+              $comment .= $comm . "\n";
+            }
+          }
+          $comment = implode(
+            ", ",
+            phutil_split_lines($comment, false)
+          );
+        }
+        if(empty($comment))
+        {
+          $comment = null;
         }
       }
       catch(\Exception $e)
@@ -81,6 +107,7 @@ class DBBuilder
       {
         $dataType = DataType::INT;
         $length   = 10;
+        $unsigned = true;
       }
       else if(substr($uname, -3) == '_at')
       {

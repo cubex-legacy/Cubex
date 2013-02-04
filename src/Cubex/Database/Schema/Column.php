@@ -15,13 +15,12 @@ class Column
   protected $_zerofill;
   protected $_default;
   protected $_comment;
-  protected $_collation;
   protected $_autoIncrement;
 
   public function __construct(
     $name, $dataType = DataType::VARCHAR, $length = 250, $unsigned = false,
     $allowNull = true, $default = null, $autoIncrement = false, $comment = null,
-    $zerofill = null, $collation = null
+    $zerofill = null
   )
   {
     $this->_autoIncrement = $autoIncrement;
@@ -33,15 +32,10 @@ class Column
     $this->_zerofill      = $zerofill;
     $this->_default       = $default;
     $this->_comment       = $comment;
-    $this->_collation     = $collation;
   }
 
   public function createSql()
   {
-    /*
-         * `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-            `test` VARCHAR( 50 ) NOT NULL
-         * */
     $sql = "`" . $this->_name . "` ";
 
     $sql .= strtoupper($this->_dataType);
@@ -53,9 +47,25 @@ class Column
         break;
     }
 
-    $sql .= " ";
+    if($this->_unsigned)
+    {
+      $sql .= " UNSIGNED";
+    }
 
     $sql .= ($this->_allowNull ? '' : ' NOT') . ' NULL ';
+
+    if($this->_default !== null)
+    {
+      $sql .= " DEFAULT '" . $this->_default . "' ";
+    }
+
+    if($this->_comment !== null)
+    {
+      $sql .= " COMMENT '" . implode(
+        ", ",
+        explode("\n", $this->_comment)
+      ) . "' ";
+    }
 
     if($this->_autoIncrement)
     {
