@@ -403,10 +403,11 @@ abstract class RecordMapper extends DataMapper
     if(isset($config[self::CONFIG_IDS]))
     {
       return in_array(
-        $config[self::CONFIG_IDS], [
-                                   self::ID_COMPOSITE,
-                                   self::ID_COMPOSITE_SPLIT
-                                   ]
+        $config[self::CONFIG_IDS],
+        [
+        self::ID_COMPOSITE,
+        self::ID_COMPOSITE_SPLIT
+        ]
       );
     }
 
@@ -458,6 +459,7 @@ abstract class RecordMapper extends DataMapper
     $connection = $this->connection(new ConnectionMode(ConnectionMode::WRITE));
     $modified   = $this->getModifiedAttributes();
     $updates    = $inserts = array();
+    $cache      = EphemeralCache::getCache($this->id(), $this, null);
 
     if(!empty($modified))
     {
@@ -481,16 +483,23 @@ abstract class RecordMapper extends DataMapper
             $val = $attr->serialize();
           }
 
+          if($cache !== null)
+          {
+            $keyname         = $attr->name();
+            $cache->$keyname = $val;
+          }
+
           $inserts[$this->stringToColumnName($attr->name())] = $val;
 
           if($attr->name() != $this->createdAttribute())
           {
             $updates[] = ParseQuery::parse(
-              $connection, [
-                           "%C = %ns",
-                           $this->stringToColumnName($attr->name()),
-                           $val
-                           ]
+              $connection,
+              [
+              "%C = %ns",
+              $this->stringToColumnName($attr->name()),
+              $val
+              ]
             );
           }
           $attr->unsetModified();
@@ -501,6 +510,11 @@ abstract class RecordMapper extends DataMapper
     if(empty($updates))
     {
       return true;
+    }
+
+    if($cache !== null)
+    {
+      EphemeralCache::storeCache($this->id(), $cache, $this);
     }
 
     if(!$this->exists())
@@ -564,7 +578,9 @@ abstract class RecordMapper extends DataMapper
     {
       $table  = new RecordCollection($entity);
       $result = $table->loadOneWhere(
-        $this->idPattern(), $foreignKey, $this->id()
+        $this->idPattern(),
+        $foreignKey,
+        $this->id()
       );
     }
     else
@@ -609,8 +625,10 @@ abstract class RecordMapper extends DataMapper
     return $collection;
   }
 
-  public function belongsTo(RecordMapper $entity, $foreignKey = null,
-                            $localKey = null)
+  public function belongsTo(
+    RecordMapper $entity, $foreignKey = null,
+    $localKey = null
+  )
   {
     $this->_load();
     if($foreignKey === null)
@@ -691,7 +709,8 @@ abstract class RecordMapper extends DataMapper
         [
         $a,
         'where'
-        ], $args
+        ],
+        $args
       );
     }
     return $a->min($key);
@@ -708,7 +727,8 @@ abstract class RecordMapper extends DataMapper
         [
         $a,
         'where'
-        ], $args
+        ],
+        $args
       );
     }
     return $a->max($key);
@@ -725,7 +745,8 @@ abstract class RecordMapper extends DataMapper
         [
         $a,
         'where'
-        ], $args
+        ],
+        $args
       );
     }
     return $a->avg($key);
@@ -742,7 +763,8 @@ abstract class RecordMapper extends DataMapper
         [
         $a,
         'where'
-        ], $args
+        ],
+        $args
       );
     }
     return $a->sum($key);
@@ -759,7 +781,8 @@ abstract class RecordMapper extends DataMapper
         [
         $a,
         'where'
-        ], $args
+        ],
+        $args
       );
     }
     return $a->count($key);
@@ -776,7 +799,8 @@ abstract class RecordMapper extends DataMapper
       [
       $collection,
       'loadOneWhere'
-      ], func_get_args()
+      ],
+      func_get_args()
     );
   }
 
