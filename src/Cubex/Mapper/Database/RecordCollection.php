@@ -196,6 +196,7 @@ class RecordCollection extends Collection
 
     $rows = [];
 
+    //TODO: If limited, but results are less than limit, treat as unlimited
     if($this->_columns == ['*'] && $this->_limit === null && $this->_groupBy == null)
     {
       $queries = EphemeralCache::getCache("sqlqueries", $this, []);

@@ -4,12 +4,7 @@
  */
 namespace Cubex;
 
-use Cubex\Cli\Dictionary;
 use Cubex\Core\Http\DispatchInjection;
-use Cubex\Dispatch\Dispatcher;
-use Cubex\Dispatch\FileSystem;
-use Cubex\Dispatch\Path;
-use Cubex\Dispatch\Serve;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
@@ -19,16 +14,14 @@ use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\ServiceManager\ServiceConfig;
-use Cubex\ServiceManager\ServiceManager;
 use Cubex\ServiceManager\ServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
 /**
  * Cubex Loader
  */
-class Loader
-  implements Configurable, DispatchableAccess,
-             DispatchInjection, ServiceManagerAware
+class Loader implements Configurable, DispatchableAccess, DispatchInjection,
+                        ServiceManagerAware
 {
   use ConfigTrait;
   use ServiceManagerAwareTrait;
@@ -80,20 +73,10 @@ class Loader
     define("CUBEX_WEB", !CUBEX_CLI);
     define("WEB_ROOT", $_SERVER['DOCUMENT_ROOT']);
 
-    spl_autoload_register(
-      [
-      $this,
-      "loadClass"
-      ], true, true
-    );
+    spl_autoload_register([$this, "loadClass"], true, true);
 
     $this->setResponse($this->buildResponse());
-    set_exception_handler(
-      array(
-           $this,
-           'handleException'
-      )
-    );
+    set_exception_handler(array($this, 'handleException'));
 
     try
     {
@@ -107,9 +90,7 @@ class Loader
 
     define("CUBEX_TRANSACTION", $this->createTransaction());
 
-    \Cubex\Container\Container::bind(
-      \Cubex\Container\Container::LOADER, $this
-    );
+    \Cubex\Container\Container::bind(\Cubex\Container\Container::LOADER, $this);
   }
 
   public function setServiceManagerClass($serviceManager)
@@ -120,6 +101,9 @@ class Loader
 
   public function init()
   {
+    /**
+     * @var $sm \Cubex\ServiceManager\ServiceManager
+     */
     $sm = new $this->_smClass();
     foreach($this->_configuration as $section => $conf)
     {
@@ -151,14 +135,16 @@ class Loader
           $shared = $conf->getBool('register_service_shared', true);
           $sm->register(
             $conf->getStr('register_service_as', $section),
-            $service, $shared
+            $service,
+            $shared
           );
         }
       }
     }
 
     \Cubex\Container\Container::bind(
-      \Cubex\Container\Container::SERVICE_MANAGER, $sm
+      \Cubex\Container\Container::SERVICE_MANAGER,
+      $sm
     );
     $this->setServiceManager($sm);
   }
@@ -224,24 +210,24 @@ class Loader
     $src = "src";
     if($configuration->exists("project"))
     {
-      $ns = $configuration->get("project")->getStr("namespace", "Project");
+      $ns  = $configuration->get("project")->getStr("namespace", "Project");
+      $src = $configuration->get("project")->getStr("source", $src);
       $this->setNamespace($ns);
-      $src                      = $configuration->get("project")->getStr(
-        "source", $src
-      );
       $this->_projectSourceRoot = realpath(dirname(WEB_ROOT) . DS . $src);
     }
 
     $cubexConfig = new Config();
     $cubexConfig->setData(
-      "project_base", realpath(dirname(WEB_ROOT) . '/' . $src)
+      "project_base",
+      realpath(dirname(WEB_ROOT) . '/' . $src)
     );
 
     $configuration->addConfig('_cubex_', $cubexConfig);
 
     $this->_configuration = $configuration;
     \Cubex\Container\Container::bind(
-      \Cubex\Container\Container::CONFIG, $this->_configuration
+      \Cubex\Container\Container::CONFIG,
+      $this->_configuration
     );
 
     return $this;
@@ -284,7 +270,8 @@ class Loader
         $this->getConfig(), new \Cubex\Dispatch\FileSystem()
       );
       $faviconPath   = $dispatchImage->getFaviconPath(
-        $this->request()->path(), $this->request()
+        $this->request()->path(),
+        $this->request()
       );
       $this->request()->setPath($faviconPath);
     }
@@ -293,20 +280,17 @@ class Loader
 
     if(substr_count($trimmedPath, "/") > 0)
     {
-      list($potentialDispatcherDirectory,) = explode(
-        "/", $trimmedPath, 2
-      );
+      list($potentialDispatcherDirectory,) = explode("/", $trimmedPath, 2);
 
-      $dispatch = new Dispatcher(
-        $this->getConfig(), new FileSystem()
+      $dispatch = new \Cubex\Dispatch\Dispatcher(
+        $this->getConfig(), new \Cubex\Dispatch\FileSystem()
       );
 
       if($dispatch->getResourceDirectory() === $potentialDispatcherDirectory)
       {
-        $dispatchServe = new Serve(
-          $this->getConfig(),
-          new FileSystem(),
-          new Path($this->request()->path())
+        $dispatchServe = new \Cubex\Dispatch\Serve(
+          $this->getConfig(), new \Cubex\Dispatch\FileSystem(),
+          new \Cubex\Dispatch\Path($this->request()->path())
         );
         $this->setDispatchable($dispatchServe);
       }
@@ -364,7 +348,8 @@ class Loader
   {
     $this->_request = $request;
     \Cubex\Container\Container::bind(
-      \Cubex\Container\Container::REQUEST, $this->_request
+      \Cubex\Container\Container::REQUEST,
+      $this->_request
     );
 
     return $this;
@@ -410,7 +395,8 @@ class Loader
   {
     $this->_response = $response;
     \Cubex\Container\Container::bind(
-      \Cubex\Container\Container::RESPONSE, $this->_response
+      \Cubex\Container\Container::RESPONSE,
+      $this->_response
     );
 
     return $this;
@@ -441,9 +427,8 @@ class Loader
 
     $hash = md5(serialize($_SERVER));
 
-    return substr(md5(implode('.', $host)), 0, 10) . time() . substr(
-      $hash, 0, 8
-    );
+    return substr(md5(implode('.', $host)), 0, 10) .
+    time() . substr($hash, 0, 8);
   }
 
   /**
@@ -507,9 +492,7 @@ class Loader
           $dispatcher->setServiceManager($this->getServiceManager());
         }
 
-        $resp = $dispatcher->dispatch(
-          $this->_request, $this->_response
-        );
+        $resp = $dispatcher->dispatch($this->_request, $this->_response);
 
         if(!($resp instanceof Response))
         {
@@ -577,7 +560,7 @@ class Loader
 
     $_SERVER['CUBEX_CLI'] = true;
 
-    $dictionary = new Dictionary();
+    $dictionary = new \Cubex\Cli\Dictionary();
     $dictionary->configure($this->_configuration);
     $script = $dictionary->match($script);
 
@@ -622,9 +605,9 @@ class Loader
     $output .= '(' . $e->getCode() . ') ' . $e->getMessage() . "\n\n";
     $output .= $e->getTraceAsString() . "\n\n";
 
-    $output .= "Page Executed In: " . number_format(
-      ((\microtime(true) - PHP_START)) * 1000, 2
-    ) . " ms";
+    $output .= "Page Executed In: ";
+    $output .= number_format(((\microtime(true) - PHP_START)) * 1000, 2);
+    $output .= " ms";
 
     $this->_failed = true;
 
