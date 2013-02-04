@@ -262,7 +262,9 @@ class RecordCollection extends Collection
         /** @var $collection RecordCollection */
         $collection = $prefetch['collection'];
         $idkey      = $prefetch['idkey'];
-        $collection->loadIds($this->loadedIds(), $idkey);
+        $relkey     = $prefetch['useKey'];
+
+        $collection->loadIds($this->getUniqueField($relkey), $idkey);
         $collection->get();
       }
       $this->_preFetches = null;
@@ -296,6 +298,7 @@ class RecordCollection extends Collection
     {
       $idKey = $this->_mapperType->getIdKey();
     }
+
     try
     {
       Validator::isArray($ids, "ints");
@@ -331,9 +334,12 @@ class RecordCollection extends Collection
 
         if($result instanceof RecordMapper)
         {
-          $idk = $result->getIdKey();
+          $useKey = $idk = $result->getIdKey();
           switch($result->fromRelationshipType())
           {
+            case RecordMapper::RELATIONSHIP_BELONGSTO:
+              $useKey = $result->recentRelationKey();
+              break;
             case RecordMapper::RELATIONSHIP_HASONE:
             case RecordMapper::RELATIONSHIP_HASMANY:
               $idk = $result->recentRelationKey();
@@ -341,7 +347,11 @@ class RecordCollection extends Collection
           }
 
           $collection          = $result::collection();
-          $this->_preFetches[] = ['collection' => $collection, 'idkey' => $idk];
+          $this->_preFetches[] = [
+            'collection' => $collection,
+            'idkey'      => $idk,
+            'useKey'     => $useKey,
+          ];
         }
       }
     }

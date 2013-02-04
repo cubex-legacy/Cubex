@@ -51,6 +51,22 @@ class Collection
     return $this;
   }
 
+  public function getUniqueField($field)
+  {
+    $result = [];
+    foreach($this->_mappers as $mapper)
+    {
+      if($mapper->attributeExists($field))
+      {
+        if(!in_array($mapper->$field, $result))
+        {
+          $result[] = $mapper->$field;
+        }
+      }
+    }
+    return $result;
+  }
+
   public function getKeyPair($keyField, $valueField)
   {
     $result = [];

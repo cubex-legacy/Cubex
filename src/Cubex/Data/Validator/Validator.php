@@ -133,13 +133,14 @@ class Validator
     {
       return true;
     }
-    else throw new \Exception("Invalid Scalar");
+    else {
+      throw new \Exception("Invalid Scalar");
+    }
   }
 
   public static function timestamp($input)
   {
-    if((string)(int)$input === (string)$input
-    && ($input <= PHP_INT_MAX) && ($input >= ~PHP_INT_MAX)
+    if((string)(int)$input === (string)$input && ($input <= PHP_INT_MAX) && ($input >= ~PHP_INT_MAX)
     )
     {
       return true;
@@ -179,7 +180,11 @@ class Validator
       case "ints":
         foreach($input as $check)
         {
-          if(gettype($check) != "integer")
+          try
+          {
+            self::int($check);
+          }
+          catch(\Exception $e)
           {
             throw new \Exception('Invalid array of integers');
           }

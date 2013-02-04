@@ -638,7 +638,7 @@ abstract class RecordMapper extends DataMapper
           $localKey = $this->stringToColumnName($localKey);
         }
 
-        $this->_recentRelationKey = $localKey;
+        $entity->setRecentRelationKey($foreignKey);
 
         if($entity->attributeExists($localKey))
         {
