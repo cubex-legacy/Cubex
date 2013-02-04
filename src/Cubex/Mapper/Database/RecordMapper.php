@@ -9,6 +9,7 @@ use Cubex\Container\Container;
 use Cubex\Data\Attribute;
 use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Database\ConnectionMode;
+use Cubex\Database\DatabaseService;
 use Cubex\Helpers\Strings;
 use Cubex\Log\Debug;
 use Cubex\Mapper\DataMapper;
@@ -57,6 +58,8 @@ abstract class RecordMapper extends DataMapper
   protected $_fromRelationship;
   protected $_newOnFailedRelationship;
   protected $_recentRelationKey;
+
+  protected $_handledError;
 
   public function __construct($id = null, $columns = ['*'])
   {
@@ -540,7 +543,6 @@ abstract class RecordMapper extends DataMapper
               ]
             );
           }
-          $attr->unsetModified();
         }
       }
     }
@@ -589,12 +591,23 @@ abstract class RecordMapper extends DataMapper
 
     $result = $connection->query($query);
 
-    if(!$this->exists())
+    if(!$result)
     {
-      $newId = $connection->insertId();
-      if($newId !== null)
+      $this->_handleError($connection);
+    }
+    else
+    {
+      foreach($this->_attributes as $attr)
       {
-        $this->setId($newId);
+        $attr->unsetModified();
+      }
+      if(!$this->exists())
+      {
+        $newId = $connection->insertId();
+        if($newId !== null)
+        {
+          $this->setId($newId);
+        }
       }
     }
 
@@ -845,5 +858,28 @@ abstract class RecordMapper extends DataMapper
   public static function collection()
   {
     return new RecordCollection(new static);
+  }
+
+  protected function _handleError(DatabaseService $connection)
+  {
+    switch($connection->errorNo())
+    {
+      case 1146:
+        $matches = array();
+        preg_match_all("/\w+/", $connection->errorMsg(), $matches);
+        if($matches)
+        {
+          list(, $database, $table,) = $matches[0];
+          new DBBuilder($connection, $this, $table, $database);
+          if(!$this->_handledError)
+          {
+            $this->_handledError = true;
+            $this->saveChanges();
+          }
+        }
+        break;
+      default:
+        throw new \Exception($connection->errorMsg(), $connection->errorNo());
+    }
   }
 }
