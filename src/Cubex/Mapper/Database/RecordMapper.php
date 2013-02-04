@@ -865,19 +865,26 @@ abstract class RecordMapper extends DataMapper
     switch($connection->errorNo())
     {
       case 1146:
-        $matches = array();
-        preg_match_all("/\w+/", $connection->errorMsg(), $matches);
-        if($matches)
+        if(Container::config()->get("devtools")->getBool(
+          "tablecreation",
+          false
+        )
+        )
         {
-          list(, $database, $table,) = $matches[0];
-          new DBBuilder($connection, $this, $table, $database);
-          if(!$this->_handledError)
+          $matches = array();
+          preg_match_all("/\w+/", $connection->errorMsg(), $matches);
+          if($matches)
           {
-            $this->_handledError = true;
-            $this->saveChanges();
+            list(, $database, $table,) = $matches[0];
+            new DBBuilder($connection, $this, $table, $database);
+            if(!$this->_handledError)
+            {
+              $this->_handledError = true;
+              $this->saveChanges();
+            }
+            return;
           }
         }
-        break;
       default:
         throw new \Exception($connection->errorMsg(), $connection->errorNo());
     }
