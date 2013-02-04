@@ -95,9 +95,16 @@ class Analyse
         $started   = true;
       }
 
-      if($token == ',' && $type == 'plural')
+      if($token == ',')
       {
-        $building = 1;
+        if($type == 'plural')
+        {
+          $building = 1;
+        }
+        else if($type == 'single')
+        {
+          $token = ')';
+        }
       }
 
       if($started && is_scalar($token) && $token == ')')
@@ -270,6 +277,7 @@ class Analyse
 
   public function wrap($message, $at)
   {
+    $parts      = [];
     $messages   = explode("\n", $message);
     $msgs       = count($messages);
     $lineappend = $msgs > 1 ? "\\n" : '';
