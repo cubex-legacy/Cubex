@@ -30,8 +30,12 @@ class Form extends DataMapper implements Renderable
   protected $_autoTimestamp = false;
   protected $_elementRenderTemplate;
 
-  public function __construct($name, $action, $method = 'post')
+  public function __construct($name, $action = null, $method = 'post')
   {
+    if($action === null)
+    {
+      $action = Container::request()->path();
+    }
     $this->_buildAttributes(__NAMESPACE__ . '\FormElement');
     $this->setFormName($name);
     $this->_elementAttributes['method'] = $method;
