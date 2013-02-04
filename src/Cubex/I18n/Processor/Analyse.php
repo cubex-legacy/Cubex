@@ -296,7 +296,7 @@ class Analyse
       $result = explode("\n", $result);
       foreach($result as $p)
       {
-        $parts[] = $this->slash($p);
+        $parts[] = str_replace("\n", '', $this->slash($p));
       }
     }
 
