@@ -281,6 +281,7 @@ abstract class RecordMapper extends DataMapper
   public function delete()
   {
     $this->_load();
+    $this->deleteEphemeralCache();
     if($this->exists())
     {
       $connection = $this->connection(
