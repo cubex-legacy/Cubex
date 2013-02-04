@@ -44,6 +44,7 @@ abstract class RecordMapper extends DataMapper
 
   const RELATIONSHIP_BELONGSTO = 'belongsto';
   const RELATIONSHIP_HASONE    = 'hasone';
+  const RELATIONSHIP_HASMANY   = 'hasmany';
 
   protected $_dbServiceName = 'db';
   protected $_dbTableName;
@@ -600,6 +601,9 @@ abstract class RecordMapper extends DataMapper
       $foreignKey = strtolower(class_shortname($this)) . '_id';
       $foreignKey = $this->stringToColumnName($foreignKey);
     }
+
+    $entity->setRecentRelationKey($foreignKey);
+    $entity->setFromRelationshipType(self::RELATIONSHIP_HASMANY);
 
     $collection = new RecordCollection($entity);
     $collection->loadWhere($this->idPattern(), $foreignKey, $this->id());

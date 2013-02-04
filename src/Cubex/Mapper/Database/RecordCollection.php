@@ -111,13 +111,11 @@ class RecordCollection extends Collection
     {
       case 1:
         return \head($this->_mappers);
-        break;
       case 0:
         return null;
       default:
         $this->clear();
         throw new \Exception("More than one result in loadOneWhere() $pattern");
-        break;
     }
   }
 
@@ -337,6 +335,7 @@ class RecordCollection extends Collection
           switch($result->fromRelationshipType())
           {
             case RecordMapper::RELATIONSHIP_HASONE:
+            case RecordMapper::RELATIONSHIP_HASMANY:
               $idk = $result->recentRelationKey();
               break;
           }
