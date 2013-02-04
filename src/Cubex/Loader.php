@@ -523,6 +523,11 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
    */
   public function respondToCliRequest(array $args)
   {
+    if($this->_failed)
+    {
+      return $this->_response->respond();
+    }
+
     $script    = $_REQUEST['__path__'] = '';
     $arguments = array();
 
