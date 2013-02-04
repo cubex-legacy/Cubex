@@ -640,7 +640,10 @@ abstract class RecordMapper extends DataMapper
 
         $this->_recentRelationKey = $localKey;
 
-        $entity->setData($localKey, $this->id());
+        if($entity->attributeExists($localKey))
+        {
+          $entity->setData($localKey, $this->id());
+        }
         $entity->touch();
         return $entity;
       }
