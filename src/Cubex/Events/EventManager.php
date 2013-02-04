@@ -5,6 +5,8 @@
 
 namespace Cubex\Events;
 
+use Cubex\Core\Interfaces\NamespaceAware;
+
 class EventManager
 {
   const CUBEX_LAUNCH   = 'cubex.launch';
@@ -29,7 +31,7 @@ class EventManager
   const CUBEX_DEBUG = 'cubex.debug';
   const CUBEX_LOG   = 'cubex.log';
 
-  const CUBEX_QUERY   = 'cubex.query';
+  const CUBEX_QUERY = 'cubex.query';
 
   const DISPATCH_RESOURCE_REQUIRE = 'dispatch.resource.require';
   const DISPATCH_PACKAGE_REQUIRE  = 'dispatch.package.require';
@@ -46,8 +48,10 @@ class EventManager
    * @param callable $callback
    * @param null     $namespace
    */
-  public static function listen($eventName, callable $callback,
-                                $namespace = null)
+  public static function listen(
+    $eventName, callable $callback,
+    $namespace = null
+  )
   {
     if(is_array($eventName))
     {
@@ -69,8 +73,10 @@ class EventManager
    * @param callable $callback
    * @param null     $namespace
    */
-  protected static function _listen($eventName, callable $callback,
-                                    $namespace = null)
+  protected static function _listen(
+    $eventName, callable $callback,
+    $namespace = null
+  )
   {
     if($namespace === null)
     {
@@ -111,8 +117,10 @@ class EventManager
    *
    * @return array|mixed|null
    */
-  public static function trigger($eventName, $args = array(), $callee = null,
-                                 $namespace = null)
+  public static function trigger(
+    $eventName, $args = array(), $callee = null,
+    $namespace = null
+  )
   {
     $event = new StdEvent($eventName, $args, $callee);
     return static::triggerWithEvent($eventName, $event, false, $namespace);
@@ -128,8 +136,10 @@ class EventManager
    *
    * @return array|mixed|null
    */
-  public static function triggerUntil($eventName, $args = [], $callee = null,
-                                      $namespace = null)
+  public static function triggerUntil(
+    $eventName, $args = [], $callee = null,
+    $namespace = null
+  )
   {
     $event = new StdEvent($eventName, $args, $callee);
     return static::triggerWithEvent($eventName, $event, true, $namespace);
@@ -154,8 +164,15 @@ class EventManager
         $source = $event->source();
         if($source !== null)
         {
-          $reflect   = new \ReflectionClass(get_class($source));
-          $namespace = $reflect->getNamespaceName();
+          if($source instanceof NamespaceAware)
+          {
+            $namespace = $source->getNamespace();
+          }
+          else
+          {
+            $reflect   = new \ReflectionClass(get_class($source));
+            $namespace = $reflect->getNamespaceName();
+          }
         }
       }
     }
@@ -195,7 +212,10 @@ class EventManager
     $result = [];
     foreach($listeners as $listen)
     {
-      if(!\is_callable($listen)) continue;
+      if(!\is_callable($listen))
+      {
+        continue;
+      }
       $res = call_user_func($listen, $event);
       if($res !== null)
       {

@@ -393,13 +393,7 @@ abstract class Application
       EventManager::CUBEX_TRANSLATE_T,
       function (Event $e)
       {
-        return call_user_func(
-          [
-          $this,
-          't'
-          ],
-          $e->getStr("text")
-        );
+        return call_user_func([$this, 't'], $e->getStr("text"));
       },
       $this->getNamespace()
     );
@@ -414,12 +408,7 @@ abstract class Application
           $e->getInt("number"),
         ];
 
-        return call_user_func_array(
-          [
-          $this,
-          'p'
-          ], $args
-        );
+        return call_user_func_array([$this, 'p'], $args);
       },
       $this->getNamespace()
     );

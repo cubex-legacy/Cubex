@@ -19,7 +19,9 @@ trait TranslateTraits
   public function t($message)
   {
     $result = EventManager::triggerUntil(
-      EventManager::CUBEX_TRANSLATE_T, ['text' => $message], $this
+      EventManager::CUBEX_TRANSLATE_T,
+      ['text' => $message],
+      $this
     );
 
     if($result === null)
