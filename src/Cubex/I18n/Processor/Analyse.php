@@ -277,6 +277,7 @@ class Analyse
 
   public function wrap($message, $at)
   {
+    $message    = str_replace("\r\n", "\n", $message);
     $parts      = [];
     $messages   = explode("\n", $message);
     $msgs       = count($messages);
