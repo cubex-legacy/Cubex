@@ -84,6 +84,10 @@ class BaseController
     return $this->_request;
   }
 
+  protected function _configure()
+  {
+  }
+
   /**
    * @param \Cubex\Core\Http\Request  $request
    * @param \Cubex\Core\Http\Response $response
@@ -285,9 +289,8 @@ class BaseController
 
     if($action === null)
     {
-      throw new \BadMethodCallException(
-        "No action specified on " . $this->_name()
-      );
+      throw new \BadMethodCallException("No action specified on " . $this->_name(
+        ));
     }
 
     $attempts = [];
@@ -333,9 +336,8 @@ class BaseController
       return $action();
     }
 
-    throw new \BadMethodCallException(
-      "Invalid action $action specified on " . $this->_name()
-    );
+    throw new \BadMethodCallException("Invalid action $action specified on " . $this->_name(
+      ));
   }
 
   /**
@@ -367,6 +369,7 @@ class BaseController
   public function configure(ConfigGroup $configuration)
   {
     $this->_configuration = $configuration;
+    $this->_configure();
   }
 
   public function baseUri()
