@@ -1,10 +1,9 @@
 {
   "name":              "cubex/cubex",
   "description":       "Cubex Framework",
-  "version":           "0.0.1",
+  "version":           "1.0.0-RC1",
   "keywords":          ["framework", "cubex"],
   "homepage":          "http://cubex.io",
-  "minimum-stability": "stable",
   "license":           "BSD-3-Clause",
   "authors":           [
     {
