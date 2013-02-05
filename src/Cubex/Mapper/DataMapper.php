@@ -5,6 +5,7 @@
 namespace Cubex\Mapper;
 
 use Cubex\Data\Attribute;
+use Cubex\Data\CompositeAttribute;
 
 abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 {
@@ -291,6 +292,22 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     return array();
   }
 
+  protected function _addCompositeAttribute($name, array $attributes)
+  {
+    $composite = new CompositeAttribute($name);
+    foreach($attributes as $attr)
+    {
+      if(is_scalar($attr))
+      {
+        $attr = $this->_attribute($attr);
+      }
+
+      $composite->addSubAttribute($attr);
+    }
+    $this->_addAttribute($composite);
+    return true;
+  }
+
 
   /**
    * @param $name
@@ -301,6 +318,11 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   {
     $name = $this->_cleanAttributeName($name);
     return isset($this->_attributes[$name]) ? $this->_attributes[$name] : null;
+  }
+
+  public function getAttribute($name)
+  {
+    return $this->_attribute($name);
   }
 
   /**
