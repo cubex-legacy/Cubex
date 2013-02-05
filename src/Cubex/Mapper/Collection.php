@@ -179,6 +179,11 @@ class Collection
   {
   }
 
+  public function exportSource(Collection $source)
+  {
+    return $this;
+  }
+
   /**
    * Get a selection from the entire result set
    *
@@ -186,7 +191,7 @@ class Collection
    * @param int  $length
    * @param bool $createCollection
    *
-   * @return DataMapper[]
+   * @return Collection
    */
   public function limit($offset = 0, $length = 1, $createCollection = true)
   {
@@ -198,6 +203,7 @@ class Collection
       $collection = $build();
       if($collection instanceof Collection)
       {
+        $collection->exportSource($this);
         $collection->hydrate($slice);
       }
       return $collection;

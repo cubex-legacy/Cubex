@@ -200,7 +200,6 @@ class RecordCollection extends Collection
 
     $rows = [];
 
-    //TODO: If limited, but results are less than limit, treat as unlimited
     if($this->_columns == ['*'] && $this->_limit === null && $this->_groupBy == null)
     {
       $queries = EphemeralCache::getCache("sqlqueries", $this, []);
@@ -273,6 +272,27 @@ class RecordCollection extends Collection
 
     $this->_loaded = true;
 
+    $this->doPrefetch();
+
+    return $this;
+  }
+
+  public function exportSource(Collection $source)
+  {
+    if($source instanceof RecordCollection)
+    {
+      $this->_preFetches = $source->getPrefetches();
+    }
+    return $this;
+  }
+
+  public function getPrefetches()
+  {
+    return $this->_preFetches;
+  }
+
+  public function doPrefetch()
+  {
     if($this->_preFetches !== null)
     {
       foreach($this->_preFetches as $prefetch)
@@ -287,7 +307,6 @@ class RecordCollection extends Collection
       }
       $this->_preFetches = null;
     }
-
     return $this;
   }
 
@@ -374,6 +393,26 @@ class RecordCollection extends Collection
       }
     }
 
+    if(!empty($this->_mappers))
+    {
+      $this->doPrefetch();
+    }
+
     return $this;
+  }
+
+
+  /**
+   * Get a selection from the entire result set
+   *
+   * @param int  $offset
+   * @param int  $length
+   * @param bool $createCollection
+   *
+   * @return RecordCollection
+   */
+  public function limit($offset = 0, $length = 1, $createCollection = true)
+  {
+    return parent::limit($offset, $length, $createCollection);
   }
 }
