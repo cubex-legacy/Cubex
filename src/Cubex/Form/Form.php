@@ -30,6 +30,10 @@ class Form extends DataMapper implements Renderable
   protected $_validatedHour;
   protected $_autoTimestamp = false;
   protected $_elementRenderTemplate;
+  /**
+   * @var DataMapper
+   */
+  protected $_mapper;
 
   public function __construct($name, $action = null, $method = 'post')
   {
@@ -42,6 +46,23 @@ class Form extends DataMapper implements Renderable
     $this->_elementAttributes['method'] = $method;
     $this->_elementAttributes['action'] = $action;
     $this->_configure();
+  }
+
+  public function bindMapper(DataMapper $mapper, $relations = true)
+  {
+    $this->_mapper = $mapper;
+    $this->buildFromMapper($mapper, $relations);
+    return $this;
+  }
+
+  public function saveChanges()
+  {
+    if($this->_mapper !== null)
+    {
+      $this->_mapper->hydrateFromMapper($this);
+      $this->_mapper->saveChanges();
+    }
+    return $this;
   }
 
   /**
