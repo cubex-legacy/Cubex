@@ -244,7 +244,9 @@ class Request implements \IteratorAggregate
     {
       return false;
     }
-    else return true;
+    else {
+      return true;
+    }
   }
 
   /**
@@ -289,7 +291,15 @@ class Request implements \IteratorAggregate
         return true;
       }
     }
-    return $this->getExists(self::TYPE_AJAX);
+    if($this->postVariables(self::TYPE_AJAX, false))
+    {
+      return true;
+    }
+    else if($this->getVariables(self::TYPE_AJAX, false))
+    {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -297,7 +307,15 @@ class Request implements \IteratorAggregate
    */
   public function isForm()
   {
-    return $this->getExists(self::TYPE_FORM);
+    if($this->postVariables(self::TYPE_FORM, false))
+    {
+      return true;
+    }
+    else if($this->getVariables(self::TYPE_FORM, false))
+    {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -314,6 +332,7 @@ class Request implements \IteratorAggregate
    *
    * @param null $variable
    * @param null $default
+   *
    * @return array|null
    */
   public function requestVariables($variable = null, $default = null)
@@ -326,6 +345,7 @@ class Request implements \IteratorAggregate
    *
    * @param null $variable
    * @param null $default
+   *
    * @return array|null
    */
   public function serverVariables($variable = null, $default = null)
@@ -338,6 +358,7 @@ class Request implements \IteratorAggregate
    *
    * @param null $variable
    * @param null $default
+   *
    * @return array|null
    */
   public function getVariables($variable = null, $default = null)
@@ -350,6 +371,7 @@ class Request implements \IteratorAggregate
    *
    * @param null $variable
    * @param null $default
+   *
    * @return array|null
    */
   public function fileVariables($variable = null, $default = null)
@@ -362,6 +384,7 @@ class Request implements \IteratorAggregate
    *
    * @param null $variable
    * @param null $default
+   *
    * @return array|null
    */
   public function postVariables($variable = null, $default = null)
@@ -372,9 +395,10 @@ class Request implements \IteratorAggregate
   /**
    * Get possible variables from array excluding __ prefixed keys, used by Cubex
    *
-   * @param $array
+   * @param      $array
    * @param null $variable
    * @param null $default
+   *
    * @return array|null
    */
   protected function _getVariables($array, $variable = null, $default = null)

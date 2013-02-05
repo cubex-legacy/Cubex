@@ -6,6 +6,7 @@
 namespace Cubex\Form;
 
 use Cubex\Container\Container;
+use Cubex\Core\Http\Request;
 use Cubex\Data\Attribute;
 use Cubex\Data\Validator\Validator;
 use Cubex\Facade\Session;
@@ -291,8 +292,8 @@ class Form extends DataMapper implements Renderable
   public function formNameInput()
   {
     $out = '';
-    $out .= '<input type="hidden" name="__cubex_form__"';
-    $out .= 'value="' . $this->_formName . '"/>';
+    $out .= '<input type="hidden" name="' . Request::TYPE_FORM . '"';
+    $out .= 'value="frm:' . $this->_formName . '"/>';
     return $out;
   }
 
@@ -319,12 +320,17 @@ class Form extends DataMapper implements Renderable
       if($req->is("post"))
       {
         $token  = $req->postVariables('__cubex_csrf_token__');
-        $cbform = $req->postVariables('__cubex_form__');
+        $cbform = $req->postVariables(Request::TYPE_FORM);
       }
       else
       {
         $token  = $req->getVariables('__cubex_csrf_token__');
-        $cbform = $req->getVariables('__cubex_form__');
+        $cbform = $req->getVariables(Request::TYPE_FORM);
+      }
+
+      if(strlen($cbform) > 3)
+      {
+        $cbform = substr($cbform, 4);
       }
 
       if(!is_bool($strongCheck))

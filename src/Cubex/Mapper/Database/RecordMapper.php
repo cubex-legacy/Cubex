@@ -597,10 +597,6 @@ abstract class RecordMapper extends DataMapper
     }
     else
     {
-      foreach($this->_attributes as $attr)
-      {
-        $attr->unsetModified();
-      }
       if(!$this->exists())
       {
         $newId = $connection->insertId();
@@ -608,6 +604,10 @@ abstract class RecordMapper extends DataMapper
         {
           $this->setId($newId);
         }
+      }
+      foreach($this->_attributes as $attr)
+      {
+        $attr->unsetModified();
       }
     }
 
@@ -796,8 +796,8 @@ abstract class RecordMapper extends DataMapper
             $this->_handledError = true;
             $this->saveChanges();
           }
+          return;
         }
-        return;
       default:
         throw new \Exception($connection->errorMsg(), $connection->errorNo());
     }
