@@ -13,11 +13,13 @@ class CompositeAttribute extends Attribute
   protected $_subAttributes = [];
   protected $_attributeOrder = [];
   protected $_setData;
+  protected $_hidden = true;
 
-  public function __construct($name)
+  public function __construct($name, $hidden = true)
   {
     $this->setName($name);
     $this->_modified = false;
+    $this->_hidden   = $hidden;
   }
 
   public function addSubAttribute(Attribute $a)
