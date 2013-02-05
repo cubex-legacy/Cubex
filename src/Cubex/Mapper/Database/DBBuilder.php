@@ -117,11 +117,12 @@ class DBBuilder
     }
     $uname = Strings::variableToUnderScore($name);
 
-    $unsigned  = false;
-    $allowNull = true;
-    $default   = $this->_emptyMapper->getData($name);
-    $length    = 150;
-    $dataType  = DataType::VARCHAR;
+    $unsigned   = false;
+    $allowNull  = true;
+    $default    = $this->_emptyMapper->getData($name);
+    $length     = 150;
+    $dataType   = DataType::VARCHAR;
+    $annotation = [];
     try
     {
       $comment = $this->_reflect->getProperty($attr->name())->getDocComment();
@@ -137,6 +138,11 @@ class DBBuilder
           {
             if(substr($comm, 0, 8) !== '@comment')
             {
+              list($type, $detail) = explode(' ', substr($comm, 1));
+              if(!empty($detail) && !empty($type))
+              {
+                $annotation[$type] = $detail;
+              }
               continue;
             }
             else
@@ -184,6 +190,34 @@ class DBBuilder
       $dataType = DataType::DATETIME;
     }
 
+    if(!empty($annotation))
+    {
+      foreach($annotation as $k => $v)
+      {
+        switch($k)
+        {
+          case 'default':
+            if($default === null)
+            {
+              $default = $v;
+            }
+            break;
+          case 'length':
+            if($length === null)
+            {
+              $length = (int)$v;
+            }
+            break;
+          case 'datatype':
+            $dataType = $v;
+            break;
+          case 'allownull':
+            $allowNull = (bool)$v;
+            break;
+        }
+      }
+    }
+
     return new Column(
       $name, $dataType, $length, $unsigned, $allowNull, $default,
       false, $comment, $zero, $collation
@@ -199,7 +233,11 @@ class DBBuilder
 
     foreach($attrs as $attr)
     {
-      $this->_columns[] = $this->_columnFromAttribute($attr);
+      $col = $this->_columnFromAttribute($attr);
+      if($col !== null)
+      {
+        $this->_columns[] = $col;
+      }
     }
   }
 
