@@ -44,8 +44,24 @@ else
  */
 abstract class Enum extends EnumWrapper
 {
+  /**
+   * @param $name
+   * @param $arguments
+   *
+   * @return static
+   */
   public static function __callStatic($name, $arguments)
   {
     return new static(constant(get_called_class() . '::' . strtoupper($name)));
+  }
+
+  /**
+   * @param string $constant
+   *
+   * @return bool
+   */
+  public function constantExists($constant)
+  {
+    return array_key_exists(strtoupper($constant), $this->getConstList());
   }
 }
