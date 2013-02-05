@@ -63,4 +63,18 @@ class EnumTest extends TestCase
     $constantsWithDefault = array_merge($constants, ["__default" => "1"]);
     $this->assertEquals($constantsWithDefault, $enum->getConstList(true));
   }
+
+  public function testCallStatic()
+  {
+    $enum = Bool::FALSE();
+    $this->assertEquals($enum, Bool::FALSE);
+  }
+
+  public function testConstantExists()
+  {
+    $enum = new Bool();
+
+    $this->assertTrue($enum->constantExists("true"));
+    $this->assertFalse($enum->constantExists("random"));
+  }
 }
