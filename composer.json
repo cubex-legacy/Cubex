@@ -4,7 +4,7 @@
   "version":           "0.0.1",
   "keywords":          ["framework", "cubex"],
   "homepage":          "http://cubex.io",
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "license":           "BSD-3-Clause",
   "authors":           [
     {
@@ -25,7 +25,7 @@
   },
   "suggest":           {
     "mobiledetect/mobiledetectlib": "Supported platform detection library",
-    "phpseclib/phpseclib": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc."
+    "phpseclib/phpseclib":          "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc."
   },
   "autoload":          {
     "files": [
