@@ -61,7 +61,7 @@ class DBBuilder
       {
         $this->_column    = $matches[0][2];
         $this->_tableName = $mapper->getTableName();
-        $sql              = $this->addColumn();
+        $sql              = $this->_addColumn();
         if($sql != null)
         {
           $this->_passed = $this->_connection->query($sql);
@@ -70,12 +70,11 @@ class DBBuilder
     }
   }
 
-  protected function addColumn()
+  protected function _addColumn()
   {
     $sql = 'ALTER TABLE `' . $this->_tableName . '` ';
 
-    $sch    = [$this->_mapperClass, 'schema'];
-    $schema = $sch();
+    $schema = call_user_func([$this->_mapperClass, 'schema']);
     $keys   = array_keys($schema);
 
     $cols = [];

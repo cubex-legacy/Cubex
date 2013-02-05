@@ -199,8 +199,7 @@ class Collection
     $slice = array_slice($this->_mappers, $offset, $length);
     if($createCollection)
     {
-      $build      = [$this->_mapperType, 'collection'];
-      $collection = $build();
+      $collection = call_user_func([$this->_mapperType, 'collection']);
       if($collection instanceof Collection)
       {
         $collection->exportSource($this);
