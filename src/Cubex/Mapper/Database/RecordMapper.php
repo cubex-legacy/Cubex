@@ -591,7 +591,7 @@ abstract class RecordMapper extends DataMapper
 
     $result = $connection->query($query);
 
-    if(!$result)
+    if($this->_handledError !== true && !$result)
     {
       $this->_handleError($connection);
     }
@@ -610,6 +610,8 @@ abstract class RecordMapper extends DataMapper
         }
       }
     }
+
+    $this->_handledError = null;
 
     return $result;
   }
@@ -865,26 +867,17 @@ abstract class RecordMapper extends DataMapper
     switch($connection->errorNo())
     {
       case 1146:
-        if(Container::config()->get("devtools")->getBool(
-          "tablecreation",
-          false
-        )
-        )
+      case 1054:
+        if(Container::config()->get("devtools")->getBool("creations", false))
         {
-          $matches = array();
-          preg_match_all("/\w+/", $connection->errorMsg(), $matches);
-          if($matches)
+          $builder = new DBBuilder($connection, $this);
+          if($builder->success())
           {
-            list(, $database, $table,) = $matches[0];
-            new DBBuilder($connection, $this, $table, $database);
-            if(!$this->_handledError)
-            {
-              $this->_handledError = true;
-              $this->saveChanges();
-            }
-            return;
+            $this->_handledError = true;
+            $this->saveChanges();
           }
         }
+        return;
       default:
         throw new \Exception($connection->errorMsg(), $connection->errorNo());
     }
