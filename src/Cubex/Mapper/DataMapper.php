@@ -6,6 +6,7 @@ namespace Cubex\Mapper;
 
 use Cubex\Data\Attribute;
 use Cubex\Data\CompositeAttribute;
+use Cubex\Exception\CubexException;
 
 abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 {
@@ -245,7 +246,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     }
     else
     {
-      throw new \Exception("Invalid Attribute " . $attribute);
+      throw $this->_invalidAttributeException($attribute);
     }
   }
 
@@ -258,8 +259,27 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     }
     else
     {
-      throw new \Exception("Invalid Attribute " . $attribute);
+      throw $this->_invalidAttributeException($attribute);
     }
+  }
+
+  public function availableAttributes()
+  {
+    $names = [];
+    foreach($this->_attributes as $attribute)
+    {
+      $names[] = $attribute->name();
+    }
+    return $names;
+  }
+
+  protected function _invalidAttributeException($attribute)
+  {
+    $message    = "Invalid Attribute '" . $attribute . "'";
+    $code       = 500;
+    $subMessage = "Possible attributes are: ";
+    $subMessage .= implode(", ", $this->availableAttributes());
+    return new CubexException($message, $code, $subMessage);
   }
 
   /**
