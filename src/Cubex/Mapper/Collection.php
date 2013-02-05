@@ -182,14 +182,30 @@ class Collection
   /**
    * Get a selection from the entire result set
    *
-   * @param int $offset
-   * @param int $length
+   * @param int  $offset
+   * @param int  $length
+   * @param bool $createCollection
    *
    * @return DataMapper[]
    */
-  public function limit($offset = 0, $length = 1)
+  public function limit($offset = 0, $length = 1, $createCollection = true)
   {
-    return array_slice($this->_mappers, $offset, $length);
+    $this->_preCheckMappers();
+    $slice = array_slice($this->_mappers, $offset, $length);
+    if($createCollection)
+    {
+      $build      = [$this->_mapperType, 'collection'];
+      $collection = $build();
+      if($collection instanceof Collection)
+      {
+        $collection->hydrate($slice);
+      }
+      return $collection;
+    }
+    else
+    {
+      return $slice;
+    }
   }
 
 
@@ -222,7 +238,7 @@ class Collection
   public function jsonSerialize()
   {
     $response = [];
-    $mappers = $this->all();
+    $mappers  = $this->all();
     foreach($mappers as $mapper)
     {
       $response[] = $mapper->jsonSerialize();
