@@ -332,9 +332,33 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     return isset($this->_attributes[$name]) ? $this->_attributes[$name] : null;
   }
 
+  /**
+   * @param $name
+   *
+   * @return \Cubex\Data\Attribute
+   */
   public function getAttribute($name)
   {
     return $this->_attribute($name);
+  }
+
+  /**
+   * @param $name
+   *
+   * @return \Cubex\Data\CompositeAttribute
+   * @throws \Exception
+   */
+  public function getCompAttribute($name)
+  {
+    $attr = $this->_attribute($name);
+    if($attr instanceof CompositeAttribute)
+    {
+      return $attr;
+    }
+    else
+    {
+      throw new \Exception("Invalid Composite Attribute");
+    }
   }
 
   /**
