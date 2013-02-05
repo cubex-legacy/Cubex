@@ -7,7 +7,7 @@ namespace Cubex\Email;
 
 use Cubex\ServiceManager\ServiceConfig;
 
-class Mailer
+class Mailer implements EmailService
 {
   protected $_service;
 
