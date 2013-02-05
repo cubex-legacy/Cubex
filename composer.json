@@ -9,13 +9,11 @@
     {
       "name":     "Brooke Bryan",
       "email":    "brooke@bajb.net",
-      "homepage": "http://www.bajb.net",
-      "role":     "Developer"
+      "homepage": "http://www.bajb.net"
     },
     {
       "name":  "Gareth Evans",
-      "email": "garoevans@gmail.com",
-      "role":  "Developer"
+      "email": "garoevans@gmail.com"
     }
   ],
   "require":           {
@@ -34,6 +32,7 @@
     "psr-0": {
       "Cubex\\": "src/"
     }
-  }
+  },
+  "minimum-stability": "dev"
 
 }
