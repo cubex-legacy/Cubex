@@ -6,6 +6,7 @@
 namespace Cubex\Mapper\Database;
 
 use Cubex\Data\Attribute;
+use Cubex\Data\CompositeAttribute;
 use Cubex\Database\DatabaseService;
 use Cubex\Database\Schema\Column;
 use Cubex\Database\Schema\DataType;
@@ -109,6 +110,10 @@ class DBBuilder
 
   protected function _columnFromAttribute(Attribute $attr)
   {
+    if($attr instanceof CompositeAttribute)
+    {
+      return null;
+    }
     $name = $this->_mapper->stringToColumnName($attr->name());
     if($this->_mapper->getIdKey() == $name)
     {

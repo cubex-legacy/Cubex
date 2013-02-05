@@ -292,17 +292,29 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     return array();
   }
 
-  protected function _addCompositeAttribute($name, array $attributes)
+  protected function _addCompositeAttribute(
+    $name, array $attributes, $createSubs = true
+  )
   {
     $composite = new CompositeAttribute($name);
     foreach($attributes as $attr)
     {
       if(is_scalar($attr))
       {
-        $attr = $this->_attribute($attr);
+        $attrName = $attr;
+        $attr     = $this->_attribute($attrName);
+
+        if($attr === null && $createSubs)
+        {
+          $attr = new Attribute($attrName);
+          $this->_addAttribute($attr);
+        }
       }
 
-      $composite->addSubAttribute($attr);
+      if($attr !== null)
+      {
+        $composite->addSubAttribute($attr);
+      }
     }
     $this->_addAttribute($composite);
     return true;
