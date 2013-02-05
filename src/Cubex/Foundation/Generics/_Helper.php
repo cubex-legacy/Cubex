@@ -106,3 +106,18 @@ if(!function_exists("psort"))
     return $result;
   }
 }
+
+if(!function_exists("is_assoc"))
+{
+  /**
+   * Check to see if an array is associative
+   *
+   * @param array $array
+   *
+   * @return bool
+   */
+  function is_assoc(array $array)
+  {
+    return ($array !== array_values($array));
+  }
+}
