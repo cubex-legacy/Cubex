@@ -147,6 +147,10 @@ class CompositeAttribute extends Attribute
           {
             $this->getAttribute($attr)->setData($data->$attr());
           }
+          else if(method_exists($data, "get$attr"))
+          {
+            $this->getAttribute($attr)->setData($data->$attr());
+          }
         }
       }
     }
