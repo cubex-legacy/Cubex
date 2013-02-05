@@ -114,7 +114,8 @@ class MySQL implements DatabaseService
    */
   protected function _doQuery($query)
   {
-    $result = $this->_connection->query($query);
+    $this->_errorno = $this->_errormsg = null;
+    $result         = $this->_connection->query($query);
     if(!$result)
     {
       $this->_errorno  = $this->_connection->errno;
