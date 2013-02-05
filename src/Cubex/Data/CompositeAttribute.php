@@ -22,6 +22,11 @@ class CompositeAttribute extends Attribute
     $this->_hidden   = $hidden;
   }
 
+  public function __get($name)
+  {
+    return $this->attributeValue($name);
+  }
+
   public function addSubAttribute(Attribute $a)
   {
     $this->_subAttributes[$a->name()] = $a;
