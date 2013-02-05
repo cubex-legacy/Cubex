@@ -619,63 +619,15 @@ abstract class RecordMapper extends DataMapper
   public function hasOne(RecordMapper $entity, $foreignKey = null)
   {
     $this->_load();
-    if($foreignKey === null)
-    {
-      $foreignKey = strtolower(class_shortname($this)) . '_id';
-      $foreignKey = $this->stringToColumnName($foreignKey);
-    }
-
-    $this->_recentRelationKey = $foreignKey;
-
-    if($this->id() !== null)
-    {
-      $table  = new RecordCollection($entity);
-      $result = $table->loadOneWhere(
-        $this->idPattern(),
-        $foreignKey,
-        $this->id()
-      );
-    }
-    else
-    {
-      $result = null;
-    }
-
-    if($result !== null && $result instanceof RecordMapper)
-    {
-      $result->setFromRelationshipType(self::RELATIONSHIP_HASONE);
-      return $result;
-    }
-    else if($this->createsNewInstanceOnFailedRelation())
-    {
-      $entity->setRecentRelationKey($foreignKey);
-      $entity->setFromRelationshipType(self::RELATIONSHIP_HASONE);
-      $entity->setData($foreignKey, $this->id());
-      $entity->touch();
-      return $entity;
-    }
-    else
-    {
-      return null;
-    }
+    $rel = new Relationship($this);
+    return $rel->hasOne($entity, $foreignKey);
   }
 
   public function hasMany(RecordMapper $entity, $foreignKey = null)
   {
     $this->_load();
-    if($foreignKey === null)
-    {
-      $foreignKey = strtolower(class_shortname($this)) . '_id';
-      $foreignKey = $this->stringToColumnName($foreignKey);
-    }
-
-    $entity->setRecentRelationKey($foreignKey);
-    $entity->setFromRelationshipType(self::RELATIONSHIP_HASMANY);
-
-    $collection = new RecordCollection($entity);
-    $collection->loadWhere($this->idPattern(), $foreignKey, $this->id());
-    $collection->setCreateData([$foreignKey => $this->id()]);
-    return $collection;
+    $rel = new Relationship($this);
+    return $rel->hasMany($entity, $foreignKey);
   }
 
   public function belongsTo(
@@ -684,43 +636,8 @@ abstract class RecordMapper extends DataMapper
   )
   {
     $this->_load();
-    if($foreignKey === null)
-    {
-      $foreignKey = strtolower(class_shortname($entity)) . '_id';
-      $foreignKey = $this->stringToColumnName($foreignKey);
-    }
-
-    $entity->setFromRelationshipType(self::RELATIONSHIP_BELONGSTO);
-
-    $key = $this->_attribute($foreignKey)->data();
-    if($key !== null)
-    {
-      return $entity->load($key);
-    }
-    else
-    {
-      if($this->createsNewInstanceOnFailedRelation())
-      {
-        if($localKey === null)
-        {
-          $localKey = strtolower(class_shortname($this)) . '_id';
-          $localKey = $this->stringToColumnName($localKey);
-        }
-
-        $entity->setRecentRelationKey($foreignKey);
-
-        if($entity->attributeExists($localKey))
-        {
-          $entity->setData($localKey, $this->id());
-        }
-        $entity->touch();
-        return $entity;
-      }
-      else
-      {
-        return false;
-      }
-    }
+    $rel = new Relationship($this);
+    return $rel->belongsTo($entity, $foreignKey, $localKey);
   }
 
   public function stringToColumnName($string)
@@ -857,6 +774,9 @@ abstract class RecordMapper extends DataMapper
     );
   }
 
+  /**
+   * @return $this[]
+   */
   public static function collection()
   {
     return new RecordCollection(new static);
