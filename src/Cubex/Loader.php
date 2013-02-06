@@ -383,7 +383,14 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
         "__path__ is not set. Your rewrite rules are not configured correctly."
       );
     }
-    return new Request($_REQUEST['__path__']);
+
+    $path = $_REQUEST['__path__'];
+    if(substr($path, 0, 1) !== '/')
+    {
+      $path = '/' . $path;
+    }
+
+    return new Request($path);
   }
 
   /**
