@@ -186,7 +186,6 @@ class CompositeAttribute extends Attribute
     {
       if($attr instanceof Attribute)
       {
-        $attr->setData(null);
         $this->addSubAttribute(clone $attr);
       }
     }

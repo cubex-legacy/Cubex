@@ -260,4 +260,9 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
   {
     return $this->data();
   }
+
+  public function __clone()
+  {
+    $this->setData(null);
+  }
 }

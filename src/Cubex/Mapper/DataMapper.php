@@ -127,10 +127,11 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
       }
       else if($attr instanceof Attribute)
       {
-        $attr->setData(null);
         $this->_addAttribute(clone $attr);
       }
     }
+
+    $this->_addAttribute(new Attribute("fewkh"));
 
     if(!empty($compAttrs))
     {

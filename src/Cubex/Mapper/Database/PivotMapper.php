@@ -105,7 +105,6 @@ class PivotMapper extends RecordMapper
       catch(\Exception $e)
       {
         echo $e->getMessage();
-        var_dump($comp->attributeValue($k));
         $patterns[] = "%C = %s";
       }
     }
@@ -168,7 +167,7 @@ class PivotMapper extends RecordMapper
       }
       $key = $this->stringToColumnName($key->remoteIdKey());
     }
-    $collection = static::collection();
+    $collection = $this::collection();
     try
     {
       Validator::int($value);

@@ -11,6 +11,7 @@ use Cubex\Database\DatabaseService;
 use Cubex\Database\Schema\Column;
 use Cubex\Database\Schema\DataType;
 use Cubex\Helpers\Strings;
+use Cubex\Sprintf\ParseQuery;
 
 class DBBuilder
 {
@@ -38,7 +39,7 @@ class DBBuilder
     $this->_connection  = $connection;
     $this->_mapper      = $mapper;
     $this->_mapperClass = get_class($mapper);
-    $this->_emptyMapper = new $this->_mapperClass();
+    $this->_emptyMapper = clone $mapper;
     $this->_reflect     = new \ReflectionObject($this->_mapper);
 
     $matches = array();
@@ -230,10 +231,14 @@ class DBBuilder
 
   public function createColumns()
   {
-    $attrs            = $this->_mapper->getRawAttributes();
-    $this->_columns[] = new Column(
-      $this->_mapper->getIdKey(), DataType::INT, 10, true, false, null, true
-    );
+    $attrs = $this->_mapper->getRawAttributes();
+
+    if(!$this->_mapper->isCompositeId())
+    {
+      $this->_columns[] = new Column(
+        $this->_mapper->getIdKey(), DataType::INT, 10, true, false, null, true
+      );
+    }
 
     foreach($attrs as $attr)
     {
@@ -263,6 +268,19 @@ class DBBuilder
     foreach($this->_columns as $col)
     {
       $cols[] = $col->createSql();
+    }
+
+    if($this->_mapper->isCompositeId())
+    {
+      $idcomp = $this->_mapper->getCompAttribute($this->_mapper->getIdKey());
+      $query  = ParseQuery::parse(
+        $this->_mapper->conn(),
+        [
+        "PRIMARY KEY ( %LC )",
+        $idcomp->attributeOrder()
+        ]
+      );
+      $cols[] = $query;
     }
 
     return $cols;
