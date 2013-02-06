@@ -2,7 +2,7 @@
 /**
  * @author: gareth.evans
  */
- namespace Cubex\Dispatch;
+namespace Cubex\Dispatch;
 
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Foundation\Config\Config;
@@ -56,27 +56,34 @@ class Dispatcher
    */
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
-    if(!defined("DS")) define("DS", DIRECTORY_SEPARATOR);
+    if(!defined("DS"))
+    {
+      define("DS", DIRECTORY_SEPARATOR);
+    }
 
     $this->configure($configGroup);
 
-    $dispatchConfig    = $this->config("dispatch");
-    $projectConfig     = $this->config("project");
-    $cubexConfig       = $this->config("_cubex_");
+    $dispatchConfig = $this->config("dispatch");
+    $projectConfig  = $this->config("project");
+    $cubexConfig    = $this->config("_cubex_");
 
     $this->_fileSystem = $fileSystem;
 
     $this->_dispatchIniFilename = $dispatchConfig->getStr(
-      "dispatch_ini_filename", "dispatch.ini"
+      "dispatch_ini_filename",
+      "dispatch.ini"
     );
     $this->_resourceDirectory   = $dispatchConfig->getStr(
-      "resource_directory", "res"
+      "resource_directory",
+      "res"
     );
     $this->_projectNamespace    = $projectConfig->getStr(
-      "namespace", "Project"
+      "namespace",
+      "Project"
     );
-    $this->_projectBase         = $this->getFileSystem()->resolvePath(
-      $cubexConfig->getStr("project_base", "..")
+
+    $this->_projectBase = $this->getFileSystem()->resolvePath(
+      $cubexConfig->getStr("project_base", '../src')
     );
 
     // We do these bits at the end as we need the project base path to get the
@@ -183,7 +190,7 @@ class Dispatcher
   {
     if($entityHash === $this->getBaseHash())
     {
-      return $this->getProjectNamespace(). "/" . $this->getResourceDirectory();
+      return $this->getProjectNamespace() . "/" . $this->getResourceDirectory();
     }
     else if(array_key_exists($entityHash, $this->getEntityMap()))
     {
@@ -241,9 +248,9 @@ class Dispatcher
    */
   public function getRelatedFilenamesOrdered($filename)
   {
-    $fileParts = explode(".", $filename);
+    $fileParts     = explode(".", $filename);
     $fileExtension = array_pop($fileParts);
-    $filename = implode(".", $fileParts);
+    $filename      = implode(".", $fileParts);
 
     return array(
       "pre"  => "{$filename}.pre.{$fileExtension}",
@@ -317,7 +324,7 @@ class Dispatcher
   {
     if(!array_key_exists($entity, self::$_dispatchInis))
     {
-      $fullEntityPath = $this->getProjectBase() . DS . $entity;
+      $fullEntityPath               = $this->getProjectBase() . DS . $entity;
       self::$_dispatchInis[$entity] = $this->loadDispatchIni($fullEntityPath);
     }
 
@@ -331,10 +338,10 @@ class Dispatcher
   {
     if(self::$_dispatchIni === null)
     {
-      $configDir = $this->getFileSystem()->resolvePath(
+      $configDir          = $this->getFileSystem()->resolvePath(
         $this->getProjectBase() . "/../conf"
       );
-      $dispatchIni = $this->loadDispatchIni($configDir);
+      $dispatchIni        = $this->loadDispatchIni($configDir);
       self::$_dispatchIni = new Config($dispatchIni);
     }
 
@@ -356,13 +363,15 @@ class Dispatcher
    */
   public function loadDispatchIni($directory)
   {
-    $path = $directory . DS . $this->getDispatchIniFilename();
-
-    $dispatchIni = @parse_ini_file($path, false);
-
-    if($dispatchIni === false)
+    $path        = $directory . DS . $this->getDispatchIniFilename();
+    $dispatchIni = [];
+    if(file_exists($path))
     {
-      $dispatchIni = [];
+      $dispatchIni = parse_ini_file($path, false);
+      if($dispatchIni === false)
+      {
+        $dispatchIni = [];
+      }
     }
 
     return $dispatchIni;
@@ -463,7 +472,9 @@ class Dispatcher
         $data = preg_replace('@;}@', '}', $data);
         // Replace #rrggbb with #rgb when possible.
         $data = preg_replace(
-          '@#([a-f0-9])\1([a-f0-9])\2([a-f0-9])\3@i', '#\1\2\3', $data
+          '@#([a-f0-9])\1([a-f0-9])\2([a-f0-9])\3@i',
+          '#\1\2\3',
+          $data
         );
         $data = trim($data);
         break;
@@ -474,7 +485,9 @@ class Dispatcher
         //remove tabs, spaces, newlines, etc.
         $data = str_replace(array("\t"), ' ', $data);
         $data = str_replace(
-          array("\r\n", "\r", "\n", '  ', '    ', '    '), '', $data
+          array("\r\n", "\r", "\n", '  ', '    ', '    '),
+          '',
+          $data
         );
         break;
     }
