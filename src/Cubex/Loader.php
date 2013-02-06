@@ -226,7 +226,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       $prefix = $this->_autoloader->getPrefixes();
       foreach($prefix as $pfix => $data)
       {
-        if($pfix == $ns || $pfix . '\\' == $ns)
+        if(rtrim($pfix, "\\") == $ns)
         {
           $nspath = $data[0];
           break;
