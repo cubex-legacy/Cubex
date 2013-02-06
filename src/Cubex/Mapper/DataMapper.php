@@ -53,7 +53,14 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
   public function id()
   {
-    return $this->_id;
+    if(is_array($this->_id))
+    {
+      return implode(',', $this->_id);
+    }
+    else
+    {
+      return $this->_id;
+    }
   }
 
   public function setId($id)
@@ -110,13 +117,27 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $attrs             = $this->_attributes;
     $this->_attributes = array();
     $this->_cloneSetup();
+    $compAttrs = [];
 
     foreach($attrs as $attr)
     {
-      if($attr instanceof Attribute)
+      if($attr instanceof CompositeAttribute)
+      {
+        $compAttrs[$attr->name()] = $attr->availableAttributes();
+      }
+      else if($attr instanceof Attribute)
       {
         $attr->setData(null);
         $this->_addAttribute(clone $attr);
+      }
+    }
+
+    if(!empty($compAttrs))
+    {
+      //Add composite attributes after base attributes have been generated
+      foreach($compAttrs as $name => $attributes)
+      {
+        $this->_addCompositeAttribute($name, $attributes);
       }
     }
   }

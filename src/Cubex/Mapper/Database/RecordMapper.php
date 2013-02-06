@@ -403,7 +403,15 @@ abstract class RecordMapper extends DataMapper
       $attr = $this->_attribute($this->getIdKey());
       if($attr !== null)
       {
-        return $attr->rawData();
+        $id = $attr->data();
+        if(is_array($id))
+        {
+          return implode(',', $id);
+        }
+        else
+        {
+          return $id;
+        }
       }
       else
       {
@@ -640,6 +648,15 @@ abstract class RecordMapper extends DataMapper
     return $rel->belongsTo($entity, $foreignKey, $localKey);
   }
 
+  public function hasAndBelongsToMany(
+    RecordMapper $entity, $localKey = null, $foreignKey = null, $table = null
+  )
+  {
+    $this->_load();
+    $rel = new Relationship($this);
+    return $rel->hasAndBelongsToMany($entity, $localKey, $foreignKey, $table);
+  }
+
   public function stringToColumnName($string)
   {
     switch($this->schemaType())
@@ -775,7 +792,7 @@ abstract class RecordMapper extends DataMapper
   }
 
   /**
-   * @return $this[]
+   * @return RecordCollection
    */
   public static function collection()
   {

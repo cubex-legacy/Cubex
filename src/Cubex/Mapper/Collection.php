@@ -38,6 +38,19 @@ class Collection
     return $this;
   }
 
+  /**
+   * (En|Dis)able loading on record collection
+   *
+   * @param $loaded
+   *
+   * @return $this
+   */
+  public function setLoaded($loaded)
+  {
+    $this->_loaded = (bool)$loaded;
+    return $this;
+  }
+
   public function isLoaded()
   {
     return (bool)$this->_loaded;
@@ -119,7 +132,7 @@ class Collection
 
   public function addMapper(DataMapper $mapper)
   {
-    $this->_loaded                 = true;
+    $this->_loaded = true;
     $this->_mappers[$mapper->id()] = $mapper;
     if($mapper->id() !== null)
     {

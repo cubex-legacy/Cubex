@@ -5,6 +5,8 @@
 
 namespace Cubex\Data;
 
+use Cubex\Mapper\DataMapper;
+
 class CompositeAttribute extends Attribute
 {
   /**
@@ -14,12 +16,19 @@ class CompositeAttribute extends Attribute
   protected $_attributeOrder = [];
   protected $_setData;
   protected $_hidden = true;
+  protected $_parent;
 
   public function __construct($name, $hidden = true)
   {
     $this->setName($name);
     $this->_modified = false;
     $this->_hidden   = $hidden;
+  }
+
+  public function setParent(DataMapper $mapper)
+  {
+    $this->_parent = $mapper;
+    return $this;
   }
 
   public function __get($name)
@@ -95,6 +104,11 @@ class CompositeAttribute extends Attribute
 
   public function setData($data)
   {
+    if($data === null)
+    {
+      return true;
+    }
+
     if(func_num_args() > 1)
     {
       $data = func_get_args();
@@ -159,6 +173,22 @@ class CompositeAttribute extends Attribute
       throw new \Exception(
         "Only objects and arrays can be set onto composite attributes"
       );
+    }
+    return $this;
+  }
+
+  public function __clone()
+  {
+    $attrs                = $this->_subAttributes;
+    $this->_subAttributes = array();
+
+    foreach($attrs as $attr)
+    {
+      if($attr instanceof Attribute)
+      {
+        $attr->setData(null);
+        $this->addSubAttribute(clone $attr);
+      }
     }
   }
 }
