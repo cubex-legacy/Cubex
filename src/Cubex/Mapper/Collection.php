@@ -9,7 +9,8 @@ namespace Cubex\Mapper;
  * @var Collection DataMapper[]
  */
 class Collection
-  implements \Countable, \JsonSerializable, \Serializable, \IteratorAggregate
+  implements \Countable, \JsonSerializable, \Serializable, \IteratorAggregate,
+             \ArrayAccess
 {
   /**
    * @var DataMapper[]
@@ -132,7 +133,7 @@ class Collection
 
   public function addMapper(DataMapper $mapper)
   {
-    $this->_loaded = true;
+    $this->_loaded                 = true;
     $this->_mappers[$mapper->id()] = $mapper;
     if($mapper->id() !== null)
     {
@@ -294,5 +295,37 @@ class Collection
   public function __toString()
   {
     return json_encode($this);
+  }
+
+
+  public function offsetSet($offset, $value)
+  {
+    $this->_preCheckMappers();
+    if($offset === null)
+    {
+      $this->_mappers[] = $value;
+    }
+    else
+    {
+      $this->_mappers[$offset] = $value;
+    }
+  }
+
+  public function offsetExists($offset)
+  {
+    $this->_preCheckMappers();
+    return isset($this->_mappers[$offset]);
+  }
+
+  public function offsetUnset($offset)
+  {
+    $this->_preCheckMappers();
+    unset($this->_mappers[$offset]);
+  }
+
+  public function offsetGet($offset)
+  {
+    $this->_preCheckMappers();
+    return isset($this->_mappers[$offset]) ? $this->_mappers[$offset] : null;
   }
 }
