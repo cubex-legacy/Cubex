@@ -126,42 +126,30 @@ class Relationship
   {
     $source = $this->_source;
 
-    $class  = strtolower(class_shortname($source));
-    $eClass = strtolower(class_shortname($entity));
-
-    if($table === null)
-    {
-      $sT     = $source->getTableName();
-      $prefix = str_replace($class . 's', '', $sT);
-      $prefix = trim($prefix, '_');
-
-      if($eClass > $class)
-      {
-        $table = implode('_', [$prefix, $class . 's', $eClass . 's']);
-      }
-      else
-      {
-        $table = implode('_', [$prefix, $eClass . 's', $class . 's']);
-      }
-    }
-
-    if($foreignKey === null)
-    {
-      $foreignKey = $eClass . '_id';
-      $foreignKey = $source->stringToColumnName($foreignKey);
-    }
-
-    if($localKey === null)
-    {
-      $localKey = $class . '_id';
-      $localKey = $source->stringToColumnName($localKey);
-    }
-
     $pivot = new PivotMapper();
-    $pivot->setTableName($table);
-    $pivot->addAttribute($localKey);
-    $pivot->addAttribute($foreignKey);
-    $pivot->addCompositeAttribute("id", [$localKey, $foreignKey]);
+    $pivot->pivotOn($source, $entity);
+
+    if($table !== null)
+    {
+      $pivot->setTableName($table);
+    }
+
+    if($localKey !== null)
+    {
+      $pivot->addAttribute($localKey);
+      $pivot->setPivotBKey($localKey);
+    }
+
+    if($foreignKey !== null)
+    {
+      $pivot->addAttribute($foreignKey);
+      $pivot->setPivotAKey($foreignKey);
+    }
+
+    $pivot->addCompositeAttribute(
+      "id",
+      [$pivot->pivotBKey(), $pivot->pivotBKey()]
+    );
 
     $collection = new RecordCollection($pivot);
     $collection->loadWhere($source->idPattern(), $localKey, $source->id());

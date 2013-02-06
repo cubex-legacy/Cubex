@@ -5,6 +5,8 @@
 
 namespace Cubex\Sprintf;
 
+use Cubex\Exception\CubexException;
+
 class SprintfEngine
 {
   public function __invoke(FormatterInterface $formatter, $userData, $argv)
@@ -43,7 +45,10 @@ class SprintfEngine
           $arg++;
           if($arg >= $argc)
           {
-            throw new \Exception("Too few arguments to Sprintf::call().");
+            throw new CubexException(
+              "Too few arguments to Sprintf::call().", 0,
+              json_encode($argv)
+            );
           }
 
           $callback($userData, $pattern, $pos, $argv[$arg], $len);

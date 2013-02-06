@@ -7,6 +7,7 @@ namespace Cubex\Mapper\Database;
 
 use Cubex\Container\Container;
 use Cubex\Data\Attribute;
+use Cubex\Data\CompositeAttribute;
 use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Database\ConnectionMode;
 use Cubex\Database\DatabaseService;
@@ -219,6 +220,16 @@ abstract class RecordMapper extends DataMapper
       return $this;
     }
 
+    $connection = $this->connection(
+      new ConnectionMode(ConnectionMode::READ)
+    );
+
+    $idAttr = $this->getAttribute($this->getIdKey());
+    if($idAttr instanceof CompositeAttribute)
+    {
+      $idAttr->setData($id);
+    }
+
     /**
      * @var $this self
      */
@@ -226,17 +237,31 @@ abstract class RecordMapper extends DataMapper
     $pattern = $this->idPattern();
     $pattern = 'SELECT %LC FROM %T WHERE ' . $pattern;
 
-    $connection = $this->connection(
-      new ConnectionMode(ConnectionMode::READ)
-    );
+    if($idAttr instanceof CompositeAttribute)
+    {
+      $args = array(
+        $pattern,
+        $columns,
+        $this->getTableName(),
+      );
 
-    $args = array(
-      $pattern,
-      $columns,
-      $this->getTableName(),
-      $this->getIdKey(),
-      $id,
-    );
+      $named = $idAttr->getNamedArray();
+      foreach($named as $k => $v)
+      {
+        $args[] = $k;
+        $args[] = $v;
+      }
+    }
+    else
+    {
+      $args = array(
+        $pattern,
+        $columns,
+        $this->getTableName(),
+        $this->getIdKey(),
+        $id,
+      );
+    }
 
     $query = ParseQuery::parse($connection, $args);
 
@@ -285,6 +310,12 @@ abstract class RecordMapper extends DataMapper
     $this->_loadPending = true;
     $this->_loadDetails = ['id' => $id, 'columns' => $columns];
     return $this;
+  }
+
+  public function exists()
+  {
+    $this->_load();
+    return $this->_exists;
   }
 
   /**
@@ -608,7 +639,7 @@ abstract class RecordMapper extends DataMapper
       if(!$this->exists())
       {
         $newId = $connection->insertId();
-        if($newId !== null)
+        if($newId !== null && $newId !== 0)
         {
           $this->setId($newId);
         }
