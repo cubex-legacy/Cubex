@@ -34,6 +34,11 @@ class Column
     $this->_comment       = $comment;
   }
 
+  public function name()
+  {
+    return $this->_name;
+  }
+
   public function createSql()
   {
     $sql = "`" . $this->_name . "` ";

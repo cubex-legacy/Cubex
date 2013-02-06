@@ -265,19 +265,37 @@ class DBBuilder
   {
     $cols = [];
 
+    if($this->_mapper->isCompositeId())
+    {
+      $idcomp     = $this->_mapper->getCompAttribute(
+        $this->_mapper->getIdKey()
+      );
+      $primaryIds = $idcomp->attributeOrder();
+    }
+    else
+    {
+      $primaryIds = [];
+    }
+
     foreach($this->_columns as $col)
     {
-      $cols[] = $col->createSql();
+      if(in_array($col->name(), $primaryIds))
+      {
+        array_unshift($cols, $col->createSql());
+      }
+      else
+      {
+        $cols[] = $col->createSql();
+      }
     }
 
     if($this->_mapper->isCompositeId())
     {
-      $idcomp = $this->_mapper->getCompAttribute($this->_mapper->getIdKey());
       $query  = ParseQuery::parse(
         $this->_mapper->conn(),
         [
         "PRIMARY KEY ( %LC )",
-        $idcomp->attributeOrder()
+        $primaryIds
         ]
       );
       $cols[] = $query;
