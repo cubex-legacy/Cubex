@@ -25,6 +25,17 @@ class PivotMapper extends RecordMapper
     }
   }
 
+  public function id()
+  {
+    $id = $this->getCompAttribute("id");
+    if($id !== null)
+    {
+      $ids = $id->getValueArray();
+      return implode(',', $ids);
+    }
+    return null;
+  }
+
   public function pivotAKey()
   {
     return $this->_pivotaKey;
@@ -49,11 +60,11 @@ class PivotMapper extends RecordMapper
 
   public function pivotOn(RecordMapper $pivota, RecordMapper $pivotb)
   {
-    $class  = strtolower(class_shortname($pivota));
-    $eClass = strtolower(class_shortname($pivotb));
-
     if($this->_dbTableName === null)
     {
+      $class  = strtolower(class_shortname($pivota));
+      $eClass = strtolower(class_shortname($pivotb));
+
       $sT     = $pivota->getTableName();
       $prefix = str_replace($class . 's', '', $sT);
       $prefix = trim($prefix, '_');
@@ -69,12 +80,10 @@ class PivotMapper extends RecordMapper
       $this->setTableName($table);
     }
 
-    $foreignKey = $eClass . '_id';
-    $foreignKey = $pivota->stringToColumnName($foreignKey);
+    $foreignKey = $pivotb->stringToColumnName($pivotb->remoteIdKey());
     $this->setPivotAKey($foreignKey);
 
-    $localKey = $class . '_id';
-    $localKey = $pivotb->stringToColumnName($localKey);
+    $localKey = $pivota->stringToColumnName($pivota->remoteIdKey());
     $this->setPivotBKey($localKey);
 
     $this->addAttribute($localKey);
@@ -147,5 +156,29 @@ class PivotMapper extends RecordMapper
   {
     $id = [$ida, $idb];
     return parent::load($id, $columns);
+  }
+
+  public function loadCollection($key, $value = null)
+  {
+    if($key instanceof RecordMapper)
+    {
+      if($value === null)
+      {
+        $value = $key->id();
+      }
+      $key = $this->stringToColumnName($key->remoteIdKey());
+    }
+    $collection = static::collection();
+    try
+    {
+      Validator::int($value);
+      $collection->loadWhere("%C = %d", $key, $value);
+    }
+    catch(\Exception $e)
+    {
+      $collection->loadWhere("%C = %s", $key, $value);
+    }
+
+    return $collection;
   }
 }

@@ -72,6 +72,12 @@ abstract class RecordMapper extends DataMapper
     }
   }
 
+  public function remoteIdKey()
+  {
+    $foreignKey = strtolower(class_shortname($this)) . '_id';
+    return $this->stringToColumnName($foreignKey);
+  }
+
   public function disableLoading()
   {
     $this->_loadPending = null;
