@@ -54,6 +54,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
    * @var bool
    */
   protected $_failed = false;
+  protected $_autoloader;
 
   protected $_projectSourceRoot;
   protected $_smClass = '\Cubex\ServiceManager\ServiceManager';
@@ -65,6 +66,8 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
    */
   public function __construct($autoLoader = null)
   {
+    $this->_autoloader = $autoLoader;
+
     defined('PHP_START') or define('PHP_START', microtime(true));
 
     isset($_SERVER['DOCUMENT_ROOT']) or $_SERVER['DOCUMENT_ROOT'] = false;
@@ -208,6 +211,8 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
   public function configure(ConfigGroup $configuration)
   {
     $src = "src";
+    $ns  = $nspath = null;
+
     if($configuration->exists("project"))
     {
       $ns  = $configuration->get("project")->getStr("namespace", "Project");
@@ -216,10 +221,23 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       $this->_projectSourceRoot = realpath(dirname(WEB_ROOT) . DS . $src);
     }
 
+    if($this->_autoloader instanceof \Composer\Autoload\ClassLoader)
+    {
+      $prefix = $this->_autoloader->getPrefixes();
+      foreach($prefix as $pfix => $data)
+      {
+        if($pfix == $ns || $pfix . '\\' == $ns)
+        {
+          $nspath = $data[0];
+          break;
+        }
+      }
+    }
+
     $cubexConfig = new Config();
     $cubexConfig->setData(
       "project_base",
-      realpath(dirname(WEB_ROOT) . '/' . $src)
+      $nspath === null ? realpath(dirname(WEB_ROOT) . '/' . $src) : $nspath
     );
 
     $configuration->addConfig('_cubex_', $cubexConfig);
