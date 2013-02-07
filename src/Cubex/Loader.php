@@ -228,7 +228,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       {
         if(rtrim($pfix, "\\") == $ns)
         {
-          $nspath = $data[0];
+          $nspath = realpath($data[0]) . DS;
           break;
         }
       }
@@ -237,7 +237,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
     $cubexConfig = new Config();
     $cubexConfig->setData(
       "project_base",
-      $nspath === null ? realpath(dirname(WEB_ROOT) . '/' . $src) : $nspath
+      $nspath === null ? realpath(dirname(WEB_ROOT) . DS . $src) : $nspath
     );
 
     $configuration->addConfig('_cubex_', $cubexConfig);

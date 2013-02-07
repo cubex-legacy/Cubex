@@ -92,10 +92,9 @@ trait Translation
 
   public function textDomain()
   {
-    $projectBase = $this->projectBase();
-    $path        = str_replace($projectBase, '', $this->filePath());
-    $path        = ltrim($path, '\\');
-
+    $projectBase       = $this->projectBase();
+    $path              = str_replace($projectBase, '', $this->filePath());
+    $path              = ltrim($path, '\\');
     $this->_textdomain = \md5($path);
 
     if(!$this->_boundTd)
@@ -109,11 +108,9 @@ trait Translation
   public function bindLanguage()
   {
     $this->_boundTd = true;
+    $path           = $this->filePath() . DS . 'locale';
 
-    return $this->getTranslator()->bindLanguage(
-      $this->textDomain(),
-    $this->filePath() . DS . 'locale'
-    );
+    return $this->getTranslator()->bindLanguage($this->textDomain(), $path);
   }
 
   /**
