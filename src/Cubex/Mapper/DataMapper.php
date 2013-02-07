@@ -28,6 +28,11 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $this->_buildAttributes();
     $this->_configure();
     $this->setId($id);
+    $this->_setup();
+  }
+
+  protected function _setup()
+  {
   }
 
   protected function _checkAttributes()
@@ -114,10 +119,10 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
    */
   public function __clone()
   {
-    $attrs             = $this->_attributes;
-    $this->_exists     = false;
+    $attrs                    = $this->_attributes;
+    $this->_exists            = false;
     $this->_invalidAttributes = null;
-    $this->_attributes = array();
+    $this->_attributes        = array();
     $this->_cloneSetup();
     $compAttrs = [];
 
