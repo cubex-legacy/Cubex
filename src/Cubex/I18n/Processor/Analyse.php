@@ -64,6 +64,7 @@ class Analyse
     $tokens    = token_get_all($content);
     $startLine = $building = 0;
     $msgId     = $type = $msgIdPlural = '';
+    $quotetype = "'";
     $started   = false;
 
     foreach($tokens as $token)
@@ -155,6 +156,9 @@ class Analyse
 
       if($started && $token[0] == 315)
       {
+        $quotetype = substr($token[1], 0, 1);
+        $token[1]  = str_replace('\\' . $quotetype, $quotetype, $token[1]);
+
         if($building == 0)
         {
           $msgId .= substr($token[1], 1, -1);
@@ -203,7 +207,7 @@ class Analyse
         if($buildType == 'single')
         {
           $translated = $translator->translate(
-            stripslashes($message),
+            $message,
             $sourceLanguage,
             $language
           );
@@ -312,7 +316,7 @@ class Analyse
   public function format($message)
   {
     $message = str_replace("\r\n", "\n", $message);
-    $message = str_replace('\\\'', "'", $message);
+    $message = str_replace('\\ \\', '\\\\', $message);
     return $message;
   }
 
