@@ -115,6 +115,8 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   public function __clone()
   {
     $attrs             = $this->_attributes;
+    $this->_exists     = false;
+    $this->_invalidAttributes = null;
     $this->_attributes = array();
     $this->_cloneSetup();
     $compAttrs = [];

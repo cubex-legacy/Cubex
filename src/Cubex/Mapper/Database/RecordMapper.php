@@ -885,4 +885,11 @@ abstract class RecordMapper extends DataMapper
         throw new \Exception($connection->errorMsg(), $connection->errorNo());
     }
   }
+
+
+  public function __clone()
+  {
+    $this->_loadPending = $this->_loadDetails = null;
+    parent::__clone();
+  }
 }
