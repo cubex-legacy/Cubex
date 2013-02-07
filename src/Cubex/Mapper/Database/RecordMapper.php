@@ -52,6 +52,7 @@ abstract class RecordMapper extends DataMapper
   protected $_dbTableName;
   protected $_idType = self::ID_AUTOINCREMENT;
   protected $_schemaType = self::SCHEMA_UNDERSCORE;
+  protected $_underscoreTable = true;
 
   protected $_loadPending;
   protected $_loadDetails;
@@ -410,22 +411,31 @@ abstract class RecordMapper extends DataMapper
         'modules',
         'components'
       ];
-      $nsparts      = explode('\\', strtolower(get_class($this)));
+      $nsparts      = explode('\\', $this->getTableClass());
 
       foreach($nsparts as $i => $part)
       {
-        if($i == 0 || in_array($part, $excludeParts))
+        if($i == 0 || in_array(strtolower($part), $excludeParts))
         {
           unset($nsparts[$i]);
         }
       }
 
       $table = implode('_', $nsparts);
+      if($this->_underscoreTable)
+      {
+        $table = Strings::variableToUnderScore($table);
+      }
 
       $table              = strtolower(str_replace('\\', '_', $table));
       $this->_dbTableName = $table . 's';
     }
     return $this->_dbTableName;
+  }
+
+  public function getTableClass()
+  {
+    return get_class($this);
   }
 
   public function id()
