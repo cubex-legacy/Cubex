@@ -265,4 +265,9 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
   {
     $this->setData(null);
   }
+
+  public function saveToDatabase()
+  {
+    return true;
+  }
 }

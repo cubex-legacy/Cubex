@@ -111,7 +111,7 @@ class DBBuilder
 
   protected function _columnFromAttribute(Attribute $attr)
   {
-    if($attr instanceof CompositeAttribute)
+    if(!$attr->saveToDatabase())
     {
       return null;
     }

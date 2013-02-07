@@ -190,4 +190,9 @@ class CompositeAttribute extends Attribute
       }
     }
   }
+
+  public function saveToDatabase()
+  {
+    return false;
+  }
 }

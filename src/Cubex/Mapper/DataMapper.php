@@ -6,6 +6,7 @@ namespace Cubex\Mapper;
 
 use Cubex\Data\Attribute;
 use Cubex\Data\CompositeAttribute;
+use Cubex\Data\PolymorphicAttribute;
 use Cubex\Exception\CubexException;
 
 abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
@@ -802,6 +803,15 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
         $this->_attribute($attr->name())->setRequired($attr->required());
       }
     }
+    return $this;
+  }
+
+  protected function _addPolymorphicAttribute($attributeName)
+  {
+    $a = new PolymorphicAttribute($attributeName);
+    $this->_addAttribute($a);
+    $this->_addAttribute($a->getIdAttribute());
+    $this->_addAttribute($a->getTypeAttribute());
     return $this;
   }
 }
