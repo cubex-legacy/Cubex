@@ -25,9 +25,9 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
    */
   public function __construct($id = null)
   {
-    $this->setId($id);
     $this->_buildAttributes();
     $this->_configure();
+    $this->setId($id);
   }
 
   protected function _checkAttributes()

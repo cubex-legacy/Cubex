@@ -546,6 +546,7 @@ abstract class RecordMapper extends DataMapper
     $modified   = $this->getModifiedAttributes();
     $updates    = $inserts = array();
     $cache      = EphemeralCache::getCache($this->id(), $this, null);
+    $idAttr     = $this->getAttribute($this->getIdKey());
 
     if(!empty($modified))
     {
@@ -624,12 +625,29 @@ abstract class RecordMapper extends DataMapper
       $pattern = 'UPDATE %T SET ' . implode(', ', $updates);
       $pattern .= ' WHERE ' . $this->idPattern();
 
-      $args = array(
-        $pattern,
-        $this->getTableName(),
-        $this->getIdKey(),
-        $this->id(),
-      );
+      if($idAttr instanceof CompositeAttribute)
+      {
+        $args = array(
+          $pattern,
+          $this->getTableName(),
+        );
+
+        $named = $idAttr->getNamedArray();
+        foreach($named as $k => $v)
+        {
+          $args[] = $k;
+          $args[] = $v;
+        }
+      }
+      else
+      {
+        $args = array(
+          $pattern,
+          $this->getTableName(),
+          $this->getIdKey(),
+          $this->id(),
+        );
+      }
     }
 
     $query = ParseQuery::parse($connection, $args);
