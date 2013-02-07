@@ -15,7 +15,11 @@ interface EmailService extends Service
 
   public function isHtml($bool = true);
 
+  public function setFrom($email, $name = null);
+
   public function setSender($email, $name = null);
+
+  public function setReturnPath($email);
 
   public function addRecipient($email, $name = null);
 

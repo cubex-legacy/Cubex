@@ -3,8 +3,9 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\Email;
+namespace Cubex\Email\Service;
 
+use Cubex\Email\EmailService;
 use Cubex\ServiceManager\ServiceConfig;
 
 class Sendmail implements EmailService

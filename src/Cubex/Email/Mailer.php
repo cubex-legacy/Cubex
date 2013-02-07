@@ -5,6 +5,8 @@
 
 namespace Cubex\Email;
 
+use Cubex\Container\Container;
+use Cubex\Foundation\Config\Config;
 use Cubex\ServiceManager\ServiceConfig;
 
 class Mailer implements EmailService
@@ -14,6 +16,26 @@ class Mailer implements EmailService
   public function __construct(EmailService $service)
   {
     $this->_service = $service;
+  }
+
+  /**
+   * @return EmailService
+   */
+  public static function fromConfig()
+  {
+    $configGroup = Container::config();
+    $emailConfig = $configGroup->get("email", new Config());
+
+    $serviceConfig = new ServiceConfig();
+    $serviceConfig->fromConfig($emailConfig);
+
+    $mailerService = $serviceConfig->getStr(
+      "mailer",
+      "Cubex\\Email\\Service\\SwiftMail"
+    );
+
+    $mailer = new self(new $mailerService());
+    return $mailer->configure($serviceConfig);
   }
 
   /**
@@ -70,9 +92,34 @@ class Mailer implements EmailService
    *
    * @return $this
    */
+  public function setFrom($email, $name = null)
+  {
+    $this->_service->setFrom($email, $name);
+
+    return $this;
+  }
+
+  /**
+   * @param      $email
+   * @param null $name
+   *
+   * @return $this
+   */
   public function setSender($email, $name = null)
   {
     $this->_service->setSender($email, $name);
+
+    return $this;
+  }
+
+  /**
+   * @param $email
+   *
+   * @return $this
+   */
+  public function setReturnPath($email)
+  {
+    $this->_service->setReturnPath($email);
 
     return $this;
   }
