@@ -35,7 +35,7 @@ trait Yielder
    *
    * @return string
    */
-  public function yield($name, $containDivId = true)
+  public function renderNest($name, $containDivId = true)
   {
     $rendered = '';
 
