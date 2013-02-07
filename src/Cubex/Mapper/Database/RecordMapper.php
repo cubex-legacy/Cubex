@@ -547,6 +547,12 @@ abstract class RecordMapper extends DataMapper
     $updates    = $inserts = array();
     $cache      = EphemeralCache::getCache($this->id(), $this, null);
     $idAttr     = $this->getAttribute($this->getIdKey());
+    $idFields   = [];
+
+    if($idAttr instanceof CompositeAttribute)
+    {
+      $idFields = array_keys($idAttr->getNamedArray());
+    }
 
     if(!empty($modified))
     {
@@ -560,6 +566,11 @@ abstract class RecordMapper extends DataMapper
       {
         if($attr->isModified())
         {
+          if(in_array($attr->name(), $idFields) && $this->exists())
+          {
+            throw new \Exception("You cannot update IDs on a pivot table");
+          }
+
           $val = $attr->rawData();
           if($val instanceof \DateTime)
           {
