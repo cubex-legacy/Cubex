@@ -13,6 +13,8 @@ class PivotMapper extends RecordMapper
   protected $_idType = self::ID_COMPOSITE;
   protected $_autoTimestamp = false;
 
+  protected $_pivotOn;
+
   protected $_pivotaKey;
   protected $_pivotbKey;
 
@@ -60,6 +62,8 @@ class PivotMapper extends RecordMapper
 
   public function pivotOn(RecordMapper $pivota, RecordMapper $pivotb)
   {
+    $this->_pivotOn = func_get_args();
+
     if($this->_dbTableName === null)
     {
       $class  = strtolower(class_shortname($pivota));
@@ -77,6 +81,9 @@ class PivotMapper extends RecordMapper
       {
         $table = implode('_', [$prefix, $eClass . 's', $class . 's']);
       }
+
+      $table = ltrim($table, '_');
+
       $this->setTableName($table);
     }
 
@@ -169,6 +176,14 @@ class PivotMapper extends RecordMapper
       $key = $this->stringToColumnName($key->remoteIdKey());
     }
     $collection = $this::collection();
+    $map        = $collection->getMapperType();
+    if($map instanceof PivotMapper)
+    {
+      call_user_func_array([$map, "pivotOn"], $this->_pivotOn);
+      $map->setTableName($this->getTableName());
+      $map->setPivotAKey($this->pivotAKey());
+      $map->setPivotBKey($this->pivotBKey());
+    }
     try
     {
       Validator::int($value);
