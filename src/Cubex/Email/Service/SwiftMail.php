@@ -7,7 +7,6 @@ namespace Cubex\Email\Service;
 
 use Cubex\Email\EmailService;
 use Cubex\ServiceManager\ServiceConfig;
-use phpDocumentor\GraphViz\Exception;
 
 final class SwiftMail implements EmailService
 {
@@ -152,12 +151,10 @@ final class SwiftMail implements EmailService
     catch(\Swift_TransportException $e)
     {
       $numSent = 0;
-      echo '<pre>';var_dump($e->getMessage());echo '</pre>';
     }
-    catch(Exception $e)
+    catch(\Exception $e)
     {
       $numSent = 0;
-      echo '<pre>';var_dump($e->getMessage());echo '</pre>';
     }
 
     if($numSent)
