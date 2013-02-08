@@ -30,12 +30,12 @@ class GetText implements Loader
    */
   public function t($textDomain, $message)
   {
-    if(!\function_exists('\dgettext'))
+    if(!function_exists('dgettext'))
     {
       return (string)$message;
     }
 
-    return \dgettext($textDomain, $message);
+    return dgettext($textDomain, $message);
   }
 
   /**
@@ -64,18 +64,18 @@ class GetText implements Loader
    */
   public function p($textDomain, $singular, $plural = null, $number = 0)
   {
-    if(!\function_exists('\dngettext'))
+    if(!function_exists('dngettext'))
     {
       $translated = $number == 1 ? $singular : $plural;
     }
     else
     {
-      $translated = \dngettext($textDomain, $singular, $plural, $number);
+      $translated = dngettext($textDomain, $singular, $plural, $number);
     }
 
-    if(\substr_count($translated, '%d') == 1)
+    if(substr_count($translated, '%d') == 1)
     {
-      $translated = \sprintf($translated, $number);
+      $translated = sprintf($translated, $number);
     }
 
     return $translated;
@@ -90,11 +90,11 @@ class GetText implements Loader
   public function bindLanguage($textDomain, $filePath)
   {
     $this->_boundTd = true;
-    if(!\function_exists('bindtextdomain'))
+    if(!function_exists('bindtextdomain'))
     {
       return false;
     }
-
-    return \bindtextdomain($textDomain, $filePath);
+    bind_textdomain_codeset($textDomain, 'UTF-8');
+    return bindtextdomain($textDomain, $filePath);
   }
 }
