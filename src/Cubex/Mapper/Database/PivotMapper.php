@@ -7,6 +7,7 @@ namespace Cubex\Mapper\Database;
 
 use Cubex\Data\Attribute;
 use Cubex\Data\Validator\Validator;
+use Cubex\Mapper\DataMapper;
 
 class PivotMapper extends RecordMapper
 {
@@ -154,6 +155,14 @@ class PivotMapper extends RecordMapper
 
   public function setLink($ida, $idb)
   {
+    if($ida instanceof DataMapper)
+    {
+      $ida = $ida->id();
+    }
+    if($idb instanceof DataMapper)
+    {
+      $idb = $idb->id();
+    }
     $this->setId(func_get_args());
     return $this;
   }
@@ -161,6 +170,14 @@ class PivotMapper extends RecordMapper
 
   public function load($ida, $idb, $columns = ['*'])
   {
+    if($ida instanceof DataMapper)
+    {
+      $ida = $ida->id();
+    }
+    if($idb instanceof DataMapper)
+    {
+      $idb = $idb->id();
+    }
     $id = [$ida, $idb];
     return parent::load($id, $columns);
   }
@@ -195,5 +212,15 @@ class PivotMapper extends RecordMapper
     }
 
     return $collection;
+  }
+
+  public static function collectionOn(RecordMapper $mapper)
+  {
+    $col = new static;
+    if($col instanceof PivotMapper)
+    {
+      $col->loadCollection($mapper);
+    }
+    return $col;
   }
 }
