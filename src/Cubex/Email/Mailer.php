@@ -30,12 +30,22 @@ class Mailer implements EmailService
     $serviceConfig->fromConfig($emailConfig);
 
     $mailerService = $serviceConfig->getStr(
-      "mailer",
-      "Cubex\\Email\\Service\\SwiftMail"
+      "service_provides",
+      "Cubex\\Email\\Service\\Mail"
     );
 
     $mailer = new self(new $mailerService());
     return $mailer->configure($serviceConfig);
+  }
+
+  /**
+   * @return $this
+   */
+  public function reset()
+  {
+    $this->_service->reset();
+
+    return $this;
   }
 
   /**
