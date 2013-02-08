@@ -94,6 +94,7 @@ class GetText implements Loader
     {
       return false;
     }
+    bind_textdomain_codeset($textDomain, 'UTF-8');
     return bindtextdomain($textDomain, $filePath);
   }
 }
