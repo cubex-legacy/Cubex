@@ -302,8 +302,12 @@ class RecordCollection extends Collection
         $idkey      = $prefetch['idkey'];
         $relkey     = $prefetch['useKey'];
 
-        $collection->loadIds($this->getUniqueField($relkey), $idkey);
-        $collection->get();
+        //Do not prefix complex relationships
+        if($collection->currentQuery() == '')
+        {
+          $collection->loadIds($this->getUniqueField($relkey), $idkey);
+          $collection->get();
+        }
       }
       $this->_preFetches = null;
     }
@@ -346,7 +350,20 @@ class RecordCollection extends Collection
       $pattern = '%C IN (%Ls)';
     }
 
-    $this->loadWhere($pattern, $idKey, $ids);
+    $this->loadWhereAppend($pattern, $idKey, $ids);
+    return $this;
+  }
+
+  public function loadWhereAppend($pattern)
+  {
+    $qAppend = '';
+    if($this->_query != '' && $pattern != '')
+    {
+      $qAppend = ' AND ' . $this->_query;
+    }
+
+    call_user_func_array([$this, 'loadWhere'], func_get_args());
+    $this->_query = $this->_query . $qAppend;
     return $this;
   }
 
@@ -362,11 +379,13 @@ class RecordCollection extends Collection
       if(method_exists($this->_mapperType, $method))
       {
         $this->_mapperType->newInstanceOnFailedRelation(true);
-        $result = $this->_mapperType->$method();
+        $result     = $this->_mapperType->$method();
+        $collection = null;
 
         if($result instanceof RecordCollection)
         {
-          $result = $result->getMapperType();
+          $collection = $result;
+          $result     = $result->getMapperType();
         }
 
         if($result instanceof RecordMapper)
@@ -383,7 +402,10 @@ class RecordCollection extends Collection
               break;
           }
 
-          $collection          = $result::collection();
+          if($collection === null)
+          {
+            $collection = $result::collection();
+          }
           $this->_preFetches[] = [
             'collection' => $collection,
             'idkey'      => $idk,

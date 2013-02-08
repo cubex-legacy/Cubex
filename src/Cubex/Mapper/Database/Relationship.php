@@ -27,7 +27,7 @@ class Relationship
 
     if($source->id() !== null)
     {
-      $table  = new RecordCollection($entity);
+      $table = new RecordCollection($entity);
       $result = $table->loadOneWhere(
         $source->idPattern(),
         $foreignKey,
@@ -71,7 +71,11 @@ class Relationship
     $entity->setFromRelationshipType(RecordMapper::RELATIONSHIP_HASMANY);
 
     $collection = new RecordCollection($entity);
-    $collection->loadWhere($source->idPattern(), $foreignKey, $source->id());
+    $collection->loadWhereAppend(
+      $source->idPattern(),
+      $foreignKey,
+      $source->id()
+    );
     $collection->setCreateData([$foreignKey => $source->id()]);
     return $collection;
   }
@@ -152,7 +156,11 @@ class Relationship
     );
 
     $collection = new RecordCollection($pivot);
-    $collection->loadWhere($source->idPattern(), $localKey, $source->id());
+    $collection->loadWhereAppend(
+      $source->idPattern(),
+      $localKey,
+      $source->id()
+    );
     $collection->get();
 
     $findIds = $collection->getUniqueField($foreignKey);
