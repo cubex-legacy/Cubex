@@ -160,6 +160,14 @@ final class SwiftMail implements EmailService
     return $this;
   }
 
+  public function attach($file)
+  {
+    $attachment = \Swift_Attachment::fromPath($file);
+    $this->_message->attach($attachment);
+
+    return $this;
+  }
+
   public function send()
   {
     $message            = $this->_getMessage();
