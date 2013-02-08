@@ -181,6 +181,11 @@ class ServiceManager
           if(class_exists($provider))
           {
             $service = $this->_buildClass($provider, $name);
+
+            if($service instanceof Service)
+            {
+              $service->configure($config);
+            }
           }
         }
         else
