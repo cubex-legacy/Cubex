@@ -124,7 +124,7 @@ class Build
 
     if(is_dir($runDir))
     {
-      $mfile   = md5($directory);
+      $mfile   = md5(str_replace('\\', '/', $directory));
       $analyse = new Analyse();
       $analyse->processDirectory($this->_projectDir . DS, $directory);
       $localeDir = $runDir . DS . 'locale';

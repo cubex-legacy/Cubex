@@ -95,7 +95,7 @@ trait Translation
     $projectBase       = $this->projectBase();
     $path              = str_replace($projectBase, '', $this->filePath());
     $path              = ltrim($path, '\\');
-    $this->_textdomain = \md5($path);
+    $this->_textdomain = md5(str_replace('\\', '/', $path));
 
     if(!$this->_boundTd)
     {
