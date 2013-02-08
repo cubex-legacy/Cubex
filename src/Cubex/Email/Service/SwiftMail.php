@@ -22,6 +22,10 @@ final class SwiftMail implements EmailService
    * @var \Swift_Message
    */
   private $_message;
+  /**
+   * @var ServiceConfig
+   */
+  private $_config;
 
   /**
    * @return $this
@@ -40,6 +44,8 @@ final class SwiftMail implements EmailService
    */
   public function configure(ServiceConfig $config)
   {
+    $this->_config = $config;
+
     switch($config->getStr("transport", "mail"))
     {
       case "smtp":
@@ -73,6 +79,12 @@ final class SwiftMail implements EmailService
     if(!$this->_message instanceof \Swift_Message)
     {
       $this->_message = new \Swift_Message();
+
+      $sender = $this->_config->getStr("default.sender", null);
+      if($sender !== null)
+      {
+        $this->setSender($sender);
+      }
     }
 
     return $this->_message;

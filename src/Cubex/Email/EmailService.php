@@ -32,4 +32,6 @@ interface EmailService extends Service
   public function send();
 
   public function reset();
+
+  public function attach($file);
 }

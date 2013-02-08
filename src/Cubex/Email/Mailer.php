@@ -187,6 +187,18 @@ class Mailer implements EmailService
   }
 
   /**
+   * @param $file
+   *
+   * @return $this
+   */
+  public function attach($file)
+  {
+    $this->_service->attach($file);
+
+    return $this;
+  }
+
+  /**
    * @return mixed
    */
   public function send()
