@@ -35,7 +35,7 @@ class GetText implements Loader
       return (string)$message;
     }
 
-    return htmlspecialchars(dgettext($textDomain, $message));
+    return dgettext($textDomain, $message);
   }
 
   /**
@@ -70,9 +70,7 @@ class GetText implements Loader
     }
     else
     {
-      $translated = htmlspecialchars(
-        dngettext($textDomain, $singular, $plural, $number)
-      );
+      $translated = dngettext($textDomain, $singular, $plural, $number);
     }
 
     if(substr_count($translated, '%d') == 1)
@@ -96,7 +94,6 @@ class GetText implements Loader
     {
       return false;
     }
-    bind_textdomain_codeset($textDomain, 'UTF-8');
     return bindtextdomain($textDomain, $filePath);
   }
 }

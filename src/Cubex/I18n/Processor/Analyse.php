@@ -195,7 +195,7 @@ class Analyse
     $result .= '"Last-Translator: \n"' . "\n";
     $result .= '"Language-Team: \n"' . "\n";
     $result .= '"MIME-Version: 1.0\n"' . "\n";
-    $result .= '"Content-Type: text/plain; charset=iso-8859-1\n"' . "\n";
+    $result .= '"Content-Type: text/plain; charset=UTF-8\n"' . "\n";
     $result .= '"Content-Transfer-Encoding: 8bit\n"' . "\n";
     $result .= '"X-Generator: Cubex PHP\n"' . "\n";
 
