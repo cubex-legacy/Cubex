@@ -62,6 +62,7 @@ abstract class RecordMapper extends DataMapper
   protected $_recentRelationKey;
 
   protected $_handledError;
+  protected $_changes;
 
   public function __construct($id = null, $columns = ['*'])
   {
@@ -539,7 +540,8 @@ abstract class RecordMapper extends DataMapper
   }
 
   /**
-   * @return mixed
+   * @return bool|mixed
+   * @throws \Exception
    */
   public function saveChanges()
   {
@@ -551,6 +553,8 @@ abstract class RecordMapper extends DataMapper
     {
       $this->_preUpdate();
     }
+
+    $this->_changes = [];
 
     $connection = $this->connection(new ConnectionMode(ConnectionMode::WRITE));
     $modified   = $this->getModifiedAttributes();
@@ -579,6 +583,18 @@ abstract class RecordMapper extends DataMapper
           if(in_array($attr->name(), $idFields) && $this->exists())
           {
             throw new \Exception("You cannot update IDs on a pivot table");
+          }
+
+          if(
+            $this->_autoTimestamp
+            && $attr->name() != $this->createdAttribute()
+            && $attr->name() != $this->updatedAttribute()
+          )
+          {
+            $this->_changes[$attr->name()] = [
+              'before' => $attr->originalData(),
+              'after'  => $attr->data()
+            ];
           }
 
           $val = $attr->rawData();
@@ -698,6 +714,11 @@ abstract class RecordMapper extends DataMapper
     $this->_handledError = null;
 
     return $result;
+  }
+
+  public function getSavedChanges()
+  {
+    return $this->_changes;
   }
 
   public function hasOne(RecordMapper $entity, $foreignKey = null)
