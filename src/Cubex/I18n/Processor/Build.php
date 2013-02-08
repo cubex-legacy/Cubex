@@ -120,7 +120,7 @@ class Build
     {
       throw new \Exception("No translator set");
     }
-    $runDir = $this->_projectDir . DS . $directory;
+    $runDir = rtrim($this->_projectDir, DS) . DS . $directory;
 
     if(is_dir($runDir))
     {
