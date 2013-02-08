@@ -35,7 +35,7 @@ class GetText implements Loader
       return (string)$message;
     }
 
-    return dgettext($textDomain, $message);
+    return utf8_decode(dgettext($textDomain, $message));
   }
 
   /**
@@ -70,7 +70,9 @@ class GetText implements Loader
     }
     else
     {
-      $translated = dngettext($textDomain, $singular, $plural, $number);
+      $translated = utf8_decode(
+        dngettext($textDomain, $singular, $plural, $number)
+      );
     }
 
     if(substr_count($translated, '%d') == 1)
