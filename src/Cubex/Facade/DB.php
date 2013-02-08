@@ -12,14 +12,14 @@ class DB extends BaseFacade
   /**
    * @return \Cubex\Database\DatabaseService
    */
-  protected static function _getAccessor()
+  public static function getAccessor()
   {
     return static::getServiceManager()->db("db");
   }
 
   protected static function _query($method, $query /*,$args*/)
   {
-    $connection = static::_getAccessor();
+    $connection = static::getAccessor();
     if(func_num_args() > 2)
     {
       $args = func_get_args();

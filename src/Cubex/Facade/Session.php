@@ -14,7 +14,7 @@ class Session extends BaseFacade
   /**
    * @return \Cubex\Session\SessionService
    */
-  protected static function _getAccessor()
+  public static function getAccessor()
   {
     $sessionManager = static::getServiceManager();
     return $sessionManager->session();
@@ -22,19 +22,19 @@ class Session extends BaseFacade
 
   public static function id()
   {
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
     return $accessor->id();
   }
 
   public static function set($key, $value)
   {
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
     return $accessor->set($key, $value);
   }
 
   public static function get($key, $default = null)
   {
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
     $response = $accessor->get($key);
     if($response !== null)
     {
@@ -45,26 +45,26 @@ class Session extends BaseFacade
 
   public static function exists($key)
   {
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
     return $accessor->get($key) === null;
   }
 
   public static function delete($key)
   {
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
     return $accessor->delete($key);
   }
 
   public static function flush()
   {
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
     return $accessor->destroy();
   }
 
   public static function flash($key, $value)
   {
     static::_resetFlash();
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
     $flash    = $accessor->get(static::FLASH_KEY);
     if(!is_array($flash))
     {
@@ -80,7 +80,7 @@ class Session extends BaseFacade
   {
     if(static::$_flash === null)
     {
-      $accessor = static::_getAccessor();
+      $accessor = static::getAccessor();
       $flash    = $accessor->get(static::FLASH_KEY);
       if($flash === null)
       {

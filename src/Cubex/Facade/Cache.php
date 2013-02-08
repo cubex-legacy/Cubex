@@ -10,7 +10,7 @@ class Cache extends BaseFacade
   /**
    * @return \Cubex\Cache\CacheService
    */
-  protected static function _getAccessor()
+  public static function getAccessor()
   {
     return static::getServiceManager()->cache();
   }
@@ -22,7 +22,7 @@ class Cache extends BaseFacade
 
   public static function get($key, $default = null)
   {
-    $result = static::_getAccessor()->get($key);
+    $result = static::getAccessor()->get($key);
     if($result === null)
     {
       return $default;
@@ -35,7 +35,7 @@ class Cache extends BaseFacade
 
   public static function set($key, $value, $expire = 1800)
   {
-    return static::_getAccessor()->set($key, $value, $expire);
+    return static::getAccessor()->set($key, $value, $expire);
   }
 
   public static function forever($key, $value)
@@ -75,6 +75,6 @@ class Cache extends BaseFacade
 
   public static function delete($key)
   {
-    return static::_getAccessor()->delete($key);
+    return static::getAccessor()->delete($key);
   }
 }

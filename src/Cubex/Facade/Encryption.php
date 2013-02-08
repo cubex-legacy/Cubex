@@ -10,7 +10,7 @@ class Encryption extends BaseFacade
   /**
    * @return \Cubex\Encryption\EncryptionService
    */
-  protected static function _getAccessor()
+  public static function getAccessor()
   {
     return static::getServiceManager()->get("encryption");
   }
@@ -23,7 +23,7 @@ class Encryption extends BaseFacade
    */
   public static function encrypt($value, array $options = [])
   {
-    return static::_getAccessor()->encrypt($value, $options);
+    return static::getAccessor()->encrypt($value, $options);
   }
 
   /**
@@ -34,6 +34,6 @@ class Encryption extends BaseFacade
    */
   public static function decrypt($value, array $options = [])
   {
-    return static::_getAccessor()->decrypt($value, $options);
+    return static::getAccessor()->decrypt($value, $options);
   }
 }

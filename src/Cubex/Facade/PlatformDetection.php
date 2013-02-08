@@ -9,7 +9,7 @@ class PlatformDetection extends BaseFacade
   /**
    * @return \Cubex\Platform\Detection\DetectionService
    */
-  protected static function _getAccessor()
+  public static function getAccessor()
   {
     $serviceManager = static::getServiceManager();
 
@@ -21,7 +21,7 @@ class PlatformDetection extends BaseFacade
    */
   public static function isMobile()
   {
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
 
     return $accessor->isMobile();
   }
@@ -31,7 +31,7 @@ class PlatformDetection extends BaseFacade
    */
   public static function isTablet()
   {
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
 
     return $accessor->isTablet();
   }
@@ -41,7 +41,7 @@ class PlatformDetection extends BaseFacade
    */
   public static function isDesktop()
   {
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
 
     return !$accessor->isMobile();
   }
@@ -51,7 +51,7 @@ class PlatformDetection extends BaseFacade
    */
   public static function canSetUserAgent()
   {
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
 
     return $accessor->canSetUserAgent();
   }
@@ -63,7 +63,7 @@ class PlatformDetection extends BaseFacade
    */
   public static function setUserAgent(array $userAgent)
   {
-    $accessor = static::_getAccessor();
+    $accessor = static::getAccessor();
 
     return $accessor->setUserAgent($userAgent);
   }

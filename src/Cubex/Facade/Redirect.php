@@ -7,7 +7,7 @@ namespace Cubex\Facade;
 
 class Redirect extends BaseFacade
 {
-  protected static function _getAccessor()
+  public static function getAccessor()
   {
     return new \Cubex\Core\Http\Redirect();
   }
@@ -20,7 +20,7 @@ class Redirect extends BaseFacade
    */
   public static function to($destination, $statusCode = 302)
   {
-    return static::_getAccessor()->to($destination, $statusCode);
+    return static::getAccessor()->to($destination, $statusCode);
   }
 
   /**
@@ -30,6 +30,6 @@ class Redirect extends BaseFacade
    */
   public static function back($statusCode = 302)
   {
-    return static::_getAccessor()->back($statusCode);
+    return static::getAccessor()->back($statusCode);
   }
 }

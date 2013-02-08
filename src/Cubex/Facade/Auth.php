@@ -14,7 +14,7 @@ class Auth extends BaseFacade
   /**
    * @return \Cubex\Auth\AuthService|null
    */
-  protected static function _getAccessor()
+  public static function getAccessor()
   {
     return static::getServiceManager()->get("auth");
   }
@@ -36,7 +36,7 @@ class Auth extends BaseFacade
 
   public static function authById($userId)
   {
-    $user = static::_getAccessor()->authById($userId);
+    $user = static::getAccessor()->authById($userId);
     if($user instanceof AuthedUser)
     {
       static::_storeLogin($user);
@@ -46,7 +46,7 @@ class Auth extends BaseFacade
 
   public static function authByCredentials(LoginCredentials $credentials)
   {
-    $user = static::_getAccessor()->authByCredentials($credentials);
+    $user = static::getAccessor()->authByCredentials($credentials);
     if($user instanceof AuthedUser)
     {
       static::_storeLogin($user);

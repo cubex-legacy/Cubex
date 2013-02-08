@@ -27,7 +27,7 @@ abstract class BaseFacade
     }
   }
 
-  protected static function _getAccessor()
+  public static function getAccessor()
   {
     throw new \RuntimeException(
       "getAccess has not been implemented on " . get_called_class()

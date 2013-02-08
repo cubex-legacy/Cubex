@@ -12,13 +12,13 @@ class FeatureSwitch extends BaseFacade
   /**
    * @return \Cubex\FeatureSwitch\FeatureSwitch|null
    */
-  protected static function _getAccessor()
+  public static function getAccessor()
   {
     return static::getServiceManager()->get("featureswitch");
   }
 
   public static function isEnabled($featureName)
   {
-    return static::_getAccessor()->isEnabled($featureName);
+    return static::getAccessor()->isEnabled($featureName);
   }
 }
