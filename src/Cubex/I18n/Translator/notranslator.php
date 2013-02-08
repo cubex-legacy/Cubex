@@ -9,7 +9,7 @@ namespace Cubex\I18n\Translator;
 
 use Cubex\Foundation\Config\ConfigTrait;
 
-class Notranslator implements Translator
+class NoTranslator implements Translator
 {
   use ConfigTrait;
   /**
