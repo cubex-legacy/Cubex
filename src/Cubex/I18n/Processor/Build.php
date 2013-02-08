@@ -8,7 +8,7 @@ namespace Cubex\I18n\Processor;
 /**
  * Build
  */
-use Cubex\I18n\Translator\Notranslator;
+use Cubex\I18n\Translator\NoTranslator;
 use Cubex\I18n\Translator\Translator;
 
 class Build
@@ -134,7 +134,7 @@ class Build
       }
       file_put_contents(
         $localeDir . DS . 'messages.po',
-        $analyse->generatePO('', new Notranslator())
+        $analyse->generatePO('', new NoTranslator())
       );
 
       foreach($this->_languages as $language)
