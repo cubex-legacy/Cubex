@@ -65,6 +65,12 @@ class Locale
         $locale = \Locale::DEFAULT_LOCALE;
       }
     }
+
+    if(strlen($locale) == 2)
+    {
+      $locale = $locale . '_' . strtoupper($locale);
+    }
+
     return $locale;
   }
 
