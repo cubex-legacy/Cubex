@@ -84,10 +84,11 @@ class TemplatedViewModel extends ViewModel
       $part = strtolower($part);
       if(
         in_array(
-          $part, [
-                 'controllers',
-                 'views'
-                 ]
+          $part,
+          [
+          'controllers',
+          'views'
+          ]
         )
         || substr($part, -10) == 'controller'
       )
@@ -103,8 +104,8 @@ class TemplatedViewModel extends ViewModel
       $templatesPath = dirname($templatesPath);
     }
 
-    $directory = $templatesPath . DIRECTORY_SEPARATOR . 'Templates';
-    $file      = implode('\\', $nsParts);
+    $directory = $templatesPath . DS . 'Templates';
+    $file      = implode(DS, $nsParts);
 
     return array(
       'directory' => $directory,
