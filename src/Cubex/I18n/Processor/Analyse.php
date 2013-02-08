@@ -187,6 +187,18 @@ class Analyse
     $wrapon = 80;
     $result = '';
 
+    $result .= 'msgid ""' . "\n";
+    $result .= 'msgstr ""' . "\n";
+    $result .= '"Project-Id-Version: \n"' . "\n";
+    $result .= '"POT-Creation-Date: \n"' . "\n";
+    $result .= '"PO-Revision-Date: \n"' . "\n";
+    $result .= '"Last-Translator: \n"' . "\n";
+    $result .= '"Language-Team: \n"' . "\n";
+    $result .= '"MIME-Version: 1.0\n"' . "\n";
+    $result .= '"Content-Type: text/plain; charset=iso-8859-1\n"' . "\n";
+    $result .= '"Content-Transfer-Encoding: 8bit\n"' . "\n";
+    $result .= '"X-Generator: Cubex PHP\n"' . "\n";
+
     foreach($this->_translations as $buildType => $translations)
     {
       foreach($translations as $message => $appearances)
