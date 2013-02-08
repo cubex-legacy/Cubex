@@ -650,12 +650,13 @@ abstract class RecordMapper extends DataMapper
         array_values($inserts),
       );
 
+      array_unshift($args, $pattern);
+      $query = ParseQuery::parse($connection, $args);
+
       if($this->id() !== null)
       {
-        $pattern .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
+        $query .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
       }
-
-      array_unshift($args, $pattern);
     }
     else
     {
@@ -685,9 +686,9 @@ abstract class RecordMapper extends DataMapper
           $this->id(),
         );
       }
-    }
 
-    $query = ParseQuery::parse($connection, $args);
+      $query = ParseQuery::parse($connection, $args);
+    }
 
     $result = $connection->query($query);
 
