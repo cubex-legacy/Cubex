@@ -21,7 +21,7 @@ class Build
   /**
    * @var string
    */
-  protected $_msgFmt = "msgfmt -V";
+  protected $_msgFmt = "msgfmt";
 
   /**
    * @var array
