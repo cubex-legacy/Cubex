@@ -30,4 +30,6 @@ interface EmailService extends Service
   public function addHeader($name, $value);
 
   public function send();
+
+  public function reset();
 }

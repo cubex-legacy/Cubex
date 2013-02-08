@@ -24,6 +24,16 @@ final class SwiftMail implements EmailService
   private $_message;
 
   /**
+   * @return $this
+   */
+  public function reset()
+  {
+    $this->_message = null;
+
+    return $this;
+  }
+
+  /**
    * @param ServiceConfig $config
    *
    * @return mixed

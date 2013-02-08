@@ -12,15 +12,34 @@ class Mail implements EmailService
 {
 
   protected $_recipients = [];
-  protected $_ccs = [];
-  protected $_bccs = [];
+  protected $_ccs        = [];
+  protected $_bccs       = [];
   protected $_subject;
   protected $_message;
-  protected $_from = [];
+  protected $_from       = [];
   protected $_sender;
   protected $_returnPath;
   protected $_isHtml;
-  protected $_headers;
+  protected $_headers    = [];
+
+  /**
+   * @return $this
+   */
+  public function reset()
+  {
+    $this->_recipients = [];
+    $this->_ccs        = [];
+    $this->_bccs       = [];
+    $this->_subject    = null;
+    $this->_message    = null;
+    $this->_from       = [];
+    $this->_sender     = null;
+    $this->_returnPath = null;
+    $this->_isHtml     = null;
+    $this->_headers    = [];
+
+    return $this;
+  }
 
   /**
    * @param ServiceConfig $config
