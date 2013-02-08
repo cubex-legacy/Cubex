@@ -35,7 +35,7 @@ class GetText implements Loader
       return (string)$message;
     }
 
-    return utf8_decode(dgettext($textDomain, $message));
+    return htmlspecialchars(dgettext($textDomain, $message));
   }
 
   /**
@@ -70,7 +70,7 @@ class GetText implements Loader
     }
     else
     {
-      $translated = utf8_decode(
+      $translated = htmlspecialchars(
         dngettext($textDomain, $singular, $plural, $number)
       );
     }
