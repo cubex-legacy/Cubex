@@ -219,8 +219,8 @@ class PivotMapper extends RecordMapper
     $col = new static;
     if($col instanceof PivotMapper)
     {
-      $col->loadCollection($mapper);
+      return $col->loadCollection($mapper);
     }
-    return $col;
+    return null;
   }
 }

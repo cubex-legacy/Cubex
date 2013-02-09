@@ -423,6 +423,19 @@ class RecordCollection extends Collection
     return $this;
   }
 
+  public function first($default = null)
+  {
+    if(!$this->_loaded)
+    {
+      $this->get();
+    }
+    if($this->count() > 0)
+    {
+      return head($this->_mappers);
+    }
+    return $default;
+  }
+
 
   /**
    * Get a selection from the entire result set
