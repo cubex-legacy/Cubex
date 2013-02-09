@@ -658,11 +658,11 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
     $class = ltrim($class, '\\');
     try
     {
-      if(strpos($class, 'Cubex') === 0)
+      if(strpos($class, 'Cubex\\') === 0)
       {
         $base = dirname(__DIR__);
       }
-      else if(strpos($class, $this->_namespace) === 0)
+      else if(strpos($class, $this->_namespace . '\\') === 0)
       {
         $base = $this->_projectSourceRoot;
       }
