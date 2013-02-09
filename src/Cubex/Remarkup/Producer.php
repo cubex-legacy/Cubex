@@ -265,19 +265,21 @@ class Producer implements Renderable
 
   protected function _parseCodeBlock($text)
   {
-    $text = trim($text);
     if(!empty($text))
     {
       $code = trim(implode("\n", $text));
-      if(substr($code, 0, 2) !== '<?')
+      if(!empty($code))
       {
-        $out = highlight_string('<?php' . "\n$code\n" . '?>', true);
+        if(substr($code, 0, 2) !== '<?')
+        {
+          $out = highlight_string('<?php' . "\n$code\n" . '?>', true);
+        }
+        else
+        {
+          $out = highlight_string($code, true);
+        }
+        return str_replace("\n", "", $out) . "\n";
       }
-      else
-      {
-        $out = highlight_string($code, true);
-      }
-      return str_replace("\n", "", $out) . "\n";
     }
     return '';
   }
