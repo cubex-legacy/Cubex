@@ -139,8 +139,6 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
       }
     }
 
-    $this->_addAttribute(new Attribute("fewkh"));
-
     if(!empty($compAttrs))
     {
       //Add composite attributes after base attributes have been generated
