@@ -4,6 +4,7 @@
  */
 namespace Cubex\View;
 
+use Cubex\Container\Container;
 use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\DataHandler\HandlerTrait;
@@ -31,6 +32,11 @@ abstract class ViewModel implements Renderable, Translatable
     }
   }
 
+  public function request()
+  {
+    return Container::request();
+  }
+
   /**
    * Attempt to set page title
    *
@@ -41,7 +47,9 @@ abstract class ViewModel implements Renderable, Translatable
   public function setTitle($title = '')
   {
     EventManager::trigger(
-      EventManager::CUBEX_PAGE_TITLE, ['title' => $title], $this
+      EventManager::CUBEX_PAGE_TITLE,
+      ['title' => $title],
+      $this
     );
     return $this;
   }
