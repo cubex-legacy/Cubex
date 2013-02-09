@@ -133,8 +133,16 @@ class Collection
 
   public function addMapper(DataMapper $mapper)
   {
-    $this->_loaded                 = true;
-    $this->_mappers[$mapper->id()] = $mapper;
+    $this->_loaded = true;
+    $id            = $mapper->id();
+    if($id === null)
+    {
+      $this->_mappers[] = $mapper;
+    }
+    else
+    {
+      $this->_mappers[$id] = $mapper;
+    }
     if($mapper->id() !== null)
     {
       $this->_dictionary[$mapper->id()] = true;
