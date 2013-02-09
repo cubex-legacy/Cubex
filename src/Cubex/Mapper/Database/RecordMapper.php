@@ -890,6 +890,23 @@ abstract class RecordMapper extends DataMapper
   }
 
   /**
+   * @return static|null
+   * @throws \Exception
+   */
+  public static function loadWhereOrNew()
+  {
+    $resp = call_user_func_array(
+      [get_called_class(), "loadWhere"],
+      func_get_args()
+    );
+    if($resp === null)
+    {
+      $resp = new static;
+    }
+    return $resp;
+  }
+
+  /**
    * @return RecordCollection
    */
   public static function collection()
