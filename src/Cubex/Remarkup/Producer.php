@@ -33,10 +33,10 @@ use Cubex\Foundation\Renderable;
  *
  * ``` echo "bob"; ```
  *
- * <?php
- * echo "srkh";
- * echo "brooke";
- * ?>
+ *   <?php
+ *   echo "srkh";
+ *   echo "brooke";
+ *   ?>
  *
  * = large header =
  * == smaller header ==
@@ -265,6 +265,7 @@ class Producer implements Renderable
 
   protected function _parseCodeBlock($text)
   {
+    $text = trim($text);
     if(!empty($text))
     {
       $code = trim(implode("\n", $text));
