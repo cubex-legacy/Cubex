@@ -407,27 +407,35 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
-  /**
-   * @param FormElement $attribute
+  /***
+   * @param FormElement|\Cubex\Data\Attribute $attribute
    *
-   * @return $this|void
+   * @return $this
+   * @throws \Exception
    */
-  protected function _addAttribute(FormElement $attribute)
+  protected function _addAttribute(Attribute $attribute)
   {
-    $attribute->setId($this->id() . '-' . $attribute->id());
-    if($attribute->type() == FormElement::FILE)
+    if($attribute instanceof FormElement)
     {
-      $this->setEncType();
+      $attribute->setId($this->id() . '-' . $attribute->id());
+      if($attribute->type() == FormElement::FILE)
+      {
+        $this->setEncType();
+      }
+      if($attribute->labelPosition() === null)
+      {
+        $attribute->setLabelPosition($this->labelPosition());
+      }
+      if($attribute->getRenderTemplate() === null)
+      {
+        $attribute->setRenderTemplate($this->_elementRenderTemplate);
+      }
+      $this->_attributes[strtolower($attribute->name())] = $attribute;
     }
-    if($attribute->labelPosition() === null)
+    else
     {
-      $attribute->setLabelPosition($this->labelPosition());
+      throw new \Exception("You can only add FormElements to Forms");
     }
-    if($attribute->getRenderTemplate() === null)
-    {
-      $attribute->setRenderTemplate($this->_elementRenderTemplate);
-    }
-    $this->_attributes[strtolower($attribute->name())] = $attribute;
     return $this;
   }
 
@@ -729,10 +737,11 @@ class Form extends DataMapper implements Renderable
 
   /**
    * @param array $attributes
+   * @param bool  $hidden
    *
    * @return array
    */
-  protected function _getRawAttributesArr(array $attributes)
+  protected function _getRawAttributesArr(array $attributes, $hidden = true)
   {
     $rawAttributes = [];
     foreach($attributes as $attribute)
