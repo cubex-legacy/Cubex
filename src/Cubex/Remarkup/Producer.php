@@ -270,14 +270,7 @@ class Producer implements Renderable
       $code = trim(implode("\n", $text));
       if(!empty($code))
       {
-        if(substr($code, 0, 2) !== '<?')
-        {
-          $out = highlight_string('<?php' . "\n$code\n" . '?>', true);
-        }
-        else
-        {
-          $out = highlight_string($code, true);
-        }
+        $out = highlight_string($code, true);
         return str_replace("\n", "", $out) . "\n";
       }
     }
