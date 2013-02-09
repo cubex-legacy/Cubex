@@ -140,7 +140,7 @@ class FormElementRender implements Renderable
       "type"  => $type,
       "name"  => $this->_element->name(),
       "id"    => $this->_element->id(),
-      "value" => $this->_element->data(),
+      "value" => esc($this->_element->data()),
       ]
     );
     $out .= $this->_renderAttributes();
@@ -215,7 +215,7 @@ class FormElementRender implements Renderable
     );
     $out .= $this->_renderAttributes();
     $out .= '>';
-    $out .= $this->_element->data();
+    $out .= esc($this->_element->data());
     $out .= '</textarea>';
     return $out;
   }
@@ -259,7 +259,7 @@ class FormElementRender implements Renderable
         "name"  => $this->_element->name(
         ) . ($multi && !$type == 'radio' ? '[]' : ''),
         "id"    => $id,
-        "value" => ($multi ? $k : $this->_element->selectedValue()),
+        "value" => esc($multi ? $k : $this->_element->selectedValue()),
         ]
       );
 
