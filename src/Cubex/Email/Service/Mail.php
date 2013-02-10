@@ -203,7 +203,11 @@ class Mail implements EmailService
     $headers          = implode("\r\n", $this->_headers);
     $to               = implode(",", $this->_recipients);
 
-    return mail($to, $this->_subject, $this->_message, $headers);
+    $mail = mail($to, $this->_subject, $this->_message, $headers);
+
+    $this->reset();
+
+    return $mail;
   }
 
   protected function _generatedAttachmentHeaders()
