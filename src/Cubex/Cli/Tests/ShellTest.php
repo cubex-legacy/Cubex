@@ -76,6 +76,7 @@ class ShellTest extends TestCase
   public function testReturnsOfSlightlyUntestableMethods()
   {
     $this->assertTrue(is_int(Shell::columns()));
+    $this->assertGreaterThan(0, Shell::columns());
     $this->assertTrue(is_bool(Shell::isPiped()));
   }
 

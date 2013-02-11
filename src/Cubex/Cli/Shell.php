@@ -8,6 +8,8 @@ namespace Cubex\Cli;
 /**
  * Basic Shell improvements
  */
+use Cubex\Helpers\System;
+
 class Shell
 {
   const COLOUR_FOREGROUND_BLACK        = '0;30';
@@ -134,7 +136,46 @@ class Shell
    */
   public static function columns()
   {
+    if(System::isWindows())
+    {
+      return static::_windowsColumns();
+    }
+
     return (int)exec('/usr/bin/env tput cols');
+  }
+
+  /**
+   * Find the number of colums on a windows shell.
+   *
+   * @return int
+   */
+  protected static function _windowsColumns()
+  {
+    $columns = 0;
+    exec("mode", $output);
+
+    if(is_array($output))
+    {
+      foreach($output as $line)
+      {
+        if(substr(trim($line), 0, 8) === "Columns:")
+        {
+          $matched = preg_match(
+            "/^\s*Columns\:\s*(\d+)\s*$/",
+            $line,
+            $matches
+          );
+
+          if($matched)
+          {
+            $columns = (int)$matches[1];
+            break;
+          }
+        }
+      }
+    }
+
+    return $columns;
   }
 
   /**
