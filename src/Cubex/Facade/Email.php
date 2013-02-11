@@ -24,7 +24,7 @@ class Email extends BaseFacade
    *
    * @return mixed
    */
-  public function mail($to, $subject, $message, $headers = array())
+  public static function mail($to, $subject, $message, $headers = array())
   {
     static::getAccessor()->reset();
 
