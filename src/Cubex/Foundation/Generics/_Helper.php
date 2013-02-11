@@ -121,3 +121,52 @@ if(!function_exists("is_assoc"))
     return ($array !== array_values($array));
   }
 }
+
+if(!function_exists("starts_with"))
+{
+  /**
+   * @param      $haystack
+   * @param      $needle
+   * @param bool $case
+   *
+   * @return bool
+   */
+  function starts_with($haystack, $needle, $case = true)
+  {
+    if($case)
+    {
+      return strncasecmp($haystack, $needle, strlen($needle)) == 0;
+    }
+    else
+    {
+      return strncmp($haystack, $needle, strlen($needle)) == 0;
+    }
+  }
+}
+
+if(!function_exists("ends_with"))
+{
+  /**
+   * @param      $haystack
+   * @param      $needle
+   * @param bool $case
+   *
+   * @return bool
+   */
+  function ends_with($haystack, $needle, $case = true)
+  {
+    return starts_with(strrev($haystack), strrev($needle), $case);
+  }
+}
+
+if(!function_exists("strip_start"))
+{
+  function strip_start($haystack, $needle)
+  {
+    if(starts_with($haystack, $needle))
+    {
+      $haystack = substr($haystack, strlen($needle));
+    }
+    return $haystack;
+  }
+}
