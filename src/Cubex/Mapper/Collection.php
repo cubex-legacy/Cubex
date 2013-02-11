@@ -67,6 +67,7 @@ class Collection
 
   public function getUniqueField($field)
   {
+    $this->_preCheckMappers();
     $result = [];
     foreach($this->_mappers as $mapper)
     {
@@ -83,6 +84,7 @@ class Collection
 
   public function getKeyPair($keyField, $valueField)
   {
+    $this->_preCheckMappers();
     $result = [];
     foreach($this->_mappers as $mapper)
     {
@@ -93,6 +95,7 @@ class Collection
 
   public function getKeyedArray($keyField, array $fields)
   {
+    $this->_preCheckMappers();
     $result = [];
     foreach($this->_mappers as $mapper)
     {
@@ -185,6 +188,7 @@ class Collection
 
   public function contains($id)
   {
+    $this->_preCheckMappers();
     return isset($this->_dictionary[$id]);
   }
 
