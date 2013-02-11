@@ -71,7 +71,7 @@ class PivotMapper extends RecordMapper
       $eClass = strtolower(class_shortname($pivotb));
 
       $sT     = $pivota->getTableName();
-      $prefix = str_replace($class . 's', '', $sT);
+      $prefix = strip_start($sT, $class . 's_');
       $prefix = trim($prefix, '_');
 
       if($eClass > $class)
