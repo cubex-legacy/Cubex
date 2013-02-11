@@ -3,21 +3,25 @@
  * @author gareth.evans
  */
 
-namespace Cubex\I18n\Service\PersistentLocale;
+namespace Cubex\I18n\Service\Locale;
 
 use Cubex\Container\Container;
+use Cubex\Cookie\CookieInterface;
 use Cubex\Cookie\Cookies;
 use Cubex\Cookie\StandardCookie;
 use Cubex\I18n\LocaleService;
 use Cubex\ServiceManager\ServiceConfig;
 
-class Cookie implements LocaleService
+class PersistentCookie implements LocaleService
 {
   public function configure(ServiceConfig $config)
   {
     return $this;
   }
 
+  /**
+   * @return null|string
+   */
   public function getLocale()
   {
     if(Cookies::exists("LC_ALL"))
@@ -30,6 +34,16 @@ class Cookie implements LocaleService
     return null;
   }
 
+  /**
+   * @param string      $locale
+   * @param \DateTime   $expire
+   * @param null|string $path
+   * @param null|string $domain
+   * @param bool        $secure
+   * @param bool        $httponly
+   *
+   * @return bool
+   */
   public function setLocale($locale, \DateTime $expire = null, $path = null,
                             $domain = null, $secure = false, $httponly = false)
   {
@@ -43,9 +57,22 @@ class Cookie implements LocaleService
       $httponly
     );
 
-    Cookies::set($localeCookie);
+    return $this->_setCookie($localeCookie);
   }
 
+  /**
+   * @param \Cubex\Cookie\CookieInterface $cookie
+   *
+   * @return bool
+   */
+  protected function _setCookie(CookieInterface $cookie)
+  {
+    return Cookies::set($cookie);
+  }
+
+  /**
+   * @return string
+   */
   protected function _getDomain()
   {
     /**

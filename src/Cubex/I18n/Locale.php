@@ -4,6 +4,8 @@
  */
 namespace Cubex\I18n;
 
+use Cubex\Container\Container;
+
 class Locale
 {
   protected $_locale;
@@ -47,11 +49,26 @@ class Locale
 
   public function getLocale()
   {
-    $locale = $this->_locale;
+    /**
+     * @var \Cubex\ServiceManager\ServiceManager $sm
+     */
+    $sm = Container::get(Container::SERVICE_MANAGER);
+    /**
+     * @var \Cubex\I18n\LocaleService $localeService
+     */
+    $localeService = $sm->get("locale");
+    $locale = $localeService->getLocale();
+
+    if($locale === null)
+    {
+      $locale = $this->_locale;
+    }
+
     if($locale === null)
     {
       $locale = static::$_localeStatic;
     }
+
     if($locale === null)
     {
       if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))

@@ -157,9 +157,16 @@ class Cookies
     return array_key_exists($name, self::$_cookies);
   }
 
+  /**
+   * @param CookieInterface $cookie
+   *
+   * @return bool
+   */
   public static function set(CookieInterface $cookie)
   {
     self::_init();
     self::$_cookies[$cookie->getName()] = $cookie;
+
+    return true;
   }
 }

@@ -159,16 +159,6 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       return $this;
     }
 
-    if($locale === null)
-    {
-      $sm = $this->getServiceManager();
-      /**
-       * @var \Cubex\I18n\LocaleService $localeService
-       */
-      $localeService = $sm->get("locale");
-      $locale = $localeService->getLocale();
-    }
-
     $obj = new \Cubex\I18n\Locale();
 
     if($locale !== null)
