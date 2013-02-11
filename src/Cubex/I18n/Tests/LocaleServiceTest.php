@@ -6,11 +6,29 @@
 namespace Cubex\I18n\Tests;
 
 use Cubex\Container\Container;
+use Cubex\Cookie\Cookies;
 use Cubex\Cookie\StandardCookie;
+use Cubex\I18n\Service\Locale\PersistentCookie;
 use Cubex\Tests\TestCase;
 
 class LocaleServiceTest extends TestCase
 {
+  /**
+   * @var \PHPUnit_Framework_MockObject_MockObject
+   */
+  private $_requestMock;
+
+  public function setUp()
+  {
+    $this->_requestMock = $this->getMock(
+      "\\Cubex\\Core\\Http\\Request",
+      ["domain", "tld"],
+      [],
+      "",
+      false
+    );
+  }
+
   public function testSetLocale()
   {
     $mockLocale = $this->getMock(
@@ -18,23 +36,15 @@ class LocaleServiceTest extends TestCase
       ["_setCookie"]
     );
 
-    $requestMock = $this->getMock(
-      "\\Cubex\\Core\\Http\\Request",
-      ["domain", "tld"],
-      [],
-      "",
-      false
-    );
-
-    $requestMock->expects($this->once())
+    $this->_requestMock->expects($this->once())
     ->method("domain")
     ->will($this->returnValue("example"));
 
-    $requestMock->expects($this->once())
+    $this->_requestMock->expects($this->once())
     ->method("tld")
     ->will($this->returnValue("com"));
 
-    Container::bind(Container::REQUEST, $requestMock);
+    Container::bind(Container::REQUEST, $this->_requestMock);
 
     $mockLocale->expects($this->once())
     ->method("_setCookie")
@@ -49,5 +59,13 @@ class LocaleServiceTest extends TestCase
     );
 
     $this->assertEquals($excpectedCookie, $cookie);
+  }
+
+  public function testGetLocale()
+  {
+    $persistentLocale = new PersistentCookie();
+    $persistentLocale->setLocale("en");
+
+    $this->assertEquals("en", $persistentLocale->getLocale());
   }
 }
