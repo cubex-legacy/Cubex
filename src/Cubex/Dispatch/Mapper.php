@@ -157,7 +157,6 @@ class Mapper extends Dispatcher
     foreach($directoryList as $directoryListItem)
     {
       $currentEntity = $directory . DS . $directoryListItem;
-
       if($this->getFileSystem()->isDir($currentEntity))
       {
         $newEntityPath = $entityPath ? $entityPath . DS : "";
@@ -170,7 +169,7 @@ class Mapper extends Dispatcher
           $entityPath
         );
         $cleanedCurrentEntity = $this->_removeHiddenDirectoriesFromPath(
-          $currentEntity
+          ($entityPath ? $entityPath . DS : "") . $directoryListItem
         );
 
         $map[$cleanedCurrentEntity] = md5(
@@ -378,17 +377,22 @@ class Mapper extends Dispatcher
    */
   protected function _removeHiddenDirectoriesFromPath($path)
   {
-    $normalizedPath = $this->getFileSystem()->normalizePath($path);
-    $pathParts = explode("/", $normalizedPath);
-
-    foreach($pathParts as $pathPartKey => $pathPart)
+    if($path)
     {
-      if($pathPart[0] === ".")
+      $normalizedPath = str_replace("\\", "/", $path);
+      $pathParts = explode("/", $normalizedPath);
+
+      foreach($pathParts as $pathPartKey => $pathPart)
       {
-        unset($pathParts[$pathPartKey]);
+        if($pathPart[0] === ".")
+        {
+          unset($pathParts[$pathPartKey]);
+        }
       }
+
+      return implode("/", $pathParts);
     }
 
-    return implode("/", $pathParts);
+    return $path;
   }
 }

@@ -68,37 +68,45 @@ class MapperTest extends TestCase
       ["listDirectory", "isDir", "fileExists", "readFile"]
     );
 
-    $fileSystemMock->expects($this->exactly(4))
+    $fileSystemMock->expects($this->exactly(6))
       ->method("listDirectory")
-      ->will($this->onConsecutiveCalls(["test.css"], [], ["test.css"], []));
+      ->will(
+        $this->onConsecutiveCalls(
+          ["css"], ["test.css"], [], ["css"], ["test.css"], []
+        )
+      );
 
     $fileSystemMock->expects($this->any())
       ->method("fileExists")
       ->will($this->returnValue(true));
 
-    $fileSystemMock->expects($this->any())
+    $fileSystemMock->expects($this->exactly(4))
       ->method("isDir")
-      ->will($this->returnValue(false));
+      ->will(
+        $this->onConsecutiveCalls(true, false, true, false)
+      );
 
     $fileSystemMock->expects($this->exactly(6))
       ->method("readFile")
-      ->will($this->onConsecutiveCalls(
-        $cssContentsArr[0], $cssContentsArr[1], $cssContentsArr[2],
-        $cssContentsArr[0], $cssContentsArr[1], $cssContentsArr[2]
-      ));
+      ->will(
+        $this->onConsecutiveCalls(
+          $cssContentsArr[0], $cssContentsArr[1], $cssContentsArr[2],
+          $cssContentsArr[0], $cssContentsArr[1], $cssContentsArr[2]
+        )
+      );
 
     $mapper = new Mapper($this->_configGroup, $fileSystemMock);
     $entityMap = $mapper->mapEntity($entity);
 
-    $this->assertArrayHasKey("$entity/test.css", $entityMap);
+    $this->assertArrayHasKey("css/test.css", $entityMap);
     $this->assertEquals(
-      md5(implode("", $cssContentsArr)), $entityMap["$entity/test.css"]
+      md5(implode("", $cssContentsArr)), $entityMap["css/test.css"]
     );
 
     // Test map entities
     $entitiesMaps = $mapper->mapEntities([$entity]);
     $this->assertArrayHasKey("$entity", $entitiesMaps);
-    $this->assertArrayHasKey("$entity/test.css", current($entitiesMaps));
+    $this->assertArrayHasKey("css/test.css", current($entitiesMaps));
 
     // Test bad dir
     $mapper      = new Mapper($this->_configGroup, new FileSystem());
