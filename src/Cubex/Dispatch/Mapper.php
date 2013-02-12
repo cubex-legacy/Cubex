@@ -23,6 +23,7 @@ class Mapper extends Dispatcher
     parent::__construct($configGroup, $fileSystem);
 
     $this->_ignoredFiles[$this->getDispatchIniFilename()] = true;
+    $this->_ignoredFiles[".gitignore"] = true;
   }
 
   /**
@@ -172,13 +173,18 @@ class Mapper extends Dispatcher
           ($entityPath ? $entityPath . DS : "") . $directoryListItem
         );
 
-        $map[$cleanedCurrentEntity] = md5(
-          $this->_concatAllRelatedFiles(
-            $entity,
-            $cleanedEntityPath,
-            $directoryListItem
-          )
-        );
+        // Little bit weak, but we don't want to risk adding an empty key to the
+        // array and breaking our ini files
+        if($cleanedCurrentEntity)
+        {
+          $map[$cleanedCurrentEntity] = md5(
+            $this->_concatAllRelatedFiles(
+              $entity,
+              $cleanedEntityPath,
+              $directoryListItem
+            )
+          );
+        }
       }
     }
 
@@ -217,11 +223,8 @@ class Mapper extends Dispatcher
   {
     $toMap = "";
 
-    // We only key the map from inside the resource directory, so we explode on
-    // it to get the second part
     foreach($map as $file => $checksum)
     {
-      $file = explode("/" . $this->getResourceDirectory() . "/", $file, 2)[1];
       $toMap .= "$file = \"$checksum\"\n";
     }
 

@@ -45,9 +45,7 @@ class Cli extends Mapper
 
   public function mapEntity($entity, $entityPath = "")
   {
-    $resourceDirectory = $this->getResourceDirectory();
-    $entityParts       = explode("/", $entity);
-    $shouldOutput      = end($entityParts) === $resourceDirectory;
+    $shouldOutput      = !$entityPath;
 
     $entityHash = $this->generateEntityHash($entity);
 
