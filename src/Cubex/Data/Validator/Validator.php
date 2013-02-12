@@ -109,7 +109,7 @@ class Validator
     {
       return true;
     }
-    if(floatval($input) == $input)
+    if(strlen(floatval($input)) == strlen($input))
     {
       return true;
     }
@@ -133,7 +133,8 @@ class Validator
     {
       return true;
     }
-    else {
+    else
+    {
       throw new \Exception("Invalid Scalar");
     }
   }

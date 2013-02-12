@@ -63,7 +63,7 @@ class ParseQuery implements FormatterInterface
         try
         {
           Validator::float($value);
-          return "%d";
+          return "%f";
         }
         catch(\Exception $e)
         {
