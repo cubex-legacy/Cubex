@@ -209,15 +209,15 @@ class Mapper extends Dispatcher
 
     try
     {
-      $existingMd5 = md5($this->getFileSystem()->readFile($dispatchFile));
+      $existingHash = md5($this->getFileSystem()->readFile($dispatchFile));
     }
     catch(\Exception $e)
     {
       // Seems we don't have one yet, let just set an emtyp string md5
-      $existingMd5 = md5("");
+      $existingHash = md5("");
     }
 
-    if($existingMd5 !== md5($toMap))
+    if($existingHash !== md5($toMap))
     {
       try
       {
