@@ -53,16 +53,16 @@ class Cli extends Mapper
 
     if($shouldOutput)
     {
-      $this->pushLine(
+      $this->_pushLine(
         $entityHash,
         Shell::colourText("Found ", Shell::COLOUR_FOREGROUND_LIGHT_CYAN)
       );
-      $this->pushLine(
+      $this->_pushLine(
         $entityHash,
         Shell::colourText($entityHash, Shell::COLOUR_FOREGROUND_PURPLE)
       );
-      $this->pushLine($entityHash, " $entity\n");
-      $this->pushLine($entityHash, "      Mapping Directory:   ");
+      $this->_pushLine($entityHash, " $entity\n");
+      $this->_pushLine($entityHash, "      Mapping Directory:   ");
       flush();
     }
 
@@ -71,7 +71,7 @@ class Cli extends Mapper
 
     if($shouldOutput)
     {
-      $this->pushLine($entityHash, $this->_getResult($numMapped > 0));
+      $this->_pushLine($entityHash, $this->_getResult($numMapped > 0));
     }
 
     return $mapped;
@@ -80,23 +80,23 @@ class Cli extends Mapper
   public function saveMap(array $map, $entity)
   {
     $entityHash = $this->generateEntityHash($entity);
-    $this->pushLine($entityHash, "      Saving Dispatch Map: ");
+    $this->_pushLine($entityHash, "      Saving Dispatch Map: ");
 
     $saved = parent::saveMap($map, $entity);
 
-    $this->pushLine($entityHash, $this->_getResult($saved) . "\n");
+    $this->_pushLine($entityHash, $this->_getResult($saved) . "\n");
   }
 
   public function writeConfig()
   {
-    $this->pushLine(
+    $this->_pushLine(
       "config",
       Shell::colourText(
         "============================================================\n\n",
         Shell::COLOUR_FOREGROUND_DARK_GREY
       )
     );
-    $this->pushLine(
+    $this->_pushLine(
       "config",
       Shell::colourText(
         "Writing Main Config:       ", Shell::COLOUR_FOREGROUND_LIGHT_CYAN
@@ -105,7 +105,7 @@ class Cli extends Mapper
 
     $result = parent::writeConfig();
 
-    $this->pushLine("config", $this->_getResult($result));
+    $this->_pushLine("config", $this->_getResult($result));
   }
 
   /*****************************************************************************
@@ -162,7 +162,7 @@ _  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
     return $result;
   }
 
-  private function pushLine($entityHash, $line)
+  private function _pushLine($entityHash, $line)
   {
     $this->_output[$entityHash][] = $line;
   }
