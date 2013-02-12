@@ -49,6 +49,7 @@ class Locale
 
   public function getLocale()
   {
+    $locale = null;
     /**
      * @var \Cubex\ServiceManager\ServiceManager $sm
      */
@@ -57,7 +58,10 @@ class Locale
      * @var \Cubex\I18n\LocaleService $localeService
      */
     $localeService = $sm->get("locale");
-    $locale = $localeService->getLocale();
+    if($localeService instanceof LocaleService)
+    {
+      $locale = $localeService->getLocale();
+    }
 
     if($locale === null)
     {
