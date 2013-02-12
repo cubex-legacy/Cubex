@@ -5,6 +5,7 @@
 
 namespace Cubex\Sprintf;
 
+use Cubex\Data\Validator\Validator;
 use Cubex\Database\DatabaseService;
 use Cubex\Mapper\Database\SearchObject;
 
@@ -47,6 +48,49 @@ use Cubex\Mapper\Database\SearchObject;
 
 class ParseQuery implements FormatterInterface
 {
+
+  public static function valueType($value)
+  {
+    if(is_scalar($value))
+    {
+      try
+      {
+        Validator::int($value);
+        return "%d";
+      }
+      catch(\Exception $e)
+      {
+        try
+        {
+          Validator::float($value);
+          return "%d";
+        }
+        catch(\Exception $e)
+        {
+          return "%s";
+        }
+      }
+    }
+    else if(is_object($value))
+    {
+      return "%QO";
+    }
+    else if(is_array($value))
+    {
+      if(is_assoc($value))
+      {
+        return "%QA";
+      }
+      else
+      {
+        return "%Ls";
+      }
+    }
+    else
+    {
+      return "%s";
+    }
+  }
 
   public static function parse(DatabaseService $connection, $args = [])
   {
@@ -134,7 +178,9 @@ class ParseQuery implements FormatterInterface
                 {
                   $val = (int)$v;
                 }
-                else $val = "'" . $connection->escapeString($v) . "'";
+                else {
+                  $val = "'" . $connection->escapeString($v) . "'";
+                }
 
                 if($next == 'O' && $value instanceof SearchObject)
                 {
