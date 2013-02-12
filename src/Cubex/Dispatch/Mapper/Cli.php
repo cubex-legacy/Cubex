@@ -43,7 +43,7 @@ class Cli extends Mapper
     $this->_completeMapper();
   }
 
-  public function mapEntity($entity)
+  public function mapEntity($entity, $entityPath = "")
   {
     $resourceDirectory = $this->getResourceDirectory();
     $entityParts       = explode("/", $entity);
@@ -66,7 +66,7 @@ class Cli extends Mapper
       flush();
     }
 
-    $mapped = parent::mapEntity($entity);
+    $mapped = parent::mapEntity($entity, $entityPath);
     $numMapped = count($mapped);
 
     if($shouldOutput)

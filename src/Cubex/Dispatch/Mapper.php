@@ -127,19 +127,27 @@ class Mapper extends Dispatcher
    * Gets an array of mapped entity paths, the value is the md5 of the content
    * from all related files.
    *
+   * Because of the location of branded directories we need to keep track of
+   * the main entity directory, so we get an entityPath to follow it around.
+   * This can look messy at times but is simply splitting the path in 2.
+   *
    * @param string $entity
+   * @param string $entityPath
    *
    * @return array
    */
-  public function mapEntity($entity)
+  public function mapEntity($entity, $entityPath = "")
   {
     $map = [];
-
     $directory = $this->getProjectBase() . DS . $entity;
+    if($entityPath)
+    {
+      $directory .= DS . $entityPath;
+    }
 
     try
     {
-      $directoryList = $this->getFileSystem()->listDirectory($directory, false);
+      $directoryList = $this->getFileSystem()->listDirectory($directory);
     }
     catch(\Exception $e)
     {
@@ -148,15 +156,29 @@ class Mapper extends Dispatcher
 
     foreach($directoryList as $directoryListItem)
     {
-      $currentEntity = $entity . DS . $directoryListItem;
-      if($this->getFileSystem()->isDir($directory . DS . $directoryListItem))
+      $currentEntity = $directory . DS . $directoryListItem;
+
+      if($this->getFileSystem()->isDir($currentEntity))
       {
-        $map = array_merge($map, $this->mapEntity($currentEntity));
+        $newEntityPath = $entityPath ? $entityPath . DS : "";
+        $newEntityPath .= $directoryListItem;
+        $map = array_merge($map, $this->mapEntity($entity, $newEntityPath));
       }
       else if(!array_key_exists($directoryListItem, $this->_ignoredFiles))
       {
-        $map[$this->getFileSystem()->normalizePath($currentEntity)] = md5(
-          $this->_concatAllRelatedFiles($entity, $directoryListItem)
+        $cleanedEntityPath = $this->_removeHiddenDirectoriesFromPath(
+          $entityPath
+        );
+        $cleanedCurrentEntity = $this->_removeHiddenDirectoriesFromPath(
+          $currentEntity
+        );
+
+        $map[$cleanedCurrentEntity] = md5(
+          $this->_concatAllRelatedFiles(
+            $entity,
+            $cleanedEntityPath,
+            $directoryListItem
+          )
         );
       }
     }
@@ -244,20 +266,26 @@ class Mapper extends Dispatcher
    * the passed file.
    *
    * @param string $entity
+   * @param string $entityPath
    * @param string $filename
    *
    * @return string
    */
-  private function _concatAllRelatedFiles($entity, $filename)
+  private function _concatAllRelatedFiles($entity, $entityPath, $filename)
   {
     $contents           = "";
-    $directory          = $this->getProjectBase() . DS . $entity;
-    $brandDirectories   = $this->_getBrandDirectoryList($directory);
+    $entityDirectory    = $this->getProjectBase() . DS . $entity;
+    $brandDirectories   = $this->_getBrandDirectoryList($entityDirectory);
     $brandDirectories[] = $this->getProjectBase() . DS . $entity;
 
     foreach($brandDirectories as $brandDirectory)
     {
-      $contents .= $this->getFileMerge($brandDirectory, $filename);
+      $brandedEntityPath = $brandDirectory;
+      if($entityPath)
+      {
+        $brandedEntityPath .= DS . $entityPath;
+      }
+      $contents .= $this->getFileMerge($brandedEntityPath, $filename);
     }
 
     return $contents;
@@ -289,7 +317,7 @@ class Mapper extends Dispatcher
       $brandDirectory = $directory . DS . $directoryListItem;
 
       if($this->getFileSystem()->isDir($brandDirectory)
-        && strncmp($brandDirectory, ".", 1) === 0)
+        && strncmp($directoryListItem, ".", 1) === 0)
       {
         $directories[] = $brandDirectory;
       }
@@ -337,5 +365,30 @@ class Mapper extends Dispatcher
       $entityHash = $this->generateEntityHash($entity);
       $this->setConfigLine("entity_map[$entityHash] = $entity");
     }
+  }
+
+  /**
+   * Sometimes we get entity paths with a hidden directory in it (for branded
+   * resources) but we want it logged at it's normal location to match
+   * dispatch
+   *
+   * @param string $path
+   *
+   * @return string
+   */
+  protected function _removeHiddenDirectoriesFromPath($path)
+  {
+    $normalizedPath = $this->getFileSystem()->normalizePath($path);
+    $pathParts = explode("/", $normalizedPath);
+
+    foreach($pathParts as $pathPartKey => $pathPart)
+    {
+      if($pathPart[0] === ".")
+      {
+        unset($pathParts[$pathPartKey]);
+      }
+    }
+
+    return implode("/", $pathParts);
   }
 }
