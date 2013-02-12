@@ -450,4 +450,66 @@ class RecordCollection extends Collection
   {
     return parent::limit($offset, $length, $createCollection);
   }
+
+  /**
+   * @param $column
+   * @param $value
+   *
+   * @return $this
+   */
+  public function whereEq($column, $value)
+  {
+    $type = substr(ParseQuery::valueType($value), 1);
+    $this->loadWhereAppend("%C %=" . $type, $column, $value);
+    return $this;
+  }
+
+  /**
+   * @param        $column
+   * @param array  $array
+   * @param string $type sprintf type (s|d|f)
+   *
+   * @return $this
+   */
+  public function whereIn($column, array $array, $type = 's')
+  {
+    $this->loadWhereAppend("%C IN (%L$type)", $column, $array);
+    return $this;
+  }
+
+  /**
+   * @param $column
+   * @param $value
+   *
+   * @return $this
+   */
+  public function whereLike($column, $value)
+  {
+    $this->loadWhereAppend("%C LIKE %~", $column, $value);
+    return $this;
+  }
+
+  /**
+   * @param $column
+   * @param $value
+   *
+   * @return $this
+   */
+  public function whereStartsLike($column, $value)
+  {
+    $this->loadWhereAppend("%C LIKE %>", $column, $value);
+    return $this;
+  }
+
+  /**
+   * @param $column
+   * @param $value
+   *
+   * @return $this
+   */
+  public function whereEndsLike($column, $value)
+  {
+    $this->loadWhereAppend("%C LIKE %<", $column, $value);
+    return $this;
+  }
 }
