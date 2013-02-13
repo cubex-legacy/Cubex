@@ -197,7 +197,9 @@ class FormElementRender implements Renderable
       {
         $out .= ' selected="selected"';
       }
-      $out .= '>' . $v . '</option>';
+      $out .= '>';
+      $out .= $this->_element->filter($v);
+      $out .= '</option>';
     }
 
     $out .= '</select>';
