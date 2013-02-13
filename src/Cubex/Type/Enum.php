@@ -17,17 +17,12 @@ use Cubex\Type\Enum\Reflection;
 
 if(class_exists("\\SplEnum"))
 {
-  class SplWrapper extends \SplEnum
+  abstract class EnumWrapper extends \SplEnum
   {
     public function __construct($enum = null, $strict = false)
     {
       parent::__construct($enum, $strict);
     }
-  }
-
-  abstract class EnumWrapper extends SplWrapper
-  {
-
   }
 }
 else
