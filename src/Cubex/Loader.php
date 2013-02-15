@@ -169,6 +169,9 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
     putenv('LC_ALL=' . $obj->getLocale());
     setlocale(LC_ALL, $obj->getLocale());
 
+    define("LOCALE", $obj->getLocale());
+    define("LOCALE2", substr($obj->getLocale(), 0, 2));
+
     return $this;
   }
 
