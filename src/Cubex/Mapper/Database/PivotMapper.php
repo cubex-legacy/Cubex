@@ -7,6 +7,7 @@ namespace Cubex\Mapper\Database;
 
 use Cubex\Data\Attribute;
 use Cubex\Data\Validator\Validator;
+use Cubex\Helpers\Inflection;
 use Cubex\Mapper\DataMapper;
 
 class PivotMapper extends RecordMapper
@@ -76,16 +77,16 @@ class PivotMapper extends RecordMapper
 
       if($eClass > $class)
       {
-        $table = implode('_', [$prefix, $class . 's', $eClass . 's']);
+        $table = implode('_', [$prefix, $class . 's', $eClass]);
       }
       else
       {
-        $table = implode('_', [$prefix, $eClass . 's', $class . 's']);
+        $table = implode('_', [$prefix, $eClass . 's', $class]);
       }
 
       $table = ltrim($table, '_');
 
-      $this->setTableName($table);
+      $this->setTableName(Inflection::pluralise($table));
     }
 
     $foreignKey = $pivotb->stringToColumnName($pivotb->remoteIdKey());

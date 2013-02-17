@@ -11,6 +11,7 @@ use Cubex\Data\CompositeAttribute;
 use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Database\ConnectionMode;
 use Cubex\Database\DatabaseService;
+use Cubex\Helpers\Inflection;
 use Cubex\Helpers\Strings;
 use Cubex\Log\Debug;
 use Cubex\Mapper\DataMapper;
@@ -429,7 +430,7 @@ abstract class RecordMapper extends DataMapper
       }
 
       $table              = strtolower(str_replace('\\', '_', $table));
-      $this->_dbTableName = $table . 's';
+      $this->_dbTableName = Inflection::pluralise($table);
     }
     return $this->_dbTableName;
   }
