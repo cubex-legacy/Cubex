@@ -266,7 +266,7 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
    */
   public function jsonSerialize()
   {
-    return $this->data();
+    return [$this->name() => $this->data()];
   }
 
   public function __clone()
