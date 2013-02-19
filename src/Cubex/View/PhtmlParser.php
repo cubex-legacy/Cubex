@@ -15,8 +15,9 @@ trait PhtmlParser
   }
 
   /**
-   * @param $file
+   * @param      $file
    * @param bool $checkExists
+   *
    * @return string
    * @throws \Exception
    */
@@ -35,7 +36,8 @@ trait PhtmlParser
           echo new Templates\Errors\PhpErrorHandler(
             $num, $msg, $file, $line, $context
           );
-        }
+        },
+        error_reporting()
       );
       /* Close PHP tags to allow for html and opening tags */
       try
