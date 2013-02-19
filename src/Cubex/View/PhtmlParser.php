@@ -33,11 +33,14 @@ trait PhtmlParser
       set_error_handler(
         function ($num, $msg, $file, $line, $context)
         {
+          if(error_reporting() === 0)
+          {
+            return;
+          }
           echo new Templates\Errors\PhpErrorHandler(
             $num, $msg, $file, $line, $context
           );
-        },
-        error_reporting()
+        }
       );
       /* Close PHP tags to allow for html and opening tags */
       try
