@@ -51,6 +51,36 @@ abstract class Enum extends EnumWrapper
   }
 
   /**
+   * @param $value
+   *
+   * @return mixed
+   */
+  public static function fromValue($value)
+  {
+    $const = static::constFromValue($value);
+
+    return static::$const();
+  }
+
+  /**
+   * @param $value
+   *
+   * @return mixed
+   * @throws \UnexpectedValueException
+   */
+  public static function constFromValue($value)
+  {
+    $const = array_search($value, (new static)->getConstList());
+
+    if($const === false)
+    {
+      throw new \UnexpectedValueException("Value '{$value}' does not exist");
+    }
+
+    return $const;
+  }
+
+  /**
    * @param string $constant
    *
    * @return bool
