@@ -310,7 +310,7 @@ class ColumnFamily
     {
       $result = $this->_client()->get_range_slices(
         $parent,
-        $predicate,
+        $this->makePredicate($predicate),
         $range,
         $level
       );
