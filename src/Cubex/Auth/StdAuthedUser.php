@@ -11,7 +11,9 @@ class StdAuthedUser implements AuthedUser
   protected $_username;
   protected $_details;
 
-  public function __construct($id = null, $username = null, $details = null)
+  public function __construct(
+    $id = null, $username = null, $details = null
+  )
   {
     $this->_id       = $id;
     $this->_username = $username;
@@ -35,7 +37,7 @@ class StdAuthedUser implements AuthedUser
   }
 
   /**
-   * @return mixed
+   * @return array
    */
   public function details()
   {

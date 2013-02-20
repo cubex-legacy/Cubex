@@ -16,4 +16,9 @@ interface AuthedUser
    * @return string
    */
   public function username();
+
+  /**
+   * @return array
+   */
+  public function details();
 }

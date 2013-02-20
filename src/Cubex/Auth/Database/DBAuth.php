@@ -9,6 +9,9 @@ use Cubex\Auth\AuthService;
 use Cubex\Auth\AuthedUser;
 use Cubex\Auth\LoginCredentials;
 use Cubex\Auth\StdAuthedUser;
+use Cubex\Container\Container;
+use Cubex\Facade\Encryption;
+use Cubex\Facade\Session;
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\ServiceManager\ServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
@@ -30,6 +33,7 @@ class DBAuth implements AuthService, ServiceManagerAware
 
   /**
    * @param $id
+   *
    * @return AuthedUser|null
    */
   public function authById($id)
@@ -70,6 +74,7 @@ class DBAuth implements AuthService, ServiceManagerAware
 
   /**
    * @param LoginCredentials $credentials
+   *
    * @return AuthedUser|null
    */
   public function authByCredentials(LoginCredentials $credentials)
@@ -99,5 +104,36 @@ class DBAuth implements AuthService, ServiceManagerAware
 
     $this->_table          = $config->getStr('table', 'users');
     $this->_connectionName = $config->getStr('connection', 'db');
+  }
+
+  /**
+   * Security hash for cookie
+   *
+   * @param AuthedUser $user
+   *
+   * @return string
+   */
+  public function cookieHash(AuthedUser $user)
+  {
+    $encryption = Container::config()->get("encryption");
+    $salt       = "+yq09jfFDJX67fxv4jr)9";
+    if($encryption !== null)
+    {
+      $salt = $encryption->getStr("secret_key", "g*53{P)!Se6vAc/xB9*ms");
+    }
+
+    return md5($salt . Session::id() . $user->id());
+  }
+
+  /**
+   * @param $id
+   * @param $username
+   * @param $details
+   *
+   * @return AuthedUser|null
+   */
+  public function buildUser($id, $username, $details)
+  {
+    return new StdAuthedUser($id, $username, $details);
   }
 }
