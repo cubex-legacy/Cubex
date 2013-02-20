@@ -218,6 +218,19 @@ class ColumnFamily
     return $range;
   }
 
+  public function makePredicate($of = null)
+  {
+    if($of instanceof SliceRange)
+    {
+      return new SlicePredicate(['slice_range' => $of]);
+    }
+    else if(is_array($of))
+    {
+      return new SlicePredicate(['column_names' => $of]);
+    }
+    return $of;
+  }
+
   public function multiGet(array $keys, array $columns = null)
   {
     $result = null;
@@ -249,13 +262,12 @@ class ColumnFamily
   }
 
   public function getKeys(
-    $start = '', $finish = '', $count = 100,
-    SliceRange $sliceRange = null
+    $start = '', $finish = '', $count = 100, $predicate = null
   )
   {
-    if($sliceRange === null)
+    if($predicate === null)
     {
-      $sliceRange = new SliceRange(['start' => '', 'finish' => '']);
+      $predicate = new SliceRange(['start' => '', 'finish' => '']);
     }
     $range        = new KeyRange(
       [
@@ -265,17 +277,17 @@ class ColumnFamily
     );
     $range->count = $count;
 
-    return $this->_getRangeSlice($range, $sliceRange);
+    return $this->_getRangeSlice($range, $predicate);
   }
 
   public function getTokens(
     $startToken = 0, $finishToken = 0, $count = 100,
-    SliceRange $sliceRange = null
+    $predicate = null
   )
   {
-    if($sliceRange === null)
+    if($predicate === null)
     {
-      $sliceRange = new SliceRange(['start' => '', 'finish' => '']);
+      $predicate = new SliceRange(['start' => '', 'finish' => '']);
     }
     $range        = new KeyRange(
       [
@@ -285,21 +297,20 @@ class ColumnFamily
     );
     $range->count = $count;
 
-    return $this->_getRangeSlice($range, $sliceRange);
+    return $this->_getRangeSlice($range, $predicate);
   }
 
-  protected function _getRangeSlice(KeyRange $range, SliceRange $sliceRange)
+  protected function _getRangeSlice(KeyRange $range, $predicate)
   {
     $final  = null;
     $level  = $this->consistencyLevel();
     $parent = $this->_columnParent();
-    $slice  = new SlicePredicate(['slice_range' => $sliceRange]);
 
     try
     {
       $result = $this->_client()->get_range_slices(
         $parent,
-        $slice,
+        $predicate,
         $range,
         $level
       );

@@ -21,6 +21,7 @@
     "psr/log": "1.0.0"
   },
   "suggest":           {
+    "cubex/cassandra":              "Cassandra Connections",
     "mobiledetect/mobiledetectlib": "Supported platform detection library",
     "phpseclib/phpseclib":          "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc."
   },
