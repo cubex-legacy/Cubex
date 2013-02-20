@@ -43,7 +43,7 @@ abstract class BaseAuthService implements AuthService
     {
       $cookie = Cookies::get("CUBEXLOGIN");
       $data   = $cookie->getValue(true);
-      list($id, $username, $security, $details) = explode('|', $data, 3);
+      list($id, $username, $security, $details) = explode('|', $data, 4);
       $details = json_decode($details);
       $user    = $this->buildUser($id, $username, $details);
       if($security == $this->cookieHash($user))
