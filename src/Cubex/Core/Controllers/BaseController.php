@@ -6,6 +6,7 @@ namespace Cubex\Core\Controllers;
 
 use Cubex\Core\Application\Application;
 use Cubex\Core\Application\Controller;
+use Cubex\Core\Http\Redirect;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Foundation\DataHandler\HandlerInterface;
@@ -13,6 +14,7 @@ use Cubex\Foundation\DataHandler\HandlerTrait;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 
+use Cubex\Foundation\Renderable;
 use Cubex\I18n\Translatable;
 use Cubex\I18n\TranslateTraits;
 use Cubex\Routing\Route;
@@ -103,9 +105,16 @@ class BaseController
     try
     {
       $canProcess = $this->canProcess();
-      if($canProcess === false)
+      if($canProcess !== true)
       {
-        throw new \Exception("Unable to process request");
+        if($canProcess instanceof Redirect || $canProcess instanceof Renderable)
+        {
+          $actionResponse = $canProcess;
+        }
+        else
+        {
+          throw new \Exception("Unable to process request");
+        }
       }
     }
     catch(\Exception $e)
@@ -290,7 +299,7 @@ class BaseController
     if($action === null)
     {
       throw new \BadMethodCallException("No action specified on " . $this->_name(
-        ));
+      ));
     }
 
     $attempts = [];
@@ -317,7 +326,8 @@ class BaseController
           [
           $this,
           $attempt
-          ], $params
+          ],
+          $params
         );
       }
     }
@@ -337,7 +347,7 @@ class BaseController
     }
 
     throw new \BadMethodCallException("Invalid action $action specified on " . $this->_name(
-      ));
+    ));
   }
 
   /**
