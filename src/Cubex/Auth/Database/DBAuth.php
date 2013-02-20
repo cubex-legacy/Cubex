@@ -7,6 +7,7 @@ namespace Cubex\Auth\Database;
 
 use Cubex\Auth\AuthService;
 use Cubex\Auth\AuthedUser;
+use Cubex\Auth\BaseAuthService;
 use Cubex\Auth\LoginCredentials;
 use Cubex\Auth\StdAuthedUser;
 use Cubex\Container\Container;
@@ -17,7 +18,7 @@ use Cubex\ServiceManager\ServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 use Cubex\Sprintf\ParseQuery;
 
-class DBAuth implements AuthService, ServiceManagerAware
+class DBAuth extends BaseAuthService implements ServiceManagerAware
 {
   use ServiceManagerAwareTrait;
 

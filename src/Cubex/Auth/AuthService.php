@@ -46,4 +46,16 @@ interface AuthService extends Service
    * @return AuthedUser|null
    */
   public function buildUser($id, $username, $details);
+
+  /**
+   * @param AuthedUser $user
+   *
+   * @return bool
+   */
+  public function storeLogin(AuthedUser $user);
+
+  /**
+   * @return null|AuthedUser
+   */
+  public function retrieveLogin();
 }
