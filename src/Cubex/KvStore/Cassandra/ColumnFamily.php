@@ -26,12 +26,24 @@ class ColumnFamily
   protected $_keyspace;
   protected $_consistency;
   protected $_cqlVersion = 3;
+  protected $_returnAttribute = true;
 
   public function __construct(Connection $connection, $name, $keyspace)
   {
     $this->_connection = $connection;
     $this->_name       = $name;
     $this->_keyspace   = $keyspace;
+  }
+
+  public function setReturnAttribute($bool = true)
+  {
+    $this->_returnAttribute = (bool)$bool;
+    return $this;
+  }
+
+  public function returnAttribute()
+  {
+    return $this->_returnAttribute;
   }
 
   public function setCqlVersion($version = 3)
@@ -456,8 +468,15 @@ class ColumnFamily
       $final = [];
       foreach($result as $col)
       {
-        $col                 = $this->_formColumn($col);
-        $final[$col->name()] = $col;
+        $col = $this->_formColumn($col);
+        if($this->returnAttribute())
+        {
+          $final[$col->name()] = $col;
+        }
+        else
+        {
+          $final[$col[0]] = $col[1];
+        }
       }
       return $final;
     }
@@ -478,16 +497,30 @@ class ColumnFamily
 
     if($input->column instanceof Column)
     {
-      $column = new ColumnAttribute($input->column->name);
-      $column->setData($input->column->value);
-      $column->setUpdatedTime($input->column->timestamp);
-      $column->setExpiry($input->column->ttl);
+      if($this->returnAttribute())
+      {
+        $column = new ColumnAttribute($input->column->name);
+        $column->setData($input->column->value);
+        $column->setUpdatedTime($input->column->timestamp);
+        $column->setExpiry($input->column->ttl);
+      }
+      else
+      {
+        return [$input->column->name, $input->column->value];
+      }
     }
     else if($input->$counterCol instanceof CounterColumn)
     {
-      $column = new ColumnAttribute($input->$counterCol->name);
-      $column->setData($input->$counterCol->value);
-      $column->setIsCounter();
+      if($this->returnAttribute())
+      {
+        $column = new ColumnAttribute($input->$counterCol->name);
+        $column->setData($input->$counterCol->value);
+        $column->setIsCounter();
+      }
+      else
+      {
+        return [$input->$counterCol->name, $input->$counterCol->value];
+      }
     }
 
     return $column;

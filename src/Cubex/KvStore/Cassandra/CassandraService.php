@@ -19,7 +19,7 @@ class CassandraService implements KvService
   protected $_columnFamily;
   protected $_keyspace;
 
-  public function cf($name)
+  public function cf($name, $attributes = true)
   {
     if($this->_columnFamily === null)
     {
@@ -27,6 +27,7 @@ class CassandraService implements KvService
         $this->_connection, $name, $this->_keyspace
       );
     }
+    $this->_columnFamily->setReturnAttribute($attributes);
     return $this->_columnFamily;
   }
 
@@ -48,18 +49,18 @@ class CassandraService implements KvService
 
   public function getField($table, $key, $column)
   {
-    return $this->cf($table)->get($key, [$column]);
+    return $this->cf($table, false)->get($key, [$column]);
   }
 
   public function getRow($table, $key, $columns = null)
   {
     if($columns === null)
     {
-      return $this->cf($table)->getSlice($key);
+      return $this->cf($table, false)->getSlice($key);
     }
     else
     {
-      return $this->cf($table)->get($key, $columns);
+      return $this->cf($table, false)->get($key, $columns);
     }
   }
 
@@ -67,11 +68,11 @@ class CassandraService implements KvService
   {
     if($columns === null)
     {
-      return $this->cf($table)->multiGetSlice($keys);
+      return $this->cf($table, false)->multiGetSlice($keys);
     }
     else
     {
-      return $this->cf($table)->multiGet($keys, $columns);
+      return $this->cf($table, false)->multiGet($keys, $columns);
     }
   }
 
@@ -79,14 +80,9 @@ class CassandraService implements KvService
   {
     $final = [];
     $key   = head($columns);
-    $rows  = $this->cf($table)->multiGet($keys, $columns);
-    foreach($rows as $row)
+    $rows  = $this->cf($table, false)->multiGet($keys, $columns);
+    foreach($rows as $data)
     {
-      $data = [];
-      foreach($row as $k => $v)
-      {
-        $data[$k] = $v->data();
-      }
       if(isset($data[$key]))
       {
         $final[$data[$key]] = $data;
@@ -97,7 +93,7 @@ class CassandraService implements KvService
 
   public function getColumns($table, $key)
   {
-    return array_keys($this->cf($table)->getSlice($key));
+    return array_keys($this->cf($table, false)->getSlice($key));
   }
 
   public function getColumnCount($table, $key, array $columns = null)
