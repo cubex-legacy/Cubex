@@ -6,6 +6,7 @@
 namespace Cubex\Mapper\KeyValue;
 
 use Cubex\Container\Container;
+use Cubex\Data\Attribute;
 use Cubex\Mapper\DataMapper;
 
 class KvMapper extends DataMapper
@@ -86,5 +87,14 @@ class KvMapper extends DataMapper
         $columns
       );
     }
+  }
+
+  public function setData($attribute, $value)
+  {
+    if(!$this->attributeExists($attribute))
+    {
+      $this->_addAttribute(new Attribute($attribute));
+    }
+    return parent::setData($attribute, $value);
   }
 }
