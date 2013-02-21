@@ -7,6 +7,7 @@ namespace Cubex\KvStore\Cassandra;
 
 use Cubex\KvStore\KvService;
 use Cubex\ServiceManager\ServiceConfigTrait;
+use cassandra\AuthenticationRequest;
 
 class CassandraService implements KvService
 {
@@ -43,6 +44,19 @@ class CassandraService implements KvService
       $this->config()->getArr("nodes"),
       $this->config()->getInt("port", 9160)
     );
+
+    $username = $this->config()->getStr("username", null);
+    $password = $this->config()->getStr("password", null);
+
+    if(!($username === null && $password === null))
+    {
+      $auth              = new AuthenticationRequest();
+      $auth->credentials = array(
+        "username" => $username,
+        "password" => $password,
+      );
+      $this->_connection->client()->login($auth);
+    }
     $this->_connection->setKeyspace($this->_keyspace);
   }
 
