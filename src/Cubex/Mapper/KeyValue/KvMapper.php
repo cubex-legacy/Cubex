@@ -88,13 +88,4 @@ class KvMapper extends DataMapper
       );
     }
   }
-
-  public function setData($attribute, $value)
-  {
-    if(!$this->attributeExists($attribute))
-    {
-      $this->_addAttribute(new Attribute($attribute));
-    }
-    return parent::setData($attribute, $value);
-  }
 }
