@@ -94,6 +94,16 @@ class ParseQuery implements FormatterInterface
 
   public static function parse(DatabaseService $connection, $args = [])
   {
+    if(func_num_args() > 2)
+    {
+      $args = func_get_args();
+      array_shift($args);
+    }
+    else if(!is_array($args))
+    {
+      $args = [$args];
+    }
+
     $sprintf = new SprintfEngine();
     return $sprintf(new ParseQuery(), $connection, $args);
   }
@@ -178,7 +188,8 @@ class ParseQuery implements FormatterInterface
                 {
                   $val = (int)$v;
                 }
-                else {
+                else
+                {
                   $val = "'" . $connection->escapeString($v) . "'";
                 }
 
