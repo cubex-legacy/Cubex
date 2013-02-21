@@ -456,8 +456,8 @@ class ColumnFamily
       $final = [];
       foreach($result as $col)
       {
-        $col     = $this->_formColumn($col);
-        $final[] = $col->name();
+        $col                 = $this->_formColumn($col);
+        $final[$col->name()] = $col;
       }
       return $final;
     }
