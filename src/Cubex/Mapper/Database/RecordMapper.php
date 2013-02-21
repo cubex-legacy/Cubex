@@ -11,9 +11,6 @@ use Cubex\Data\CompositeAttribute;
 use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Database\ConnectionMode;
 use Cubex\Database\DatabaseService;
-use Cubex\Helpers\Inflection;
-use Cubex\Helpers\Strings;
-use Cubex\Log\Debug;
 use Cubex\Mapper\DataMapper;
 use Cubex\Sprintf\ParseQuery;
 
