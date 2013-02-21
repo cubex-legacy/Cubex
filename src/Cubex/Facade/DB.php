@@ -10,11 +10,13 @@ use Cubex\Sprintf\ParseQuery;
 class DB extends BaseFacade
 {
   /**
-   * @return \Cubex\Database\DatabaseService
+   * @param string $name
+   *
+   * @return \Cubex\Database\DatabaseService|void
    */
-  public static function getAccessor()
+  public static function getAccessor($name = 'db')
   {
-    return static::getServiceManager()->db("db");
+    return static::getServiceManager()->db($name);
   }
 
   protected static function _query($method, $query /*,$args*/)
