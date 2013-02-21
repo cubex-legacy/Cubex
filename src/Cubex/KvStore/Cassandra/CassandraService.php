@@ -21,6 +21,10 @@ class CassandraService implements KvService
 
   public function cf($name, $attributes = true)
   {
+    if($this->_connection === null)
+    {
+      $this->connect();
+    }
     if($this->_columnFamily === null)
     {
       $this->_columnFamily = new ColumnFamily(
