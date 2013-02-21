@@ -80,6 +80,11 @@ class ColumnFamily
     return $this->_connection;
   }
 
+  public function keyspace()
+  {
+    return $this->_keyspace;
+  }
+
   protected function _client()
   {
     return $this->connection()->client();
