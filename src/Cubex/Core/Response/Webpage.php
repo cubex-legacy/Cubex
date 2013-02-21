@@ -28,14 +28,6 @@ class Webpage implements
 {
   use DispatchIOTrait;
 
-  /**
-   * @var \Cubex\Core\Http\Response
-   */
-  protected $_response;
-  /**
-   * @var \Cubex\Core\Http\Request
-   */
-  protected $_request;
   protected $_title;
   protected $_meta;
   protected $_bodyAttributes = [];
