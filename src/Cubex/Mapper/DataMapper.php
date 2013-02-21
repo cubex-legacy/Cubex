@@ -8,9 +8,36 @@ use Cubex\Data\Attribute;
 use Cubex\Data\CompositeAttribute;
 use Cubex\Data\PolymorphicAttribute;
 use Cubex\Exception\CubexException;
+use Cubex\Helpers\Inflection;
+use Cubex\Helpers\Strings;
 
 abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 {
+  const CONFIG_IDS    = 'id-mechanism';
+  const CONFIG_SCHEMA = 'schema-type';
+
+  /**
+   * Manual ID Assignment
+   */
+  const ID_MANUAL = 'manual';
+  /**
+   * Combine multiple keys to a single key for store
+   */
+  const ID_COMPOSITE = 'composite';
+  /**
+   * Base ID on multiple keys
+   */
+  const ID_COMPOSITE_SPLIT = 'compositesplit';
+
+
+  const SCHEMA_UNDERSCORE = 'underscore';
+  const SCHEMA_CAMELCASE  = 'camel';
+  const SCHEMA_PASCALCASE = 'pascal';
+  const SCHEMA_AS_IS      = 'asis';
+
+  protected $_tableName;
+  protected $_underscoreTable = true;
+
   protected $_id;
   /**
    * @var \Cubex\Data\Attribute[]
@@ -19,6 +46,10 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   protected $_invalidAttributes;
   protected $_exists = false;
   protected $_autoTimestamp = true;
+  protected $_changes;
+
+  protected $_idType = self::ID_MANUAL;
+  protected $_schemaType = self::SCHEMA_UNDERSCORE;
 
   /**
    * Automatically add all public properties as attributes
@@ -45,6 +76,22 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $name = strtolower($name);
     $name = str_replace([' ', '_'], '', $name);
     return $name;
+  }
+
+  /**
+   * @return string
+   */
+  public function schemaType()
+  {
+    $config = $this->getConfiguration();
+    if(!isset($config[static::CONFIG_SCHEMA]))
+    {
+      return self::SCHEMA_AS_IS;
+    }
+    else
+    {
+      return $config[static::CONFIG_SCHEMA];
+    }
   }
 
   /**
@@ -97,7 +144,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $class = new \ReflectionClass(get_class($this));
     foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
     {
-      $property = $p->getName();
+      $property = $this->stringToColumnName($p->getName());
       if(!$this->attributeExists($property))
       {
         $this->_addAttribute(
@@ -331,13 +378,15 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     return $this->setData($name, $value);
   }
 
-
   /**
    * @return array
    */
   public function getConfiguration()
   {
-    return array();
+    return array(
+      static::CONFIG_IDS    => $this->_idType,
+      static::CONFIG_SCHEMA => $this->_schemaType,
+    );
   }
 
   protected function _addCompositeAttribute(
@@ -649,15 +698,24 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   /**
    * @param array $data
    * @param bool  $setUnmodified
+   * @param bool  $createAttributes
    *
-   * @return DataMapper
+   * @return $this
    */
-  public function hydrate(array $data, $setUnmodified = false)
+  public function hydrate(
+    array $data, $setUnmodified = false, $createAttributes = false
+  )
   {
     foreach($data as $k => $v)
     {
-      $k = strtolower($k);
-      if($this->attributeExists($k))
+      $k      = strtolower($k);
+      $exists = $this->attributeExists($k);
+      if(!$exists && $createAttributes)
+      {
+        $this->_addAttribute(new Attribute($k));
+      }
+
+      if($exists)
       {
         $this->setData($k, $this->_attribute($k)->unserialize($v));
         if($setUnmodified)
@@ -726,7 +784,35 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
 
   public function saveChanges()
   {
-    $this->_updateTimestamps();
+    $this->_changes = [];
+    $modified       = $this->getModifiedAttributes();
+    if(!empty($modified))
+    {
+      $this->_updateTimestamps();
+      $modified = $this->getModifiedAttributes();
+    }
+
+    foreach($modified as $attr)
+    {
+      if($attr instanceof Attribute)
+      {
+        if($attr->isModified())
+        {
+          if(
+            $this->_autoTimestamp
+            && $attr->name() != $this->createdAttribute()
+            && $attr->name() != $this->updatedAttribute()
+          )
+          {
+            $this->_changes[$attr->name()] = [
+              'before' => $attr->originalData(),
+              'after'  => $attr->data()
+            ];
+          }
+        }
+      }
+    }
+
     return false;
   }
 
@@ -811,5 +897,86 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $this->_addAttribute($a->getIdAttribute());
     $this->_addAttribute($a->getTypeAttribute());
     return $this;
+  }
+
+  public function getSavedChanges()
+  {
+    return $this->_changes;
+  }
+
+  public function getTableClass()
+  {
+    return get_class($this);
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getTableName()
+  {
+    if($this->_tableName === null)
+    {
+      $excludeParts = [
+        'mappers',
+        'applications',
+        'modules',
+        'components'
+      ];
+      $nsparts      = explode('\\', $this->getTableClass());
+
+      foreach($nsparts as $i => $part)
+      {
+        if($i == 0 || in_array(strtolower($part), $excludeParts))
+        {
+          unset($nsparts[$i]);
+        }
+      }
+
+      $table = implode('_', $nsparts);
+      if($this->_underscoreTable)
+      {
+        $table = Strings::variableToUnderScore($table);
+      }
+
+      $table            = strtolower(str_replace('\\', '_', $table));
+      $this->_tableName = Inflection::pluralise($table);
+    }
+    return $this->_tableName;
+  }
+
+  /**
+   * @throws \Exception
+   */
+  public function connection()
+  {
+    throw new \Exception("No connection available");
+  }
+
+  /**
+   * @return \Cubex\ServiceManager\Service
+   */
+  public static function conn()
+  {
+    $a = new static;
+    /**
+     * @var $a self
+     */
+    return $a->connection();
+  }
+
+  public function stringToColumnName($string)
+  {
+    switch($this->schemaType())
+    {
+      case self::SCHEMA_UNDERSCORE:
+        return Strings::variableToUnderScore($string);
+      case self::SCHEMA_PASCALCASE:
+        return Strings::variableToPascalCase($string);
+      case self::SCHEMA_CAMELCASE:
+        return Strings::variableToCamelCase($string);
+      case self::SCHEMA_AS_IS:
+        return $string;
+    }
+    return $string;
   }
 }

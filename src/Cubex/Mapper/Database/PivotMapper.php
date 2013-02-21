@@ -66,7 +66,7 @@ class PivotMapper extends RecordMapper
   {
     $this->_pivotOn = func_get_args();
 
-    if($this->_dbTableName === null)
+    if($this->_tableName === null)
     {
       $class  = strtolower(class_shortname($pivota));
       $eClass = strtolower(class_shortname($pivotb));
@@ -124,7 +124,7 @@ class PivotMapper extends RecordMapper
 
   public function setTableName($table)
   {
-    $this->_dbTableName = $table;
+    $this->_tableName = $table;
     return $this;
   }
 

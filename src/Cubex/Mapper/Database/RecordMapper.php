@@ -19,41 +19,17 @@ use Cubex\Sprintf\ParseQuery;
 
 abstract class RecordMapper extends DataMapper
 {
-  const CONFIG_IDS    = 'id-mechanism';
-  const CONFIG_SCHEMA = 'schema-type';
-
   /**
    * Auto Incrementing ID
    */
   const ID_AUTOINCREMENT = 'auto';
-  /**
-   * Manual ID Assignment
-   */
-  const ID_MANUAL = 'manual';
-  /**
-   * Combine multiple keys to a single key for store
-   */
-  const ID_COMPOSITE = 'composite';
-  /**
-   * Base ID on multiple keys
-   */
-  const ID_COMPOSITE_SPLIT = 'compositesplit';
-
-
-  const SCHEMA_UNDERSCORE = 'underscore';
-  const SCHEMA_CAMELCASE  = 'camel';
-  const SCHEMA_PASCALCASE = 'pascal';
-  const SCHEMA_AS_IS      = 'asis';
 
   const RELATIONSHIP_BELONGSTO = 'belongsto';
   const RELATIONSHIP_HASONE    = 'hasone';
   const RELATIONSHIP_HASMANY   = 'hasmany';
 
   protected $_dbServiceName = 'db';
-  protected $_dbTableName;
   protected $_idType = self::ID_AUTOINCREMENT;
-  protected $_schemaType = self::SCHEMA_UNDERSCORE;
-  protected $_underscoreTable = true;
 
   protected $_loadPending;
   protected $_loadDetails;
@@ -63,7 +39,6 @@ abstract class RecordMapper extends DataMapper
   protected $_recentRelationKey;
 
   protected $_handledError;
-  protected $_changes;
 
   public function __construct($id = null, $columns = ['*'])
   {
@@ -141,17 +116,6 @@ abstract class RecordMapper extends DataMapper
   }
 
   /**
-   * @return array
-   */
-  public function getConfiguration()
-  {
-    return array(
-      static::CONFIG_IDS    => $this->_idType,
-      static::CONFIG_SCHEMA => $this->_schemaType,
-    );
-  }
-
-  /**
    * @return string
    */
   public function idPattern()
@@ -171,21 +135,6 @@ abstract class RecordMapper extends DataMapper
     }
   }
 
-  /**
-   * @return string
-   */
-  public function schemaType()
-  {
-    $config = $this->getConfiguration();
-    if(!isset($config[static::CONFIG_SCHEMA]))
-    {
-      return self::SCHEMA_AS_IS;
-    }
-    else
-    {
-      return $config[static::CONFIG_SCHEMA];
-    }
-  }
 
   public function setExists($bool = true)
   {
@@ -400,45 +349,6 @@ abstract class RecordMapper extends DataMapper
     return $sm->db($this->_dbServiceName, $mode);
   }
 
-  /**
-   * @return mixed
-   */
-  public function getTableName()
-  {
-    if($this->_dbTableName === null)
-    {
-      $excludeParts = [
-        'mappers',
-        'applications',
-        'modules',
-        'components'
-      ];
-      $nsparts      = explode('\\', $this->getTableClass());
-
-      foreach($nsparts as $i => $part)
-      {
-        if($i == 0 || in_array(strtolower($part), $excludeParts))
-        {
-          unset($nsparts[$i]);
-        }
-      }
-
-      $table = implode('_', $nsparts);
-      if($this->_underscoreTable)
-      {
-        $table = Strings::variableToUnderScore($table);
-      }
-
-      $table              = strtolower(str_replace('\\', '_', $table));
-      $this->_dbTableName = Inflection::pluralise($table);
-    }
-    return $this->_dbTableName;
-  }
-
-  public function getTableClass()
-  {
-    return get_class($this);
-  }
 
   public function id()
   {
@@ -718,11 +628,6 @@ abstract class RecordMapper extends DataMapper
     return $result;
   }
 
-  public function getSavedChanges()
-  {
-    return $this->_changes;
-  }
-
   public function hasOne(RecordMapper $entity, $foreignKey = null)
   {
     $this->_load();
@@ -754,22 +659,6 @@ abstract class RecordMapper extends DataMapper
     $this->_load();
     $rel = new Relationship($this);
     return $rel->hasAndBelongsToMany($entity, $localKey, $foreignKey, $table);
-  }
-
-  public function stringToColumnName($string)
-  {
-    switch($this->schemaType())
-    {
-      case self::SCHEMA_UNDERSCORE:
-        return Strings::variableToUnderScore($string);
-      case self::SCHEMA_PASCALCASE:
-        return Strings::variableToPascalCase($string);
-      case self::SCHEMA_CAMELCASE:
-        return Strings::variableToCamelCase($string);
-      case self::SCHEMA_AS_IS:
-        return $string;
-    }
-    return $string;
   }
 
   public static function schema()

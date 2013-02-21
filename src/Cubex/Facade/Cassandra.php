@@ -12,7 +12,7 @@ class Cassandra extends BaseFacade
    *
    * @return \Cubex\KvStore\Cassandra\CassandraService
    */
-  public static function getAccessor($name = 'cass')
+  public static function getAccessor($name = 'cassandra')
   {
     return static::getServiceManager()->get($name);
   }
