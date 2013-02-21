@@ -3,7 +3,7 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\Cassandra;
+namespace Cubex\KvStore\Cassandra;
 
 use Thrift\Exception\TException;
 use Thrift\Protocol\TBinaryProtocolAccelerated;

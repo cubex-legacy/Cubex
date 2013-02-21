@@ -3,7 +3,7 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\Cassandra;
+namespace Cubex\KvStore\Cassandra;
 
 use cassandra\Column;
 use cassandra\ColumnOrSuperColumn;
@@ -456,7 +456,8 @@ class ColumnFamily
       $final = [];
       foreach($result as $col)
       {
-        $final[] = $this->_formColumn($col);
+        $col     = $this->_formColumn($col);
+        $final[] = $col->name();
       }
       return $final;
     }
