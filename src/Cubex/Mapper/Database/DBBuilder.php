@@ -199,7 +199,7 @@ class DBBuilder
     {
       foreach($annotation as $k => $v)
       {
-        switch($k)
+        switch(strtolower($k))
         {
           case 'default':
             if($default === null)
