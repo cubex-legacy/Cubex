@@ -86,7 +86,6 @@ class Request implements \IteratorAggregate
     {
       $parts++;
       $ps = explode("/", $this->_path, $parts + 1);
-      var_dump($ps);
       if(count($ps) > $parts)
       {
         array_pop($ps);
