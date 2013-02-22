@@ -294,6 +294,8 @@ abstract class RecordMapper extends DataMapper
       $pattern = $this->idPattern();
       $pattern = 'DELETE FROM %T WHERE ' . $pattern;
 
+      $idAttr = $this->getAttribute($this->getIdKey());
+
       if($idAttr instanceof CompositeAttribute)
       {
         $args = array(
@@ -690,7 +692,7 @@ abstract class RecordMapper extends DataMapper
 
   public static function min($key = 'id')
   {
-    $a = new Aggregate((new static));
+    $a = new Aggregate(new static);
     if(func_num_args() > 1)
     {
       $args = func_get_args();
@@ -708,7 +710,7 @@ abstract class RecordMapper extends DataMapper
 
   public static function max($key = 'id')
   {
-    $a = new Aggregate((new static));
+    $a = new Aggregate(new static);
     if(func_num_args() > 1)
     {
       $args = func_get_args();
@@ -726,7 +728,7 @@ abstract class RecordMapper extends DataMapper
 
   public static function avg($key = 'id')
   {
-    $a = new Aggregate((new static));
+    $a = new Aggregate(new static);
     if(func_num_args() > 1)
     {
       $args = func_get_args();
@@ -744,7 +746,7 @@ abstract class RecordMapper extends DataMapper
 
   public static function sum($key = 'id')
   {
-    $a = new Aggregate((new static));
+    $a = new Aggregate(new static);
     if(func_num_args() > 1)
     {
       $args = func_get_args();
@@ -762,7 +764,7 @@ abstract class RecordMapper extends DataMapper
 
   public static function count($key = 'id')
   {
-    $a = new Aggregate((new static));
+    $a = new Aggregate(new static);
     if(func_num_args() > 1)
     {
       $args = func_get_args();
@@ -784,7 +786,7 @@ abstract class RecordMapper extends DataMapper
    */
   public static function loadWhere()
   {
-    $collection = new RecordCollection(new static());
+    $collection = new RecordCollection(new static);
     return call_user_func_array(
       [
       $collection,
@@ -823,8 +825,8 @@ abstract class RecordMapper extends DataMapper
   {
     switch($connection->errorNo())
     {
-      case 1146:
-      case 1054:
+      case 1146: //Table does not exist
+      case 1054: //Column does not exist
         if(Container::config()->get("devtools")->getBool("creations", false))
         {
           $builder = new DBBuilder($connection, $this);

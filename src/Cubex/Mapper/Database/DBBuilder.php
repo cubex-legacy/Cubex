@@ -43,7 +43,7 @@ class DBBuilder
     $this->_reflect     = new \ReflectionObject($this->_mapper);
 
     $matches = array();
-    if($connection->errorNo() == 1146)
+    if($connection->errorNo() == 1146) //Table does not exist
     {
       preg_match_all("/\w+/", $connection->errorMsg(), $matches);
       if($matches)
@@ -56,7 +56,7 @@ class DBBuilder
         $this->_passed = $this->_connection->query($this->createDB());
       }
     }
-    else if($connection->errorNo() == 1054)
+    else if($connection->errorNo() == 1054) //Column does not exist
     {
       preg_match_all("/\w+/", $connection->errorMsg(), $matches);
       if($matches)
