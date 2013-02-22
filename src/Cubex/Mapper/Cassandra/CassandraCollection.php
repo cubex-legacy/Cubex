@@ -54,7 +54,7 @@ class CassandraCollection extends KvCollection
       return;
     }
 
-    foreach($results as $result)
+    foreach($results as $key => $result)
     {
       foreach($result as $attr)
       {
@@ -64,6 +64,7 @@ class CassandraCollection extends KvCollection
       }
       $map = clone $this->_mapperType;
       $map->hydrate($result, true, true);
+      $map->setId($key);
       $map->setExists(true);
       $this->addMapper($map);
     }
