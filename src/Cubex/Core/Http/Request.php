@@ -244,7 +244,8 @@ class Request implements \IteratorAggregate
     {
       return false;
     }
-    else {
+    else
+    {
       return true;
     }
   }
@@ -276,7 +277,19 @@ class Request implements \IteratorAggregate
    */
   public function is($method)
   {
-    return !strcasecmp($method, $this->requestMethod());
+    switch($method)
+    {
+      case 'form':
+        return $this->isForm();
+      case 'ajax':
+        return $this->isAjax();
+      case 'ssl':
+      case 'secure':
+      case 'https':
+        return $this->isHttps();
+      default:
+        return !strcasecmp($method, $this->requestMethod());
+    }
   }
 
   /**
