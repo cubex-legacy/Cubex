@@ -45,6 +45,15 @@ class KvCollection extends Collection
 
   public function loadIds($ids)
   {
+    if(func_num_args() > 1)
+    {
+      $ids = func_get_args();
+    }
+    else if(!is_array($ids))
+    {
+      $ids = [$ids];
+    }
+
     $this->connection()->getRows(
       $this->_mapperType->getTableName(),
       $ids,
