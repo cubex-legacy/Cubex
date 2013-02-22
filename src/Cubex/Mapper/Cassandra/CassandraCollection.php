@@ -56,6 +56,10 @@ class CassandraCollection extends KvCollection
 
     foreach($results as $key => $result)
     {
+      if(empty($result))
+      {
+        continue;
+      }
       foreach($result as $attr)
       {
         if($attr instanceof ColumnAttribute)
