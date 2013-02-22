@@ -33,6 +33,24 @@ trait RequireTrait
   }
 
   /**
+   * @param string      $library
+   * @param null|string $version
+   */
+  public function requireCssLibrary($library, $version = null)
+  {
+    $this->_requireResource($library, new TypeEnum(TypeEnum::CSS), $version);
+  }
+
+  /**
+   * @param string      $library
+   * @param null|string $version
+   */
+  public function requireJsLibrary($library, $version = null)
+  {
+    $this->_requireResource($library, new TypeEnum(TypeEnum::JS), $version);
+  }
+
+  /**
    * Specify a CSS Package to include (/css | .css are not required)
    *
    * @param string $package
@@ -53,16 +71,18 @@ trait RequireTrait
   }
 
   /**
-   * @param string   $file
-   * @param TypeEnum $type
+   * @param string                                       $file
+   * @param \Cubex\Dispatch\Dependency\Resource\TypeEnum $type
+   * @param null|string                                  $version
    */
-  protected function _requireResource($file, TypeEnum $type)
+  protected function _requireResource($file, TypeEnum $type, $version = null)
   {
     $namespace = $this->_getOrFindNamespace();
 
     $event = (new Event(EventManager::DISPATCH_RESOURCE_REQUIRE))
       ->setFile($file)
       ->setType($type)
+      ->setVersion($version)
       ->setSource($this);
 
     EventManager::triggerWithEvent(

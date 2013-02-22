@@ -12,6 +12,7 @@ class Event extends StdEvent
   protected $_file;
   protected $_type;
   protected $_namespace;
+  protected $_version;
 
   public function __construct($name, array $args = array(), $source = null)
   {
@@ -82,6 +83,26 @@ class Event extends StdEvent
   public function setNamespace($namespace)
   {
     $this->_namespace = $namespace;
+
+    return $this;
+  }
+
+  /**
+   * @return string|null
+   */
+  public function getVersion()
+  {
+    return $this->_version;
+  }
+
+  /**
+   * @param string $version
+   *
+   * @return $this
+   */
+  public function setVersion($version)
+  {
+    $this->_version = $version;
 
     return $this;
   }

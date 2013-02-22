@@ -16,15 +16,49 @@ class Resource extends Dependency
    * @var array
    */
   protected static $_requires = array(
-    "css" => [],
-    "js" => [],
+    "css"      => [],
+    "js"       => [],
     "packages" => []
   );
 
-  protected $_priorotisedProtocols = array(
-    "https://",
-    "//",
-    "http://"
+  /**
+   * @var array
+   */
+  protected $_priorotisedProtocols = array("https://", "//", "http://");
+
+  /**
+   * @var array
+   */
+  protected static $_thirdpartyLibraries = array(
+    "css" => [
+      "bootstrap" => [
+        "2.3.0" => "netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css"
+      ]
+    ],
+    "js"  => [
+      "bootstrap" => [
+        "2.3.0" => "netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"
+      ],
+      "jquery" => [
+        "1.9.1" => "ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js",
+        "1.9.0" => "ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js",
+        "1.8.3" => "ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js",
+        "1.8.2" => "ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js",
+        "1.8.1" => "ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js",
+        "1.8.0" => "ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"
+      ],
+      "swfobject" => [
+        "2.2" => "ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js",
+        "2.1" => "ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js"
+      ],
+      "jqueryui" => [
+        "1.10.1" => "ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js",
+        "1.10.0" => "ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js",
+        "1.9.2"  => "ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js",
+        "1.9.1"  => "ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js",
+        "1.9.0"  => "ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"
+      ]
+    ]
   );
 
   /**
@@ -35,13 +69,18 @@ class Resource extends Dependency
   public static function getResourceUris(TypeEnum $type)
   {
     $resourceUris = [];
+    $sentUris     = [];
 
     foreach(self::$_requires[(string)$type] as $resource)
     {
       if(!isset(self::$_requires["packages"][$type . "_" . $resource["group"]])
         || $resource["resource"] === "package")
       {
-        $resourceUris[] = $resource["uri"];
+        if(!array_key_exists($resource["uri"], $sentUris))
+        {
+          $resourceUris[]             = $resource["uri"];
+          $sentUris[$resource["uri"]] = $resource["uri"];
+        }
       }
     }
 
@@ -134,43 +173,113 @@ class Resource extends Dependency
    */
   public function requireResource(Event $event)
   {
-    $file = $event->getFile();
-    $type = $event->getType();
-
-    if(!$this->isExternalUri($file))
+    if($this->isExternalUri($event->getFile()))
     {
-      // If it's an internal URI we want to make sure we have the correct
-      // directory prefix
-      $typeStringLength = strlen($type);
-
-      if(substr($file, -($typeStringLength + 1)) !== ".$type")
-      {
-        $file = "$file.$type";
-      }
-
-      if(substr($file, 0, 1) === "/")
-      {
-        $file = "/$type$file";
-      }
-      else
-      {
-        $file = "$type/$file";
-      }
+      $this->requireExternalResource($event);
     }
-
-    $event->setFile($file);
-    $this->_requireResource($event);
-    $this->mergeDuplicateExternalUris($type);
+    elseif(array_key_exists(
+      $event->getFile(),
+      self::$_thirdpartyLibraries[(string)$event->getType()]
+    ))
+    {
+      $this->requireThirdpartyResource(
+        $event,
+        Container::get(Container::REQUEST)
+      );
+    }
+    else
+    {
+      $this->requireInternalResource($event);
+    }
   }
 
   /**
    * @param \Cubex\Dispatch\Event $event
    */
-  protected function _requireResource(Event $event)
+  public function requireExternalResource(Event $event)
+  {
+    $this->_requireResource($event, true);
+    $this->mergeDuplicateExternalUris($event->getType());
+  }
+
+  /**
+   * @param \Cubex\Dispatch\Event $event
+   */
+  public function requireInternalResource(Event $event)
+  {
+    $file = $event->getFile();
+    $type = $event->getType();
+
+    $typeStringLength = strlen($type);
+
+    if(substr($file, -($typeStringLength + 1)) !== ".$type")
+    {
+      $file = "$file.$type";
+    }
+
+    if(substr($file, 0, 1) === "/")
+    {
+      $file = "/$type$file";
+    }
+    else
+    {
+      $file = "$type/$file";
+    }
+
+    $event->setFile($file);
+    $this->_requireResource($event);
+  }
+
+  /**
+   * @param \Cubex\Dispatch\Event $event
+   * @param \Cubex\Core\Http\Request $request
+   * @throws \InvalidArgumentException
+   */
+  public function requireThirdpartyResource(Event $event, Request $request)
+  {
+    $library = $event->getFile();
+    $type    = $event->getType();
+    $version = $event->getVersion();
+
+    if(!isset(self::$_thirdpartyLibraries[(string)$type][$library]))
+    {
+      throw new \InvalidArgumentException(
+        "The '{$library}' {$type} library is not available"
+      );
+    }
+
+    if($version === null)
+    {
+      $uri  = current(self::$_thirdpartyLibraries[(string)$type][$library]);
+    }
+    else
+    {
+      if(!array_key_exists(
+        $version, self::$_thirdpartyLibraries[(string)$type][$library]
+      ))
+      {
+        throw new \InvalidArgumentException(
+          "Version '{$version}' of the {$type} '{$library}' library is not ".
+          "available"
+        );
+      }
+
+      $uri  = self::$_thirdpartyLibraries[(string)$type][$library][$version];
+    }
+
+    $event->setFile($request->protocol() . $uri);
+    $this->_requireResource($event, true);
+  }
+
+  /**
+   * @param \Cubex\Dispatch\Event $event
+   * @param bool $external
+   */
+  protected function _requireResource(Event $event, $external = false)
   {
     $resource = $event->getFile();
 
-    if($this->isExternalUri($resource))
+    if($external)
     {
       $uri   = $resource;
       $group = "fullpath";
