@@ -279,6 +279,8 @@ class Request implements \IteratorAggregate
   {
     switch($method)
     {
+      case 'http':
+        return $this->isHttp();
       case 'form':
         return $this->isForm();
       case 'ajax':
