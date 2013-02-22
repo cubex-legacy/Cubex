@@ -98,6 +98,18 @@ class Request implements \IteratorAggregate
     }
   }
 
+  public function offsetPath($offset = 0, $limit = 1)
+  {
+    $parts = $offset + $limit;
+    $path  = $this->path($parts);
+    $ps    = explode("/", $path);
+    for($i = 0; $i <= $offset; $i++)
+    {
+      array_shift($ps);
+    }
+    return '/' . implode('/', $ps);
+  }
+
   /**
    * @param string $host
    *
