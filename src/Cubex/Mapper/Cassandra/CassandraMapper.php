@@ -29,10 +29,44 @@ class CassandraMapper extends KvMapper
   }
 
   /**
+   * @param $name
+   *
+   * @return \Cubex\KvStore\Cassandra\ColumnAttribute
+   */
+  public function getAttribute($name)
+  {
+    return $this->_attribute($name);
+  }
+
+  /**
    * @return CassandraCollection
    */
   public static function collection()
   {
     return new CassandraCollection(new static);
+  }
+
+  public function columnUpdated($columnName)
+  {
+    if($this->attributeExists($columnName))
+    {
+      return $this->getAttribute($columnName)->updatedTime();
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  public function columnExpiry($columnName)
+  {
+    if($this->attributeExists($columnName))
+    {
+      return $this->getAttribute($columnName)->expiryTime();
+    }
+    else
+    {
+      return false;
+    }
   }
 }
