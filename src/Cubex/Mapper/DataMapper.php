@@ -174,15 +174,18 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $this->_cloneSetup();
     $compAttrs = [];
 
-    foreach($attrs as $attr)
+    if(!empty($attrs))
     {
-      if($attr instanceof CompositeAttribute)
+      foreach($attrs as $attr)
       {
-        $compAttrs[$attr->name()] = $attr->availableAttributes();
-      }
-      else if($attr instanceof Attribute)
-      {
-        $this->_addAttribute(clone $attr);
+        if($attr instanceof CompositeAttribute)
+        {
+          $compAttrs[$attr->name()] = $attr->availableAttributes();
+        }
+        else if($attr instanceof Attribute)
+        {
+          $this->_addAttribute(clone $attr);
+        }
       }
     }
 
@@ -708,19 +711,29 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   {
     foreach($data as $k => $v)
     {
-      $k      = strtolower($k);
-      $exists = $this->attributeExists($k);
-      if(!$exists && $createAttributes)
+      if($v instanceof Attribute)
       {
-        $this->_addAttribute(new Attribute($k));
-      }
-
-      if($exists)
-      {
-        $this->setData($k, $this->_attribute($k)->unserialize($v));
+        $this->_addAttribute($v);
         if($setUnmodified)
         {
           $this->_attribute($k)->unsetModified();
+        }
+      }
+      else
+      {
+        $exists = $this->attributeExists($k);
+        if(!$exists && $createAttributes)
+        {
+          $this->_addAttribute(new Attribute($k));
+        }
+
+        if($exists)
+        {
+          $this->setData($k, $this->_attribute($k)->unserialize($v));
+          if($setUnmodified)
+          {
+            $this->_attribute($k)->unsetModified();
+          }
         }
       }
     }
@@ -978,5 +991,13 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
         return $string;
     }
     return $string;
+  }
+
+  /**
+   * @return Collection
+   */
+  public static function collection()
+  {
+    return new Collection(new static);
   }
 }

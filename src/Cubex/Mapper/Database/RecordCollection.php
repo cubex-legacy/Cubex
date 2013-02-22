@@ -328,11 +328,6 @@ class RecordCollection extends Collection
     return $rows;
   }
 
-  public function loadedIds()
-  {
-    return array_keys($this->_mappers);
-  }
-
   public function loadIds($ids, $idKey = null)
   {
     if($idKey === null)
@@ -429,11 +424,7 @@ class RecordCollection extends Collection
     {
       $this->get();
     }
-    if($this->count() > 0)
-    {
-      return head($this->_mappers);
-    }
-    return $default;
+    return parent::first($default);
   }
 
 

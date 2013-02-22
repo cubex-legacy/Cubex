@@ -39,6 +39,20 @@ class Collection
     return $this;
   }
 
+  public function loadedIds()
+  {
+    return array_keys($this->_mappers);
+  }
+
+  public function first($default = null)
+  {
+    if($this->count() > 0)
+    {
+      return head($this->_mappers);
+    }
+    return $default;
+  }
+
   /**
    * (En|Dis)able loading on record collection
    *

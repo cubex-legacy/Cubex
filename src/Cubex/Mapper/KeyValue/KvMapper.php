@@ -88,4 +88,12 @@ class KvMapper extends DataMapper
       );
     }
   }
+
+  /**
+   * @return KvCollection
+   */
+  public static function collection()
+  {
+    return new KvCollection(new static);
+  }
 }
