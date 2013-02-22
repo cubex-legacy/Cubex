@@ -72,11 +72,31 @@ class Request implements \IteratorAggregate
   }
 
   /**
-   * @return string
+   * @param null $parts depth of /
+   *
+   * @return null
    */
-  public function path()
+  public function path($parts = null)
   {
-    return $this->_path;
+    if($parts === null)
+    {
+      return $this->_path;
+    }
+    else
+    {
+      $parts++;
+      $ps = explode("/", $this->_path, $parts + 1);
+      var_dump($ps);
+      if(count($ps) > $parts)
+      {
+        array_pop($ps);
+        return implode('/', $ps);
+      }
+      else
+      {
+        return $this->_path;
+      }
+    }
   }
 
   /**
