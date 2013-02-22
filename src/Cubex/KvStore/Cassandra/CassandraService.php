@@ -19,8 +19,9 @@ class CassandraService implements KvService
   protected $_connection;
   protected $_columnFamily;
   protected $_keyspace;
+  protected $_returnAttributes = false;
 
-  public function cf($name, $attributes = true)
+  public function cf($name)
   {
     if($this->_connection === null)
     {
@@ -32,8 +33,19 @@ class CassandraService implements KvService
         $this->_connection, $name, $this->_keyspace
       );
     }
-    $this->_columnFamily->setReturnAttribute($attributes);
+    $this->_columnFamily->setReturnAttribute($this->returnAttributes());
     return $this->_columnFamily;
+  }
+
+  public function returnAttributes()
+  {
+    return $this->_returnAttributes;
+  }
+
+  public function setReturnAttributes($bool = true)
+  {
+    $this->_returnAttributes = (bool)$bool;
+    return $this;
   }
 
   public function connect()
@@ -67,18 +79,18 @@ class CassandraService implements KvService
 
   public function getField($table, $key, $column)
   {
-    return $this->cf($table, false)->get($key, [$column]);
+    return $this->cf($table)->get($key, [$column]);
   }
 
   public function getRow($table, $key, $columns = null)
   {
     if($columns === null)
     {
-      return $this->cf($table, false)->getSlice($key);
+      return $this->cf($table)->getSlice($key);
     }
     else
     {
-      return $this->cf($table, false)->get($key, $columns);
+      return $this->cf($table)->get($key, $columns);
     }
   }
 
@@ -86,11 +98,11 @@ class CassandraService implements KvService
   {
     if($columns === null)
     {
-      return $this->cf($table, false)->multiGetSlice($keys);
+      return $this->cf($table)->multiGetSlice($keys);
     }
     else
     {
-      return $this->cf($table, false)->multiGet($keys, $columns);
+      return $this->cf($table)->multiGet($keys, $columns);
     }
   }
 
@@ -98,7 +110,7 @@ class CassandraService implements KvService
   {
     $final = [];
     $key   = head($columns);
-    $rows  = $this->cf($table, false)->multiGet($keys, $columns);
+    $rows  = $this->cf($table)->multiGet($keys, $columns);
     foreach($rows as $data)
     {
       if(isset($data[$key]))
@@ -111,7 +123,7 @@ class CassandraService implements KvService
 
   public function getColumns($table, $key)
   {
-    return array_keys($this->cf($table, false)->getSlice($key));
+    return array_keys($this->cf($table)->getSlice($key));
   }
 
   public function getColumnCount($table, $key, array $columns = null)

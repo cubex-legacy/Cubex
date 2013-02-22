@@ -725,6 +725,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
         if(!$exists && $createAttributes)
         {
           $this->_addAttribute(new Attribute($k));
+          $exists = true;
         }
 
         if($exists)

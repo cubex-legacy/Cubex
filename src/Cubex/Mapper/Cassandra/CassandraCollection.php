@@ -40,6 +40,16 @@ class CassandraCollection extends KvCollection
     return $this;
   }
 
+  /**
+   * @return \Cubex\KvStore\Cassandra\CassandraService
+   */
+  public function connection()
+  {
+    $conn = $this->_mapperType->connection();
+    $conn->setReturnAttributes(true);
+    return $conn;
+  }
+
   protected function _populate($results)
   {
     $this->clear();
@@ -81,13 +91,5 @@ class CassandraCollection extends KvCollection
   )
   {
     return $this->cf()->makeSlice($start, $finish, $reverse, $limit);
-  }
-
-  /**
-   * @return \Cubex\KvStore\Cassandra\CassandraService
-   */
-  public function connection()
-  {
-    return parent::connection();
   }
 }

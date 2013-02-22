@@ -54,11 +54,29 @@ class KvCollection extends Collection
       $ids = [$ids];
     }
 
-    $this->connection()->getRows(
+    $results = $this->connection()->getRows(
       $this->_mapperType->getTableName(),
       $ids,
       $this->_columns
     );
+
+    $this->clear();
+    if($results !== null && is_array($results))
+    {
+      foreach($results as $key => $result)
+      {
+        if(empty($result))
+        {
+          continue;
+        }
+        $map = clone $this->_mapperType;
+        $map->hydrate($result, true, true);
+        $map->setId($key);
+        $map->setExists(true);
+        $this->addMapper($map);
+      }
+    }
+
     return $this;
   }
 }
