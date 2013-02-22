@@ -82,6 +82,13 @@ class CassandraCollection extends KvCollection
     return $this->connection()->cf($this->_mapperType->getTableName());
   }
 
+  public function makeSlice(
+    $start = '', $finish = '', $reverse = false, $limit = 100
+  )
+  {
+    return $this->cf()->makeSlice($start, $finish, $reverse, $limit);
+  }
+
   /**
    * @return \Cubex\KvStore\Cassandra\CassandraService
    */
