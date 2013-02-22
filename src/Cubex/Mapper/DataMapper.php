@@ -144,14 +144,15 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
     $class = new \ReflectionClass(get_class($this));
     foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
     {
-      $property = $this->stringToColumnName($p->getName());
+      $propName = $p->getName();
+      $property = $this->stringToColumnName($propName);
       if(!$this->attributeExists($property))
       {
         $this->_addAttribute(
           new $type($property, false, null, $p->getValue($this))
         );
       }
-      unset($this->$property);
+      unset($this->$propName);
     }
     return $this;
   }
