@@ -33,6 +33,11 @@ class KvCollection extends Collection
     return $this;
   }
 
+  public function getLimit()
+  {
+    return $this->_limit;
+  }
+
   public function connection()
   {
     return $this->_mapperType->connection();

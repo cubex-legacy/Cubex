@@ -22,23 +22,19 @@ class CassandraCollection extends KvCollection
     parent::__construct($map, $mappers);
   }
 
-  public function getKeys(
-    $start = '', $finish = '', $count = 100, $predicate = null
-  )
+  public function getKeys($start = '', $finish = '', $predicate = null)
   {
-    $results = $this->cf()->getKeys($start, $finish, $count, $predicate);
+    $results = $this->cf()->getKeys($start, $finish, $this->_limit, $predicate);
     $this->_populate($results);
     return $this;
   }
 
-  public function getTokens(
-    $startToken = '', $endToken = '', $count = 100, $predicate = null
-  )
+  public function getTokens($startToken = '', $endToken = '', $predicate = null)
   {
     $results = $this->cf()->getTokens(
       $startToken,
       $endToken,
-      $count,
+      $this->_limit,
       $predicate
     );
 
