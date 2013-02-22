@@ -98,11 +98,10 @@ class Request implements \IteratorAggregate
     }
   }
 
-  public function offsetPath($offset = 0, $limit = 1)
+  public function offsetPath($offset = 0, $limit = null)
   {
-    $parts = $offset + $limit;
-    $path  = $this->path($parts);
-    $ps    = explode("/", $path);
+    $path = $this->path($limit === null ? null : $offset + $limit);
+    $ps   = explode("/", $path);
     for($i = 0; $i <= $offset; $i++)
     {
       array_shift($ps);
