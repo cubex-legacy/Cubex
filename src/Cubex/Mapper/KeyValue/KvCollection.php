@@ -14,7 +14,7 @@ class KvCollection extends Collection
    */
   protected $_mapperType;
   protected $_columns;
-  protected $_limit;
+  protected $_limit = 100;
 
   public function __construct(KvMapper $map, array $mappers = null)
   {

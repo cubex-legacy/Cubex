@@ -14,8 +14,6 @@ class CassandraCollection extends KvCollection
    * @var CassandraMapper
    */
   protected $_mapperType;
-  protected $_columns;
-  protected $_limit;
 
   public function __construct(CassandraMapper $map, array $mappers = null)
   {
