@@ -79,7 +79,7 @@ abstract class Application
     return "";
   }
 
-  public function _configure()
+  protected function _configure()
   {
     return $this;
   }

@@ -18,14 +18,17 @@ trait ListenerTrait
    */
   abstract public function getNamespace();
 
-  protected function _listen()
+  protected function _listen($namespace = null)
   {
-    $namespace = $this->getNamespace();
+    if($namespace === null)
+    {
+      $namespace = $this->getNamespace();
+    }
     $fileSystem = new FileSystem();
 
     EventManager::listen(
       EventManager::DISPATCH_RESOURCE_REQUIRE,
-      function(Event $event) use ($namespace, $fileSystem)
+      function (Event $event) use ($namespace, $fileSystem)
       {
         $event->setNamespace($namespace);
 
@@ -39,7 +42,7 @@ trait ListenerTrait
 
     EventManager::listen(
       EventManager::DISPATCH_PACKAGE_REQUIRE,
-      function(Event $event) use ($namespace, $fileSystem)
+      function (Event $event) use ($namespace, $fileSystem)
       {
         $event->setNamespace($namespace);
 
@@ -53,7 +56,7 @@ trait ListenerTrait
 
     EventManager::listen(
       EventManager::DISPATCH_IMG_URL,
-      function(Event $event) use ($namespace, $fileSystem)
+      function (Event $event) use ($namespace, $fileSystem)
       {
         $event->setNamespace($namespace);
 
