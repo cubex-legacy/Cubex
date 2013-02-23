@@ -26,10 +26,17 @@ class Layout implements Renderable, NamespaceAware
   protected $_namespaceCache;
 
 
-  public function __construct($entity)
+  public function __construct($entity, $layoutDir = null)
   {
-    $this->_entity          = $entity;
-    $this->_layoutDirectory = $this->calculateLayoutDirs($entity);
+    $this->_entity = $entity;
+    if($layoutDir === null)
+    {
+      $this->_layoutDirectory = $this->calculateLayoutDirs($entity);
+    }
+    else
+    {
+      $this->_layoutDirectory = $layoutDir;
+    }
   }
 
   public function calculateLayoutDirs($entity)
