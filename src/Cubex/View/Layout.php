@@ -26,11 +26,25 @@ class Layout implements Renderable, NamespaceAware
   protected $_namespaceCache;
 
 
-  public function __construct(DirectoryAware $entity)
+  public function __construct($entity)
   {
     $this->_entity          = $entity;
-    $this->_layoutDirectory = $entity->containingDirectory();
-    $this->_layoutDirectory .= '/Templates/Layouts/';
+    $this->_layoutDirectory = $this->calculateLayoutDirs($entity);
+  }
+
+  public function calculateLayoutDirs($entity)
+  {
+    $dirs   = [];
+    $eClass = get_class($entity);
+    do
+    {
+      $reflect = new \ReflectionClass($eClass);
+      $filedir = dirname($reflect->getFileName());
+      $dirs[]  = $filedir . DS . 'Templates' . DS . 'Layouts' . DS;
+      $eClass  = $reflect->getParentClass()->getName();
+    }
+    while(substr($reflect->getParentClass()->getName(), 0, 5) != 'Cubex');
+    return implode(';', $dirs);
   }
 
   public function getNamespace()
@@ -77,6 +91,15 @@ class Layout implements Renderable, NamespaceAware
 
   public function getFilePath()
   {
-    return $this->_layoutDirectory . '/' . $this->_layoutTemplate . '.phtml';
+    $directories = explode(';', $this->_layoutDirectory);
+    foreach($directories as $dir)
+    {
+      $try = $dir . $this->_layoutTemplate . '.phtml';
+      if(file_exists($try))
+      {
+        return $try;
+      }
+    }
+    return;
   }
 }
