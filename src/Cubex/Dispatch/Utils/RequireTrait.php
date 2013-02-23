@@ -15,21 +15,23 @@ trait RequireTrait
   /**
    * Specify a CSS file to include (/css | .css are not required)
    *
-   * @param string $file
+   * @param      $file
+   * @param null $namespace
    */
-  public function requireCss($file)
+  public function requireCss($file, $namespace = null)
   {
-    $this->_requireResource($file, new TypeEnum(TypeEnum::CSS));
+    $this->_requireResource($file, TypeEnum::CSS(), null, $namespace);
   }
 
   /**
    * Specify a JS file to include (/js | .js are not required)
    *
    * @param string $file
+   * @param null   $namespace
    */
-  public function requireJs($file)
+  public function requireJs($file, $namespace = null)
   {
-    $this->_requireResource($file, new TypeEnum(TypeEnum::JS));
+    $this->_requireResource($file, TypeEnum::JS(), null, $namespace);
   }
 
   /**
@@ -38,7 +40,7 @@ trait RequireTrait
    */
   public function requireCssLibrary($library, $version = null)
   {
-    $this->_requireResource($library, new TypeEnum(TypeEnum::CSS), $version);
+    $this->_requireResource($library, TypeEnum::CSS(), $version);
   }
 
   /**
@@ -47,27 +49,29 @@ trait RequireTrait
    */
   public function requireJsLibrary($library, $version = null)
   {
-    $this->_requireResource($library, new TypeEnum(TypeEnum::JS), $version);
+    $this->_requireResource($library, TypeEnum::JS(), $version);
   }
 
   /**
    * Specify a CSS Package to include (/css | .css are not required)
    *
    * @param string $package
+   * @param null   $namespace
    */
-  public function requireCssPackage($package)
+  public function requireCssPackage($package, $namespace = null)
   {
-    $this->_requirePackage($package, new TypeEnum(TypeEnum::CSS));
+    $this->_requirePackage($package, TypeEnum::CSS(), $namespace);
   }
 
   /**
    * Specify a JS Package to include (/js | .js are not required)
    *
    * @param string $package
+   * @param null   $namespace
    */
-  public function requireJsPackage($package)
+  public function requireJsPackage($package, $namespace = null)
   {
-    $this->_requirePackage($package, new TypeEnum(TypeEnum::JS));
+    $this->_requirePackage($package, TypeEnum::JS(), $namespace);
   }
 
   /**
@@ -75,54 +79,78 @@ trait RequireTrait
    * @param \Cubex\Dispatch\Dependency\Resource\TypeEnum $type
    * @param null|string                                  $version
    */
-  protected function _requireResource($file, TypeEnum $type, $version = null)
+  protected function _requireResource(
+    $file, TypeEnum $type, $version = null, $namespace = null
+  )
   {
-    $namespace = $this->_getOrFindNamespace();
+    if($namespace === null)
+    {
+      $namespace = $this->_getOrFindNamespace();
+    }
 
     $event = (new Event(EventManager::DISPATCH_RESOURCE_REQUIRE))
-      ->setFile($file)
-      ->setType($type)
-      ->setVersion($version)
-      ->setSource($this);
+    ->setFile($file)
+    ->setType($type)
+    ->setVersion($version)
+    ->setSource($this);
 
     EventManager::triggerWithEvent(
-      EventManager::DISPATCH_RESOURCE_REQUIRE, $event, false, $namespace
+      EventManager::DISPATCH_RESOURCE_REQUIRE,
+      $event,
+      false,
+      $namespace
     );
   }
 
   /**
    * @param string   $package
    * @param TypeEnum $type
+   * @param null     $namespace
    */
-  protected function _requirePackage($package, TypeEnum $type)
+  protected function _requirePackage(
+    $package, TypeEnum $type, $namespace = null
+  )
   {
-    $namespace = $this->_getOrFindNamespace();
+    if($namespace === null)
+    {
+      $namespace = $this->_getOrFindNamespace();
+    }
 
     $event = (new Event(EventManager::DISPATCH_PACKAGE_REQUIRE))
-      ->setFile($package)
-      ->setType($type)
-      ->setSource($this);
+    ->setFile($package)
+    ->setType($type)
+    ->setSource($this);
 
     EventManager::triggerWithEvent(
-      EventManager::DISPATCH_PACKAGE_REQUIRE, $event, false, $namespace
+      EventManager::DISPATCH_PACKAGE_REQUIRE,
+      $event,
+      false,
+      $namespace
     );
   }
 
   /**
    * @param string $file
+   * @param null   $namespace
    *
    * @return string
    */
-  public function imgUrl($file)
+  public function imgUrl($file, $namespace = null)
   {
     $event = (new Event(EventManager::DISPATCH_IMG_URL))
-      ->setFile($file)
-      ->setSource($this);
+    ->setFile($file)
+    ->setSource($this);
 
-    $namespace = $this->_getOrFindNamespace();
+    if($namespace === null)
+    {
+      $namespace = $this->_getOrFindNamespace();
+    }
 
     return EventManager::triggerWithEvent(
-      EventManager::DISPATCH_IMG_URL, $event, true, $namespace
+      EventManager::DISPATCH_IMG_URL,
+      $event,
+      true,
+      $namespace
     );
   }
 
