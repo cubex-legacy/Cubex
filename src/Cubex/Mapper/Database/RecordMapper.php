@@ -495,6 +495,23 @@ abstract class RecordMapper extends DataMapper
       $idFields = array_keys($idAttr->getNamedArray());
     }
 
+    if($this->id() !== null && !$this->exists())
+    {
+      if(empty($idFields))
+      {
+        $idFields = [$this->getIdKey()];
+      }
+
+      foreach($idFields as $idk)
+      {
+        $at = $this->_attribute($idk);
+        if($at !== null)
+        {
+          $at->setModified();
+        }
+      }
+    }
+
     if(!empty($modified))
     {
       $this->_updateTimestamps();
@@ -632,6 +649,7 @@ abstract class RecordMapper extends DataMapper
         if($newId !== null && $newId !== 0)
         {
           $this->setId($newId);
+          $this->setExists();
         }
       }
       foreach($this->_attributes as $attr)
