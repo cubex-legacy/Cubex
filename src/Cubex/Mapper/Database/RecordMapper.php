@@ -649,8 +649,8 @@ abstract class RecordMapper extends DataMapper
         if($newId !== null && $newId !== 0)
         {
           $this->setId($newId);
-          $this->setExists();
         }
+        $this->setExists();
       }
       foreach($this->_attributes as $attr)
       {
