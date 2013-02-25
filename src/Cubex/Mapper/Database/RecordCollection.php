@@ -130,8 +130,21 @@ class RecordCollection extends Collection
 
   public function loadWhere($pattern /* , $arg, $arg, $arg ... */)
   {
+    $args = func_get_args();
+
+    if(func_num_args() === 1)
+    {
+      if(is_array($pattern))
+      {
+        $args = ["%QA", $pattern];
+      }
+      else if(is_object($pattern))
+      {
+        $args = ["%QO", $pattern];
+      }
+    }
     $this->clear();
-    $this->_query = ParseQuery::parse($this->connection(), func_get_args());
+    $this->_query = ParseQuery::parse($this->connection(), $args);
 
     return $this;
   }
