@@ -259,6 +259,14 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
   }
 
   /**
+   * @return \Composer\Autoload\ClassLoader
+   */
+  public function getAutoloader()
+  {
+    return $this->_autoloader;
+  }
+
+  /**
    * @param \Cubex\Core\Http\Dispatchable $dispatcher
    *
    * @return $this

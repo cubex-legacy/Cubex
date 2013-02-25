@@ -27,7 +27,8 @@ class Cli extends Mapper
     );
 
     $entities = $this->findEntities();
-    $this->setEntityMapConfigLines($entities);
+    $externalEntities = $this->findExternalEntities();
+    $this->setEntityMapConfigLines(array_merge($entities, $externalEntities));
     $maps = $this->mapEntities($entities);
     $savedMaps = $this->saveMaps($maps);
     $this->writeConfig();

@@ -55,22 +55,6 @@ class FileSystem
 
   public function normalizePath($path)
   {
-    if(\Cubex\Helpers\System::isWindows())
-    {
-      $isAbsolute = preg_match('/^[A-Z]+:/', $path);
-    }
-    else
-    {
-      $isAbsolute = strncmp($path, DIRECTORY_SEPARATOR, 1) === 0;
-    }
-
-    $unresolvedPath = $path;
-    $path           = $this->resolvePath($path);
-    if($path === false)
-    {
-      $path = $unresolvedPath;
-    }
-
     $path = str_replace("\\", "/", $path);
 
     if(is_dir($path))
@@ -78,7 +62,7 @@ class FileSystem
       $path = rtrim($path, "/");
     }
 
-    if(!$isAbsolute)
+    if(!$this->isAbsolute($path))
     {
       $path = ltrim($path, "/");
     }
@@ -96,5 +80,54 @@ class FileSystem
   public function isDir($directory)
   {
     return is_dir($directory);
+  }
+
+  public function isAbsolute($path)
+  {
+    if(\Cubex\Helpers\System::isWindows())
+    {
+      return preg_match('/^[A-Z]+:/', $path);
+    }
+    else
+    {
+      return strncmp($path, DIRECTORY_SEPARATOR, 1) === 0;
+    }
+  }
+
+  public function getRelativePath($from, $to, $file = true)
+  {
+    $from    = explode("/", $this->normalizePath($from));
+    $to      = explode("/", $this->normalizePath($to));
+    $relPath = $to;
+
+    if(!$file)
+    {
+      $from[] = null;
+    }
+
+    foreach($from as $depth => $dir)
+    {
+      if($dir === $to[$depth])
+      {
+        array_shift($relPath);
+      }
+      else
+      {
+        $remaining = count($from) - $depth;
+
+        if($remaining > 1)
+        {
+          $padLength = (count($relPath) + $remaining - 1) * -1;
+          $relPath   = array_pad($relPath, $padLength, "..");
+          break;
+        }
+        else
+        {
+          $relPath[0] = "./{$relPath[0]}";
+        }
+      }
+    }
+
+    return implode("/", $relPath);
   }
 }

@@ -4,6 +4,7 @@
  */
 namespace Cubex\Dispatch;
 
+use Cubex\Container\Container;
 use Cubex\Foundation\Config\ConfigGroup;
 
 class Mapper extends Dispatcher
@@ -17,6 +18,7 @@ class Mapper extends Dispatcher
   private $_ignoredFiles = [];
 
   private $_configLines = [];
+  private $_externalProjects = [];
 
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
@@ -24,6 +26,7 @@ class Mapper extends Dispatcher
 
     $this->_ignoredFiles[$this->getDispatchIniFilename()] = true;
     $this->_ignoredFiles[".gitignore"] = true;
+    $this->_setExternalProjects();
   }
 
   /**
@@ -33,7 +36,8 @@ class Mapper extends Dispatcher
   public function run()
   {
     $entities = $this->findEntities();
-    $this->setEntityMapConfigLines($entities);
+    $externalEntities = $this->findExternalEntities();
+    $this->setEntityMapConfigLines(array_merge($entities, $externalEntities));
     $this->writeConfig();
     $maps = $this->mapEntities($entities);
     $savedMaps = $this->saveMaps($maps);
@@ -55,13 +59,26 @@ class Mapper extends Dispatcher
    */
   public function findEntities($entityPath = "")
   {
+    $this->_changeWorkingDir($this->getProjectBase());
+
     $entities = [];
+
+    $traversing = $directory = false;
+
     if(!empty($entityPath))
     {
       $entityPath = $this->getFileSystem()->normalizePath($entityPath);
+      $traversing = true;
+      $directory  = $this->getFileSystem()->resolvePath($entityPath);
     }
 
-    $directory = $this->getProjectPath() . DS . $entityPath;
+    if(!$directory)
+    {
+      $traversing = false;
+      $directory  = $this->getFileSystem()->resolvePath(
+        $this->getProjectPath() . DS . $entityPath
+      );
+    }
 
     try
     {
@@ -77,12 +94,28 @@ class Mapper extends Dispatcher
       if($this->getFileSystem()->isDir($directory . DS . $directoryListItem))
       {
         $newEntityPath = $entityPath . DS . $directoryListItem;
-        $newEntityPath = ltrim($newEntityPath, DS);
+
         if($directoryListItem === $this->getResourceDirectory())
         {
-          $entities[] = $this->getFileSystem()->normalizePath(
-            $this->getProjectNamespace() . DS . $newEntityPath
-          );
+          if($this->getFileSystem()->isAbsolute($newEntityPath))
+          {
+            $newEntityPath = $this->getFileSystem()->getRelativePath(
+              $this->getProjectBase(),
+              $newEntityPath,
+              false
+            );
+          }
+
+          if($traversing)
+          {
+            $entities[] = $this->getFileSystem()->normalizePath($newEntityPath);
+          }
+          else
+          {
+            $entities[] = $this->getFileSystem()->normalizePath(
+              $this->getProjectNamespace() . DS . $newEntityPath
+            );
+          }
         }
         else
         {
@@ -90,9 +123,43 @@ class Mapper extends Dispatcher
             $entities,
             $this->findEntities($newEntityPath)
           );
+          $this->_changeWorkingDir($this->getProjectBase());
         }
       }
     }
+
+    $this->_changeWorkingDir();
+
+    return $entities;
+  }
+
+  /**
+   * This looks in a composer vendor directory for any bundls that we may want
+   * to map.
+   *
+   * @return array
+   */
+  public function findExternalEntities()
+  {
+    $this->_changeWorkingDir($this->getProjectBase());
+
+    $entities = [];
+
+    $normalizedProjectPath = $this->getFileSystem()->normalizePath(
+      $this->getProjectPath()
+    );
+
+    foreach($this->_getAutoloader()->getPrefixes() as $dirs)
+    {
+      $normalizedPrefixDir = $this->getFileSystem()->normalizePath($dirs[0]);
+
+      if(strpos($normalizedProjectPath, $normalizedPrefixDir) !== 0)
+      {
+        $entities = array_merge($entities, $this->findEntities($dirs[0]));
+      }
+    }
+
+    $this->_changeWorkingDir();
 
     return $entities;
   }
@@ -362,11 +429,30 @@ class Mapper extends Dispatcher
 
   public function setEntityMapConfigLines(array $entities)
   {
+    $this->_changeWorkingDir($this->getProjectBase());
+
     foreach($entities as $entity)
     {
+      $fullEntity = $entity;
+
+      if($this->getFileSystem()->resolvePath($entity) !== false)
+      {
+        foreach($this->_externalProjects as $externalProject)
+        {
+          if(stristr($entity, $externalProject) !== false)
+          {
+            $entityEnd = last(explode($externalProject, $entity));
+            $entity = $externalProject . $entityEnd;
+            break;
+          }
+        }
+      }
+
       $entityHash = $this->generateEntityHash($entity);
-      $this->setConfigLine("entity_map[$entityHash] = $entity");
+      $this->setConfigLine("entity_map[$entityHash] = $fullEntity");
     }
+
+    $this->_changeWorkingDir();
   }
 
   /**
@@ -397,5 +483,55 @@ class Mapper extends Dispatcher
     }
 
     return $path;
+  }
+
+  /**
+   * When we're working with relative paths that need to be resolved we need to
+   * be in a standard working directory. This is here to abstract that
+   * functionality and easily revert it.
+   *
+   * @param null|string $dir
+   */
+  protected function _changeWorkingDir($dir = null)
+  {
+    static $cwd;
+
+    if($cwd === null)
+    {
+      $cwd = getcwd();
+    }
+
+    if($dir === null)
+    {
+      chdir($cwd);
+    }
+    else
+    {
+      chdir($dir);
+    }
+  }
+
+  /**
+   * We need to get a specific part of an entity path to generate the entity
+   * hash and with external projects this is after the first part of the
+   * namespace.
+   */
+  protected function _setExternalProjects()
+  {
+    foreach($this->_getAutoloader()->getPrefixes() as $baseNamespaces => $dirs)
+    {
+      $baseNamespacesParts = explode("\\", $baseNamespaces);
+      $baseNamespace       = $baseNamespacesParts[0];
+
+      $this->_externalProjects[$baseNamespace] = $baseNamespace;
+    }
+  }
+
+  /**
+   * @return \Composer\Autoload\ClassLoader
+   */
+  protected function _getAutoloader()
+  {
+    return Container::get(Container::LOADER)->getAutoloader();
   }
 }
