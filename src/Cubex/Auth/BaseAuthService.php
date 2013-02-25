@@ -56,4 +56,9 @@ abstract class BaseAuthService implements AuthService
     }
     return null;
   }
+
+  public function logout()
+  {
+    Cookies::delete("CUBEXLOGIN");
+  }
 }

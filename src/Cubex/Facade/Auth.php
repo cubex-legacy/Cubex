@@ -78,4 +78,9 @@ class Auth extends BaseFacade
     }
     return $user;
   }
+
+  public static function logout($rememberUsername = false)
+  {
+    return static::getAccessor()->logout($rememberUsername);
+  }
 }

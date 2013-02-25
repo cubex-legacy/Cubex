@@ -58,4 +58,9 @@ interface AuthService extends Service
    * @return null|AuthedUser
    */
   public function retrieveLogin();
+
+  /**
+   * @return void|null|bool
+   */
+  public function logout();
 }
