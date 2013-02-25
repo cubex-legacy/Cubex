@@ -124,7 +124,7 @@ class DBBuilder
 
     $unsigned   = false;
     $allowNull  = true;
-    $default    = $this->_emptyMapper->getData($name);
+    $default    = $this->_emptyMapper->getAttribute($name)->defaultValue();
     $length     = 150;
     $dataType   = DataType::VARCHAR;
     $annotation = [];
