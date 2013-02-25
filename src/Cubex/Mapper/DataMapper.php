@@ -148,9 +148,11 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
       $property = $this->stringToColumnName($propName);
       if(!$this->attributeExists($property))
       {
+        $default = $p->getValue($this);
         $this->_addAttribute(
-          new $type($property, false, null, $p->getValue($this))
+          new $type($property, false, null, $default)
         );
+        $this->_attribute($property)->setDefault($default);
       }
       unset($this->$propName);
     }

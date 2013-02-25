@@ -202,16 +202,10 @@ class DBBuilder
         switch(strtolower($k))
         {
           case 'default':
-            if($default === null)
-            {
-              $default = $v;
-            }
+            $default = $v;
             break;
           case 'length':
-            if($length === null)
-            {
-              $length = (int)$v;
-            }
+            $length = (int)$v;
             break;
           case 'datatype':
             $dataType = $v;

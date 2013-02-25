@@ -21,6 +21,7 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
   const SERIALIZATION_PHP  = 'php';
 
   protected $_id;
+  protected $_default;
   protected $_modified;
   protected $_serializer;
   protected $_name;
@@ -50,6 +51,17 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
   public function __toString()
   {
     return $this->_name . " = " . $this->data();
+  }
+
+  public function setDefault($value)
+  {
+    $this->_default = $value;
+    return $this;
+  }
+
+  public function defaultValue()
+  {
+    return $this->_default;
   }
 
   public function populated()
@@ -271,7 +283,7 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
 
   public function __clone()
   {
-    $this->setData(null);
+    $this->setData($this->defaultValue());
   }
 
   public function saveToDatabase()
