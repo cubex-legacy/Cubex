@@ -45,6 +45,7 @@ class Dispatcher
 
   private static $_dispatchInis = [];
   private static $_entities;
+  private static $_externalEntities;
   /**
    * @var \Cubex\Foundation\Config\Config
    */
@@ -431,10 +432,23 @@ class Dispatcher
   {
     if(self::$_entities === null)
     {
-      self::$_entities = $entities = $mapper->findEntities();
+      self::$_entities = $mapper->findEntities();
     }
 
     foreach(self::$_entities as $entity)
+    {
+      if($this->generateEntityHash($entity, strlen($hash)) === $hash)
+      {
+        return $entity;
+      }
+    }
+
+    if(self::$_externalEntities === null)
+    {
+      self::$_externalEntities = $mapper->findExternalEntities();
+    }
+
+    foreach(self::$_externalEntities as $entity)
     {
       if($this->generateEntityHash($entity, strlen($hash)) === $hash)
       {
