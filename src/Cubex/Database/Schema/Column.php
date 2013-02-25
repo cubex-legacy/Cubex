@@ -61,7 +61,14 @@ class Column
 
     if($this->_default !== null)
     {
-      $sql .= " DEFAULT '" . $this->_default . "' ";
+      if(is_int($this->_default))
+      {
+        $sql .= " DEFAULT " . (int)$this->_default . " ";
+      }
+      else
+      {
+        $sql .= " DEFAULT '" . $this->_default . "' ";
+      }
     }
 
     if($this->_comment !== null)
