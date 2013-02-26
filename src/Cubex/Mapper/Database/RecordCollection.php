@@ -90,6 +90,13 @@ class RecordCollection extends Collection
     }
   }
 
+  public function runQuery($query)
+  {
+    $conn  = $this->connection();
+    $query = ParseQuery::parse($conn, func_get_args());
+    return $conn->query($query);
+  }
+
   public function currentQuery()
   {
     return $this->_query;
