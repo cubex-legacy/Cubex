@@ -1,33 +1,32 @@
 <?php
 /**
- * @author  brooke.bryan
+ * @author gareth.evans
  */
-namespace Cubex\Session\PhpSession;
+
+namespace Cubex\Session\BlackHoleSession;
 
 use Cubex\ServiceManager\ServiceConfig;
+use Cubex\Session\SessionIdTrait;
 use Cubex\Session\SessionService;
 
 class Session implements SessionService
 {
+  use SessionIdTrait;
+
+  protected static $_sessionData = [];
+
   /**
    * @param \Cubex\ServiceManager\ServiceConfig $config
    *
-   * @return mixed|void
+   * @return mixed
    */
   public function configure(ServiceConfig $config)
   {
-    $this->init();
+    return $this;
   }
 
   public function init()
   {
-    session_start();
-    if(!isset($_SESSION['cubex'])) $_SESSION['cubex'] = array();
-  }
-
-  public function id()
-  {
-    return session_id();
   }
 
   /**
@@ -37,30 +36,32 @@ class Session implements SessionService
    */
   public function get($key)
   {
-    return $this->exists($key) ? $_SESSION['cubex'][$key] : null;
+    return $this->exists($key) ? self::$_sessionData[$key] : null;
   }
 
   /**
    * @param $key
    * @param $data
    *
-   * @return mixed|void
+   * @return bool
    */
   public function set($key, $data)
   {
-    $_SESSION['cubex'][$key] = $data;
+    self::$_sessionData[$key] = $data;
+
     return true;
   }
 
   public function delete($key)
   {
-    unset($_SESSION['cubex'][$key]);
+    unset(self::$_sessionData[$key]);
+
     return true;
   }
 
   public function exists($key)
   {
-    return isset($_SESSION['cubex'][$key]);
+    return isset(self::$_sessionData[$key]);
   }
 
   /**
@@ -68,6 +69,8 @@ class Session implements SessionService
    */
   public function destroy()
   {
-    unset($_SESSION['cubex']);
+    self::$_sessionData = [];
+
+    return true;
   }
 }

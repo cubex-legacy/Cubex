@@ -170,3 +170,15 @@ if(!function_exists("strip_start"))
     return $haystack;
   }
 }
+
+if(!function_exists("short_string"))
+{
+  /**
+   * Always returns a 5 character alpha-numeric string
+   * @return string
+   */
+  function short_string()
+  {
+    return base_convert(rand("0x19a100", "0x39aa3ff"), 16, 36);
+  }
+}
