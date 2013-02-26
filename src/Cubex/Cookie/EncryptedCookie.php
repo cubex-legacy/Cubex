@@ -19,7 +19,7 @@ class EncryptedCookie extends StandardCookie
   {
     $value = parent::getValue();
 
-    if($decrypted)
+    if($decrypted && !empty($value))
     {
       $value = static::stripValueKey($value);
       $value = Encryption::decrypt($value);
@@ -35,7 +35,7 @@ class EncryptedCookie extends StandardCookie
    */
   public function setValue($value)
   {
-    if(!static::isEncrypted($value))
+    if(!static::isEncrypted($value) && !empty($value))
     {
       $value = self::PRE_VALUE_KEY . Encryption::encrypt($value);
     }
