@@ -46,6 +46,6 @@ class Image extends Dependency
     $request      = Container::get(Container::REQUEST);
     $dispatchPath = $this->getDispatchPath($event, $request);
 
-    return $dispatchPath->getDispatchPath();
+    return $this->getDispatchUrl($dispatchPath, $request);
   }
 }

@@ -29,10 +29,23 @@ class Serve extends Dispatcher implements Dispatchable
   {
     parent::__construct($configGroup, $fileSystem);
 
+    // If they have a dispatch path build option we need to strip it and
+    // re-build the dispatchPath object
+    if($this->getBuildOptionType() === self::BUILD_OPT_TYPE_PATH)
+    {
+      $buildOptionPathParts = substr_count(
+        $this->getBuildOptionPattern(),
+        "/"
+      ) + 1;
+      $path                 = ltrim($dispatchPath->getDispatchPath(), "/");
+      $pathParts            = explode("/", $path);
+      $pathParts            = array_slice($pathParts, $buildOptionPathParts);
+      $dispatchPath         = new Path(implode("/", $pathParts));
+    }
+
+    $resourceHash = $this->getNomapHash();
     $this->setDispatchPath($dispatchPath)
-      ->setUseMap(
-        $this->getDispatchPath()->getResourceHash() !== $this->getNomapHash()
-      );
+      ->setUseMap($resourceHash !== $this->getNomapHash());
   }
 
   /**
@@ -78,6 +91,7 @@ class Serve extends Dispatcher implements Dispatchable
   {
     $resourceHash   = $this->getDispatchPath()->getResourceHash();
     $pathToResource = $this->getDispatchPath()->getPathToResource();
+    $debugString    = $this->getDispatchPath()->getDebugString();
     $resourceType   = $this->getResourceExtension($pathToResource);
 
     if(!array_key_exists($resourceType, $this->getSupportedTypes()))
@@ -106,8 +120,7 @@ class Serve extends Dispatcher implements Dispatchable
         $response->from($data);
         $this->_setResponseHeaders($response, $data, $resourceType);
 
-        if($this->getDispatchPath()->getDebugString()
-          === self::getNocacheDebugString())
+        if($debugString === self::getNocacheDebugString())
         {
           $response->disbleCache();
         }
@@ -133,8 +146,9 @@ class Serve extends Dispatcher implements Dispatchable
     $filePathParts  = explode("/", $pathToResource);
     $filename       = array_pop($filePathParts);
     $pathToFile     = implode("/", $filePathParts);
-    $fullEntityPath = $this->getProjectBase() . DS .
-      $this->getEntityPathByHash($this->getDispatchPath()->getEntityHash());
+    $entityHash     = $this->getDispatchPath()->getEntityHash();
+    $fullEntityPath = $this->getProjectBase() . DS;
+    $fullEntityPath .= $this->getEntityPathByHash($entityHash);
 
     $locateList = $this->buildResourceLocateDirectoryList(
       $fullEntityPath, $pathToFile, $filename, $domain

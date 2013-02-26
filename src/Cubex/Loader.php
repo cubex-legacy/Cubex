@@ -308,24 +308,25 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       );
       $this->request()->setPath($faviconPath);
     }
-
-    $trimmedPath = ltrim($this->request()->path(), "/");
-
-    if(substr_count($trimmedPath, "/") > 0)
+    else
     {
-      list($potentialDispatcherDirectory,) = explode("/", $trimmedPath, 2);
-
-      $dispatch = new \Cubex\Dispatch\Dispatcher(
-        $this->getConfig(), new \Cubex\Dispatch\FileSystem()
-      );
-
-      if($dispatch->getResourceDirectory() === $potentialDispatcherDirectory)
+      try
       {
+        $dispatchPath  = new \Cubex\Dispatch\Path($this->request()->path());
         $dispatchServe = new \Cubex\Dispatch\Serve(
-          $this->getConfig(), new \Cubex\Dispatch\FileSystem(),
-          new \Cubex\Dispatch\Path($this->request()->path())
+          $this->getConfig(),
+          new \Cubex\Dispatch\FileSystem(),
+          $dispatchPath
         );
-        $this->setDispatchable($dispatchServe);
+
+        if($dispatchServe->isDispatchablePath($this->request()))
+        {
+          $this->setDispatchable($dispatchServe);
+        }
+      }
+      catch(\Exception $e)
+      {
+        // Bad path, just let the page carry on
       }
     }
 

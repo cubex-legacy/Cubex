@@ -32,7 +32,6 @@ class Dependency extends Dispatcher
       $entity = $this->getFileSystem()->normalizePath($entity);
     }
 
-    $resourceDirectory = $this->getResourceDirectory();
     $domainHash        = $this->generateDomainHash($domain);
     $entityHash        = $this->generateEntityHash($entity);
     $resourceHash      = $this->getNomapHash();
@@ -44,7 +43,6 @@ class Dependency extends Dispatcher
     }
 
     return Path::fromParams(
-      $resourceDirectory,
       $domainHash,
       $entityHash,
       $resourceHash,

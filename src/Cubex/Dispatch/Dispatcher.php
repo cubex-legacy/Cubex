@@ -4,6 +4,8 @@
  */
 namespace Cubex\Dispatch;
 
+use Cubex\Container\Container;
+use Cubex\Core\Http\Request;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
@@ -16,6 +18,7 @@ class Dispatcher
   private $_fileSystem;
   private $_domainMap;
   private $_entityMap;
+  private $_buildOptions;
   private $_dispatchIniFilename;
   private $_resourceDirectory;
   private $_projectNamespace;
@@ -42,6 +45,14 @@ class Dispatcher
     "eot"   => "application/vnd.ms-fontobject",
     "woff"  => "application/x-font-woff"
   ];
+
+  const BUILD_OPT_FORCE_SECURE = "force_secure";
+  const BUILD_OPT_TYPE         = "type";
+  const BUILD_OPT_PATTERN      = "pattern";
+
+  const BUILD_OPT_TYPE_PATH      = "path";
+  const BUILD_OPT_TYPE_DOMAIN    = "domain";
+  const BUILD_OPT_TYPE_SUBDOMAIN = "subdomain";
 
   private static $_dispatchInis = [];
   private static $_entities;
@@ -74,13 +85,22 @@ class Dispatcher
       "dispatch_ini_filename",
       "dispatch.ini"
     );
-    $this->_resourceDirectory   = $dispatchConfig->getStr(
-      "resource_directory",
-      "res"
-    );
     $this->_projectNamespace    = $projectConfig->getStr(
       "namespace",
       "Project"
+    );
+    $this->_domainMap           = $dispatchConfig->getArr("domain_map", []);
+    $this->_buildOptions        = array_merge(
+      [
+        self::BUILD_OPT_FORCE_SECURE => false,
+        self::BUILD_OPT_TYPE         => self::BUILD_OPT_TYPE_PATH,
+        self::BUILD_OPT_PATTERN      => "res"
+      ],
+      $dispatchConfig->getArr("build_options", [])
+    );
+    $this->_resourceDirectory   = $dispatchConfig->getStr(
+      "resource_directory",
+      "res"
     );
 
     $this->_projectBase = $this->getFileSystem()->resolvePath(
@@ -90,7 +110,6 @@ class Dispatcher
     // We do these bits at the end as we need the project base path to get the
     // correct config file directory
     $dispatchIniConfig = $this->getBaseDispatchConfig();
-    $this->_domainMap  = $dispatchIniConfig->getArr("domain_map", []);
     $this->_entityMap  = $dispatchIniConfig->getArr("entity_map", []);
   }
 
@@ -108,6 +127,47 @@ class Dispatcher
   public function getEntityMap()
   {
     return $this->_entityMap;
+  }
+
+  /**
+   * @return array
+   */
+  public function getBuildOptions()
+  {
+    return $this->_buildOptions;
+  }
+
+  /**
+   * @return string
+   */
+  public function getBuildOptionType()
+  {
+    return $this->_buildOptions[self::BUILD_OPT_TYPE];
+  }
+
+  /**
+   * @return bool
+   */
+  public function getBuildOptionForceSecure()
+  {
+    return $this->_buildOptions[self::BUILD_OPT_FORCE_SECURE];
+  }
+
+  /**
+   * @return string
+   */
+  public function getBuildOptionPattern()
+  {
+    if($this->getBuildOptionType() === self::BUILD_OPT_TYPE_PATH)
+    {
+      return trim(
+        $this->getFileSystem()->normalizePath(
+          $this->_buildOptions[self::BUILD_OPT_PATTERN]
+        ),
+        "/"
+      );
+    }
+    return $this->_buildOptions[self::BUILD_OPT_PATTERN];
   }
 
   /**
@@ -554,14 +614,13 @@ class Dispatcher
     }
 
     $dispatchPath = Path::fromParams(
-      $this->getResourceDirectory(),
       $domainHash,
       $entityHash,
       $resourceHash,
       $pathToResource
     );
 
-    return $dispatchPath->getDispatchPath();
+    return $this->getDispatchUrl($dispatchPath, Container::request());
   }
 
   /**
@@ -621,5 +680,104 @@ class Dispatcher
     }
 
     return $uri;
+  }
+
+  /**
+   * Figures out if the request path is a dispatchable one based on the configs
+   * set by the system.
+   *
+   * @param \Cubex\Core\Http\Request $request
+   *
+   * @return bool
+   */
+  public function isDispatchablePath(Request $request)
+  {
+    $pattern = $this->getBuildOptionPattern();
+
+    switch($this->getBuildOptionType())
+    {
+      case self::BUILD_OPT_TYPE_DOMAIN:
+        return $pattern === $request->domain() . "." . $request->tld();
+      case self::BUILD_OPT_TYPE_SUBDOMAIN:
+        return $pattern === $request->subDomain();
+      case self::BUILD_OPT_TYPE_PATH:
+      default:
+        $patternComparison = "/" . $pattern . "/";
+        $patternPosition   = strncmp(
+          $request->path(),
+          $patternComparison,
+          strlen($patternComparison)
+        );
+
+        return $patternPosition === 0;
+    }
+  }
+
+  /**
+   * @param Path $path
+   * @param \Cubex\Core\Http\Request $request
+   *
+   * @return string
+   */
+  public function getDispatchUrl(Path $path, Request $request)
+  {
+    if($this->canDispatchUrl($request))
+    {
+      $pattern = $this->getBuildOptionPattern();
+
+      switch($this->getBuildOptionType())
+      {
+        case self::BUILD_OPT_TYPE_DOMAIN:
+        case self::BUILD_OPT_TYPE_SUBDOMAIN:
+          $protocol = $request->protocol();
+
+          if($this->getBuildOptionForceSecure())
+          {
+            $protocol = "https://";
+          }
+
+          $host = $pattern;
+
+          if($this->getBuildOptionType() !== self::BUILD_OPT_TYPE_DOMAIN)
+          {
+            $host .= "." . $request->domain() . "." . $request->tld();
+          }
+
+          return "$protocol$host{$path->getDispatchPath()}";
+        case self::BUILD_OPT_TYPE_PATH:
+        default:
+          return "/" . $pattern . $path->getDispatchPath();
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Exception explains it all
+   *
+   * @param \Cubex\Core\Http\Request $request
+   *
+   * @return bool
+   * @throws \Exception
+   */
+  public function canDispatchUrl(Request $request)
+  {
+    if($this->getBuildOptionType() === self::BUILD_OPT_TYPE_DOMAIN)
+    {
+      $host       = $request->domain() . "." . $request->tld();
+      $domainHash = $this->generateDomainHash($host);
+      $domainMap  = $this->getDomainMap();
+
+      if(!array_key_exists($domainHash, $domainMap))
+      {
+        throw new \Exception(
+          "You can't dispatch with a different domain withouth setting your " .
+          "domain map. `domain_map[{$domainHash}] = {$host}` missing."
+        );
+      }
+    }
+
+    return true;
   }
 }

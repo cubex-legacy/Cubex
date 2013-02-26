@@ -289,7 +289,7 @@ class Resource extends Dependency
       $request      = Container::get(Container::REQUEST);
       $dispatchPath = $this->getDispatchPath($event, $request);
       $group        = $dispatchPath->getEntityHash();
-      $uri          = $dispatchPath->getDispatchPath();
+      $uri          = $this->getDispatchUrl($dispatchPath, $request);
     }
 
     self::$_requires[(string)$event->getType()][] = [

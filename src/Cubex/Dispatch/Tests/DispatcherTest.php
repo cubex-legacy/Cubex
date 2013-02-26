@@ -40,7 +40,8 @@ class DispatcherTest extends TestCase
       array(
         "dispatch"  => array(
           "dispatch_ini_filename" => $this->_dispatchIniFilename,
-          "resource_directory"    => $this->_resourceDirectory
+          "resource_directory"    => $this->_resourceDirectory,
+          "domain_map"            => $this->_domainMap
         ),
         "project"   => array(
           "namespace" => $this->_namespace
@@ -51,12 +52,7 @@ class DispatcherTest extends TestCase
       )
     );
 
-    Dispatcher::setBaseDispatchConfig(
-      [
-        "domain_map" => $this->_domainMap,
-        "entity_map" => $this->_entityMap,
-      ]
-    );
+    Dispatcher::setBaseDispatchConfig(["entity_map" => $this->_entityMap]);
 
     $this->_dispatcher = new Dispatcher($this->_configGroup, new FileSystem());
   }
@@ -164,8 +160,12 @@ class DispatcherTest extends TestCase
       ->will($this->returnValue(true));
     $fileSystemMock->expects($this->exactly(3))
       ->method("readFile")
-      ->will($this->onConsecutiveCalls(
-        "pre", $this->throwException(new \Exception()), "post")
+      ->will(
+        $this->onConsecutiveCalls(
+          "pre",
+          $this->throwException(new \Exception()),
+          "post"
+        )
       );
 
     $dispatcher = new Dispatcher($this->_configGroup, $fileSystemMock);
