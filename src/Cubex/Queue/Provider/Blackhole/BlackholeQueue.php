@@ -3,8 +3,11 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\Queue;
+namespace Cubex\Queue\Provider\Blackhole;
 
+use Cubex\Queue\Queue;
+use Cubex\Queue\QueueConsumer;
+use Cubex\Queue\QueueProvider;
 use Cubex\ServiceManager\ServiceConfigTrait;
 
 class BlackholeQueue implements QueueProvider
