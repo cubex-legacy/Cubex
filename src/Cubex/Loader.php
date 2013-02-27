@@ -5,6 +5,7 @@
 namespace Cubex;
 
 use Cubex\Core\Http\DispatchInjection;
+use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
@@ -80,6 +81,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
 
     $this->setResponse($this->buildResponse());
     set_exception_handler(array($this, 'handleException'));
+    set_error_handler(array($this, 'handleError'));
 
     try
     {
@@ -612,21 +614,38 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
 
     if(class_exists($script))
     {
-      $obj = new $script($this, $arguments);
-
-      if($obj instanceof Configurable)
+      try
       {
-        $obj->configure($this->getConfig());
+        $obj = new $script($this, $arguments);
+
+        if($obj instanceof Configurable)
+        {
+          $obj->configure($this->getConfig());
+        }
+
+        if($obj instanceof ServiceManagerAware)
+        {
+          $obj->setServiceManager($this->getServiceManager());
+        }
+
+        if($obj instanceof \Cubex\Cli\CliTask)
+        {
+          $result = $obj->init();
+          if(is_numeric($result))
+          {
+            $this->_response->setStatusCode($result);
+            $this->_response->from("");
+          }
+          else
+          {
+            $this->_response->setStatusCode(0);
+            $this->_response->from($result ? $result : "");
+          }
+        }
       }
-
-      if($obj instanceof ServiceManagerAware)
+      catch(\Exception $e)
       {
-        $obj->setServiceManager($this->getServiceManager());
-      }
-
-      if($obj instanceof \Cubex\Cli\CliTask)
-      {
-        $obj->init();
+        $this->handleException($e);
       }
     }
     else
@@ -655,10 +674,36 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
     $output .= number_format(((\microtime(true) - PHP_START)) * 1000, 2);
     $output .= " ms";
 
+    EventManager::trigger(
+      EventManager::CUBEX_UNHANDLED_EXCEPTION,
+      array(
+           'exception' => $e,
+           'formatted_message' => $output
+      )
+    );
+
     $this->_failed = true;
 
     $this->_response->fromText($output);
     return $this->_response;
+  }
+
+  public function handleError($errNo, $errMsg, $errFile, $errLine, $errContext)
+  {
+    $errorLevel = error_reporting();
+    if(($errNo & $errorLevel) == $errNo)
+    {
+      EventManager::trigger(
+        EventManager::CUBEX_PHP_ERROR,
+        array(
+             'errNo' => $errNo,
+             'errMsg' => $errMsg,
+             'errFile' => $errFile,
+             'errLine' => $errLine,
+             'errContext' => $errContext
+        )
+      );
+    }
   }
 
   /**

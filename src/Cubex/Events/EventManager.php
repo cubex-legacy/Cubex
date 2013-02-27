@@ -31,6 +31,9 @@ class EventManager
   const CUBEX_DEBUG = 'cubex.debug';
   const CUBEX_LOG   = 'cubex.log';
 
+  const CUBEX_PHP_ERROR = 'cubex.php.error';
+  const CUBEX_UNHANDLED_EXCEPTION = 'cubex.unhandled.exception';
+
   const CUBEX_QUERY = 'cubex.query';
 
   const DISPATCH_RESOURCE_REQUIRE = 'dispatch.resource.require';

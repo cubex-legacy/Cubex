@@ -19,6 +19,9 @@ class CliLogger
   private $_dateFormat;
   private $_longestLevel = 0;
 
+  public $logPhpErrors = true;
+  public $logUnhandledExceptions = true;
+
   // Log levels in order of importance
   private $_allLogLevels = [
     LogLevel::EMERGENCY,
@@ -31,6 +34,24 @@ class CliLogger
     LogLevel::DEBUG
   ];
 
+  private $_phpErrors = [
+    E_ERROR             => 'ERROR',
+    E_WARNING           => 'WARNING',
+    E_PARSE             => 'PARSE',
+    E_NOTICE            => 'NOTICE',
+    E_CORE_ERROR        => 'CORE ERROR',
+    E_CORE_WARNING      => 'CORE WARNING',
+    E_COMPILE_ERROR     => 'COMPILE ERROR',
+    E_COMPILE_WARNING   => 'COMPILE WARNING',
+    E_USER_ERROR        => 'USER ERROR',
+    E_USER_WARNING      => 'USER WARNING',
+    E_USER_NOTICE       => 'USER NOTICE',
+    E_STRICT            => 'STRICT',
+    E_RECOVERABLE_ERROR => 'RECOVERABLE ERROR',
+    E_DEPRECATED        => 'DEPRECATED',
+    E_USER_DEPRECATED   => 'USER DEPRECATED'
+  ];
+
   /**
    * @param mixed $echoLevel
    * @param mixed $logLevel
@@ -38,7 +59,7 @@ class CliLogger
   public function __construct($echoLevel = LogLevel::ERROR, $logLevel = LogLevel::WARNING, $logFile = "")
   {
     $this->_echoLevel = $echoLevel;
-    $this->_logLevel = $logLevel;
+    $this->_logLevel  = $logLevel;
 
     // find the longest level string we will encounter
     foreach($this->_allLogLevels as $level)
@@ -51,9 +72,11 @@ class CliLogger
     }
 
     $this->_logFilePath = $this->_getLogFilePath($logFile);
-    $this->_dateFormat = $this->_getConfigOption('date_format', 'd/m/Y H:i:s');
+    $this->_dateFormat  = $this->_getConfigOption('date_format', 'd/m/Y H:i:s');
 
     EventManager::listen(EventManager::CUBEX_LOG, [$this, 'handleLogEvent']);
+    EventManager::listen(EventManager::CUBEX_PHP_ERROR, [$this, 'handlePhpError']);
+    EventManager::listen(EventManager::CUBEX_UNHANDLED_EXCEPTION, [$this, 'handleException']);
   }
 
   private function _getConfigOption($option, $default = "")
@@ -64,15 +87,21 @@ class CliLogger
 
   private function _getLogFilePath($logFile = "")
   {
-    if($logFile == "") $logFile = $this->_getConfigOption('log_file', "");
+    if($logFile == "")
+    {
+      $logFile = $this->_getConfigOption('log_file', "");
+    }
 
     if($logFile == "")
     {
-      $logsDir = realpath(dirname(WEB_ROOT)) . DS . 'logs';
+      $logsDir  = realpath(dirname(WEB_ROOT)) . DS . 'logs';
       $fileName = (isset($_REQUEST['__path__']) ? $_REQUEST['__path__'] : 'logfile') . '.log';
-      $logFile = $logsDir . DS . $fileName;
+      $logFile  = $logsDir . DS . $fileName;
 
-      if(! file_exists($logsDir)) @mkdir($logsDir);
+      if(!file_exists($logsDir))
+      {
+        @mkdir($logsDir);
+      }
     }
 
     return $logFile;
@@ -86,7 +115,10 @@ class CliLogger
   private function _logLevelToDisplay($level)
   {
     $spaces = $this->_longestLevel - strlen($level);
-    if($spaces < 0) $spaces = 0;
+    if($spaces < 0)
+    {
+      $spaces = 0;
+    }
     return '[' . str_repeat(' ', $spaces) . strtoupper($level) . ']';
   }
 
@@ -94,7 +126,7 @@ class CliLogger
   public function handleLogEvent(Event $event)
   {
     $logData = $event->getData();
-    $level = $logData['level'];
+    $level   = $logData['level'];
     $fullMsg = date($this->_dateFormat) . " " . $this->_logLevelToDisplay($level) . " " . $logData['message'];
 
     if($this->_logLevelLessThanOrEqual($level, $this->_echoLevel))
@@ -110,6 +142,52 @@ class CliLogger
         fputs($fp, $fullMsg . "\n");
         fclose($fp);
       }
+    }
+  }
+
+  public function handlePhpError(Event $event)
+  {
+    if(!$this->logPhpErrors)
+    {
+      return;
+    }
+
+    $errNo = $event->getInt('errNo');
+    if(isset($this->_phpErrors[$errNo]))
+    {
+      $errMsg = 'PHP ' . $this->_phpErrors[$errNo];
+    }
+    else
+    {
+      $errMsg = 'PHP ERROR';
+    }
+    $errMsg .= ' in ' . $event->getStr('errFile') . ' at line ' . $event->getInt('errLine') . ' : '
+    . $event->getStr('errMsg');
+    switch($event->getInt('errNo'))
+    {
+      case E_ERROR:
+      case E_USER_ERROR:
+      case E_RECOVERABLE_ERROR:
+        Log::error($errMsg);
+        break;
+      case E_WARNING:
+      case E_USER_WARNING:
+        Log::warning($errMsg);
+        break;
+      case E_NOTICE:
+      case E_USER_NOTICE:
+        Log::notice($errMsg);
+        break;
+      default:
+        Log::info($errMsg);
+    }
+  }
+
+  public function handleException(Event $event)
+  {
+    if($this->logUnhandledExceptions)
+    {
+      Log::error("\n" . $event->getStr('formatted_message'));
     }
   }
 }
