@@ -320,7 +320,7 @@ class ServiceManager
    * @return \Cubex\Cache\CacheService
    * @throws \Exception
    */
-  public function cache($connection = 'local')
+  public function cache($connection = 'cache')
   {
     $cache = $this->get($connection);
     if($cache instanceof CacheService)
