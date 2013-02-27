@@ -46,7 +46,7 @@ class Cache extends BaseFacade
   public static function remember($key, \Closure $callback, $expire = 1800)
   {
     $result = static::get($key);
-    if($result !== null)
+    if($result)
     {
       return $result;
     }

@@ -44,6 +44,15 @@ class Memcache implements CacheService
     );
   }
 
+  protected function _conn()
+  {
+    if($this->_connection === null)
+    {
+      $this->connect();
+    }
+    return $this->_connection;
+  }
+
   /**
    * Disconnect from the connection
    *
@@ -51,7 +60,7 @@ class Memcache implements CacheService
    */
   public function disconnect()
   {
-    return $this->_connection->close();
+    return $this->_conn()->close();
   }
 
   /**
@@ -63,7 +72,7 @@ class Memcache implements CacheService
    */
   public function get($key)
   {
-    return $this->_connection->get($key);
+    return $this->_conn()->get($key);
   }
 
   /**
@@ -75,7 +84,7 @@ class Memcache implements CacheService
    */
   public function multi(array $keys)
   {
-    return $this->_connection->get($keys);
+    return $this->_conn()->get($keys);
   }
 
   /**
@@ -90,7 +99,7 @@ class Memcache implements CacheService
   public function set($key, $data, $expire = 0)
   {
     $compress = !(is_bool($data) || is_int($data) || is_float($data));
-    return $this->_connection->set(
+    return $this->_conn()->set(
       $key,
       $data,
       $compress ? MEMCACHE_COMPRESSED : false,
@@ -107,7 +116,7 @@ class Memcache implements CacheService
    */
   public function delete($key)
   {
-    return $this->_connection->delete($key);
+    return $this->_conn()->delete($key);
   }
 
   /**
@@ -117,11 +126,11 @@ class Memcache implements CacheService
   {
     try
     {
-      if($this->_connection === null)
+      if($this->_conn === null)
       {
-        throw new \Exception();
+        return false;
       }
-      $return = $this->_connection->getServerStatus(
+      $return = $this->_conn()->getServerStatus(
         $this->_config->getStr("hostname", 'localhost')
       );
     }
