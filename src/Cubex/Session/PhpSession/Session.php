@@ -12,17 +12,27 @@ class Session implements SessionService
   /**
    * @param \Cubex\ServiceManager\ServiceConfig $config
    *
-   * @return mixed|void
+   * @return mixed
    */
   public function configure(ServiceConfig $config)
   {
     $this->init();
+
+    return $this;
   }
 
+  /**
+   * @return $this
+   */
   public function init()
   {
     session_start();
-    if(!isset($_SESSION['cubex'])) $_SESSION['cubex'] = array();
+    if(!isset($_SESSION['cubex']))
+    {
+      $_SESSION['cubex'] = array();
+    }
+
+    return $this;
   }
 
   public function id()
@@ -31,9 +41,9 @@ class Session implements SessionService
   }
 
   /**
-   * @param $key
+   * @param string $key
    *
-   * @return mixed
+   * @return mixed|null
    */
   public function get($key)
   {
@@ -41,33 +51,48 @@ class Session implements SessionService
   }
 
   /**
-   * @param $key
-   * @param $data
+   * @param string $key
+   * @param mixed  $data
    *
-   * @return mixed|void
+   * @return $this
    */
   public function set($key, $data)
   {
     $_SESSION['cubex'][$key] = $data;
-    return true;
+
+    return $this;
   }
 
+  /**
+   * @param string $key
+   *
+   * @return $this
+   */
   public function delete($key)
   {
     unset($_SESSION['cubex'][$key]);
-    return true;
+
+    return $this;
   }
 
+  /**
+   * @param string $key
+   *
+   * @return bool
+   */
   public function exists($key)
   {
     return isset($_SESSION['cubex'][$key]);
   }
 
   /**
-   * @return bool
+   * @return $this
+   *
    */
   public function destroy()
   {
     unset($_SESSION['cubex']);
+
+    return $this;
   }
 }

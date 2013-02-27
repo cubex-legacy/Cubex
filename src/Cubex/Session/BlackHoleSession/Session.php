@@ -25,14 +25,18 @@ class Session implements SessionService
     return $this;
   }
 
+  /**
+   * @return $this
+   */
   public function init()
   {
+    return $this;
   }
 
   /**
-   * @param $key
+   * @param string $key
    *
-   * @return mixed
+   * @return mixed|null
    */
   public function get($key)
   {
@@ -40,37 +44,47 @@ class Session implements SessionService
   }
 
   /**
-   * @param $key
-   * @param $data
+   * @param string $key
+   * @param mixed  $data
    *
-   * @return bool
+   * @return $this
    */
   public function set($key, $data)
   {
     self::$_sessionData[$key] = $data;
 
-    return true;
+    return $this;
   }
 
+  /**
+   * @param string $key
+   *
+   * @return $this
+   */
   public function delete($key)
   {
     unset(self::$_sessionData[$key]);
 
-    return true;
+    return $this;
   }
 
+  /**
+   * @param string $key
+   *
+   * @return bool
+   */
   public function exists($key)
   {
     return isset(self::$_sessionData[$key]);
   }
 
   /**
-   * @return bool
+   * @return $this
    */
   public function destroy()
   {
     self::$_sessionData = [];
 
-    return true;
+    return $this;
   }
 }

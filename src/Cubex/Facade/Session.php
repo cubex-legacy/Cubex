@@ -17,21 +17,39 @@ class Session extends BaseFacade
   public static function getAccessor()
   {
     $sessionManager = static::getServiceManager();
+
     return $sessionManager->session();
   }
 
+  /**
+   * @return mixed
+   */
   public static function id()
   {
     $accessor = static::getAccessor();
+
     return $accessor->id();
   }
 
+  /**
+   * @param string $key
+   * @param mixed  $value
+   *
+   * @return \Cubex\Session\SessionService
+   */
   public static function set($key, $value)
   {
     $accessor = static::getAccessor();
+
     return $accessor->set($key, $value);
   }
 
+  /**
+   * @param string     $key
+   * @param mixed|null $default
+   *
+   * @return mixed|null
+   */
   public static function get($key, $default = null)
   {
     $accessor = static::getAccessor();
@@ -40,27 +58,50 @@ class Session extends BaseFacade
     {
       return $response;
     }
+
     return $default;
   }
 
+  /**
+   * @param string $key
+   *
+   * @return bool
+   */
   public static function exists($key)
   {
     $accessor = static::getAccessor();
+
     return $accessor->get($key) === null;
   }
 
+  /**
+   * @param string $key
+   *
+   * @return \Cubex\Session\SessionService
+   */
   public static function delete($key)
   {
     $accessor = static::getAccessor();
+
     return $accessor->delete($key);
   }
 
+  /**
+   * @return \Cubex\Session\SessionService
+   */
   public static function flush()
   {
     $accessor = static::getAccessor();
+
     return $accessor->destroy();
   }
 
+  /**
+   * @param string $key
+   * @param mixed $value
+   *
+   * @return \Cubex\Session\SessionService
+   */
   public static function flash($key, $value)
   {
     static::_resetFlash();
@@ -91,12 +132,24 @@ class Session extends BaseFacade
     }
   }
 
+  /**
+   * @param string     $key
+   * @param mixed|null $default
+   *
+   * @return mixed|null
+   */
   public static function getFlash($key, $default = null)
   {
     static::_resetFlash();
+
     return isset(static::$_flash[$key]) ? static::$_flash[$key] : $default;
   }
 
+  /**
+   * @param string $keys
+   *
+   * @return bool
+   */
   public static function reFlash($keys)
   {
     static::_resetFlash();
@@ -109,6 +162,7 @@ class Session extends BaseFacade
     {
       static::flash($key, static::getFlash($key));
     }
+
     return true;
   }
 }

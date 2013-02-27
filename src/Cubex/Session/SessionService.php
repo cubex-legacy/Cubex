@@ -15,6 +15,9 @@ use Cubex\ServiceManager\Service;
 
 interface SessionService extends Service
 {
+  /**
+   * @return $this
+   */
   public function init();
 
   /**
@@ -25,36 +28,36 @@ interface SessionService extends Service
   public function id();
 
   /**
-   * @param $key
-   * @param $data
+   * @param string $key
+   * @param mixed  $data
    *
-   * @return bool
+   * @return $this
    */
   public function set($key, $data);
 
   /**
-   * @param $key
+   * @param string $key
    *
-   * @return mixed
+   * @return mixed|null
    */
   public function get($key);
 
   /**
-   * @param $key
+   * @param string $key
    *
-   * @return bool
+   * @return $this
    */
   public function delete($key);
 
   /**
-   * @param $key
+   * @param string $key
    *
    * @return bool
    */
   public function exists($key);
 
   /**
-   * @return bool
+   * @return $this
    */
   public function destroy();
 }

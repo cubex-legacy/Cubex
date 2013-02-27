@@ -40,10 +40,16 @@ class Session implements SessionService
 
     $this->_columnFamily = $this->_config->getStr("column_family", "Session");
     $this->_serviceProvider = $serviceProvider;
+
+    return $this;
   }
 
+  /**
+   * @return $this
+   */
   public function init()
   {
+    return $this;
   }
 
   /**
@@ -71,21 +77,23 @@ class Session implements SessionService
   }
 
   /**
-   * @param $key
-   * @param $data
+   * @param string $key
+   * @param mixed  $data
    *
-   * @return bool
+   * @return $this
    */
   public function set($key, $data)
   {
     self::$_sessionData[$key] = $data;
     $this->_undeleteData($key);
+
+    return $this;
   }
 
   /**
-   * @param $key
+   * @param string $key
    *
-   * @return mixed
+   * @return mixed|null
    */
   public function get($key)
   {
@@ -98,9 +106,9 @@ class Session implements SessionService
   }
 
   /**
-   * @param $key
+   * @param string $key
    *
-   * @return bool
+   * @return $this
    */
   public function delete($key)
   {
@@ -110,10 +118,12 @@ class Session implements SessionService
     }
 
     self::$_sessionDataDeleted[$key] = $key;
+
+    return $this;
   }
 
   /**
-   * @param $key
+   * @param string $key
    *
    * @return bool
    */
@@ -123,7 +133,7 @@ class Session implements SessionService
   }
 
   /**
-   * @return bool
+   * @return $this
    */
   public function destroy()
   {
@@ -138,10 +148,12 @@ class Session implements SessionService
       $this->_columnFamily,
       $this->_getSessionId()
     );
+
+    return $this;
   }
 
   /**
-   * @param $key
+   * @param string $key
    */
   protected function _undeleteData($key)
   {
