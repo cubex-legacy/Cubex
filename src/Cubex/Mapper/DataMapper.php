@@ -816,9 +816,9 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
         if($attr->isModified())
         {
           if(
-            $this->_autoTimestamp
-            && $attr->name() != $this->createdAttribute()
-            && $attr->name() != $this->updatedAttribute()
+            !$this->_autoTimestamp
+            || ($attr->name() != $this->createdAttribute()
+            && $attr->name() != $this->updatedAttribute())
           )
           {
             $this->_changes[$attr->name()] = [
