@@ -11,7 +11,7 @@ class CallableQueueConsumer implements QueueConsumer
   protected $_waitTime;
   protected $_maxSleeps;
 
-  public function __construct($consumer, $waitTime = false, $maxSleeps = 5)
+  public function __construct($consumer, $waitTime = false, $maxSleeps = null)
   {
     $this->_callback  = $consumer;
     $this->_waitTime  = $waitTime;
@@ -47,7 +47,7 @@ class CallableQueueConsumer implements QueueConsumer
    */
   public function waitTime($waits = 0)
   {
-    if($waits >= $this->_maxSleeps)
+    if($this->_maxSleeps !== null && $waits >= $this->_maxSleeps)
     {
       return false;
     }
