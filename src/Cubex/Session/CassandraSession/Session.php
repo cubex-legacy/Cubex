@@ -51,6 +51,8 @@ class Session implements SessionService
    */
   public function init()
   {
+    $this->sessionStart();
+
     return $this;
   }
 

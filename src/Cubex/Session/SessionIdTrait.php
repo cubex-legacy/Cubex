@@ -15,6 +15,11 @@ trait SessionIdTrait
   protected $_sessionIdCookieExpires;
   protected $_sessionId;
 
+  public function sessionStart()
+  {
+    $this->_getSessionId();
+  }
+
   /**
    * Session ID
    *
