@@ -13,16 +13,16 @@ class Mail implements EmailService
 {
 
   protected $_recipients = [];
-  protected $_ccs        = [];
-  protected $_bccs       = [];
+  protected $_ccs = [];
+  protected $_bccs = [];
   protected $_subject;
   protected $_message;
-  protected $_from       = [];
+  protected $_from = [];
   protected $_sender;
   protected $_returnPath;
   protected $_isHtml;
-  protected $_headers    = [];
-  protected $_files      = [];
+  protected $_headers = [];
+  protected $_files = [];
 
   /**
    * @var ServiceConfig
@@ -100,7 +100,7 @@ class Mail implements EmailService
       $name = $email;
     }
 
-    $this->_from[] = "$name <$email>";
+    $this->_from[] = $this->_rfc2822Recipient($name, $email);
 
     if($this->_sender === null)
     {
@@ -117,7 +117,7 @@ class Mail implements EmailService
       $name = $email;
     }
 
-    $this->_sender = "$name <$email>";
+    $this->_sender = $this->_rfc2822Recipient($name, $email);
 
     if($this->_returnPath === null)
     {
@@ -134,6 +134,18 @@ class Mail implements EmailService
     return $this;
   }
 
+  protected function _rfc2822Recipient($name, $email)
+  {
+    if($name == $email)
+    {
+      return $email;
+    }
+    else
+    {
+      return "$name <$email>";
+    }
+  }
+
   public function addRecipient($email, $name = null)
   {
     if($name === null)
@@ -141,7 +153,7 @@ class Mail implements EmailService
       $name = $email;
     }
 
-    $this->_recipients[] = "$name <$email>";
+    $this->_recipients[] = $this->_rfc2822Recipient($name, $email);
 
     return $this;
   }
@@ -153,7 +165,7 @@ class Mail implements EmailService
       $name = $email;
     }
 
-    $this->_ccs[] = "$name <$email>";
+    $this->_ccs[] = $this->_rfc2822Recipient($name, $email);
 
     return $this;
   }
@@ -165,7 +177,7 @@ class Mail implements EmailService
       $name = $email;
     }
 
-    $this->_bccs[] = "$name <$email>";
+    $this->_bccs[] = $this->_rfc2822Recipient($name, $email);
 
     return $this;
   }
@@ -257,7 +269,6 @@ Content-Disposition: attachment
 
 $fileData
 MSG;
-
       }
     }
 
