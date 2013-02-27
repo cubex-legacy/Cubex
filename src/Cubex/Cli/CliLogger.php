@@ -119,7 +119,9 @@ class CliLogger
     {
       $spaces = 0;
     }
-    return '[' . str_repeat(' ', $spaces) . strtoupper($level) . ']';
+    $startSpaces = floor($spaces / 2);
+    $endSpaces = $spaces - $startSpaces;
+    return '[' . str_repeat(' ', $startSpaces) . strtoupper($level) . str_repeat(' ', $endSpaces) . ']';
   }
 
 
