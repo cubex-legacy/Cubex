@@ -52,4 +52,11 @@ class Redirect implements DispatchableAccess, DispatchInjection
     \Cubex\Facade\Session::flash($key, $value);
     return $this;
   }
+
+  public function now()
+  {
+    $response = new Response($this);
+    $response->respond();
+    die;
+  }
 }
