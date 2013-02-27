@@ -37,7 +37,7 @@ class Session implements SessionService
   {
     $this->_config = $config;
     $serviceProvider = Cassandra::getAccessor(
-      $this->_config->getStr("keyspace", "Session")
+      $this->_config->getStr("cassandra_service", "Session")
     );
 
     $this->_columnFamily = $this->_config->getStr("column_family", "Session");
