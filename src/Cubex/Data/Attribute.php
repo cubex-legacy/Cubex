@@ -247,6 +247,10 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
 
   public function setSerializer($serializer)
   {
+    if($this->_serializer !== $serializer)
+    {
+      $this->_requireUnserialize = true;
+    }
     $this->_serializer = $serializer;
     return $this;
   }
