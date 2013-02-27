@@ -43,6 +43,8 @@ class Session implements SessionService
     $this->_columnFamily = $this->_config->getStr("column_family", "Session");
     $this->_serviceProvider = $serviceProvider;
 
+    $this->init();
+    
     return $this;
   }
 

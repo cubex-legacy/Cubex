@@ -22,6 +22,8 @@ class Session implements SessionService
    */
   public function configure(ServiceConfig $config)
   {
+    $this->init();
+
     return $this;
   }
 
