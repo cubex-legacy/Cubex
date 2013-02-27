@@ -150,9 +150,10 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
       $this->_originalData = $this->_data;
     }
 
-    $this->_populated = $data !== null;
-    $this->_data      = $data;
-    $this->_modified  = true;
+    $this->_populated          = $data !== null;
+    $this->_data               = $data;
+    $this->_modified           = true;
+    $this->_requireUnserialize = false;
 
     return $this;
   }
