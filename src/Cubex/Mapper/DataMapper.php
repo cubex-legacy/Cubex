@@ -823,7 +823,7 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
           {
             $this->_changes[$attr->name()] = [
               'before' => $attr->originalData(),
-              'after'  => $attr->data()
+              'after'  => $attr->serialize()
             ];
           }
         }
