@@ -5,11 +5,13 @@
 
 namespace Cubex\Database\Schema;
 
+use Cubex\Type\Enum;
+
 class Column
 {
   protected $_name;
   protected $_dataType;
-  protected $_length;
+  protected $_options;
   protected $_unsigned;
   protected $_allowNull;
   protected $_zerofill;
@@ -18,7 +20,7 @@ class Column
   protected $_autoIncrement;
 
   public function __construct(
-    $name, $dataType = DataType::VARCHAR, $length = 250, $unsigned = false,
+    $name, $dataType = DataType::VARCHAR, $options = 250, $unsigned = false,
     $allowNull = true, $default = null, $autoIncrement = false, $comment = null,
     $zerofill = null
   )
@@ -26,7 +28,7 @@ class Column
     $this->_autoIncrement = $autoIncrement;
     $this->_name          = $name;
     $this->_dataType      = $dataType;
-    $this->_length        = $length;
+    $this->_options       = $options;
     $this->_unsigned      = $unsigned;
     $this->_allowNull     = $allowNull;
     $this->_zerofill      = $zerofill;
@@ -48,7 +50,18 @@ class Column
     switch($this->_dataType)
     {
       case DataType::VARCHAR:
-        $sql .= "(" . $this->_length . ") ";
+        $sql .= "(" . $this->_options . ") ";
+        break;
+      case DataType::ENUM:
+        $opts = $this->_options;
+        if($opts instanceof Enum)
+        {
+          $opts = $opts->getConstList();
+        }
+        if(!empty($opts) && is_array($opts))
+        {
+          $sql .= "('" . implode("','", $opts) . "') ";
+        }
         break;
     }
 

@@ -125,7 +125,7 @@ class DBBuilder
     $unsigned   = false;
     $allowNull  = true;
     $default    = $this->_emptyMapper->getAttribute($name)->defaultValue();
-    $length     = 150;
+    $options    = 150;
     $dataType   = DataType::VARCHAR;
     $annotation = [];
     try
@@ -179,7 +179,7 @@ class DBBuilder
     if(substr($uname, -3) == '_id')
     {
       $dataType = DataType::INT;
-      $length   = 10;
+      $options  = 10;
       $unsigned = true;
     }
     else if(substr($uname, -3) == '_at')
@@ -204,8 +204,14 @@ class DBBuilder
           case 'default':
             $default = $v;
             break;
+          case 'enumclass':
+            if(class_exists($v))
+            {
+              $options = new $v;
+            }
+            break;
           case 'length':
-            $length = (int)$v;
+            $options = (int)$v;
             break;
           case 'datatype':
             $dataType = $v;
@@ -218,7 +224,7 @@ class DBBuilder
     }
 
     return new Column(
-      $name, $dataType, $length, $unsigned, $allowNull, $default,
+      $name, $dataType, $options, $unsigned, $allowNull, $default,
       false, $comment, $zero, $collation
     );
   }
