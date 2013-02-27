@@ -18,10 +18,10 @@ class PidFile
     $this->_enabled = true;
 
     // no PID file on Windows
-    /*if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
+    if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
     {
       $this->_enabled = false;
-    }*/
+    }
 
     $conf = Container::config()->get('pidfile');
     if($conf)
