@@ -36,7 +36,9 @@ class Session implements SessionService
   public function configure(ServiceConfig $config)
   {
     $this->_config = $config;
-    $serviceProvider = Cassandra::getAccessor("cassgar");
+    $serviceProvider = Cassandra::getAccessor(
+      $this->_config->getStr("keyspace", "Session")
+    );
 
     $this->_columnFamily = $this->_config->getStr("column_family", "Session");
     $this->_serviceProvider = $serviceProvider;
