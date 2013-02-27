@@ -31,6 +31,7 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
   protected $_originalData;
   protected $_populated = false;
   protected $_hidden = false;
+  protected $_requireUnserialize = false;
 
   public function __construct(
     $name,
@@ -131,6 +132,13 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
     return empty($this->_data);
   }
 
+  public function setRawData($data)
+  {
+    $this->_requireUnserialize = true;
+    $this->setData($data);
+    return $this;
+  }
+
   public function setData($data)
   {
     if($data == $this->_data)
@@ -151,12 +159,17 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
 
   public function rawData()
   {
+    if($this->_requireUnserialize)
+    {
+      $this->_requireUnserialize = false;
+      $this->_data               = $this->unserialize($this->_data);
+    }
     return $this->_data;
   }
 
   public function data()
   {
-    return $this->filter($this->_data);
+    return $this->filter($this->rawData());
   }
 
   /**
