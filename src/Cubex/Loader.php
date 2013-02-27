@@ -308,28 +308,26 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
         $this->request()->path(),
         $this->request()
       );
-      $this->request()->setPath($faviconPath);
+      $this->request()->setPath("/" . $faviconPath);
     }
-    else
-    {
-      try
-      {
-        $dispatchPath  = new \Cubex\Dispatch\Path($this->request()->path());
-        $dispatchServe = new \Cubex\Dispatch\Serve(
-          $this->getConfig(),
-          new \Cubex\Dispatch\FileSystem(),
-          $dispatchPath
-        );
 
-        if($dispatchServe->isDispatchablePath($this->request()))
-        {
-          $this->setDispatchable($dispatchServe);
-        }
-      }
-      catch(\Exception $e)
+    try
+    {
+      $dispatchPath  = new \Cubex\Dispatch\Path($this->request()->path());
+      $dispatchServe = new \Cubex\Dispatch\Serve(
+        $this->getConfig(),
+        new \Cubex\Dispatch\FileSystem(),
+        $dispatchPath
+      );
+
+      if($dispatchServe->isDispatchablePath($this->request()))
       {
-        // Bad path, just let the page carry on
+        $this->setDispatchable($dispatchServe);
       }
+    }
+    catch(\Exception $e)
+    {
+      // Bad path, just let the page carry on
     }
 
     if(!$this->canDispatch())
@@ -677,7 +675,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
     EventManager::trigger(
       EventManager::CUBEX_UNHANDLED_EXCEPTION,
       array(
-           'exception' => $e,
+           'exception'         => $e,
            'formatted_message' => $output
       )
     );
@@ -696,10 +694,10 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       EventManager::trigger(
         EventManager::CUBEX_PHP_ERROR,
         array(
-             'errNo' => $errNo,
-             'errMsg' => $errMsg,
-             'errFile' => $errFile,
-             'errLine' => $errLine,
+             'errNo'      => $errNo,
+             'errMsg'     => $errMsg,
+             'errFile'    => $errFile,
+             'errLine'    => $errLine,
              'errContext' => $errContext
         )
       );
