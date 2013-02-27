@@ -91,11 +91,6 @@ class ServiceManager
    */
   public function register($name, ServiceConfig $config, $shared = true)
   {
-    if($this->exists($name))
-    {
-      throw new \Exception("Service already exists");
-    }
-
     $this->_services[$name] = array(
       'config' => $config,
       'shared' => $shared
