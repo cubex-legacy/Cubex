@@ -681,7 +681,7 @@ class Dispatcher
         $uri = "img/$uri";
         break;
       default:
-        $uri = "resource/$uri";
+        $uri = "resources/$uri";
         break;
     }
 
