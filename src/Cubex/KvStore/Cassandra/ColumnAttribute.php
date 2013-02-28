@@ -12,6 +12,7 @@ class ColumnAttribute extends Attribute
   protected $_timestamp;
   protected $_ttl;
   protected $_isCounter;
+  protected $_isSuper;
 
   public function setExpiry($ttl = null)
   {
@@ -44,5 +45,21 @@ class ColumnAttribute extends Attribute
   public function isCounter()
   {
     return $this->_isCounter;
+  }
+
+  public function setIsSuper($bool = true)
+  {
+    $this->_isSuper = (bool)$bool;
+    return $this;
+  }
+
+  public function isSuper()
+  {
+    return $this->_isSuper;
+  }
+
+  public function isSuperCounter()
+  {
+    return $this->_isSuper && $this->_isCounter;
   }
 }

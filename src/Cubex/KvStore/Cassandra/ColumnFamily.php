@@ -18,6 +18,7 @@ use cassandra\KeySlice;
 use cassandra\Mutation;
 use cassandra\SlicePredicate;
 use cassandra\SliceRange;
+use cassandra\SuperColumn;
 
 class ColumnFamily
 {
@@ -499,6 +500,7 @@ class ColumnFamily
   {
     $column     = null;
     $counterCol = 'counter_column';
+    $superCol = 'super_column';
 
     if($input->column instanceof Column)
     {
@@ -525,6 +527,37 @@ class ColumnFamily
       else
       {
         return [$input->$counterCol->name, $input->$counterCol->value];
+      }
+    }
+    else if($input->$superCol instanceof SuperColumn)
+    {
+        $column = new ColumnAttribute($input->$superCol->name);
+        $cols = [];
+        foreach($input->$superCol->columns as $col)
+        {
+          if($this->returnAttribute())
+          {
+            $subCol = new ColumnAttribute($col->name);
+            $subCol->setData($col->value);
+            $subCol->setUpdatedTime($col->timestamp);
+            $subCol->setExpiry($col->ttl);
+
+            $cols[$col->name] = $subCol;
+          }
+          else
+          {
+            $cols[$col->name] = $col->value;
+          }
+        }
+
+      if($this->returnAttribute())
+      {
+        $column->setData($cols);
+        $column->setIsSuper();
+      }
+      else
+      {
+        return [$input->$superCol->name, $cols];
       }
     }
 
