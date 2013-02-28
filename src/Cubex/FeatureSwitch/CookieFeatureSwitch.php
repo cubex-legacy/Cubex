@@ -28,10 +28,11 @@ class CookieFeatureSwitch implements FeatureSwitch
 
   public function isEnabled($feature)
   {
-    $specific = Cookies::exists("CUBEX_FSW_" . $feature);
+    $prefix   = $this->_config->getStr("cookie_prefix", "CUBEX_FSW");
+    $specific = Cookies::exists($prefix . "_" . $feature);
     if(!$specific)
     {
-      return Cookies::exists("CUBEX_FSWALL");
+      return Cookies::exists($prefix . "ALL");
     }
     return true;
   }
