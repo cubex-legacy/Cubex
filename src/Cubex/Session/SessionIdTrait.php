@@ -8,6 +8,7 @@ namespace Cubex\Session;
 use Cubex\Container\Container;
 use Cubex\Cookie\Cookies;
 use Cubex\Cookie\StandardCookie;
+use Cubex\FileSystem\FileSystem;
 
 trait SessionIdTrait
 {
@@ -54,7 +55,9 @@ trait SessionIdTrait
   {
     $request = Container::request();
 
-    return md5(microtime() . $request->remoteIp() . short_string());
+    return md5(
+      microtime() . $request->remoteIp() . FileSystem::readRandomCharacters(5)
+    );
   }
 
   protected function _setSessionCookie()
