@@ -299,7 +299,8 @@ class Collection
    */
   public function serialize()
   {
-    return serialize($this->all());
+    $mappers = json_encode($this->all());
+    return serialize(["mapper" => $this->_mapperType, 'mappers' => $mappers]);
   }
 
   /**
@@ -313,8 +314,9 @@ class Collection
    */
   public function unserialize($serialized)
   {
-    $mappers = unserialize($serialized);
-    $this->hydrate($mappers);
+    $un                = unserialize($serialized);
+    $this->_mapperType = $un['mapper'];
+    $this->hydrate(json_decode($un['mappers']));
   }
 
 

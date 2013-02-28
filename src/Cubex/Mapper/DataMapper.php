@@ -11,7 +11,8 @@ use Cubex\Exception\CubexException;
 use Cubex\Helpers\Inflection;
 use Cubex\Helpers\Strings;
 
-abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
+abstract class DataMapper
+  implements \JsonSerializable, \IteratorAggregate, \Serializable
 {
   const CONFIG_IDS    = 'id-mechanism';
   const CONFIG_SCHEMA = 'schema-type';
@@ -28,7 +29,6 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
    * Base ID on multiple keys
    */
   const ID_COMPOSITE_SPLIT = 'compositesplit';
-
 
   const SCHEMA_UNDERSCORE = 'underscore';
   const SCHEMA_CAMELCASE  = 'camel';
@@ -1010,5 +1010,16 @@ abstract class DataMapper implements \JsonSerializable, \IteratorAggregate
   public static function collection()
   {
     return new Collection(new static);
+  }
+
+  public function serialize()
+  {
+    return serialize(json_encode($this));
+  }
+
+  public function unserialize($data)
+  {
+    $this->__construct();
+    $this->hydrate(json_decode($data));
   }
 }
