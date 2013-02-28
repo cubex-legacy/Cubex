@@ -258,7 +258,40 @@ class Request implements \IteratorAggregate
    */
   public function remoteIp()
   {
-    return $_SERVER['REMOTE_ADDR'];
+    static $ip;
+
+    $ipKeys = [
+      'HTTP_CLIENT_IP',
+      'HTTP_X_FORWARDED_FOR',
+      'HTTP_X_FORWARDED',
+      'HTTP_X_CLUSTER_CLIENT_IP',
+      'HTTP_FORWARDED_FOR',
+      'HTTP_FORWARDED',
+      'REMOTE_ADDR'
+    ];
+
+    if($ip === null)
+    {
+      foreach($ipKeys as $ipKey)
+      {
+        $ipString = idx($_SERVER, $ipKey);
+
+        if($ipString !== null)
+        {
+          foreach(explode(",", $ipString) as $ip)
+          {
+            if(filter_var($ip, FILTER_VALIDATE_IP) !== false)
+            {
+              return $ip;
+            }
+          }
+        }
+      }
+
+      $ip = "";
+    }
+
+    return $ip;
   }
 
   /**
