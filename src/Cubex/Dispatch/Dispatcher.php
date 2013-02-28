@@ -33,6 +33,7 @@ class Dispatcher
     "jpg"   => "image/jpg",
     "gif"   => "image/gif",
     "swf"   => "application/x-shockwave-flash",
+    "flv"   => "video/x-flv",
     "ttf"   => "application/x-font-ttf",
     "ttc"   => "application/x-font-ttc",
     "pfb"   => "application/x-font-pfb",
@@ -674,8 +675,13 @@ class Dispatcher
       case "woff":
         $uri = "fonts/$uri";
         break;
-      default:
+      case "png":
+      case "jpg":
+      case "gif":
         $uri = "img/$uri";
+        break;
+      default:
+        $uri = "resource/$uri";
         break;
     }
 
