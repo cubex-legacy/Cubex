@@ -134,8 +134,8 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
 
   public function setRawData($data)
   {
-    $this->_requireUnserialize = true;
     $this->setData($data);
+    $this->_requireUnserialize = true;
     return $this;
   }
 
