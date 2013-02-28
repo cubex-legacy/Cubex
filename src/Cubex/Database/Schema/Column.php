@@ -56,6 +56,10 @@ class Column
         $opts = $this->_options;
         if($opts instanceof Enum)
         {
+          if($this->_default === null)
+          {
+            $this->_default = $opts->getDefault();
+          }
           $opts = $opts->getConstList();
         }
         if(!empty($opts) && is_array($opts))
