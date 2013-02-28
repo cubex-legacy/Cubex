@@ -941,16 +941,18 @@ abstract class DataMapper
     if($this->_tableName === null)
     {
       $excludeParts = [
+        'bundl',
         'mappers',
         'applications',
         'modules',
         'components'
       ];
       $nsparts      = explode('\\', $this->getTableClass());
+      $ignoreFirst  = $nsparts[0] == 'Bundl' ? 2 : 1;
 
       foreach($nsparts as $i => $part)
       {
-        if($i == 0 || in_array(strtolower($part), $excludeParts))
+        if($i < $ignoreFirst || in_array(strtolower($part), $excludeParts))
         {
           unset($nsparts[$i]);
         }
