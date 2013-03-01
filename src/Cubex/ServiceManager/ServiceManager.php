@@ -43,7 +43,9 @@ class ServiceManager
     }
     else
     {
-      throw new \InvalidArgumentException("Service does not exist");
+      throw new \InvalidArgumentException(
+        "The service '$name' has not been registered"
+      );
     }
   }
 
