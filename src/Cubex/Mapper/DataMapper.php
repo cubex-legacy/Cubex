@@ -5,6 +5,7 @@
 namespace Cubex\Mapper;
 
 use Cubex\Data\Attribute;
+use Cubex\Data\CallbackAttribute;
 use Cubex\Data\CompositeAttribute;
 use Cubex\Data\PolymorphicAttribute;
 use Cubex\Exception\CubexException;
@@ -820,6 +821,15 @@ abstract class DataMapper
     {
       if($attr instanceof Attribute)
       {
+        if($attr instanceof CallbackAttribute)
+        {
+          $attr->saveAttribute();
+          if(!$attr->storeOriginal())
+          {
+            continue;
+          }
+        }
+
         if($attr->isModified())
         {
           if(

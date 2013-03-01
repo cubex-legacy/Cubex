@@ -7,6 +7,7 @@ namespace Cubex\Mapper\Database;
 
 use Cubex\Container\Container;
 use Cubex\Data\Attribute;
+use Cubex\Data\CallbackAttribute;
 use Cubex\Data\CompositeAttribute;
 use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Database\ConnectionMode;
@@ -522,6 +523,15 @@ abstract class RecordMapper extends DataMapper
     {
       if($attr instanceof Attribute)
       {
+        if($attr instanceof CallbackAttribute)
+        {
+          $attr->saveAttribute();
+          if(!$attr->storeOriginal())
+          {
+            continue;
+          }
+        }
+
         if($attr->isModified())
         {
           if(in_array($attr->name(), $idFields) && $this->exists())
@@ -882,7 +892,7 @@ abstract class RecordMapper extends DataMapper
             $keys = array_keys($attr->getNamedArray());
             if(count($keys) == count($v))
             {
-              $out = array_combine($keys, $v);
+              $out   = array_combine($keys, $v);
               $final = array_merge($final, $out);
             }
             else
