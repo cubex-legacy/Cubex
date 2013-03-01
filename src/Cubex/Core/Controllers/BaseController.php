@@ -367,8 +367,14 @@ class BaseController
    */
   protected function _attemptRoutes(array $routes)
   {
+    $base = $this->application()->baseUri();
+    $path = $this->request()->path();
+    if(starts_with($path, $base))
+    {
+      $path = substr($path, strlen($base));
+    }
     $router = new StdRouter($routes, $this->request()->requestMethod());
-    return $router->getRoute($this->request()->path());
+    return $router->getRoute($path);
   }
 
   /**
