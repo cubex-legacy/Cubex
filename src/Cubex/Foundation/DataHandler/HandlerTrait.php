@@ -108,7 +108,9 @@ trait HandlerTrait
     {
       return (int)$this->_data[$name];
     }
-    else return $default;
+    else {
+      return $default;
+    }
   }
 
   /**
@@ -123,7 +125,9 @@ trait HandlerTrait
     {
       return (float)$this->_data[$name];
     }
-    else return $default;
+    else {
+      return $default;
+    }
   }
 
   /**
@@ -144,9 +148,13 @@ trait HandlerTrait
       {
         return false;
       }
-      else return (bool)$this->_data[$name];
+      else {
+        return (bool)$this->_data[$name];
+      }
     }
-    else return $default;
+    else {
+      return $default;
+    }
   }
 
   /**
@@ -161,10 +169,14 @@ trait HandlerTrait
     {
       // Normalize newlines.
       return \str_replace(
-        array("\r\n", "\r"), array("\n", "\n"), (string)$this->_data[$name]
+        array("\r\n", "\r"),
+        array("\n", "\n"),
+        (string)$this->_data[$name]
       );
     }
-    else return $default;
+    else {
+      return $default;
+    }
   }
 
   /**
@@ -179,7 +191,9 @@ trait HandlerTrait
     {
       return $this->_data[$name];
     }
-    else return $default;
+    else {
+      return $default;
+    }
   }
 
   /**
@@ -199,7 +213,8 @@ trait HandlerTrait
       return $this->_data[$name];
     }
     else if(\is_string($this->_data[$name]) && \stristr(
-      $this->_data[$name], ','
+      $this->_data[$name],
+      ','
     )
     )
     {
@@ -237,9 +252,13 @@ trait HandlerTrait
       {
         return $this->_data[$name];
       }
-      else return (object)$this->_data[$name];
+      else {
+        return (object)$this->_data[$name];
+      }
     }
-    else return $default;
+    else {
+      return $default;
+    }
   }
 
   /**
@@ -285,5 +304,10 @@ trait HandlerTrait
   public function offsetGet($offset)
   {
     return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
+  }
+
+  public function availableKeys()
+  {
+    return array_keys($this->_data);
   }
 }
