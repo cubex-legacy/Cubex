@@ -141,6 +141,7 @@ class RecordCollection extends Collection
 
     if(func_num_args() === 1)
     {
+      $pattern = $this->_mapperType->queryArrayParse($pattern);
       if(is_array($pattern))
       {
         $args = ["%QA", $pattern];
@@ -150,6 +151,11 @@ class RecordCollection extends Collection
         $args = ["%QO", $pattern];
       }
     }
+    else if(func_num_args() === 2 && $pattern == "%QA")
+    {
+      $args[1] = $this->_mapperType->queryArrayParse($args[1]);
+    }
+
     $this->clear();
     $this->_query = ParseQuery::parse($this->connection(), $args);
 

@@ -866,4 +866,43 @@ abstract class RecordMapper extends DataMapper
     $this->_loadPending = $this->_loadDetails = null;
     parent::__clone();
   }
+
+  public function queryArrayParse($data)
+  {
+    $final = [];
+    foreach($data as $k => $v)
+    {
+      if(is_array($v))
+      {
+        $attr = $this->getAttribute($k);
+        if($attr !== null)
+        {
+          if($attr instanceof CompositeAttribute)
+          {
+            $keys = array_keys($attr->getNamedArray());
+            if(count($keys) == count($v))
+            {
+              $out = array_combine($keys, $v);
+              $final = array_merge($final, $out);
+            }
+            else
+            {
+              foreach($keys as $i => $key)
+              {
+                if(isset($v[$i]))
+                {
+                  $final[$key] = $v[$i];
+                }
+              }
+            }
+          }
+        }
+      }
+      else
+      {
+        $final[$k] = $v;
+      }
+    }
+    return $final;
+  }
 }
