@@ -50,6 +50,7 @@ class Column
     switch($this->_dataType)
     {
       case DataType::VARCHAR:
+      case DataType::CHAR:
         $sql .= "(" . $this->_options . ") ";
         break;
       case DataType::ENUM:
