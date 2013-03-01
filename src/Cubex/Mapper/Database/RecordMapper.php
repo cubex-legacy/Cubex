@@ -473,6 +473,7 @@ abstract class RecordMapper extends DataMapper
    */
   public function saveChanges()
   {
+    $callbackAttributes = [];
     if(!$this->exists())
     {
       $this->_prePersist();
@@ -525,7 +526,7 @@ abstract class RecordMapper extends DataMapper
       {
         if($attr instanceof CallbackAttribute)
         {
-          $attr->saveAttribute();
+          $callbackAttributes[] = $attr;
           if(!$attr->storeOriginal())
           {
             continue;
@@ -665,6 +666,17 @@ abstract class RecordMapper extends DataMapper
       foreach($this->_attributes as $attr)
       {
         $attr->unsetModified();
+      }
+    }
+
+    if(!empty($callbackAttributes))
+    {
+      foreach($callbackAttributes as $attr)
+      {
+        /**
+         * @var $attr CallbackAttribute
+         */
+        $attr->saveAttribute();
       }
     }
 
