@@ -32,7 +32,7 @@ class CallbackAttribute extends Attribute
     $cb = $this->_callback;
     if(is_callable($cb))
     {
-      return $cb();
+      return $cb($this);
     }
     return false;
   }
