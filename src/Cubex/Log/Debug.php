@@ -23,7 +23,7 @@ class Debug extends Log
   }
 
   /**
-   * Disable debug logging
+   * Disable debug logging for everything
    *
    * @return bool success
    */
