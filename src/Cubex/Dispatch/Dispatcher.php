@@ -509,12 +509,27 @@ class Dispatcher
       self::$_externalEntities = $mapper->findExternalEntities();
     }
 
+    // We don't really know how much of the directory to use so we just explode
+    // it and work backwards hoping for the best
     foreach(self::$_externalEntities as $entity)
     {
-      if($this->generateEntityHash($entity, strlen($hash)) === $hash)
+      $entityParts    = explode("/", $entity);
+      $attemptedParts = [];
+
+      do
       {
-        return $entity;
+        end($entityParts);
+        $attemptedParts[key($entityParts)] = array_pop($entityParts);
+        ksort($attemptedParts);
+
+        $rebuiltEntity = implode("/", $attemptedParts);
+
+        if($this->generateEntityHash($rebuiltEntity, strlen($hash)) === $hash)
+        {
+          return $entity;
+        }
       }
+      while($entityParts);
     }
 
     return null;
