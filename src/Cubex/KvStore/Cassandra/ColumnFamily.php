@@ -500,7 +500,7 @@ class ColumnFamily
   {
     $column     = null;
     $counterCol = 'counter_column';
-    $superCol = 'super_column';
+    $superCol   = 'super_column';
 
     if($input->column instanceof Column)
     {
@@ -531,24 +531,24 @@ class ColumnFamily
     }
     else if($input->$superCol instanceof SuperColumn)
     {
-        $column = new ColumnAttribute($input->$superCol->name);
-        $cols = [];
-        foreach($input->$superCol->columns as $col)
+      $column = new ColumnAttribute($input->$superCol->name);
+      $cols   = [];
+      foreach($input->$superCol->columns as $col)
+      {
+        if($this->returnAttribute())
         {
-          if($this->returnAttribute())
-          {
-            $subCol = new ColumnAttribute($col->name);
-            $subCol->setData($col->value);
-            $subCol->setUpdatedTime($col->timestamp);
-            $subCol->setExpiry($col->ttl);
+          $subCol = new ColumnAttribute($col->name);
+          $subCol->setData($col->value);
+          $subCol->setUpdatedTime($col->timestamp);
+          $subCol->setExpiry($col->ttl);
 
-            $cols[$col->name] = $subCol;
-          }
-          else
-          {
-            $cols[$col->name] = $col->value;
-          }
+          $cols[$col->name] = $subCol;
         }
+        else
+        {
+          $cols[$col->name] = $col->value;
+        }
+      }
 
       if($this->returnAttribute())
       {
