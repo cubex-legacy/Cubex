@@ -6,7 +6,6 @@
 namespace Cubex\Mapper\Database;
 
 use Cubex\Data\Attribute;
-use Cubex\Data\CompositeAttribute;
 use Cubex\Database\DatabaseService;
 use Cubex\Database\Schema\Column;
 use Cubex\Database\Schema\DataType;
@@ -133,12 +132,10 @@ class DBBuilder
       $comment = $this->_reflect->getProperty($attr->name())->getDocComment();
       if(!empty($comment))
       {
-        $comment  = substr($comment, 3, -2);
-        $comments = explode("\n", $comment);
+        $comments = $this->_docExplosion($comment);
         $comment  = '';
         foreach($comments as $comm)
         {
-          $comm = trim(ltrim(trim($comm), '*'));
           if(substr($comm, 0, 1) == '@')
           {
             if(substr($comm, 0, 8) !== '@comment')
@@ -229,6 +226,21 @@ class DBBuilder
     );
   }
 
+  protected function _docExplosion($comment)
+  {
+    $comments = [];
+    $comment  = substr($comment, 3, -2);
+    foreach(explode("\n", $comment) as $comment)
+    {
+      $comment = trim(ltrim(trim($comment), '*'));
+      if(!empty($comment))
+      {
+        $comments[] = $comment;
+      }
+    }
+    return $comments;
+  }
+
   public function createColumns()
   {
     $attrs = $this->_mapper->getRawAttributes();
@@ -253,12 +265,38 @@ class DBBuilder
   public function createDB()
   {
     $columns = $this->_columnSqls();
+    $indexes = $this->_getIndexes();
+    $content = array_merge((array)$columns, (array)$indexes);
 
     $sql = "CREATE TABLE ";
     $sql .= "`" . $this->_database . "`.`" . $this->_tableName . "`" .
-    "(" . implode(",", $columns) . ") ENGINE = MYISAM";
+    "(" . implode(",", $content) . ") ENGINE = MYISAM";
 
     return $sql;
+  }
+
+  protected function _getIndexes()
+  {
+    $indexes  = [];
+    $comments = $this->_docExplosion($this->_reflect->getDocComment());
+    foreach($comments as $comment)
+    {
+      list($type, $desc) = explode(" ", $comment, 2);
+      $on = implode("`,`", explode(",", str_replace(' ', '', $desc)));
+      switch($type)
+      {
+        case '@index':
+          $indexes[] = " INDEX(`$on`) ";
+          break;
+        case '@fulltext':
+          $indexes[] = " FULLTEXT(`$on`) ";
+          break;
+        case '@unique':
+          $indexes[] = " UNIQUE(`$on`) ";
+          break;
+      }
+    }
+    return $indexes;
   }
 
   protected function _columnSqls()
