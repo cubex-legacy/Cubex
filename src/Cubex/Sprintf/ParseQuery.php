@@ -215,6 +215,21 @@ class ParseQuery implements FormatterInterface
                     case '=':
                       $qu[] = $connection->escapeColumnName($k) . " = " . $val;
                       break;
+                    case '!=':
+                      $qu[] = $connection->escapeColumnName($k) . " != " . $val;
+                      break;
+                    case 'gt':
+                      $qu[] = $connection->escapeColumnName($k) . " > " . $val;
+                      break;
+                    case 'gte':
+                      $qu[] = $connection->escapeColumnName($k) . " >= " . $val;
+                      break;
+                    case 'lt':
+                      $qu[] = $connection->escapeColumnName($k) . " < " . $val;
+                      break;
+                    case 'lte':
+                      $qu[] = $connection->escapeColumnName($k) . " <= " . $val;
+                      break;
                   }
                 }
                 else
