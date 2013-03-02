@@ -897,27 +897,28 @@ abstract class RecordMapper extends DataMapper
       if(is_array($v))
       {
         $attr = $this->getAttribute($k);
-        if($attr !== null)
+        if($attr !== null && $attr instanceof CompositeAttribute)
         {
-          if($attr instanceof CompositeAttribute)
+          $keys = array_keys($attr->getNamedArray());
+          if(count($keys) == count($v))
           {
-            $keys = array_keys($attr->getNamedArray());
-            if(count($keys) == count($v))
+            $out   = array_combine($keys, $v);
+            $final = array_merge($final, $out);
+          }
+          else
+          {
+            foreach($keys as $i => $key)
             {
-              $out   = array_combine($keys, $v);
-              $final = array_merge($final, $out);
-            }
-            else
-            {
-              foreach($keys as $i => $key)
+              if(isset($v[$i]))
               {
-                if(isset($v[$i]))
-                {
-                  $final[$key] = $v[$i];
-                }
+                $final[$key] = $v[$i];
               }
             }
           }
+        }
+        else
+        {
+          $final[$k] = $v;
         }
       }
       else

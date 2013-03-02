@@ -247,7 +247,16 @@ class ParseQuery implements FormatterInterface
                 }
                 else
                 {
-                  $qu[] = $connection->escapeColumnName($k) . " = " . $val;
+                  $match = '=';
+                  if(is_array($val))
+                  {
+                    $match = 'IN';
+                    $val   = ParseQuery::parse(
+                      $connection,
+                      ["(%Ls)", $val]
+                    );
+                  }
+                  $qu[] = $connection->escapeColumnName($k) . " $match " . $val;
                 }
               }
               $value = implode(' AND ', $qu);
