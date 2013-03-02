@@ -237,12 +237,11 @@ class ParseQuery implements FormatterInterface
                     case 'ins':
                     case 'inf':
                     case 'ind':
-                      $t       = substr($value->getMatchType($k), -1);
-                      $pattern = ParseQuery::parse(
+                      $t    = substr($value->getMatchType($k), -1);
+                      $qu[] = ParseQuery::parse(
                         $connection,
                         ["%C IN (%L$t)", $k, $val]
                       );
-                      $qu[]    = $pattern;
                       break;
                   }
                 }
