@@ -188,6 +188,10 @@ class ParseQuery implements FormatterInterface
                 {
                   $val = (int)$v;
                 }
+                else if(is_array($v))
+                {
+                  $val = $v;
+                }
                 else
                 {
                   $val = "'" . $connection->escapeString($v) . "'";
@@ -229,6 +233,16 @@ class ParseQuery implements FormatterInterface
                       break;
                     case 'lte':
                       $qu[] = $connection->escapeColumnName($k) . " <= " . $val;
+                      break;
+                    case 'ins':
+                    case 'inf':
+                    case 'ind':
+                      $t       = substr($value->getMatchType($k), -1);
+                      $pattern = ParseQuery::parse(
+                        $connection,
+                        ["%C IN (%L$t)", $k, $val]
+                      );
+                      $qu[]    = $pattern;
                       break;
                   }
                 }
@@ -390,7 +404,7 @@ class ParseQuery implements FormatterInterface
         if(!is_object($value))
         {
           throw new \Exception(
-            "Expected array argument for %{$type} conversion in {$query}"
+            "Expected object argument for %{$type} conversion in {$query}"
           );
         }
         break;

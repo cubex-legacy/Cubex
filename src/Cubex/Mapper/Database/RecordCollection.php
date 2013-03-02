@@ -141,9 +141,9 @@ class RecordCollection extends Collection
 
     if(func_num_args() === 1)
     {
-      $pattern = $this->_mapperType->queryArrayParse($pattern);
       if(is_array($pattern))
       {
+        $pattern = $this->_mapperType->queryArrayParse($pattern);
         $args = ["%QA", $pattern];
       }
       else if(is_object($pattern))

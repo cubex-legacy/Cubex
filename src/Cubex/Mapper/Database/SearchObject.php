@@ -16,6 +16,9 @@ class SearchObject
   const MATCH_GREATER_EQ = 'gte';
   const MATCH_LESS       = 'lt';
   const MATCH_LESS_EQ    = 'lte';
+  const MATCH_IN         = 'ins';
+  const MATCH_IN_INT     = 'ind';
+  const MATCH_IN_FLOAT   = 'inf';
 
   private $_fields = array();
 
@@ -75,6 +78,27 @@ class SearchObject
   public function addGreaterEqualThan($field, $value)
   {
     return $this->addSearch($field, $value, self::MATCH_GREATER_EQ);
+  }
+
+  public function addIn($field, $value, $type = 's')
+  {
+    switch($type)
+    {
+      case 's':
+        $const = self::MATCH_IN;
+        break;
+      case 'd':
+        $const = self::MATCH_IN_INT;
+        break;
+      case 'f':
+        $const = self::MATCH_IN_FLOAT;
+        break;
+      default:
+        throw new \Exception(
+          "Invalid IN type '$type', only ('s','d','f') are supported"
+        );
+    }
+    return $this->addSearch($field, $value, $const);
   }
 
   public function getMatchType($field)
