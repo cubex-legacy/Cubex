@@ -13,7 +13,7 @@ class StdRouter implements Router
   /**
    * Initiate Router
    *
-   * @param Route[] $routes
+   * @param StdRoute[] $routes
    * @param         $httpVerb
    */
   public function __construct(array $routes, $httpVerb = null)
@@ -122,14 +122,31 @@ class StdRouter implements Router
       }
     }
     $routePattern = $route->pattern();
-    if(substr($pattern, -1) !== '/') $pattern = $pattern . '/';
-    if(substr($routePattern, -1) !== '/') $routePattern = $routePattern . '/';
-    if(substr($routePattern, 0, 1) !== '/') $routePattern = '/' . $routePattern;
+    $appendEnd    = substr($routePattern, -1) == '$';
+
+    if(!$appendEnd && substr($pattern, -1) !== '/')
+    {
+      $pattern = $pattern . '/';
+    }
+    if(!$appendEnd && substr($routePattern, -1) !== '/')
+    {
+      $routePattern = $routePattern . '/';
+    }
+    if(substr($routePattern, 0, 1) !== '/')
+    {
+      $routePattern = '/' . $routePattern;
+    }
 
     // This looks strange but actually fixes a bug when trying to match nothing
     // using a regex pattern.
-    if(strlen($pattern) === 1) $pattern .= "/";
-    if(strlen($routePattern) === 1) $routePattern .= "/";
+    if(strlen($pattern) === 1)
+    {
+      $pattern .= "/";
+    }
+    if(strlen($routePattern) === 1)
+    {
+      $routePattern .= "/";
+    }
 
     $matchedOn = 1;
     $matches   = array();
@@ -151,7 +168,9 @@ class StdRouter implements Router
         {
           if($subRoute instanceof StdRoute)
           {
-            $subRoute->setPattern($route->pattern() . $subRoute->pattern());
+            $subPattern = $route->pattern() . '/' . $subRoute->pattern();
+            $subPattern = str_replace('//','/',$subPattern);
+            $subRoute->setPattern($subPattern);
             $result = $this->_tryRoute($subRoute, $pattern);
             if($result instanceof StdRoute)
             {

@@ -7,7 +7,7 @@ namespace Cubex\Routing;
 use Cubex\Foundation\DataHandler\HandlerInterface;
 use Cubex\Foundation\DataHandler\HandlerTrait;
 
-class StdRoute implements Route, HandlerInterface
+class StdRoute implements Route, HandlerInterface, \JsonSerializable
 {
   use HandlerTrait;
 
@@ -31,6 +31,16 @@ class StdRoute implements Route, HandlerInterface
     $this->_result    = $result;
     $this->_subRoutes = array();
     $this->setVerbs($verbs);
+  }
+
+  public function jsonSerialize()
+  {
+    $result = $this->_result;
+    if(is_object($result))
+    {
+      $result = get_class($result);
+    }
+    return [$this->_pattern => $result];
   }
 
   /**
