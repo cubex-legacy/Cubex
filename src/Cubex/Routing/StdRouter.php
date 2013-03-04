@@ -14,7 +14,7 @@ class StdRouter implements Router
    * Initiate Router
    *
    * @param StdRoute[] $routes
-   * @param         $httpVerb
+   * @param            $httpVerb
    */
   public function __construct(array $routes, $httpVerb = null)
   {
@@ -123,6 +123,10 @@ class StdRouter implements Router
     }
     $routePattern = $route->pattern();
     $appendEnd    = substr($routePattern, -1) == '$';
+    if($routePattern == '$')
+    {
+      $routePattern = '/$';
+    }
 
     if(!$appendEnd && substr($pattern, -1) !== '/')
     {
@@ -139,7 +143,7 @@ class StdRouter implements Router
 
     // This looks strange but actually fixes a bug when trying to match nothing
     // using a regex pattern.
-    if(strlen($pattern) === 1)
+    if(strlen($pattern) === 1 && $pattern !== '/')
     {
       $pattern .= "/";
     }
@@ -169,7 +173,7 @@ class StdRouter implements Router
           if($subRoute instanceof StdRoute)
           {
             $subPattern = $route->pattern() . '/' . $subRoute->pattern();
-            $subPattern = str_replace('//','/',$subPattern);
+            $subPattern = str_replace('//', '/', $subPattern);
             $subRoute->setPattern($subPattern);
             $result = $this->_tryRoute($subRoute, $pattern);
             if($result instanceof StdRoute)
