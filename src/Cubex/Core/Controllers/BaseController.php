@@ -298,8 +298,9 @@ class BaseController
 
     if($action === null)
     {
-      throw new \BadMethodCallException("No action specified on " . $this->_name(
-      ));
+      throw new \BadMethodCallException(
+        "No action specified on " . $this->_name()
+      );
     }
 
     $attempts = [];
@@ -346,8 +347,9 @@ class BaseController
       return $action();
     }
 
-    throw new \BadMethodCallException("Invalid action $action specified on " . $this->_name(
-    ));
+    throw new \BadMethodCallException(
+      "Invalid action $action specified on " . $this->_name()
+    );
   }
 
   /**

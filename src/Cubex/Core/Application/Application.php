@@ -5,6 +5,7 @@
 namespace Cubex\Core\Application;
 
 use Cubex\Bundle\BundlerTrait;
+use Cubex\Core\Controllers\BaseController;
 use Cubex\Core\Interfaces\DirectoryAware;
 use Cubex\Core\Interfaces\NamespaceAware;
 use Cubex\Dispatch\Utils\ListenerTrait;
@@ -195,9 +196,12 @@ abstract class Application
 
     if($dispatcher instanceof Dispatchable)
     {
-      if($dispatcher instanceof Controller)
+      if($dispatcher instanceof BaseController)
       {
         $dispatcher->forceAction($action);
+      }
+      if($dispatcher instanceof Controller)
+      {
         $matchRoute = $router->getMatchedRoute();
         if($matchRoute !== null)
         {
