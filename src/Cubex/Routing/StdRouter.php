@@ -147,7 +147,7 @@ class StdRouter implements Router
     {
       $pattern .= "/";
     }
-    if(strlen($routePattern) === 1)
+    if(strlen($routePattern) === 1 && $routePattern !== '/')
     {
       $routePattern .= "/";
     }
@@ -155,6 +155,7 @@ class StdRouter implements Router
     $matchedOn = 1;
     $matches   = array();
     $match     = preg_match("#^$routePattern#", $pattern, $matches);
+
     if(!$match)
     {
       $routePattern = $this->convertSimpleRoute($routePattern);
