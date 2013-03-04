@@ -393,9 +393,24 @@ class ColumnFamily
   }
 
   protected function _remove(
-    $key, $superColumn = null, array $columns = null, $timestamp = null
+    $keys, $superColumn = null, array $columns = null, $timestamp = null
   )
   {
+    if($keys === null)
+    {
+      return null;
+    }
+
+    if(!is_array($keys))
+    {
+      $keys    = [$keys];
+      $numKeys = 1;
+    }
+    else
+    {
+      $numKeys = count($keys);
+    }
+
     $level = $this->consistencyLevel();
     $path  = $this->_columnPath();
 
@@ -404,26 +419,40 @@ class ColumnFamily
       $timestamp = $this->timestamp();
     }
 
-    if($columns === null)
+    if($numKeys == 1 && $columns === null)
     {
-      $this->_client()->remove($key, $path, $timestamp, $level);
+      foreach($keys as $key)
+      {
+        $this->_client()->remove($key, $path, $timestamp, $level);
+      }
     }
-    else if(count($columns) == 1)
+    else if($numKeys == 1 && count($columns) == 1)
     {
       $path->column = head($columns);
-      $this->_client()->remove($key, $path, $timestamp, $level);
+      foreach($keys as $key)
+      {
+        $this->_client()->remove($key, $path, $timestamp, $level);
+      }
     }
     else
     {
       $deletion = new Deletion(['timestamp' => $timestamp]);
       if($superColumn !== null)
       {
-        $deletion->super_column = $superColumn;
+        $sc            = 'super_column';
+        $deletion->$sc = $superColumn;
       }
-      $deletion->predicate = new SlicePredicate(['column_names' => $columns]);
-      $mutations           = [new Mutation(['deletion' => $deletion])];
+      if($columns !== null)
+      {
+        $deletion->predicate = new SlicePredicate(['column_names' => $columns]);
+      }
+      $mutations   = [new Mutation(['deletion' => $deletion])];
+      $mutationMap = [];
 
-      $mutationMap[$key][$this->name()] = $mutations;
+      foreach($keys as $key)
+      {
+        $mutationMap[$key][$this->name()] = $mutations;
+      }
       $this->_client()->batch_mutate($mutationMap, $level);
     }
   }
