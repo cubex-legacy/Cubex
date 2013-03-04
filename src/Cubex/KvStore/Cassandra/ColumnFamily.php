@@ -389,6 +389,13 @@ class ColumnFamily
 
   public function remove($key, array $columns = null, $timestamp = null)
   {
+    $this->_remove($key, null, $columns, $timestamp);
+  }
+
+  protected function _remove(
+    $key, $superColumn = null, array $columns = null, $timestamp = null
+  )
+  {
     $level = $this->consistencyLevel();
     $path  = $this->_columnPath();
 
@@ -408,13 +415,24 @@ class ColumnFamily
     }
     else
     {
-      $deletion            = new Deletion(['timestamp' => $timestamp]);
+      $deletion = new Deletion(['timestamp' => $timestamp]);
+      if($superColumn !== null)
+      {
+        $deletion->super_column = $superColumn;
+      }
       $deletion->predicate = new SlicePredicate(['column_names' => $columns]);
       $mutations           = [new Mutation(['deletion' => $deletion])];
 
       $mutationMap[$key][$this->name()] = $mutations;
       $this->_client()->batch_mutate($mutationMap, $level);
     }
+  }
+
+  public function removeSuper(
+    $key, $superColumn, array $columns = null, $timestamp = null
+  )
+  {
+    $this->_remove($key, $superColumn, $columns, $timestamp);
   }
 
   public function incement($key, $column, $incement = 1)
