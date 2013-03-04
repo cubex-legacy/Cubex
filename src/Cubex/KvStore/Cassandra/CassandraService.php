@@ -17,7 +17,7 @@ class CassandraService implements KvService
    * @var Connection
    */
   protected $_connection;
-  protected $_columnFamily;
+  protected $_columnFamily = [];
   protected $_keyspace;
   protected $_returnAttributes = false;
 
@@ -27,14 +27,18 @@ class CassandraService implements KvService
     {
       $this->connect();
     }
-    if($this->_columnFamily === null)
+    if(!isset($this->_columnFamily[$name]))
     {
-      $this->_columnFamily = new ColumnFamily(
+      $this->_columnFamily[$name] = new ColumnFamily(
         $this->_connection, $name, $this->_keyspace
       );
     }
-    $this->_columnFamily->setReturnAttribute($this->returnAttributes());
-    return $this->_columnFamily;
+    $cf = $this->_columnFamily[$name];
+    if($cf instanceof ColumnFamily)
+    {
+      $cf->setReturnAttribute($this->returnAttributes());
+    }
+    return $cf;
   }
 
   public function returnAttributes()
