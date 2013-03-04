@@ -916,6 +916,10 @@ abstract class RecordMapper extends DataMapper
             }
           }
         }
+        else if($attr !== null)
+        {
+          $final[$k] = $attr->serialize($v);
+        }
         else
         {
           $final[$k] = $v;

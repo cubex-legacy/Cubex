@@ -261,16 +261,20 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
     return $this->_serializer;
   }
 
-  public function serialize()
+  public function serialize($data = null)
   {
+    if($data === null)
+    {
+      $data = $this->rawData();
+    }
     switch($this->getSerializer())
     {
       case self::SERIALIZATION_JSON:
-        return json_encode($this->rawData());
+        return json_encode($data);
       case self::SERIALIZATION_PHP:
-        return serialize($this->rawData());
+        return serialize($data);
     }
-    return $this->rawData();
+    return $data;
   }
 
   public function unserialize($data)
