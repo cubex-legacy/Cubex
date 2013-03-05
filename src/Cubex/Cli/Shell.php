@@ -197,6 +197,17 @@ class Shell
   }
 
   /**
+   * Clear the current line
+   *
+   * @param bool $cursorToStart If true then return the cursor to the start of the line, otherwise leave it where it is
+   */
+  public static function clearLine($cursorToStart = true)
+  {
+    echo "\033[2K";
+    if($cursorToStart) echo "\r";
+  }
+
+  /**
    * Determine if the current CLI Shell can support color. This may need
    * updating and is likely not accurate. More importantly there may be ways
    * around to support color for these but they've not been implemented here
