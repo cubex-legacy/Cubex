@@ -24,6 +24,8 @@ class Session implements SessionService
    */
   protected $_serviceProvider;
 
+  protected $_ttl;
+
   protected $_columnFamily;
   protected static $_sessionData = [];
   protected static $_sessionDataDeleted = [];
@@ -42,9 +44,10 @@ class Session implements SessionService
 
     $this->_columnFamily = $this->_config->getStr("column_family", "Session");
     $this->_serviceProvider = $serviceProvider;
+    $this->_ttl = $this->_config->getInt("ttl", 2592000);
 
     $this->init();
-    
+
     return $this;
   }
 
@@ -169,15 +172,40 @@ class Session implements SessionService
     }
   }
 
+  protected function _getTtl($key)
+  {
+    $ttls = $this->_config->getArr("ttlkeys", array());
+
+    return idx($ttls, $key, $this->_ttl);
+  }
+
   public function __destruct()
   {
     if(self::$_sessionData)
     {
-      $this->_serviceProvider->insert(
-        $this->_columnFamily,
-        $this->_getSessionId(),
-        self::$_sessionData
-      );
+      $ttlKeyedData = array();
+
+      foreach(self::$_sessionData as $key => $data)
+      {
+        $ttl = $this->_getTtl($key);
+
+        if(array_key_exists($ttl, $ttlKeyedData))
+        {
+          $ttlKeyedData[$ttl] = array();
+        }
+
+        $ttlKeyedData[$ttl][$key] = $data;
+      }
+
+      foreach($ttlKeyedData as $ttl => $data)
+      {
+        $this->_serviceProvider->insert(
+          $this->_columnFamily,
+          $this->_getSessionId(),
+          $data,
+          $ttl
+        );
+      }
     }
 
     if(self::$_sessionDataDeleted)
