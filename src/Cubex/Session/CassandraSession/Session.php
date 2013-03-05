@@ -189,7 +189,7 @@ class Session implements SessionService
       {
         $ttl = $this->_getTtl($key);
 
-        if(array_key_exists($ttl, $ttlKeyedData))
+        if(!array_key_exists($ttl, $ttlKeyedData))
         {
           $ttlKeyedData[$ttl] = array();
         }
