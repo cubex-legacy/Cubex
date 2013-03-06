@@ -134,7 +134,7 @@ class StdRouter implements Router
     }
     if(!$appendEnd && substr($routePattern, -1) !== '/')
     {
-      $routePattern = $routePattern . '/';
+      $routePattern = $routePattern . '/?';
     }
     if(substr($routePattern, 0, 1) !== '/')
     {
