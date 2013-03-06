@@ -11,6 +11,7 @@ use Cubex\Core\Http\Dispatchable;
 use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
+use Cubex\Foundation\Config\Configurable;
 use Cubex\ServiceManager\ServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
@@ -21,7 +22,7 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
  *
  */
 abstract class Project
-  implements Dispatchable, DispatchableAccess, ServiceManagerAware
+  implements Dispatchable, DispatchableAccess, ServiceManagerAware, Configurable
 {
   use ServiceManagerAwareTrait;
   use ConfigTrait;
