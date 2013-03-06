@@ -49,13 +49,15 @@ class MySQL implements DatabaseService
       $hostname = current($slaves);
     }
 
-    $this->_connection = new \mysqli($hostname, $this->_config->getStr(
-      'username',
-      'root'
-    ), $this->_config->getStr('password', ''), $this->_config->getStr(
-      'database',
-      'test'
-    ), $this->_config->getStr('port', 3306));
+    $this->_connection = new \mysqli(
+      $hostname, $this->_config->getStr(
+        'username',
+        'root'
+      ), $this->_config->getStr('password', ''), $this->_config->getStr(
+        'database',
+        'test'
+      ), $this->_config->getStr('port', 3306)
+    );
 
     $this->_connected = true;
 
@@ -73,16 +75,31 @@ class MySQL implements DatabaseService
   /**
    * @param $column
    *
-   * @return string
+   * @return mixed|string
+   * @throws \RuntimeException
    */
   public function escapeColumnName($column)
   {
+    if($column === null || $column === '')
+    {
+      return '``';
+    }
+
     if($column == '*')
     {
       return '*';
     }
 
     $column = str_replace('`', '', $this->escapeString($column));
+
+    if(empty($column))
+    {
+      throw new \RuntimeException(
+        "Unable to escape string, please check MySQL Connection for " .
+        $this->_config->getStr('register_service_as', '') .
+        ' (' . $this->_config->getStr('hostname', 'localhost') . ')'
+      );
+    }
 
     return "`$column`";
   }
@@ -199,7 +216,7 @@ class MySQL implements DatabaseService
       return $rows;
     }
 
-    if($result->num_rows > 0)
+    if($result->{'num_rows'} > 0)
     {
       while($row = $result->fetch_object())
       {
@@ -234,7 +251,7 @@ class MySQL implements DatabaseService
     $rows         = array();
     $keyField     = $valueKey = null;
     $valueAsArray = true;
-    if($result->num_rows > 0)
+    if($result->{'num_rows'} > 0)
     {
       while($row = $result->fetch_object())
       {
@@ -253,7 +270,8 @@ class MySQL implements DatabaseService
           }
           $keyField = $keyField[0];
         }
-        $rows[$row->$keyField] = !$valueAsArray && !empty($valueKey) ? $row->$valueKey : $row;
+        $rows[$row->$keyField] = !$valueAsArray && !empty($valueKey)
+        ? $row->$valueKey : $row;
       }
     }
 
@@ -282,7 +300,7 @@ class MySQL implements DatabaseService
     $this->_prepareConnection('r');
     $result  = $this->_doQuery($query);
     $columns = array();
-    if($result->num_rows > 0)
+    if($result->{'num_rows'} > 0)
     {
       $row     = $result->fetch_object();
       $columns = array_keys(get_object_vars($row));
@@ -311,7 +329,7 @@ class MySQL implements DatabaseService
   {
     $this->_prepareConnection('r');
     $result = $this->_doQuery($query);
-    $rows   = (int)$result->num_rows;
+    $rows   = (int)$result->{'num_rows'};
 
     try
     {
