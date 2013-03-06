@@ -32,4 +32,9 @@ class Redirect extends BaseFacade
   {
     return static::getAccessor()->back($statusCode);
   }
+
+  public static function secure()
+  {
+    static::getAccessor()->secure();
+  }
 }
