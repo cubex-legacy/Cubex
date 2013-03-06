@@ -74,6 +74,12 @@ class CliLogger
     $this->_logFilePath = $this->_getLogFilePath($logFile);
     $this->_dateFormat  = $this->_getConfigOption('date_format', 'd/m/Y H:i:s');
 
+    $logDir = dirname($this->_logFilePath);
+    if(! file_exists($logDir))
+    {
+      mkdir($logDir);
+    }
+
     EventManager::listen(EventManager::CUBEX_LOG, [$this, 'handleLogEvent']);
     EventManager::listen(EventManager::CUBEX_PHP_ERROR, [$this, 'handlePhpError']);
     EventManager::listen(EventManager::CUBEX_UNHANDLED_EXCEPTION, [$this, 'handleException']);
