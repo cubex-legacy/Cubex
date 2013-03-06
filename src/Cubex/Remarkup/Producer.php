@@ -154,7 +154,7 @@ class Producer implements Renderable
   public function links($text)
   {
     $text = preg_replace_callback(
-      '/\[\[(.*)\]\]/',
+      '/\[\[([^\]]*)\]\]/',
       array($this, '_processLink'),
       $text
     );
