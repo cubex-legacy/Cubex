@@ -59,4 +59,16 @@ class Redirect implements DispatchableAccess, DispatchInjection
     $response->respond();
     die;
   }
+
+  public function secure()
+  {
+    if(!$this->_getRequest()->isHttps())
+    {
+      Redirect::to(
+        "https://" .
+        $this->_getRequest()->host() .
+        $this->_getRequest()->path()
+      )->now();
+    }
+  }
 }
