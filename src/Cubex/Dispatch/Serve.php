@@ -43,7 +43,7 @@ class Serve extends Dispatcher implements Dispatchable
       $dispatchPath         = new Path(implode("/", $pathParts));
     }
 
-    $resourceHash = $this->getNomapHash();
+    $resourceHash = $dispatchPath->getResourceHash();
     $this->setDispatchPath($dispatchPath)
       ->setUseMap($resourceHash !== $this->getNomapHash());
   }
