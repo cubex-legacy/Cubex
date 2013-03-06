@@ -22,7 +22,7 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
  *
  */
 abstract class Project
-  implements Dispatchable, DispatchableAccess, ServiceManagerAware, Configurable
+  implements Dispatchable, DispatchableAccess, ServiceManagerAware
 {
   use ServiceManagerAwareTrait;
   use ConfigTrait;
