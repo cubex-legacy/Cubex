@@ -141,17 +141,6 @@ class StdRouter implements Router
       $routePattern = '/' . $routePattern;
     }
 
-    // This looks strange but actually fixes a bug when trying to match nothing
-    // using a regex pattern.
-    if(strlen($pattern) === 1 && $pattern !== '/')
-    {
-      $pattern .= "/";
-    }
-    if(strlen($routePattern) === 1 && $routePattern !== '/')
-    {
-      $routePattern .= "/";
-    }
-
     $matchedOn = 1;
     $matches   = array();
     $match     = preg_match("#^$routePattern#", $pattern, $matches);
