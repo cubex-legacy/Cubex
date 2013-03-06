@@ -13,7 +13,7 @@ class PidFile
   private $_pidFilePath;
   private $_enabled;
 
-  public function __construct($path = "")
+  public function __construct($path = "", $instanceName = "")
   {
     $this->_enabled = true;
 
@@ -31,7 +31,7 @@ class PidFile
 
     if($this->_enabled)
     {
-      $this->_pidFilePath = $this->_getPidFilePath($path);
+      $this->_pidFilePath = $this->_getPidFilePath($path, $instanceName);
       $this->_createPidFile();
     }
   }
@@ -41,7 +41,7 @@ class PidFile
     $this->_deletePidFile();
   }
 
-  private function _getPidFilePath($path = "")
+  private function _getPidFilePath($path = "", $instanceName = "")
   {
     if($path == "")
     {
@@ -50,13 +50,17 @@ class PidFile
     }
     if($path == "")
     {
+      $filename = $_REQUEST['__path__'];
+      if($instanceName != "") $filename .= "." . $instanceName;
+      $filename .= ".pid";
+
       if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
       {
-        $path = realpath(dirname(WEB_ROOT)) . DS . $_REQUEST['__path__'] . '.pid';
+        $path = realpath(dirname(WEB_ROOT)) . DS . $filename;
       }
       else
       {
-        $path = '/var/run/' . $_REQUEST['__path__'] . '.pid';
+        $path = '/var/run/' . $filename;
       }
     }
     return $path;
