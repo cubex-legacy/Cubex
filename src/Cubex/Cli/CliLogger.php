@@ -77,7 +77,7 @@ class CliLogger
     $logDir = dirname($this->_logFilePath);
     if(! file_exists($logDir))
     {
-      mkdir($logDir);
+      mkdir($logDir, 0755, true);
     }
 
     EventManager::listen(EventManager::CUBEX_LOG, [$this, 'handleLogEvent']);
@@ -103,11 +103,6 @@ class CliLogger
       $logsDir  = realpath(dirname(WEB_ROOT)) . DS . 'logs';
       $fileName = (isset($_REQUEST['__path__']) ? $_REQUEST['__path__'] : 'logfile') . '.log';
       $logFile  = $logsDir . DS . $fileName;
-
-      if(!file_exists($logsDir))
-      {
-        @mkdir($logsDir);
-      }
     }
 
     return $logFile;
