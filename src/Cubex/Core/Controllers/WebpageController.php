@@ -28,6 +28,10 @@ class WebpageController extends BaseController
    */
   protected $_layout;
 
+  protected $_renderingEsiAction;
+
+  protected $_surrogateCapability = false;
+
   protected function _getActionNestName()
   {
     return $this->_actionNest;
@@ -166,5 +170,41 @@ class WebpageController extends BaseController
     }
 
     return $result;
+  }
+
+  public function esiRender($action, $path, $params = [])
+  {
+    $surrogateCapability = strpos(
+      $this->request()->header("surrogate_capability", ''),
+      'ESI/1.0'
+    ) !== false;
+
+    if($surrogateCapability)
+    {
+      return new Impart('<esi:include src="' . $path . '" />');
+    }
+    else
+    {
+      $this->_renderingEsiAction = true;
+      $resp                      = $this->_processAction($action, $params);
+      if(!($resp instanceof Renderable))
+      {
+        if(is_scalar($resp))
+        {
+          $resp = new Impart($resp);
+        }
+        else
+        {
+          throw new \Exception("Invalid ESI response on $action");
+        }
+      }
+      $this->_renderingEsiAction = false;
+      return $resp;
+    }
+  }
+
+  public function isEsiSubAction()
+  {
+    return (bool)$this->_renderingEsiAction;
   }
 }

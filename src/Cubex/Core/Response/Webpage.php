@@ -34,6 +34,8 @@ class Webpage implements
   protected $_renderables = [];
   protected $_headerElements = [];
 
+  protected $_renderType;
+
   /**
    * @var \Cubex\View\Layout
    */
@@ -50,6 +52,12 @@ class Webpage implements
   public function __toString()
   {
     return $this->render();
+  }
+
+  public function setRenderType($renderType = 'body')
+  {
+    $this->_renderType = $renderType;
+    return $this;
   }
 
   public function setStatusCode($status = 200)
@@ -91,10 +99,11 @@ class Webpage implements
   public function registerPageTitleListener()
   {
     EM::listen(
-      EM::CUBEX_PAGE_TITLE, array(
-                                 $this,
-                                 "setTitle"
-                            )
+      EM::CUBEX_PAGE_TITLE,
+      array(
+           $this,
+           "setTitle"
+      )
     );
     return $this;
   }
@@ -128,7 +137,9 @@ class Webpage implements
     {
       return $this->_meta;
     }
-    else return $this->_meta[$key];
+    else {
+      return $this->_meta[$key];
+    }
   }
 
   /**
@@ -138,7 +149,10 @@ class Webpage implements
    */
   public function metaHTML()
   {
-    if(!$this->_meta) return '';
+    if(!$this->_meta)
+    {
+      return '';
+    }
     $html = '';
     foreach($this->_meta as $name => $content)
     {
@@ -252,12 +266,17 @@ class Webpage implements
 
     $requestUrl = $this->request()->path();
     $requestUrl .= '?' . \http_build_query(
-      $this->request()->getVariables(), '', '&amp;'
+      $this->request()->getVariables(),
+      '',
+      '&amp;'
     );
 
     $noscript = '<meta http-equiv="refresh" content="0; URL=';
     $noscript .= $requestUrl . '&amp;__noscript__=1" />';
-    if($this->request()->jsSupport() === false) $noscript = '';
+    if($this->request()->jsSupport() === false)
+    {
+      $noscript = '';
+    }
 
     $response = "<!DOCTYPE html>\n"
     . '<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"><![endif]-->'
@@ -296,7 +315,9 @@ class Webpage implements
     }
 
     $processed = EM::triggerUntil(
-      EM::CUBEX_WEBPAGE_RENDER_BODY, ["content" => $body], $this
+      EM::CUBEX_WEBPAGE_RENDER_BODY,
+      ["content" => $body],
+      $this
     );
 
     if($processed !== null)
@@ -323,7 +344,10 @@ class Webpage implements
    */
   protected function _bodyAttributes()
   {
-    if(empty($this->_bodyAttributes)) return null;
+    if(empty($this->_bodyAttributes))
+    {
+      return null;
+    }
     $attr = array();
     foreach($this->_bodyAttributes as $k => $v)
     {
@@ -349,7 +373,21 @@ class Webpage implements
    */
   public function render()
   {
+    if($this->_renderType == 'content')
+    {
+      $lay = $this->_layout;
+      $this->_layout = null;
+      $render = $this->body();
+      $this->_layout = $lay;
+      return $render;
+    }
+
     $body = $this->renderBody();
+    if($this->_renderType == 'body')
+    {
+      return $body;
+    }
+
     return $this->renderHead() . $body . $this->renderClosing();
   }
 
@@ -407,7 +445,9 @@ class Webpage implements
     }
 
     $html = preg_replace(
-      '/<!--[^\[](.|\s)*?-->/', '', $html
+      '/<!--[^\[](.|\s)*?-->/',
+      '',
+      $html
     ); //Strip HTML Comments
 
     $search  = array(
