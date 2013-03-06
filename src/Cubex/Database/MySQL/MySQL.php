@@ -96,7 +96,7 @@ class MySQL implements DatabaseService
     {
       throw new \RuntimeException(
         "Unable to escape string, please check MySQL Connection for " .
-        $this->_config->getStr('register_service_as', '') .
+        $this->_config->getStr('database', 'unknown db') .
         ' (' . $this->_config->getStr('hostname', 'localhost') . ')'
       );
     }
