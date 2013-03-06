@@ -34,14 +34,11 @@ class MySQL implements DatabaseService
     $this->_config = $config;
   }
 
-  /**
-   * @param string $mode
-   *
-   * @return MySQL
-   */
+
   public function connect($mode = 'w')
   {
     $hostname = $this->_config->getStr('hostname', 'localhost');
+    $database = $this->_config->getStr('database', 'test');
     if($mode == 'r')
     {
       $slaves = $this->_config->getArr('slaves', array($hostname));
@@ -50,14 +47,21 @@ class MySQL implements DatabaseService
     }
 
     $this->_connection = new \mysqli(
-      $hostname, $this->_config->getStr(
-        'username',
-        'root'
-      ), $this->_config->getStr('password', ''), $this->_config->getStr(
-        'database',
-        'test'
-      ), $this->_config->getStr('port', 3306)
+      $hostname,
+      $this->_config->getStr('username', 'root'),
+      $this->_config->getStr('password', ''),
+      $database,
+      $this->_config->getStr('port', 3306)
     );
+
+    if($this->_connection->connect_errno)
+    {
+      throw new \RuntimeException(
+        "Failed to connect to MySQL: ($hostname.$database) " .
+        "[" . $this->_connection->connect_errno . "] " .
+        $this->_connection->connect_error
+      );
+    }
 
     $this->_connected = true;
 
