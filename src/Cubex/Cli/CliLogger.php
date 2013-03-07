@@ -53,10 +53,12 @@ class CliLogger
   ];
 
   /**
-   * @param mixed $echoLevel
-   * @param mixed $logLevel
+   * @param string $echoLevel
+   * @param string $logLevel
+   * @param string $logFile
+   * @param string $instanceName
    */
-  public function __construct($echoLevel = LogLevel::ERROR, $logLevel = LogLevel::WARNING, $logFile = "")
+  public function __construct($echoLevel = LogLevel::ERROR, $logLevel = LogLevel::WARNING, $logFile = "", $instanceName = "")
   {
     $this->_echoLevel = $echoLevel;
     $this->_logLevel  = $logLevel;
@@ -71,7 +73,7 @@ class CliLogger
       }
     }
 
-    $this->_logFilePath = $this->_getLogFilePath($logFile);
+    $this->_logFilePath = $this->_getLogFilePath($logFile, $instanceName);
     $this->_dateFormat  = $this->_getConfigOption('date_format', 'd/m/Y H:i:s');
 
     $logDir = dirname($this->_logFilePath);
@@ -85,13 +87,20 @@ class CliLogger
     EventManager::listen(EventManager::CUBEX_UNHANDLED_EXCEPTION, [$this, 'handleException']);
   }
 
+  public static function getDefaultLogPath($instanceName = "")
+  {
+    $logsDir  = realpath(dirname(WEB_ROOT)) . DS . 'logs';
+    if($instanceName != "") $logsDir .= DS . $instanceName;
+    return $logsDir;
+  }
+
   private function _getConfigOption($option, $default = "")
   {
     $conf = Container::config()->get('cli_logger');
     return $conf ? $conf->getStr($option, $default) : $default;
   }
 
-  private function _getLogFilePath($logFile = "")
+  private function _getLogFilePath($logFile = "", $instanceName = "")
   {
     if($logFile == "")
     {
@@ -100,7 +109,7 @@ class CliLogger
 
     if($logFile == "")
     {
-      $logsDir  = realpath(dirname(WEB_ROOT)) . DS . 'logs';
+      $logsDir  = self::getDefaultLogPath($instanceName);
       $fileName = (isset($_REQUEST['__path__']) ? $_REQUEST['__path__'] : 'logfile') . '.log';
       $logFile  = $logsDir . DS . $fileName;
     }
