@@ -46,10 +46,6 @@ class Memcache implements CacheService
 
   protected function _conn()
   {
-    if($this->_connection === null)
-    {
-      $this->connect();
-    }
     return $this->_connection;
   }
 
@@ -126,7 +122,7 @@ class Memcache implements CacheService
   {
     try
     {
-      if($this->_conn === null)
+      if($this->_conn() === null)
       {
         return false;
       }
