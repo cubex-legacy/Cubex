@@ -21,7 +21,7 @@ class Request implements \IteratorAggregate
   protected $_subdomain;
   protected $_domain;
   protected $_tld;
-  protected $_port = 80;
+  protected $_port;
   protected $_processedHost;
   protected $_definedTlds = array();
   protected $_headers;
@@ -246,6 +246,11 @@ class Request implements \IteratorAggregate
     if($this->_port === null)
     {
       $this->_processHost($this->_host);
+
+      if($this->_port === null)
+      {
+        $this->_port = 80;
+      }
     }
 
     return $this->_port;
@@ -557,5 +562,35 @@ class Request implements \IteratorAggregate
       return $headers[$key];
     }
     return $default;
+  }
+
+  /**
+   * Returns a formatted string based on the url parts
+   *
+   * - %po = Port Number (no colon)
+   * - %pa = Path (leading slash)
+   * - %p  = Scheme with //: (Usually http:// or https://)
+   * - %h  = Host (Subdomain . Domain . Tld : Port [port may not be set])
+   * - %d  = Domain
+   * - %s  = Sub Domain
+   * - %t  = Tld
+   *
+   * @param string $format
+   *
+   * @return string mixed
+   */
+  public function urlSprintf($format = "%p%h:%po%pa")
+  {
+    $formater = [
+      "%po" => $this->port(),
+      "%pa" => $this->path(),
+      "%p"  => $this->protocol(),
+      "%h"  => $this->host(),
+      "%d"  => $this->domain(),
+      "%s"  => $this->subDomain(),
+      "%t"  => $this->tld(),
+    ];
+
+    return str_replace(array_keys($formater), $formater, $format);
   }
 }
