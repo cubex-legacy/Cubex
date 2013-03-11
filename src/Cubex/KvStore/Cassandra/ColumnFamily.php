@@ -152,6 +152,7 @@ class ColumnFamily
       }
       catch(\Exception $e)
       {
+        throw $e;
       }
     }
     else
@@ -164,6 +165,7 @@ class ColumnFamily
       }
       catch(\Exception $e)
       {
+        throw $e;
       }
     }
     return $this->_formColumnResult($result);
@@ -186,6 +188,7 @@ class ColumnFamily
     }
     catch(\Exception $e)
     {
+      throw $e;
     }
     return $this->_formColumnResult($result);
   }
@@ -212,6 +215,7 @@ class ColumnFamily
     }
     catch(\Exception $e)
     {
+      throw $e;
     }
 
     $final = [];
@@ -267,6 +271,7 @@ class ColumnFamily
     }
     catch(\Exception $e)
     {
+      throw $e;
     }
 
     $final = [];
@@ -347,6 +352,7 @@ class ColumnFamily
     }
     catch(\Exception $e)
     {
+      throw $e;
     }
 
     return $final;
