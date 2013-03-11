@@ -16,6 +16,7 @@ use cassandra\Deletion;
 use cassandra\KeyRange;
 use cassandra\KeySlice;
 use cassandra\Mutation;
+use cassandra\NotFoundException;
 use cassandra\SlicePredicate;
 use cassandra\SliceRange;
 use cassandra\SuperColumn;
@@ -121,13 +122,24 @@ class ColumnFamily
     $parent = $this->_columnParent();
     $level  = $this->consistencyLevel();
     $slice  = new SlicePredicate(['column_names' => $columnNames]);
-    if(is_array($key))
+    try
     {
-      return $this->_client()->multiget_count($key, $parent, $slice, $level);
+      if(is_array($key))
+      {
+        return $this->_client()->multiget_count($key, $parent, $slice, $level);
+      }
+      else
+      {
+        return $this->_client()->get_count($key, $parent, $slice, $level);
+      }
     }
-    else
+    catch(NotFoundException $e)
     {
-      return $this->_client()->get_count($key, $parent, $slice, $level);
+      return 0;
+    }
+    catch(\Exception $e)
+    {
+      throw $e;
     }
   }
 
@@ -150,6 +162,10 @@ class ColumnFamily
         $result = $this->_client()->get($key, $path, $level);
         $result = [$result];
       }
+      catch(NotFoundException $e)
+      {
+        $result = [];
+      }
       catch(\Exception $e)
       {
         throw $e;
@@ -162,6 +178,10 @@ class ColumnFamily
       try
       {
         $result = $this->_client()->get_slice($key, $parent, $slice, $level);
+      }
+      catch(NotFoundException $e)
+      {
+        $result = [];
       }
       catch(\Exception $e)
       {
@@ -185,6 +205,10 @@ class ColumnFamily
     try
     {
       $result = $this->_client()->get_slice($key, $parent, $slice, $level);
+    }
+    catch(NotFoundException $e)
+    {
+      $result = [];
     }
     catch(\Exception $e)
     {
@@ -212,6 +236,10 @@ class ColumnFamily
         $slice,
         $level
       );
+    }
+    catch(NotFoundException $e)
+    {
+      $result = [];
     }
     catch(\Exception $e)
     {
@@ -268,6 +296,10 @@ class ColumnFamily
         $slice,
         $level
       );
+    }
+    catch(NotFoundException $e)
+    {
+      $result = [];
     }
     catch(\Exception $e)
     {
@@ -349,6 +381,10 @@ class ColumnFamily
           }
         }
       }
+    }
+    catch(NotFoundException $e)
+    {
+      $final = [];
     }
     catch(\Exception $e)
     {
