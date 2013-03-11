@@ -88,76 +88,125 @@ class CassandraService implements KvService
 
   public function getRow($table, $key, $columns = null)
   {
-    if($columns === null)
+    try
     {
-      return $this->cf($table)->getSlice($key);
+      if($columns === null)
+      {
+        return $this->cf($table)->getSlice($key);
+      }
+      else
+      {
+        return $this->cf($table)->get($key, $columns);
+      }
     }
-    else
+    catch(\Exception $e)
     {
-      return $this->cf($table)->get($key, $columns);
+      return null;
     }
   }
 
   public function getRows($table, array $keys, $columns = null)
   {
-    if($columns === null)
+    try
     {
-      return $this->cf($table)->multiGetSlice($keys);
+      if($columns === null)
+      {
+        return $this->cf($table)->multiGetSlice($keys);
+      }
+      else
+      {
+        return $this->cf($table)->multiGet($keys, $columns);
+      }
     }
-    else
+    catch(\Exception $e)
     {
-      return $this->cf($table)->multiGet($keys, $columns);
+      return null;
     }
   }
 
   public function getKeyedRows($table, array $keys, array $columns)
   {
-    $final = [];
-    $key   = head($columns);
-    $rows  = $this->cf($table)->multiGet($keys, $columns);
-    foreach($rows as $data)
+    try
     {
-      if(isset($data[$key]))
+      $final = [];
+      $key   = head($columns);
+      $rows  = $this->cf($table)->multiGet($keys, $columns);
+      foreach($rows as $data)
       {
-        $final[$data[$key]] = $data;
+        if(isset($data[$key]))
+        {
+          $final[$data[$key]] = $data;
+        }
       }
+      return $final;
     }
-    return $final;
+    catch(\Exception $e)
+    {
+      return null;
+    }
   }
 
   public function getColumns($table, $key)
   {
-    return array_keys($this->cf($table)->getSlice($key));
+    try
+    {
+      return array_keys($this->cf($table)->getSlice($key));
+    }
+    catch(\Exception $e)
+    {
+      return null;
+    }
   }
 
   public function getColumnCount($table, $key, array $columns = null)
   {
-    if($columns === null)
+    try
     {
-      return $this->cf($table)->columnCount($key);
+      if($columns === null)
+      {
+        return $this->cf($table)->columnCount($key);
+      }
+      else
+      {
+        return $this->cf($table)->columnCount($key, $columns);
+      }
     }
-    else
+    catch(\Exception $e)
     {
-      return $this->cf($table)->columnCount($key, $columns);
+      return false;
     }
   }
 
   public function deleteData($table, $key, array $columns = null)
   {
-    if($columns === null)
+    try
     {
-      $this->cf($table)->remove($key);
+      if($columns === null)
+      {
+        $this->cf($table)->remove($key);
+      }
+      else
+      {
+        $this->cf($table)->remove($key, $columns);
+      }
+      return true;
     }
-    else
+    catch(\Exception $e)
     {
-      $this->cf($table)->remove($key, $columns);
+      return false;
     }
-    return true;
   }
 
   public function insert($table, $key, array $columns, $ttl = null)
   {
-    $this->cf($table)->insert($key, $columns, $ttl);
-    return true;
+    try
+    {
+      $this->cf($table)->insert($key, $columns, $ttl);
+      return true;
+    }
+    catch(\Exception $e)
+    {
+      return false;
+    }
   }
 }
