@@ -8,6 +8,7 @@ namespace Cubex\KvStore\Cassandra;
 use Cubex\KvStore\KvService;
 use Cubex\ServiceManager\ServiceConfigTrait;
 use cassandra\AuthenticationRequest;
+use cassandra\InvalidRequestException;
 
 class CassandraService implements KvService
 {
@@ -99,6 +100,10 @@ class CassandraService implements KvService
         return $this->cf($table)->get($key, $columns);
       }
     }
+    catch(InvalidRequestException $e)
+    {
+      throw $e;
+    }
     catch(\Exception $e)
     {
       return null;
@@ -117,6 +122,10 @@ class CassandraService implements KvService
       {
         return $this->cf($table)->multiGet($keys, $columns);
       }
+    }
+    catch(InvalidRequestException $e)
+    {
+      throw $this->cf($table)->formException($e);
     }
     catch(\Exception $e)
     {
@@ -140,6 +149,10 @@ class CassandraService implements KvService
       }
       return $final;
     }
+    catch(InvalidRequestException $e)
+    {
+      throw $this->cf($table)->formException($e);
+    }
     catch(\Exception $e)
     {
       return null;
@@ -151,6 +164,10 @@ class CassandraService implements KvService
     try
     {
       return array_keys($this->cf($table)->getSlice($key));
+    }
+    catch(InvalidRequestException $e)
+    {
+      throw $this->cf($table)->formException($e);
     }
     catch(\Exception $e)
     {
@@ -170,6 +187,10 @@ class CassandraService implements KvService
       {
         return $this->cf($table)->columnCount($key, $columns);
       }
+    }
+    catch(InvalidRequestException $e)
+    {
+      throw $this->cf($table)->formException($e);
     }
     catch(\Exception $e)
     {
@@ -191,6 +212,10 @@ class CassandraService implements KvService
       }
       return true;
     }
+    catch(InvalidRequestException $e)
+    {
+      throw $this->cf($table)->formException($e);
+    }
     catch(\Exception $e)
     {
       return false;
@@ -203,6 +228,10 @@ class CassandraService implements KvService
     {
       $this->cf($table)->insert($key, $columns, $ttl);
       return true;
+    }
+    catch(InvalidRequestException $e)
+    {
+      throw $this->cf($table)->formException($e);
     }
     catch(\Exception $e)
     {
