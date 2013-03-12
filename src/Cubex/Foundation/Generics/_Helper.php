@@ -170,3 +170,16 @@ if(!function_exists("strip_start"))
     return $haystack;
   }
 }
+
+if(!function_exists("url"))
+{
+  /**
+   * @param string $format
+   *
+   * @return string
+   */
+  function url($format = "%p%h")
+  {
+    return \Cubex\Container\Container::request()->urlSprintf($format);
+  }
+}
