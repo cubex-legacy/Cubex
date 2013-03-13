@@ -34,6 +34,7 @@ class Response
   const RENDER_REDIRECT   = 'redirect';
   const RENDER_RENDERABLE = 'renderable';
   const RENDER_JSON       = 'json';
+  const RENDER_JSONP      = 'jsonp';
   const RENDER_TEXT       = 'text';
   const RENDER_UNKNOWN    = 'unknown';
 
@@ -149,6 +150,26 @@ class Response
   }
 
   /**
+   * Set the response to be a json encoded object using the JSONP standard;
+   * http://bob.ippoli.to/archives/2005/12/05/remote-json-jsonp/
+   *
+   * @param string $key
+   * @param object $object
+   *
+   * @return $this
+   */
+  public function fromJsonp($key, $object)
+  {
+    $this->_responseObject = [
+      "key"    => $key,
+      "object" => $object
+    ];
+    $this->_renderType     = self::RENDER_JSONP;
+
+    return $this;
+  }
+
+  /**
    * Set the response to be a renderable object
    *
    * @param \Cubex\Foundation\Renderable $item
@@ -224,6 +245,24 @@ class Response
         $this->sendHeaders();
 
         $response = \json_encode($this->_responseObject);
+
+        // Prevent content sniffing attacks by encoding "<" and ">", so browsers
+        // won't try to execute the document as HTML
+        $response = \str_replace(
+          array('<', '>'), array('\u003c', '\u003e'), $response
+        );
+
+        echo $response;
+
+        break;
+      case self::RENDER_JSONP:
+
+        $this->addHeader("Content-Type", "application/json", false);
+        $this->sendHeaders();
+
+        $responseKey    = $this->_responseObject["key"];
+        $responseObject = \json_encode($this->_responseObject["object"]);
+        $response       = "{$responseKey}({$responseObject})";
 
         // Prevent content sniffing attacks by encoding "<" and ">", so browsers
         // won't try to execute the document as HTML
