@@ -567,13 +567,13 @@ class Request implements \IteratorAggregate
   /**
    * Returns a formatted string based on the url parts
    *
-   * - %po = Port Number (no colon)
-   * - %pa = Path (leading slash)
-   * - %p  = Scheme with //: (Usually http:// or https://)
-   * - %h  = Host (Subdomain . Domain . Tld : Port [port may not be set])
-   * - %d  = Domain
-   * - %s  = Sub Domain
-   * - %t  = Tld
+   * - %r = Port Number (no colon)
+   * - %i = Path (leading slash)
+   * - %p = Scheme with //: (Usually http:// or https://)
+   * - %h = Host (Subdomain . Domain . Tld : Port [port may not be set])
+   * - %d = Domain
+   * - %s = Sub Domain
+   * - %t = Tld
    *
    * @param string $format
    *
@@ -582,13 +582,13 @@ class Request implements \IteratorAggregate
   public function urlSprintf($format = "%p%h:%po%pa")
   {
     $formater = [
-      "%po" => $this->port(),
-      "%pa" => $this->path(),
-      "%p"  => $this->protocol(),
-      "%h"  => $this->host(),
-      "%d"  => $this->domain(),
-      "%s"  => $this->subDomain(),
-      "%t"  => $this->tld(),
+      "%r" => $this->port(),
+      "%i" => $this->path(),
+      "%p" => $this->protocol(),
+      "%h" => $this->host(),
+      "%d" => $this->domain(),
+      "%s" => $this->subDomain(),
+      "%t" => $this->tld(),
     ];
 
     return str_replace(array_keys($formater), $formater, $format);
