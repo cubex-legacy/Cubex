@@ -62,19 +62,13 @@ trait SessionIdTrait
 
   protected function _setSessionCookie()
   {
-    $expires = $this->_sessionIdCookieExpires;
-    if($expires === null)
-    {
-      $expires = new \DateTime("+30 days");
-    }
-
     $request = Container::request();
     $domain  = "." . $request->domain() . "." . $request->tld();
 
     $sessionCookie = new StandardCookie(
       $this->_sessionIdCookieName,
       $this->_getSessionId(),
-      $expires,
+      $this->getSessionIdCookieExpires(),
       "/",
       $domain,
       false,
@@ -82,5 +76,30 @@ trait SessionIdTrait
     );
 
     Cookies::set($sessionCookie);
+  }
+
+  /**
+   * @param int|string|\DateTime $expires
+   *
+   * @return $this
+   */
+  public function setSessionIdCookieExpires($expires)
+  {
+    $this->_sessionIdCookieExpires = $expires;
+
+    return $this;
+  }
+
+  /**
+   * @return int|string|\DateTime
+   */
+  public function getSessionIdCookieExpires()
+  {
+    if($this->_sessionIdCookieExpires === null)
+    {
+      return new \DateTime("+30 days");
+    }
+
+    return $this->_sessionIdCookieExpires;
   }
 }
