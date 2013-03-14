@@ -10,15 +10,15 @@ interface AuthedUser
   /**
    * @return mixed
    */
-  public function id();
+  public function getId();
 
   /**
    * @return string
    */
-  public function username();
+  public function getUsername();
 
   /**
    * @return array
    */
-  public function details();
+  public function getDetails();
 }

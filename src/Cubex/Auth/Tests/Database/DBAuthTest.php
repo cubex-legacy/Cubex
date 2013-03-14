@@ -52,12 +52,12 @@ class DBAuthTest extends TestCase
     $dbAuth->configure(new ServiceConfig());
 
     $authedUser = $dbAuth->authById(1);
-    $this->assertEquals($return->id, $authedUser->id());
-    $this->assertEquals($return->username, $authedUser->username());
+    $this->assertEquals($return->id, $authedUser->getId());
+    $this->assertEquals($return->username, $authedUser->getUsername());
 
     $authedUser = $dbAuth->authById("1");
-    $this->assertEquals($return->id, $authedUser->id());
-    $this->assertEquals($return->username, $authedUser->username());
+    $this->assertEquals($return->id, $authedUser->getId());
+    $this->assertEquals($return->username, $authedUser->getUsername());
 
     $authedUser = $dbAuth->authById(null);
     $this->assertEquals(null, $authedUser);
@@ -90,8 +90,8 @@ class DBAuthTest extends TestCase
     $dbAuth->configure(new ServiceConfig());
 
     $authedUser = $dbAuth->authByCredentials($credentialsMock);
-    $this->assertEquals($return->id, $authedUser->id());
-    $this->assertEquals($return->username, $authedUser->username());
+    $this->assertEquals($return->id, $authedUser->getId());
+    $this->assertEquals($return->username, $authedUser->getUsername());
 
     $authedUser = $dbAuth->authByCredentials($credentialsMock);
     $this->assertEquals(null, $authedUser);

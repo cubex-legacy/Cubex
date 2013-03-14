@@ -18,16 +18,16 @@ class StdAuthedUserTest extends TestCase
   {
     $stdAuthedUser = new StdAuthedUser();
 
-    $this->assertEquals(null, $stdAuthedUser->id());
-    $this->assertEquals(null, $stdAuthedUser->username());
-    $this->assertEquals(null, $stdAuthedUser->details());
+    $this->assertEquals(null, $stdAuthedUser->getId());
+    $this->assertEquals(null, $stdAuthedUser->getUsername());
+    $this->assertEquals(null, $stdAuthedUser->getDetails());
 
     $stdAuthedUser = new StdAuthedUser(
       $this->_id, $this->_username, $this->_details
     );
 
-    $this->assertEquals($this->_id, $stdAuthedUser->id());
-    $this->assertEquals($this->_username, $stdAuthedUser->username());
-    $this->assertEquals($this->_details, $stdAuthedUser->details());
+    $this->assertEquals($this->_id, $stdAuthedUser->getId());
+    $this->assertEquals($this->_username, $stdAuthedUser->getUsername());
+    $this->assertEquals($this->_details, $stdAuthedUser->getDetails());
   }
 }

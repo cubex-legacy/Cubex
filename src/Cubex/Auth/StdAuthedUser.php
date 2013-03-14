@@ -23,7 +23,7 @@ class StdAuthedUser implements AuthedUser
   /**
    * @return mixed
    */
-  public function id()
+  public function getId()
   {
     return $this->_id;
   }
@@ -31,7 +31,7 @@ class StdAuthedUser implements AuthedUser
   /**
    * @return string
    */
-  public function username()
+  public function getUsername()
   {
     return $this->_username;
   }
@@ -39,7 +39,7 @@ class StdAuthedUser implements AuthedUser
   /**
    * @return array
    */
-  public function details()
+  public function getDetails()
   {
     return $this->_details;
   }
