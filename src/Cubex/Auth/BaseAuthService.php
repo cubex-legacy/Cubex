@@ -23,10 +23,10 @@ abstract class BaseAuthService implements AuthService
     $cookieData = implode(
       "|",
       [
-      $user->id(),
-      $user->username(),
+      $user->getId(),
+      $user->getUsername(),
       $security,
-      json_encode($user->details())
+      json_encode($user->getDetails())
       ]
     );
     $cookie     = new EncryptedCookie("CUBEXLOGIN", $cookieData);

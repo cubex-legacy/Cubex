@@ -123,7 +123,7 @@ class DBAuth extends BaseAuthService implements ServiceManagerAware
       $salt = $encryption->getStr("secret_key", "g*53{P)!Se6vAc/xB9*ms");
     }
 
-    return md5($salt . Session::id() . $user->id());
+    return md5($salt . Session::id() . $user->getId());
   }
 
   /**
