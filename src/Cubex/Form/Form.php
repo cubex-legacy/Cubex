@@ -151,6 +151,12 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
+  protected function _addReflectedAttribute(Attribute $attribute)
+  {
+    $this->_addElementFromAttribute($attribute);
+    return $this;
+  }
+
   protected function _addElementFromAttribute(Attribute $a)
   {
     $name = $a->name();
@@ -431,7 +437,9 @@ class Form extends DataMapper implements Renderable
       {
         $attribute->setRenderTemplate($this->_elementRenderTemplate);
       }
-      $name = $this->_cleanAttributeName($attribute->name());
+      $name                     = $this->_cleanAttributeName(
+        $attribute->name()
+      );
       $this->_attributes[$name] = $attribute;
     }
     else
