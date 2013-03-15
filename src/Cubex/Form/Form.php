@@ -245,7 +245,7 @@ class Form extends DataMapper implements Renderable
    */
   protected function _attribute($name)
   {
-    $name = strtolower($name);
+    $name = $this->_cleanAttributeName($name);
     return isset($this->_attributes[$name]) ? $this->_attributes[$name] : null;
   }
 
@@ -430,7 +430,8 @@ class Form extends DataMapper implements Renderable
       {
         $attribute->setRenderTemplate($this->_elementRenderTemplate);
       }
-      $this->_attributes[strtolower($attribute->name())] = $attribute;
+      $name = $this->_cleanAttributeName($attribute->name());
+      $this->_attributes[$name] = $attribute;
     }
     else
     {
