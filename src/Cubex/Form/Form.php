@@ -31,6 +31,7 @@ class Form extends DataMapper implements Renderable
   protected $_validatedHour;
   protected $_autoTimestamp = false;
   protected $_elementRenderTemplate;
+  protected $_schemaType = self::SCHEMA_AS_IS;
   /**
    * @var DataMapper
    */
