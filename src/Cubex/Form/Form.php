@@ -43,8 +43,8 @@ class Form extends DataMapper implements Renderable
     {
       $action = Container::request()->path();
     }
-    $this->_buildAttributes(__NAMESPACE__ . '\FormElement');
     $this->setFormName($name);
+    $this->_buildAttributes(__NAMESPACE__ . '\FormElement');
     $this->_elementAttributes['method'] = $method;
     $this->_elementAttributes['action'] = $action;
     $this->_configure();
@@ -422,9 +422,15 @@ class Form extends DataMapper implements Renderable
    */
   protected function _addAttribute(Attribute $attribute)
   {
+    $prepend = $this->id();
+    if($prepend !== null)
+    {
+      $prepend .= '-';
+    }
+
     if($attribute instanceof FormElement)
     {
-      $attribute->setId($this->id() . '-' . $attribute->id());
+      $attribute->setId($prepend . $attribute->id());
       if($attribute->type() == FormElement::FILE)
       {
         $this->setEncType();

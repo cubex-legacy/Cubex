@@ -104,9 +104,7 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
     {
       if(substr($this->name(), 0, 7) != '__cubex')
       {
-        $this->setId(
-          str_replace(' ', '-', str_replace('_', '-', $this->name()))
-        );
+        $this->setId(str_replace([' ', '_'], '-', $this->name()));
       }
       else
       {
