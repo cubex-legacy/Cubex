@@ -10,7 +10,9 @@ class Strings
   public static function camelWords($string)
   {
     return preg_replace(
-      "/(([a-z])([A-Z])|([A-Z])([A-Z][a-z]))/", "\\2\\4 \\3\\5", $string
+      "/(([a-z])([A-Z])|([A-Z])([A-Z][a-z]))/",
+      "\\2\\4 \\3\\5",
+      $string
     );
   }
 
@@ -42,5 +44,38 @@ class Strings
     $variable = ucwords($variable);
     $variable = str_replace(' ', '', $variable);
     return $variable;
+  }
+
+  public static function titleize($title)
+  {
+    return ucwords(static::humanize($title));
+  }
+
+  public static function humanize($string, $splitOnCamel = true)
+  {
+    if($splitOnCamel)
+    {
+      $string = static::variableToUnderScore($string);
+    }
+    $string       = preg_replace('/_id$/', "", $string);
+    $replacements = [
+      "-" => ' ',
+      "_" => ' ',
+    ];
+    return ucfirst(strtr($string, $replacements));
+  }
+
+  public static function hyphenate($string)
+  {
+    $replacements = [
+      " " => '-',
+      "_" => '-',
+    ];
+    return strtr($string, $replacements);
+  }
+
+  public static function urlize($url)
+  {
+    return strtolower(static::hyphenate($url));
   }
 }
