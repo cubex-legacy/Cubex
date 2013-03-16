@@ -160,6 +160,7 @@ class ServiceManager
    * @param $name
    *
    * @return Service
+   * @throws \RuntimeException
    * @throws \InvalidArgumentException
    * @throws \Exception
    */
@@ -184,6 +185,13 @@ class ServiceManager
               $service->configure($config);
             }
           }
+          else
+          {
+            throw new \RuntimeException(
+              "The service $name has not been correctly configured, " .
+              "The class '$provider' could not be loaded", 500
+            );
+          }
         }
         else
         {
@@ -195,7 +203,11 @@ class ServiceManager
           }
           else
           {
-            throw new \Exception("Invalid service factory");
+            throw new \RuntimeException(
+              "The service $name has not been correctly configured, " .
+              "The factory '$factoryClass' was not a valid ServiceFactory",
+              500
+            );
           }
 
           $service->configure($config);
@@ -206,14 +218,23 @@ class ServiceManager
           $service->setServiceManager($this);
         }
 
-        if($this->_services[$name]['shared'])
+        if($service instanceof Service)
         {
-          $this->bindInstance($name, $service);
-          return $this->get($name);
+          if($this->_services[$name]['shared'])
+          {
+            $this->bindInstance($name, $service);
+            return $this->get($name);
+          }
+          else
+          {
+            return $service;
+          }
         }
         else
         {
-          return $service;
+          throw new \RuntimeException(
+            "The service $name has not been correctly configured"
+          );
         }
       }
       else
