@@ -608,9 +608,23 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
 
     $dictionary = new \Cubex\Cli\Dictionary();
     $dictionary->configure($this->_configuration);
-    $script = $dictionary->match($script);
 
-    if(class_exists($script))
+    $canLoadClass   = false;
+    $originalScript = $script;
+
+    $attempts = ['', $this->_namespace . '.', 'Bundl.', 'Cubex.'];
+    foreach($attempts as $try)
+    {
+      $script       = $try . $originalScript;
+      $script       = $dictionary->match($script);
+      $canLoadClass = class_exists($script);
+      if($canLoadClass)
+      {
+        break;
+      }
+    }
+
+    if($canLoadClass)
     {
       try
       {
