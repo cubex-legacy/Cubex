@@ -141,7 +141,7 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
   {
     if($data == $this->_data)
     {
-      return true;
+      return $this;
     }
     else if(!$this->isModified())
     {
