@@ -543,18 +543,30 @@ class ColumnFamily
 
   public function runQuery($query, $compression = Compression::NONE)
   {
-    if($this->cqlVersion() === 3)
+    $result = null;
+    try
     {
-      $result = $this->_client()->execute_cql3_query(
-        $query,
-        $compression,
-        $this->consistencyLevel()
-      );
+      if($this->cqlVersion() === 3)
+      {
+        $result = $this->_client()->execute_cql3_query(
+          $query,
+          $compression,
+          $this->consistencyLevel()
+        );
+      }
+      else
+      {
+        $result = $this->_client()->execute_cql_query($query, $compression);
+      }
     }
-    else
+    catch(NotFoundException $e)
     {
-      $result = $this->_client()->execute_cql_query($query, $compression);
     }
+    catch(\Exception $e)
+    {
+      throw $this->formException($e);
+    }
+
     return $result;
   }
 

@@ -46,6 +46,14 @@ class CassandraMapper extends KvMapper
     return new CassandraCollection(new static);
   }
 
+  /**
+   * @return CassandraCollection
+   */
+  public static function conn()
+  {
+    return parent::conn();
+  }
+
   public function columnUpdated($columnName)
   {
     if($this->attributeExists($columnName))
