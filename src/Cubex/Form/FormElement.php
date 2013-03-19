@@ -128,6 +128,13 @@ class FormElement extends Attribute implements Renderable
     return $this->_selectedValue;
   }
 
+  public function setChecked($checked)
+  {
+    $this->setData($checked ? 1 : 0)->setSelectedValue(1);
+
+    return $this;
+  }
+
   public function render()
   {
     $render = new FormElementRender($this);

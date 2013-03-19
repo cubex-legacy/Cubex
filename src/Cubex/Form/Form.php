@@ -50,6 +50,36 @@ class Form extends DataMapper implements Renderable
     $this->_configure();
   }
 
+  /**
+   * @param array $data
+   * @param bool  $setUnmodified
+   * @param bool  $createAttributes
+   *
+   * @return $this
+   */
+  public function hydrate(
+    array $data, $setUnmodified = false, $createAttributes = false
+  )
+  {
+    $rawAttributes     = mpull($this->getRawAttributes(), "name", "name");
+    $missingAttributes = array_diff_key($rawAttributes, $data);
+
+    foreach($missingAttributes as $missingAttribute)
+    {
+      $attribute = $this->getAttribute($missingAttribute);
+
+      if($attribute instanceof FormElement)
+      {
+        if($attribute->type() === FormElement::CHECKBOX)
+        {
+          $data[$attribute->name()] = false;
+        }
+      }
+    }
+
+    parent::hydrate($data, $setUnmodified, $createAttributes);
+  }
+
   public function bindMapper(DataMapper $mapper, $relations = true)
   {
     $this->_mapper = $mapper;
