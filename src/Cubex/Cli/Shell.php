@@ -193,7 +193,7 @@ class Shell
    */
   public static function clear()
   {
-    passthru("clear");
+    echo "\033[2J\033[;H";
   }
 
   /**
@@ -227,6 +227,25 @@ class Shell
     }
 
     return true;
+  }
+
+  /**
+   * Set the cursor position - 1,1 is top left
+   *
+   * @param int $row
+   * @param int $col
+   */
+  public static function setCursorPos($row, $col)
+  {
+    echo "\033[" . $row . ';' . $col . 'H';
+  }
+
+  /**
+   * Move the cursor to the top left of the window
+   */
+  public static function home()
+  {
+    self::setCursorPos(1, 1);
   }
 }
 
