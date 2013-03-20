@@ -19,6 +19,26 @@ class CassandraMapper extends KvMapper
     return Cassandra::getAccessor($this->_cassandraConnection);
   }
 
+  /**
+   * @return \Cubex\KvStore\Cassandra\ColumnFamily
+   */
+  public static function cf()
+  {
+    $instance = new static;
+    /**
+     * @var $instance self
+     */
+    return $instance->getCf();
+  }
+
+  /**
+   * @return \Cubex\KvStore\Cassandra\ColumnFamily
+   */
+  public function getCf()
+  {
+    return $this->connection()->cf($this->getTableName());
+  }
+
   public function setData($attribute, $value)
   {
     if(!$this->attributeExists($attribute))
@@ -47,7 +67,7 @@ class CassandraMapper extends KvMapper
   }
 
   /**
-   * @return CassandraCollection
+   * @return \Cubex\KvStore\Cassandra\CassandraService
    */
   public static function conn()
   {
