@@ -12,10 +12,16 @@ use Psr\Log\LoggerInterface;
 class Logger implements LoggerInterface
 {
   protected $_eventType;
+  protected $_logName;
 
-  public function __construct($eventType = EventManager::CUBEX_LOG)
+  public function __construct($eventType = EventManager::CUBEX_LOG, $log = null)
   {
     $this->_eventType = $eventType;
+    if($log === null)
+    {
+      $log = CUBEX_TRANSACTION;
+    }
+    $this->_logName = $log;
   }
 
   /**
@@ -147,8 +153,10 @@ class Logger implements LoggerInterface
     $this->_log($level, $message, $context);
   }
 
-  public function _log($level, $message, array $context = array(), $file = '',
-                       $line = 0)
+  public function _log(
+    $level, $message, array $context = array(), $file = '',
+    $line = 0
+  )
   {
     EventManager::trigger(
       $this->_eventType,
@@ -159,6 +167,7 @@ class Logger implements LoggerInterface
            'file'           => $file,
            'line'           => $line,
            'transaction_id' => CUBEX_TRANSACTION,
+           'log_name'       => $this->_logName
       )
     );
   }
