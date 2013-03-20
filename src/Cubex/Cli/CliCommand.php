@@ -62,6 +62,18 @@ abstract class CliCommand implements CliTask
   }
 
   /**
+   * Display usage information. Invoked automatically if --help is specified on the command-line
+   */
+  protected function _help()
+  {
+    echo "\n" . $_REQUEST['__path__'] . "\n\n";
+
+    foreach($this->_argumentsList() as $arg)
+    {
+    }
+  }
+
+  /**
    * Parse the raw command-line arguments.
    * Override this to customise how arguments are parsed.
    *
@@ -197,7 +209,7 @@ abstract class CliCommand implements CliTask
                 $argName = substr($argName, 1);
               }
 
-              $argObj                              = $this->_getArgByName(
+              $argObj                              = $this->_getArgObjByName(
                 $thisArg,
                 false
               );
@@ -223,7 +235,7 @@ abstract class CliCommand implements CliTask
    *
    * @return CliArgument|null
    */
-  private function _getArgByName($name, $isLongName)
+  protected function _getArgObjByName($name, $isLongName)
   {
     foreach($this->_argumentsList() as $arg)
     {
@@ -253,7 +265,7 @@ abstract class CliCommand implements CliTask
    *
    * @return bool
    */
-  protected function _argumentIsSet($longArgName)
+  public function argumentIsSet($longArgName)
   {
     return isset($this->_arguments[$longArgName]);
   }
@@ -261,12 +273,29 @@ abstract class CliCommand implements CliTask
   /**
    * Get the value of a command-line argument. Returns null if the argument does not exist.
    *
-   * @param $longArgName
+   * @param string $longArgName
+   * @param mixed  $default The default value to return if the argument is
+   *                        not set - overrides the argument's own default
    *
    * @return string|null
    */
-  protected function _argumentValue($longArgName)
+  public function argumentValue($longArgName, $default = null)
   {
-    return isset($this->_arguments[$longArgName]) ? $this->_arguments[$longArgName] : null;
+    if(isset($this->_arguments[$longArgName]))
+    {
+      return $this->_arguments[$longArgName];
+    }
+    else
+    {
+      if($default === null)
+      {
+        $argObj = $this->_getArgObjByName($longArgName, true);
+        return $argObj->defaultValue;
+      }
+      else
+      {
+        return $default;
+      }
+    }
   }
 }

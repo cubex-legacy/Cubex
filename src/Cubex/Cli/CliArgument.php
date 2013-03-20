@@ -7,7 +7,7 @@ namespace Cubex\Cli;
 
 class CliArgument
 {
-  const VALUE_NONE = 0;
+  const VALUE_NONE     = 0;
   const VALUE_OPTIONAL = 1;
   const VALUE_REQUIRED = 2;
 
@@ -15,23 +15,40 @@ class CliArgument
   public $shortName;
   public $longName;
   public $valueOption;
+  public $valueName;
+  public $defaultValue;
 
-  public function __construct($longName, $description, $valueOption, $shortName = "")
+  /**
+   * @param string $longName     The long argument name. Must only contain numbers, letters and hyphens.
+   * @param string $description  The description to show in the help
+   * @param int    $valueOption  Specify whether this argument needs a value
+   * @param string $shortName    The short argument name. Must be a single letter.
+   * @param string $valueName    The name of the value to show in the help
+   * @param mixed  $defaultValue The default value to use if this argument is not specified.
+   *
+   * @throws \Exception
+   */
+  public function __construct(
+    $longName, $description, $valueOption = CliArgument::VALUE_NONE,
+    $shortName = "", $valueName = "", $defaultValue = null
+  )
   {
-    if(! $this->_isValidLongName($longName))
+    if(!$this->_isValidLongName($longName))
     {
       throw new \Exception('Invalid long option name: ' . $longName);
     }
 
-    if($shortName && (! $this->_isValidShortName($shortName)))
+    if($shortName && (!$this->_isValidShortName($shortName)))
     {
       throw new \Exception('Invalid short option name: ' . $shortName);
     }
 
-    $this->longName = $longName;
-    $this->description = $description;
-    $this->valueOption = $valueOption;
-    $this->shortName = $shortName;
+    $this->longName     = $longName;
+    $this->description  = $description;
+    $this->valueOption  = $valueOption;
+    $this->shortName    = $shortName;
+    $this->valueName    = $valueName;
+    $this->defaultValue = $defaultValue;
   }
 
   private function _isValidShortName($name)
