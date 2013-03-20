@@ -41,7 +41,6 @@ abstract class CliCommand implements CliTask
   {
     $this->_loader  = $loader;
     $this->_rawArgs = $rawArgs;
-    $this->_parseArguments($this->_rawArgs);
   }
 
   /**
@@ -49,6 +48,13 @@ abstract class CliCommand implements CliTask
    */
   public function init()
   {
+    if(in_array('--help', $this->_rawArgs))
+    {
+      $this->_help();
+      die();
+    }
+
+    $this->_parseArguments($this->_rawArgs);
   }
 
   /**
@@ -66,11 +72,55 @@ abstract class CliCommand implements CliTask
    */
   protected function _help()
   {
-    echo "\n" . $_REQUEST['__path__'] . "\n\n";
+    echo "\nUsage: " . $_REQUEST['__path__'] . " [arg]...\n\n";
 
     foreach($this->_argumentsList() as $arg)
     {
+      $this->_showHelpArg($arg);
     }
+  }
+
+  private function _showHelpArg(CliArgument $arg)
+  {
+    $labelWidth       = 30;
+    $descriptionWidth = 50;
+
+    $text = "  ";
+    if($arg->hasShortName())
+    {
+      $text .= '-' . $arg->shortName . ', ';
+    }
+    else
+    {
+      $text .= '    ';
+    }
+
+    $text .= '--' . $arg->longName;
+    if($arg->valueOption == CliArgument::VALUE_REQUIRED)
+    {
+      $text .= '=' . $arg->valueDescription;
+    }
+    else if($arg->valueOption == CliArgument::VALUE_OPTIONAL)
+    {
+      $text .= '[=' . $arg->valueDescription . ']';
+    }
+
+    if(strlen($text) < $labelWidth)
+    {
+      $text = str_pad($text, $labelWidth, " ", STR_PAD_RIGHT);
+    }
+    else
+    {
+      $text .= "\n" . str_repeat(" ", $labelWidth);
+    }
+
+    $text .= wordwrap(
+      $arg->description,
+      $descriptionWidth,
+    "\n" . str_repeat(" ", $labelWidth)
+    );
+
+    echo $text . "\n";
   }
 
   /**

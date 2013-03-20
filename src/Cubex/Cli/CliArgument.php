@@ -15,22 +15,23 @@ class CliArgument
   public $shortName;
   public $longName;
   public $valueOption;
-  public $valueName;
+  public $valueDescription;
   public $defaultValue;
 
   /**
-   * @param string $longName     The long argument name. Must only contain numbers, letters and hyphens.
-   * @param string $description  The description to show in the help
-   * @param int    $valueOption  Specify whether this argument needs a value
-   * @param string $shortName    The short argument name. Must be a single letter.
-   * @param string $valueName    The name of the value to show in the help
-   * @param mixed  $defaultValue The default value to use if this argument is not specified.
+   * @param string $longName         The long argument name. Must only contain numbers, letters and hyphens.
+   * @param string $description      The description to show in the help
+   * @param string $shortName        The short argument name. Must be a single letter.
+   * @param int    $valueOption      Specify whether this argument needs a value
+   * @param string $valueDescription The name of the value to show in the help
+   * @param mixed  $defaultValue     The default value to use if this argument is not specified.
    *
    * @throws \Exception
    */
   public function __construct(
-    $longName, $description, $valueOption = CliArgument::VALUE_NONE,
-    $shortName = "", $valueName = "value", $defaultValue = null
+    $longName, $description, $shortName = "",
+    $valueOption = CliArgument::VALUE_NONE, $valueDescription = "value",
+    $defaultValue = null
   )
   {
     if(!$this->_isValidLongName($longName))
@@ -43,12 +44,12 @@ class CliArgument
       throw new \Exception('Invalid short option name: ' . $shortName);
     }
 
-    $this->longName     = $longName;
-    $this->description  = $description;
-    $this->valueOption  = $valueOption;
-    $this->shortName    = $shortName;
-    $this->valueName    = $valueName;
-    $this->defaultValue = $defaultValue;
+    $this->longName         = $longName;
+    $this->description      = $description;
+    $this->valueOption      = $valueOption;
+    $this->shortName        = $shortName;
+    $this->valueDescription = $valueDescription;
+    $this->defaultValue     = $defaultValue;
   }
 
   private function _isValidShortName($name)
