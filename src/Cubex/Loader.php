@@ -195,16 +195,16 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       {
         $env = 'development';
         echo '
-##############################
-##                          ##
-##     NO CUBEX_ENV SET     ##
-##  ASSUMING \'development\'  ##
-##  Sleeping for 5 seconds  ##
-##                          ##
-##  Giving you a chance to  ##
-##     STOP this script     ##
-##                          ##
-##############################
+##################################
+##                              ##
+##       NO CUBEX_ENV SET       ##
+##    ASSUMING \'development\'    ##
+##    Sleeping for 5 seconds    ##
+##                              ##
+##    Giving you a chance to    ##
+##       STOP this script       ##
+##                              ##
+##################################
 
 ';
         flush();
