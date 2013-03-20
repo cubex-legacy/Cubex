@@ -169,4 +169,17 @@ class Cookies
 
     return true;
   }
+
+  /**
+   * If the page stops execution before the default event triggers the cookies
+   * to write then we try and send them now. If the headers are already gone
+   * though, it's far too late!
+   */
+  public function __destruct()
+  {
+    if(!self::$_written)
+    {
+      self::write();
+    }
+  }
 }
