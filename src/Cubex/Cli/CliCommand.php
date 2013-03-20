@@ -41,13 +41,7 @@ abstract class CliCommand implements CliTask
   {
     $this->_loader  = $loader;
     $this->_rawArgs = $rawArgs;
-  }
 
-  /**
-   * Perform initialisation operations for this command
-   */
-  public function init()
-  {
     if(in_array('--help', $this->_rawArgs))
     {
       $this->_help();
@@ -55,6 +49,13 @@ abstract class CliCommand implements CliTask
     }
 
     $this->_parseArguments($this->_rawArgs);
+  }
+
+  /**
+   * Perform initialisation operations for this command
+   */
+  public function init()
+  {
   }
 
   /**
