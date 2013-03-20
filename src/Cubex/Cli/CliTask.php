@@ -10,4 +10,9 @@ use Cubex\Foundation\Config\Configurable;
 interface CliTask extends Configurable
 {
   public function init();
+
+  /**
+   * @return int
+   */
+  public function execute();
 }

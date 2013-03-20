@@ -4,6 +4,7 @@
  */
 namespace Cubex;
 
+use Cubex\Cli\CliTask;
 use Cubex\Core\Http\DispatchInjection;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\Config;
@@ -591,8 +592,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       return $this->_response->respond();
     }
 
-    $script    = $_REQUEST['__path__'] = '';
-    $arguments = array();
+    $_REQUEST['__path__'] = '';
 
     $this->init();
 
@@ -601,56 +601,41 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       $this->setResponse($this->buildResponse());
     }
 
-    foreach($args as $argi => $arg)
+    try
     {
-      if($argi == 1)
+      if(count($args) < 2)
       {
-        $script = $_REQUEST['__path__'] = $arg;
+        throw new \RuntimeException('No command was specified');
       }
-      else if(substr($arg, 0, 6) == '--env=')
+
+      $command = $_REQUEST['__path__'] = $args[1];
+
+      // remove the "cubex" command from the arguments
+      array_shift($args);
+
+      $_SERVER['CUBEX_CLI'] = true;
+
+      $dictionary = new \Cubex\Cli\Dictionary();
+      $dictionary->configure($this->_configuration);
+
+      $canLoadClass    = false;
+      $originalCommand = $command;
+
+      $attempts = ['', $this->_namespace . '.', 'Bundl.', 'Cubex.'];
+      foreach($attempts as $try)
       {
-        $_ENV['CUBEX_ENV'] = substr($arg, 6);
-      }
-      else if($argi > 1)
-      {
-        if(strstr($arg, "=") !== false)
+        $command      = $try . $originalCommand;
+        $command      = $dictionary->match($command);
+        $canLoadClass = class_exists($command);
+        if($canLoadClass)
         {
-          list($k, $v) = explode('=', $arg, 2);
+          break;
         }
-        else
-        {
-          $k = $arg;
-          $v = null;
-        }
-        $arguments[$k] = $_REQUEST[$k] = $_GET[$k] = $v;
       }
-    }
 
-    $_SERVER['CUBEX_CLI'] = true;
-
-    $dictionary = new \Cubex\Cli\Dictionary();
-    $dictionary->configure($this->_configuration);
-
-    $canLoadClass   = false;
-    $originalScript = $script;
-
-    $attempts = ['', $this->_namespace . '.', 'Bundl.', 'Cubex.'];
-    foreach($attempts as $try)
-    {
-      $script       = $try . $originalScript;
-      $script       = $dictionary->match($script);
-      $canLoadClass = class_exists($script);
       if($canLoadClass)
       {
-        break;
-      }
-    }
-
-    if($canLoadClass)
-    {
-      try
-      {
-        $obj = new $script($this, $arguments);
+        $obj = new $command($this, $args);
 
         if($obj instanceof Configurable)
         {
@@ -662,9 +647,10 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
           $obj->setServiceManager($this->getServiceManager());
         }
 
-        if($obj instanceof \Cubex\Cli\CliTask)
+        if($obj instanceof CliTask)
         {
-          $result = $obj->init();
+          $obj->init();
+          $result = $obj->execute();
           if(is_numeric($result))
           {
             $this->_response->setStatusCode($result);
@@ -677,16 +663,16 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
           }
         }
       }
-      catch(\Exception $e)
+      else
       {
-        $this->handleException($e);
+        $this->handleException(
+          new \RuntimeException($command . " could not be loaded")
+        );
       }
     }
-    else
+    catch(\Exception $e)
     {
-      $this->handleException(
-        new \RuntimeException($script . " could not be loaded")
-      );
+      $this->handleException($e);
     }
 
     return $this->_response->respond();
