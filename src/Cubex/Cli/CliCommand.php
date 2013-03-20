@@ -281,6 +281,11 @@ abstract class CliCommand implements CliTask
    */
   public function argumentValue($longArgName, $default = null)
   {
+    if(is_numeric($longArgName))
+    {
+      return $this->positionalArgValue($longArgName, $default);
+    }
+
     if(isset($this->_arguments[$longArgName]))
     {
       return $this->_arguments[$longArgName];
@@ -297,5 +302,16 @@ abstract class CliCommand implements CliTask
         return $default;
       }
     }
+  }
+
+  /**
+   * @param int   $argNum
+   * @param mixed $default
+   *
+   * @return mixed
+   */
+  public function positionalArgValue($argNum, $default = null)
+  {
+    return isset($this->_positionalArgs[$argNum]) ? $this->_positionalArgs[$argNum] : $default;
   }
 }

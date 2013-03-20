@@ -30,7 +30,7 @@ class CliArgument
    */
   public function __construct(
     $longName, $description, $valueOption = CliArgument::VALUE_NONE,
-    $shortName = "", $valueName = "", $defaultValue = null
+    $shortName = "", $valueName = "value", $defaultValue = null
   )
   {
     if(!$this->_isValidLongName($longName))
