@@ -74,6 +74,11 @@ class Cookies
       EventManager::CUBEX_RESPONSE_PREPARE,
       [__NAMESPACE__ . "\\Cookies", "write"]
     );
+
+    // If the page stops execution before the default event triggers the cookies
+    // to write then we try and send them now. If the headers are already gone
+    // though, it's far too late!
+    register_shutdown_function([__NAMESPACE__ . "\\Cookies", "write"]);
   }
 
   /**
@@ -168,18 +173,5 @@ class Cookies
     self::$_cookies[$cookie->getName()] = $cookie;
 
     return true;
-  }
-
-  /**
-   * If the page stops execution before the default event triggers the cookies
-   * to write then we try and send them now. If the headers are already gone
-   * though, it's far too late!
-   */
-  public function __destruct()
-  {
-    if(!self::$_written)
-    {
-      self::write();
-    }
   }
 }
