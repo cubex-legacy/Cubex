@@ -191,9 +191,31 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
     }
     if(!$env)
     {
-      throw new \Exception(
-        "The 'CUBEX_ENV' environmental variable is not defined."
-      );
+      if(CUBEX_CLI)
+      {
+        $env = 'development';
+        echo '
+##############################
+##                          ##
+##     NO CUBEX_ENV SET     ##
+##  ASSUMING \'development\'  ##
+##  Sleeping for 5 seconds  ##
+##                          ##
+##  Giving you a chance to  ##
+##     STOP this script     ##
+##                          ##
+##############################
+
+';
+        flush();
+        sleep(5);
+      }
+      else
+      {
+        throw new \Exception(
+          "The 'CUBEX_ENV' environmental variable is not defined."
+        );
+      }
     }
 
     define("CUBEX_ENV", $env);
