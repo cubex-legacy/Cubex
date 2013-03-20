@@ -12,6 +12,11 @@ use Cubex\Cookie\EncryptedCookie;
 abstract class BaseAuthService implements AuthService
 {
   /**
+   * @var int|string|\DateTime
+   */
+  protected $_loginExpiry = 0;
+
+  /**
    * @param AuthedUser $user
    *
    * @return bool
@@ -20,6 +25,7 @@ abstract class BaseAuthService implements AuthService
   {
     $security = $this->cookieHash($user);
     Container::bind(Container::AUTHED_USER, $user);
+
     $cookieData = implode(
       "|",
       [
@@ -29,8 +35,18 @@ abstract class BaseAuthService implements AuthService
       json_encode($user->getDetails())
       ]
     );
-    $cookie     = new EncryptedCookie("CUBEXLOGIN", $cookieData);
+
+    $cookie     = new EncryptedCookie(
+      "CUBEXLOGIN",
+      $cookieData,
+      $this->_loginExpiry,
+      "/",
+      url(".%d.%t"),
+      false,
+      true
+    );
     Cookies::set($cookie);
+
     return true;
   }
 

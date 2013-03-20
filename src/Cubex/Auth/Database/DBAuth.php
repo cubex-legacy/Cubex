@@ -105,6 +105,8 @@ class DBAuth extends BaseAuthService implements ServiceManagerAware
 
     $this->_table          = $config->getStr('table', 'users');
     $this->_connectionName = $config->getStr('connection', 'db');
+
+    $this->_loginExpiry = $config->getInt("login_expiry", 0);
   }
 
   /**
