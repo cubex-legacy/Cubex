@@ -493,7 +493,7 @@ class Request implements \IteratorAggregate
       {
         $variables[$k] = $v;
       }
-      else if(substr($k, 0, 7) !== '__cubex')
+      else if(substr($k, 0, 2) !== '__')
       {
         $variables[$k] = $v;
       }
