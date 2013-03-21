@@ -7,12 +7,14 @@ namespace Cubex\Mapper\Cassandra;
 
 use Cubex\Data\Attribute;
 use Cubex\Facade\Cassandra;
+use Cubex\KvStore\Cassandra\ColumnAttribute;
 use Cubex\Mapper\KeyValue\KvMapper;
 
 class CassandraMapper extends KvMapper
 {
   protected $_cassandraConnection = 'cassandra';
   protected $_autoTimestamp = false;
+  protected $_attributeType = '\Cubex\KvStore\Cassandra\ColumnAttribute';
 
   public function connection()
   {
@@ -39,13 +41,25 @@ class CassandraMapper extends KvMapper
     return $this->connection()->cf($this->getTableName());
   }
 
-  public function setData($attribute, $value)
+  public function setData($attribute, $value, $ttl = null)
   {
     if(!$this->attributeExists($attribute))
     {
-      $this->_addAttribute(new Attribute($attribute));
+      $a = new ColumnAttribute($attribute);
+      $a->setExpiry($ttl);
+      $this->_addAttribute($a);
     }
     return parent::setData($attribute, $value);
+  }
+
+  public function setExpiry($attribute, $ttl)
+  {
+    $a = $this->_attribute($attribute);
+    if($a instanceof ColumnAttribute)
+    {
+      $a->setExpiry($ttl);
+    }
+    return $this;
   }
 
   /**

@@ -52,6 +52,8 @@ abstract class DataMapper
   protected $_idType = self::ID_MANUAL;
   protected $_schemaType = self::SCHEMA_UNDERSCORE;
 
+  protected $_attributeType = '\Cubex\Data\Attribute';
+
   /**
    * Automatically add all public properties as attributes
    * and unset them for automatic handling of data
@@ -127,8 +129,12 @@ abstract class DataMapper
     return $this;
   }
 
-  protected function _buildAttributes($type = '\Cubex\Data\Attribute')
+  protected function _buildAttributes($type = null)
   {
+    if($type == null)
+    {
+      $type = $this->_attributeType;
+    }
     if($this->_autoTimestamp)
     {
       if(!$this->attributeExists($this->createdAttribute()))
