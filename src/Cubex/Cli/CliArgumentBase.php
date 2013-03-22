@@ -69,10 +69,13 @@ class CliArgumentBase implements Validatable, Filterable
   {
     if(!$this->isValid($data))
     {
-      throw new \Exception(
-        'Invalid value for option "' . $this->name . '": ' . $data . "\n  " .
-        implode("\n  ", $this->validationErrors())
-      );
+      $msg = 'Invalid value for option "' . $this->name . '": ' . $data;
+      $errors = $this->validationErrors();
+      if(count($errors) > 0)
+      {
+        $msg .= "\n       " . implode("\n       ", $errors);
+      }
+      throw new ArgumentException($msg);
     }
   }
 }
