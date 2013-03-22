@@ -16,22 +16,30 @@ abstract class CliCommand implements CliTask
    * @var Loader
    */
   protected $_loader;
-
   /**
    * @var \string[]
    */
   protected $_rawArgs;
-
   /**
-   * @var array
+   * @var CliArgument[]
    */
-  protected $_arguments;
-
+  protected $_options;
+  /**
+   * @var PositionalArgument[]
+   */
+  protected $_positionalArgs;
+  /**
+   * @var CliArgument[]
+   */
+  protected $_argsByName;
+  /**
+   * @var CliArgument[]
+   */
+  protected $_argsByShortName;
   /**
    * @var string[]
    */
-  protected $_positionalArgs;
-
+  protected $_rawPositionalArgs;
 
   /**
    * @param Loader   $loader
@@ -42,13 +50,27 @@ abstract class CliCommand implements CliTask
     $this->_loader  = $loader;
     $this->_rawArgs = $rawArgs;
 
+    $this->_argsByName      = [];
+    $this->_argsByShortName = [];
+
+    $this->_initArguments();
+
     if(in_array('--help', $this->_rawArgs))
     {
       $this->_help();
       die();
     }
 
-    $this->_parseArguments($this->_rawArgs);
+    try
+    {
+      $this->_parseArguments($this->_rawArgs);
+    }
+    catch(ArgumentException $e)
+    {
+      echo "\nERROR: " . $e->getMessage() . "\n";
+      $this->_help();
+      die();
+    }
   }
 
   /**
@@ -56,6 +78,42 @@ abstract class CliCommand implements CliTask
    */
   public function init()
   {
+  }
+
+  protected function _initArguments()
+  {
+    $args = $this->_argumentsList();
+
+    $seenArrayArg = false;
+    foreach($args as $arg)
+    {
+      if($arg instanceof PositionalArgument)
+      {
+        if($seenArrayArg)
+        {
+          throw new \Exception(
+            'No more positional arguments can be specified after an ArrayArgument'
+          );
+        }
+
+        $this->_positionalArgs[] = $arg;
+
+        if($arg instanceof ArrayArgument)
+        {
+          $seenArrayArg = true;
+        }
+      }
+      else
+      {
+        $this->_options[] = $arg;
+        if($arg->hasShortName())
+        {
+          $this->_argsByShortName[$arg->shortName] = $arg;
+        }
+      }
+
+      $this->_argsByName[$arg->name] = $arg;
+    }
   }
 
   /**
@@ -73,9 +131,34 @@ abstract class CliCommand implements CliTask
    */
   protected function _help()
   {
-    echo "\nUsage: " . $_REQUEST['__path__'] . " [arg]...\n\n";
+    $usage = "Usage: " . $_REQUEST['__path__'];
+    if(count($this->_options) > 0)
+    {
+      $usage .= " [option]...";
+    }
 
-    foreach($this->_argumentsList() as $arg)
+    if(count($this->_positionalArgs) > 0)
+    {
+      foreach($this->_positionalArgs as $arg)
+      {
+        if($arg->required)
+        {
+          $usage .= " " . $arg->name;
+        }
+        else
+        {
+          $usage .= " [" . $arg->name . "]";
+        }
+        if($arg instanceof ArrayArgument)
+        {
+          $usage .= "...";
+        }
+      }
+    }
+
+    echo "\n" . $usage . "\n\n";
+
+    foreach($this->_options as $arg)
     {
       $this->_showHelpArg($arg);
     }
@@ -130,22 +213,17 @@ abstract class CliCommand implements CliTask
    *
    * @param string[] $args The raw arguments passed to the command
    *
-   * @throws \Exception
+   * @throws ArgumentException
    */
   protected function _parseArguments($args)
   {
     // skip the script name argument
     array_shift($args);
 
-    if(count($args) == 0)
-    {
-      return;
-    }
-
     // Build arrays of option_name => value_option
     $shortOpts = [];
     $longOpts  = [];
-    foreach($this->_argumentsList() as $argObj)
+    foreach($this->_options as $argObj)
     {
       $longOpts[$argObj->longName] = $argObj->valueOption;
       if($argObj->hasShortName())
@@ -155,6 +233,8 @@ abstract class CliCommand implements CliTask
     }
 
     // First split up the arguments to allow for different syntax etc.
+    $maxPositionalArg = count($this->_positionalArgs) - 1;
+    $positionalArgNum = 0;
     while(count($args) > 0)
     {
       $argStr = array_shift($args);
@@ -196,7 +276,7 @@ abstract class CliCommand implements CliTask
               }
               else
               {
-                throw new \Exception('Argument --' . $argName . ' needs a value');
+                throw new ArgumentException('Argument --' . $argName . ' needs a value');
               }
             }
             else
@@ -204,11 +284,12 @@ abstract class CliCommand implements CliTask
               $thisValue = true;
             }
 
-            $this->_arguments[$argName] = $thisValue;
+            $argObj = $this->_getArgObjByName($argName, true);
+            $argObj->setData($thisValue);
           }
           else
           {
-            throw new \Exception('Unknown argument: --' . $argName);
+            throw new ArgumentException('Unknown argument: --' . $argName);
           }
         }
         else
@@ -245,7 +326,7 @@ abstract class CliCommand implements CliTask
                   }
                   else
                   {
-                    throw new \Exception('Argument -' . $thisArg . ' needs a value');
+                    throw new ArgumentException('Argument -' . $thisArg . ' needs a value');
                   }
                 }
               }
@@ -260,23 +341,63 @@ abstract class CliCommand implements CliTask
                 $argName = substr($argName, 1);
               }
 
-              $argObj                              = $this->_getArgObjByName(
+              $argObj = $this->_getArgObjByName(
                 $thisArg,
                 false
               );
-              $this->_arguments[$argObj->longName] = $thisValue;
+              $argObj->setData($thisValue);
             }
             else
             {
-              throw new \Exception('Unknown argument: -' . $thisArg);
+              throw new ArgumentException('Unknown argument: -' . $thisArg);
             }
           }
         }
       }
       else
       {
-        $this->_positionalArgs[] = $argStr;
+        $this->_rawPositionalArgs[] = $argStr;
+
+        if(($maxPositionalArg > -1) && ($positionalArgNum <= $maxPositionalArg))
+        {
+          $argObj = $this->_positionalArgs[$positionalArgNum];
+
+          if($argObj instanceof ArrayArgument)
+          {
+            $argObj->addData($argStr);
+          }
+          else
+          {
+            $argObj->setData($argStr);
+            $positionalArgNum++;
+          }
+        }
       }
+    }
+
+    // Check for missing required arguments
+    $missingArgs = [];
+    foreach($this->_options as $argObj)
+    {
+      if($argObj->required && (!$argObj->hasData()))
+      {
+        $missingArgs[] = '--' . $argObj->name;
+      }
+    }
+
+    foreach($this->_positionalArgs as $argObj)
+    {
+      if($argObj->required && (!$argObj->hasData()))
+      {
+        $missingArgs[] = $argObj->name;
+      }
+    }
+
+    if(count($missingArgs) > 0)
+    {
+      throw new ArgumentException(
+        'The following arguments are required: ' . implode(", ", $missingArgs)
+      );
     }
   }
 
@@ -286,24 +407,15 @@ abstract class CliCommand implements CliTask
    *
    * @return CliArgument|null
    */
-  protected function _getArgObjByName($name, $isLongName)
+  protected function _getArgObjByName($name, $isLongName = true)
   {
-    foreach($this->_argumentsList() as $arg)
+    if($isLongName && isset($this->_argsByName[$name]))
     {
-      if($isLongName)
-      {
-        if($arg->longName == $name)
-        {
-          return $arg;
-        }
-      }
-      else
-      {
-        if($arg->hasShortName() && ($arg->shortName == $name))
-        {
-          return $arg;
-        }
-      }
+      return $this->_argsByName[$name];
+    }
+    else if((!$isLongName) && isset($this->_argsByShortName[$name]))
+    {
+      return $this->_argsByShortName[$name];
     }
 
     return null;
@@ -312,13 +424,13 @@ abstract class CliCommand implements CliTask
   /**
    * Check if a command-line argument was provided
    *
-   * @param $longArgName The long name of the argument
+   * @param string $longArgName The long name of the argument
    *
    * @return bool
    */
   public function argumentIsSet($longArgName)
   {
-    return isset($this->_arguments[$longArgName]);
+    return $this->_getArgObjByName($longArgName, true)->hasData();
   }
 
   /**
@@ -337,21 +449,14 @@ abstract class CliCommand implements CliTask
       return $this->positionalArgValue($longArgName, $default);
     }
 
-    if(isset($this->_arguments[$longArgName]))
+    $argObj = $this->_getArgObjByName($longArgName, true);
+    if($argObj->hasData())
     {
-      return $this->_arguments[$longArgName];
+      return $argObj->getData();
     }
     else
     {
-      if($default === null)
-      {
-        $argObj = $this->_getArgObjByName($longArgName, true);
-        return $argObj->defaultValue;
-      }
-      else
-      {
-        return $default;
-      }
+      return $default === null ? $argObj->defaultValue : $default;
     }
   }
 
@@ -363,6 +468,14 @@ abstract class CliCommand implements CliTask
    */
   public function positionalArgValue($argNum, $default = null)
   {
-    return isset($this->_positionalArgs[$argNum]) ? $this->_positionalArgs[$argNum] : $default;
+    return isset($this->_rawPositionalArgs[$argNum]) ? $this->_rawPositionalArgs[$argNum] : $default;
+  }
+
+  /**
+   * @return int
+   */
+  public function positionalArgCount()
+  {
+    return count($this->_rawPositionalArgs);
   }
 }

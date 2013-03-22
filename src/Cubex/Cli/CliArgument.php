@@ -5,18 +5,16 @@
 
 namespace Cubex\Cli;
 
-class CliArgument
+class CliArgument extends CliArgumentBase
 {
   const VALUE_NONE     = 0;
   const VALUE_OPTIONAL = 1;
   const VALUE_REQUIRED = 2;
 
-  public $description;
   public $shortName;
   public $longName;
   public $valueOption;
   public $valueDescription;
-  public $defaultValue;
 
   /**
    * @param string $longName         The long argument name. Must only contain numbers, letters and hyphens.
@@ -24,6 +22,7 @@ class CliArgument
    * @param string $shortName        The short argument name. Must be a single letter.
    * @param int    $valueOption      Specify whether this argument needs a value
    * @param string $valueDescription The name of the value to show in the help
+   * @param bool   $required         True if this option is required
    * @param mixed  $defaultValue     The default value to use if this argument is not specified.
    *
    * @throws \Exception
@@ -31,7 +30,7 @@ class CliArgument
   public function __construct(
     $longName, $description, $shortName = "",
     $valueOption = CliArgument::VALUE_NONE, $valueDescription = "value",
-    $defaultValue = null
+    $required = false, $defaultValue = null
   )
   {
     if(!$this->_isValidLongName($longName))
@@ -44,12 +43,12 @@ class CliArgument
       throw new \Exception('Invalid short option name: ' . $shortName);
     }
 
+    parent::__construct($longName, $description, $required, $defaultValue);
+
     $this->longName         = $longName;
-    $this->description      = $description;
     $this->valueOption      = $valueOption;
     $this->shortName        = $shortName;
     $this->valueDescription = $valueDescription;
-    $this->defaultValue     = $defaultValue;
   }
 
   private function _isValidShortName($name)
