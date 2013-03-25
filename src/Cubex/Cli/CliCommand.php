@@ -201,7 +201,7 @@ abstract class CliCommand implements CliTask
     $text .= wordwrap(
       $arg->description,
       $descriptionWidth,
-    "\n" . str_repeat(" ", $labelWidth)
+      "\n" . str_repeat(" ", $labelWidth)
     );
 
     echo $text . "\n";

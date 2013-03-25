@@ -17,22 +17,24 @@ class CliArgument extends CliArgumentBase
   public $valueDescription;
 
   /**
-   * @param string $longName         The long argument name. Must only contain numbers, letters and hyphens.
-   * @param string $description      The description to show in the help
-   * @param string $shortName        The short argument name. Must be a single letter.
-   * @param int    $valueOption      Specify whether this argument needs a value
-   * @param string $valueDescription The name of the value to show in the help
-   * @param bool   $required         True if this option is required
-   * @param mixed  $defaultValue     The default value to use if this argument is not specified.
+   * @param string     $longName         The long argument name. Must only contain numbers, letters and hyphens.
+   * @param string     $description      The description to show in the help
+   * @param string     $shortName        The short argument name. Must be a single letter.
+   * @param int        $valueOption      Specify whether this argument needs a value
+   * @param string     $valueDescription The name of the value to show in the help
+   * @param bool       $required         True if this option is required
+   * @param mixed      $defaultValue     The default value to use if this argument is not specified.
+   * @param callable[] $validators       Validators to use on this argument's value
    *
    * @throws \Exception
    */
   public function __construct(
     $longName, $description, $shortName = "",
     $valueOption = CliArgument::VALUE_NONE, $valueDescription = "value",
-    $required = false, $defaultValue = null
+    $required = false, $defaultValue = null, $validators = []
   )
   {
+
     if(!$this->_isValidLongName($longName))
     {
       throw new \Exception('Invalid long option name: ' . $longName);
@@ -49,6 +51,15 @@ class CliArgument extends CliArgumentBase
     $this->valueOption      = $valueOption;
     $this->shortName        = $shortName;
     $this->valueDescription = $valueDescription;
+
+    if(!is_array($validators))
+    {
+      $validators = [$validators];
+    }
+    foreach($validators as $validator)
+    {
+      $this->addValidator($validator);
+    }
   }
 
   private function _isValidShortName($name)
