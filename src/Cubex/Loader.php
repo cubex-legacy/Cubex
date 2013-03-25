@@ -618,8 +618,12 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       $dictionary = new \Cubex\Cli\Dictionary();
       $dictionary->configure($this->_configuration);
 
-      $canLoadClass    = false;
-      $originalCommand = $command;
+      $canLoadClass = false;
+      list($originalCommand, $action) = explode(':', $command);
+      if($action === null)
+      {
+        $action = 'execute';
+      }
 
       $attempts = ['', $this->_namespace . '.', 'Bundl.', 'Cubex.'];
       foreach($attempts as $try)
@@ -650,7 +654,15 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
         if($obj instanceof CliTask)
         {
           $obj->init();
-          $result = $obj->execute();
+
+          if(!method_exists($obj, $action))
+          {
+            throw new \Exception(
+              "'$action' is not a valid method within $command"
+            );
+          }
+
+          $result = $obj->$action();
           if(is_numeric($result))
           {
             $this->_response->setStatusCode($result);
