@@ -5,7 +5,7 @@
 
 namespace Cubex\KvStore\Cassandra\DataType;
 
-class LongType
+class LongType extends CassandraType
 {
   public function pack($value)
   {

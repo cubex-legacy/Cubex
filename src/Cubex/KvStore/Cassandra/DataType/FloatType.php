@@ -5,15 +5,15 @@
 
 namespace Cubex\KvStore\Cassandra\DataType;
 
-class DoubleType extends CassandraType
+class FloatType extends CassandraType
 {
   public function pack($value)
   {
-    return pack("d", $value);
+    return pack("f", $value);
   }
 
   public function unpack($data)
   {
-    return array_shift(unpack("d", $data));
+    return array_shift(unpack("f", $data));
   }
 }
