@@ -5,6 +5,8 @@
 
 namespace Cubex\KvStore\Cassandra;
 
+use Cubex\KvStore\Cassandra\DataType\BytesType;
+use Cubex\KvStore\Cassandra\DataType\CassandraType;
 use Thrift\Exception\TApplicationException;
 use cassandra\AuthenticationException;
 use cassandra\AuthorizationException;
@@ -37,11 +39,61 @@ class ColumnFamily
   protected $_cqlVersion = 3;
   protected $_returnAttribute = true;
 
+  /**
+   * @var DataType\BytesType
+   */
+  protected $_keyDataType;
+  /**
+   * @var DataType\BytesType
+   */
+  protected $_columnDataType;
+
   public function __construct(Connection $connection, $name, $keyspace)
   {
-    $this->_connection = $connection;
-    $this->_name       = $name;
-    $this->_keyspace   = $keyspace;
+    $this->_keyDataType    = new BytesType();
+    $this->_columnDataType = new BytesType();
+    $this->_connection     = $connection;
+    $this->_name           = $name;
+    $this->_keyspace       = $keyspace;
+  }
+
+  public function setKeyDataType(CassandraType $type)
+  {
+    $this->_keyDataType = $type;
+    return $this;
+  }
+
+  public function keyDataType()
+  {
+    return $this->_keyDataType;
+  }
+
+  public function columnDataType()
+  {
+    return $this->_keyDataType;
+  }
+
+  /**
+   * @param CassandraType $dataType
+   * @param               $keys
+   *
+   * @return mixed
+   */
+  public function prepareDataType(CassandraType $dataType, $keys)
+  {
+    if(!is_array($keys))
+    {
+      return $dataType->pack($keys);
+    }
+    else
+    {
+      $return = [];
+      foreach($keys as $key)
+      {
+        $return[] = $dataType->pack($key);
+      }
+      return $return;
+    }
   }
 
   public function setReturnAttribute($bool = true)
@@ -133,10 +185,12 @@ class ColumnFamily
     {
       if(is_array($key))
       {
+        $key = $this->prepareDataType($this->keyDataType(), $key);
         return $this->_client()->multiget_count($key, $parent, $slice, $level);
       }
       else
       {
+        $key = $this->prepareDataType($this->keyDataType(), $key);
         return $this->_client()->get_count($key, $parent, $slice, $level);
       }
     }
@@ -157,6 +211,8 @@ class ColumnFamily
 
   public function get($key, array $columns)
   {
+    $key = $this->prepareDataType($this->keyDataType(), $key);
+
     $result = null;
     $level  = $this->consistencyLevel();
 
@@ -204,6 +260,7 @@ class ColumnFamily
   {
     $result = null;
 
+    $key   = $this->prepareDataType($this->keyDataType(), $key);
     $level = $this->consistencyLevel();
     $range = $this->makeSlice($start, $finish, $reverse, $limit);
     $slice = new SlicePredicate(['slice_range' => $range]);
@@ -229,6 +286,7 @@ class ColumnFamily
   )
   {
     $result = null;
+    $keys   = $this->prepareDataType($this->keyDataType(), $keys);
 
     $level = $this->consistencyLevel();
     $range = $this->makeSlice($start, $finish, $reverse, $limit);
@@ -290,6 +348,7 @@ class ColumnFamily
 
   public function multiGet(array $keys, array $columns = null)
   {
+    $keys   = $this->prepareDataType($this->keyDataType(), $keys);
     $result = null;
     $level  = $this->consistencyLevel();
     $parent = $this->_columnParent();
@@ -403,6 +462,8 @@ class ColumnFamily
 
   public function insert($key, array $columns, $expiry = null)
   {
+    $key = $this->prepareDataType($this->keyDataType(), $key);
+
     $mutationMap = $mutations = [];
     $column      = null;
     $level       = $this->consistencyLevel();
@@ -411,7 +472,7 @@ class ColumnFamily
     foreach($columns as $columnName => $columnValue)
     {
       $column            = new Column();
-      $column->name      = $columnName;
+      $column->name      = $this->columnDataType()->pack($columnName);
       $column->value     = $columnValue;
       $column->ttl       = $expiry;
       $column->timestamp = $this->timestamp();
@@ -438,6 +499,7 @@ class ColumnFamily
 
   public function remove($key, array $columns = null, $timestamp = null)
   {
+    $key = $this->prepareDataType($this->keyDataType(), $key);
     $this->_remove($key, null, $columns, $timestamp);
   }
 
@@ -449,6 +511,7 @@ class ColumnFamily
     {
       return null;
     }
+    $keys = $this->prepareDataType($this->keyDataType(), $keys);
 
     if(!is_array($keys))
     {
@@ -515,6 +578,7 @@ class ColumnFamily
 
   public function incement($key, $column, $incement = 1)
   {
+    $key            = $this->keyDataType()->pack($key);
     $level          = $this->consistencyLevel();
     $parent         = $this->_columnParent();
     $counter        = new CounterColumn();
@@ -525,6 +589,7 @@ class ColumnFamily
 
   public function decrement($key, $column, $decrement = 1)
   {
+    $key            = $this->keyDataType()->pack($key);
     $level          = $this->consistencyLevel();
     $parent         = $this->_columnParent();
     $counter        = new CounterColumn();
@@ -535,6 +600,7 @@ class ColumnFamily
 
   public function removeCounter($key, $column)
   {
+    $key          = $this->keyDataType()->pack($key);
     $level        = $this->consistencyLevel();
     $path         = $this->_columnPath();
     $path->column = $column;
