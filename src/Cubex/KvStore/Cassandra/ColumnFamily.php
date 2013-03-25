@@ -62,6 +62,7 @@ class ColumnFamily
     $this->_keyDataType = $type;
     return $this;
   }
+
   public function setColumnDataType(CassandraType $type)
   {
     $this->_columnDataType = $type;
@@ -491,21 +492,35 @@ class ColumnFamily
       );
     }
 
-    if(count($columns) === 1 && $column instanceof Column)
+    try
     {
-      $this->_client()->insert($key, $parent, $column, $level);
+      if(count($columns) === 1 && $column instanceof Column)
+      {
+        $this->_client()->insert($key, $parent, $column, $level);
+      }
+      else
+      {
+        $mutationMap[$key][$this->name()] = $mutations;
+        $this->_client()->batch_mutate($mutationMap, $level);
+      }
     }
-    else
+    catch(\Exception $e)
     {
-      $mutationMap[$key][$this->name()] = $mutations;
-      $this->_client()->batch_mutate($mutationMap, $level);
+      throw $this->formException($e);
     }
   }
 
   public function remove($key, array $columns = null, $timestamp = null)
   {
     $key = $this->prepareDataType($this->keyDataType(), $key);
-    $this->_remove($key, null, $columns, $timestamp);
+    try
+    {
+      $this->_remove($key, null, $columns, $timestamp);
+    }
+    catch(\Exception $e)
+    {
+      throw $this->formException($e);
+    }
   }
 
   protected function _remove(
@@ -536,41 +551,50 @@ class ColumnFamily
       $timestamp = $this->timestamp();
     }
 
-    if($numKeys == 1 && $columns === null)
+    try
     {
-      foreach($keys as $key)
+      if($numKeys == 1 && $columns === null)
       {
-        $this->_client()->remove($key, $path, $timestamp, $level);
+        foreach($keys as $key)
+        {
+          $this->_client()->remove($key, $path, $timestamp, $level);
+        }
       }
-    }
-    else if($numKeys == 1 && count($columns) == 1)
-    {
-      $path->column = head($columns);
-      foreach($keys as $key)
+      else if($numKeys == 1 && count($columns) == 1)
       {
-        $this->_client()->remove($key, $path, $timestamp, $level);
+        $path->column = head($columns);
+        foreach($keys as $key)
+        {
+          $this->_client()->remove($key, $path, $timestamp, $level);
+        }
       }
-    }
-    else
-    {
-      $deletion = new Deletion(['timestamp' => $timestamp]);
-      if($superColumn !== null)
+      else
       {
-        $sc            = 'super_column';
-        $deletion->$sc = $superColumn;
-      }
-      if($columns !== null)
-      {
-        $deletion->predicate = new SlicePredicate(['column_names' => $columns]);
-      }
-      $mutations   = [new Mutation(['deletion' => $deletion])];
-      $mutationMap = [];
+        $deletion = new Deletion(['timestamp' => $timestamp]);
+        if($superColumn !== null)
+        {
+          $sc            = 'super_column';
+          $deletion->$sc = $superColumn;
+        }
+        if($columns !== null)
+        {
+          $deletion->predicate = new SlicePredicate(
+            ['column_names' => $columns]
+          );
+        }
+        $mutations   = [new Mutation(['deletion' => $deletion])];
+        $mutationMap = [];
 
-      foreach($keys as $key)
-      {
-        $mutationMap[$key][$this->name()] = $mutations;
+        foreach($keys as $key)
+        {
+          $mutationMap[$key][$this->name()] = $mutations;
+        }
+        $this->_client()->batch_mutate($mutationMap, $level);
       }
-      $this->_client()->batch_mutate($mutationMap, $level);
+    }
+    catch(\Exception $e)
+    {
+      throw $this->formException($e);
     }
   }
 
@@ -589,7 +613,14 @@ class ColumnFamily
     $counter        = new CounterColumn();
     $counter->value = abs($incement);
     $counter->name  = $column;
-    $this->_client()->add($key, $parent, $counter, $level);
+    try
+    {
+      $this->_client()->add($key, $parent, $counter, $level);
+    }
+    catch(\Exception $e)
+    {
+      throw $this->formException($e);
+    }
   }
 
   public function decrement($key, $column, $decrement = 1)
@@ -600,7 +631,14 @@ class ColumnFamily
     $counter        = new CounterColumn();
     $counter->value = abs($decrement) * -1;
     $counter->name  = $column;
-    $this->_client()->add($key, $parent, $counter, $level);
+    try
+    {
+      $this->_client()->add($key, $parent, $counter, $level);
+    }
+    catch(\Exception $e)
+    {
+      throw $this->formException($e);
+    }
   }
 
   public function removeCounter($key, $column)
@@ -609,7 +647,14 @@ class ColumnFamily
     $level        = $this->consistencyLevel();
     $path         = $this->_columnPath();
     $path->column = $column;
-    $this->_client()->remove_counter($key, $path, $level);
+    try
+    {
+      $this->_client()->remove_counter($key, $path, $level);
+    }
+    catch(\Exception $e)
+    {
+      throw $this->formException($e);
+    }
   }
 
   public function runQuery($query, $compression = Compression::NONE)
