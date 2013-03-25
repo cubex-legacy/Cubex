@@ -62,6 +62,11 @@ class ColumnFamily
     $this->_keyDataType = $type;
     return $this;
   }
+  public function setColumnDataType(CassandraType $type)
+  {
+    $this->_columnDataType = $type;
+    return $this;
+  }
 
   public function keyDataType()
   {
@@ -70,7 +75,7 @@ class ColumnFamily
 
   public function columnDataType()
   {
-    return $this->_keyDataType;
+    return $this->_columnDataType;
   }
 
   /**
