@@ -22,12 +22,17 @@ class StdEvent implements Event
    * @var Boolean Whether no further event listeners should be triggered
    */
   protected $_propagationStopped = false;
+  /**
+   * @var float Time event created
+   */
+  protected $_eventTime;
 
   public function __construct($name, array $args = array(), $source = null)
   {
-    $this->_name   = $name;
-    $this->_data   = $args;
-    $this->_source = $source;
+    $this->_name      = $name;
+    $this->_data      = $args;
+    $this->_source    = $source;
+    $this->_eventTime = microtime(true);
   }
 
   /**
@@ -95,5 +100,13 @@ class StdEvent implements Event
   public function source()
   {
     return $this->_source;
+  }
+
+  /**
+   * @return float Event Trigger Time (microtime(true))
+   */
+  public function eventTime()
+  {
+    return $this->_eventTime;
   }
 }
