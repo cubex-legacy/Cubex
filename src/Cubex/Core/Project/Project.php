@@ -183,7 +183,7 @@ abstract class Project
     return $this;
   }
 
-  public function _configure()
+  protected function _configure()
   {
     return $this;
   }
