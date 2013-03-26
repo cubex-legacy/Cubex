@@ -72,21 +72,37 @@ class PivotMapper extends RecordMapper
       $eClass = strtolower(class_shortname($pivotb));
 
       $sT     = $pivota->getTableName();
-      $prefix = strip_start($sT, $class . 's_');
+      $prefix = strrev(
+        strip_start(strrev($sT), strrev(Inflection::pluralise($class)))
+      );
       $prefix = trim($prefix, '_');
 
       if($eClass > $class)
       {
-        $table = implode('_', [$prefix, $class . 's', $eClass]);
+        $table = implode(
+          '_',
+          [
+          $prefix,
+          Inflection::pluralise($class),
+          Inflection::pluralise($eClass)
+          ]
+        );
       }
       else
       {
-        $table = implode('_', [$prefix, $eClass . 's', $class]);
+        $table = implode(
+          '_',
+          [
+          $prefix,
+          Inflection::pluralise($eClass),
+          Inflection::pluralise($class)
+          ]
+        );
       }
 
       $table = ltrim($table, '_');
 
-      $this->setTableName(Inflection::pluralise($table));
+      $this->setTableName($table);
     }
 
     $foreignKey = $pivotb->stringToColumnName($pivotb->remoteIdKey());
