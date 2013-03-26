@@ -156,9 +156,12 @@ abstract class DataMapper
       if(!$this->attributeExists($property))
       {
         $default = $p->getValue($this);
-        $this->_addReflectedAttribute(
-          new $type($property, false, null, $default)
-        );
+        $attr    = new $type($property, false, null, $default);
+        /**
+         * @var $attr Attribute
+         */
+        $attr->setSourcePropertyName($propName);
+        $this->_addReflectedAttribute($attr);
         $this->_attribute($property)->setDefault($default);
       }
       unset($this->$propName);

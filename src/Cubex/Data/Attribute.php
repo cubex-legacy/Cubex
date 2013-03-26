@@ -21,6 +21,7 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
   const SERIALIZATION_PHP  = 'php';
 
   protected $_id;
+  protected $_sourceProperty;
   protected $_default;
   protected $_modified;
   protected $_serializer;
@@ -47,6 +48,24 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
     $this->setOptions($options);
     $this->setSerializer($serializer);
     $this->_modified = false;
+  }
+
+  public function setSourcePropertyName($name)
+  {
+    $this->_sourceProperty = $name;
+    return $this;
+  }
+
+  public function sourceProperty()
+  {
+    if($this->_sourceProperty === null)
+    {
+      return $this->name();
+    }
+    else
+    {
+      return $this->_sourceProperty;
+    }
   }
 
   public function __toString()

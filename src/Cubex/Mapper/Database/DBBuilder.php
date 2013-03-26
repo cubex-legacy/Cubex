@@ -129,7 +129,9 @@ class DBBuilder
     $annotation = [];
     try
     {
-      $comment = $this->_reflect->getProperty($attr->name())->getDocComment();
+      $comment = $this->_reflect->getProperty(
+        $attr->sourceProperty()
+      )->getDocComment();
       if(!empty($comment))
       {
         $comments = $this->_docExplosion($comment);
