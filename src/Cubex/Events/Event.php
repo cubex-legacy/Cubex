@@ -56,4 +56,9 @@ interface Event extends HandlerInterface
    * @return object|string|null
    */
   public function source();
+
+  /**
+   * @return float Event Trigger Time (microtime(true))
+   */
+  public function eventTime();
 }
