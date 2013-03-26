@@ -204,7 +204,8 @@ class DBBuilder
           case 'enumclass':
             if(class_exists($v))
             {
-              $options = new $v;
+              $options  = new $v;
+              $dataType = DataType::ENUM;
             }
             break;
           case 'length':
