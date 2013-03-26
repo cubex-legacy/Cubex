@@ -181,11 +181,11 @@ class DBBuilder
       $options  = 10;
       $unsigned = true;
     }
-    else if(substr($uname, -3) == '_at')
+    else if(substr($uname, -3) == '_at' || substr($uname, -5) == '_time')
     {
       $dataType = DataType::DATETIME;
     }
-    else if(substr($uname, -3) == '_on')
+    else if(substr($uname, -3) == '_on' || substr($uname, -5) == '_date')
     {
       $dataType = DataType::DATE;
     }
