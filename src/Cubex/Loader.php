@@ -625,7 +625,13 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
         $action = 'execute';
       }
 
-      $attempts = ['', $this->_namespace . '.', 'Bundl.', 'Cubex.'];
+      $attempts = [
+        '',
+        $this->_namespace . '.',
+        $this->_namespace . '.Cli.',
+        'Bundl.',
+        'Cubex.'
+      ];
       foreach($attempts as $try)
       {
         $command      = $try . $originalCommand;
