@@ -93,9 +93,9 @@ class Dispatcher
     $this->_domainMap           = $dispatchConfig->getArr("domain_map", []);
     $this->_buildOptions        = array_merge(
       [
-        self::BUILD_OPT_FORCE_SECURE => false,
-        self::BUILD_OPT_TYPE         => self::BUILD_OPT_TYPE_PATH,
-        self::BUILD_OPT_PATTERN      => "res"
+      self::BUILD_OPT_FORCE_SECURE => false,
+      self::BUILD_OPT_TYPE         => self::BUILD_OPT_TYPE_PATH,
+      self::BUILD_OPT_PATTERN      => "res"
       ],
       $dispatchConfig->getArr("build_options", [])
     );
@@ -430,6 +430,10 @@ class Dispatcher
     if(file_exists($path))
     {
       $dispatchIni = parse_ini_file($path, false);
+      if($dispatchIni === null)
+      {
+        $dispatchIni = parse_ini_string(file_get_contents($path), false);
+      }
       if($dispatchIni === false)
       {
         $dispatchIni = [];
@@ -735,7 +739,7 @@ class Dispatcher
   }
 
   /**
-   * @param Path $path
+   * @param Path                     $path
    * @param \Cubex\Core\Http\Request $request
    *
    * @return string
