@@ -47,14 +47,20 @@ class ColumnFamily
    * @var DataType\BytesType
    */
   protected $_columnDataType;
+  /**
+   * @var DataType\BytesType
+   */
+  protected $_subColumnDataType;
 
   public function __construct(Connection $connection, $name, $keyspace)
   {
-    $this->_keyDataType    = new BytesType();
-    $this->_columnDataType = new BytesType();
-    $this->_connection     = $connection;
-    $this->_name           = $name;
-    $this->_keyspace       = $keyspace;
+    $bytesType                = new BytesType();
+    $this->_keyDataType       = $bytesType;
+    $this->_columnDataType    = $bytesType;
+    $this->_subColumnDataType = $bytesType;
+    $this->_connection        = $connection;
+    $this->_name              = $name;
+    $this->_keyspace          = $keyspace;
   }
 
   public function setKeyDataType(CassandraType $type)
@@ -69,14 +75,27 @@ class ColumnFamily
     return $this;
   }
 
+  public function setSubColumnDataType(CassandraType $type)
+  {
+    $this->_subColumnDataType = $type;
+    return $this;
+  }
+
   public function keyDataType()
   {
     return $this->_keyDataType;
   }
 
-  public function columnDataType()
+  public function columnDataType($subColumn = false)
   {
-    return $this->_columnDataType;
+    if($subColumn)
+    {
+      return $this->_subColumnDataType;
+    }
+    else
+    {
+      return $this->_columnDataType;
+    }
   }
 
   /**
@@ -728,6 +747,9 @@ class ColumnFamily
 
     if($input->column instanceof Column)
     {
+      $input->column->name = $this->columnDataType()->unpack(
+        $input->column->name
+      );
       if($this->returnAttribute())
       {
         $column = new ColumnAttribute($input->column->name);
@@ -742,6 +764,9 @@ class ColumnFamily
     }
     else if($input->$counterCol instanceof CounterColumn)
     {
+      $input->$counterCol->name = $this->columnDataType()->unpack(
+        $input->$counterCol->name
+      );
       if($this->returnAttribute())
       {
         $column = new ColumnAttribute($input->$counterCol->name);
@@ -755,10 +780,14 @@ class ColumnFamily
     }
     else if($input->$superCol instanceof SuperColumn)
     {
-      $column = new ColumnAttribute($input->$superCol->name);
-      $cols   = [];
+      $input->$superCol->name = $this->columnDataType()->unpack(
+        $input->$superCol->name
+      );
+      $column                 = new ColumnAttribute($input->$superCol->name);
+      $cols                   = [];
       foreach($input->$superCol->columns as $col)
       {
+        $col->name = $this->columnDataType(true)->unpack($col->name);
         if($this->returnAttribute())
         {
           $subCol = new ColumnAttribute($col->name);
