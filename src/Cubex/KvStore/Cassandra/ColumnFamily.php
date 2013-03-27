@@ -106,7 +106,11 @@ class ColumnFamily
    */
   public function prepareDataType(CassandraType $dataType, $keys)
   {
-    if(!is_array($keys))
+    if($keys === null)
+    {
+      return null;
+    }
+    else if(!is_array($keys))
     {
       return $dataType->pack($keys);
     }
@@ -236,7 +240,8 @@ class ColumnFamily
 
   public function get($key, array $columns)
   {
-    $key = $this->prepareDataType($this->keyDataType(), $key);
+    $key     = $this->prepareDataType($this->keyDataType(), $key);
+    $columns = $this->prepareDataType($this->columnDataType(), $columns);
 
     $result = null;
     $level  = $this->consistencyLevel();
@@ -373,11 +378,12 @@ class ColumnFamily
 
   public function multiGet(array $keys, array $columns = null)
   {
-    $keys   = $this->prepareDataType($this->keyDataType(), $keys);
-    $result = null;
-    $level  = $this->consistencyLevel();
-    $parent = $this->_columnParent();
-    $slice  = new SlicePredicate(['column_names' => $columns]);
+    $keys    = $this->prepareDataType($this->keyDataType(), $keys);
+    $columns = $this->prepareDataType($this->columnDataType(), $columns);
+    $result  = null;
+    $level   = $this->consistencyLevel();
+    $parent  = $this->_columnParent();
+    $slice   = new SlicePredicate(['column_names' => $columns]);
 
     try
     {
@@ -531,7 +537,6 @@ class ColumnFamily
 
   public function remove($key, array $columns = null, $timestamp = null)
   {
-    $key = $this->prepareDataType($this->keyDataType(), $key);
     try
     {
       $this->_remove($key, null, $columns, $timestamp);
@@ -550,7 +555,16 @@ class ColumnFamily
     {
       return null;
     }
-    $keys = $this->prepareDataType($this->keyDataType(), $keys);
+
+    $keys        = $this->prepareDataType($this->keyDataType(), $keys);
+    $superColumn = $this->prepareDataType(
+      $this->columnDataType(),
+      $superColumn
+    );
+    $columns     = $this->prepareDataType(
+      $this->columnDataType($superColumn !== null),
+      $columns
+    );
 
     if(!is_array($keys))
     {
@@ -631,7 +645,7 @@ class ColumnFamily
     $parent         = $this->_columnParent();
     $counter        = new CounterColumn();
     $counter->value = abs($incement);
-    $counter->name  = $column;
+    $counter->name  = $this->prepareDataType($this->columnDataType(), $column);
     try
     {
       $this->_client()->add($key, $parent, $counter, $level);
@@ -649,7 +663,7 @@ class ColumnFamily
     $parent         = $this->_columnParent();
     $counter        = new CounterColumn();
     $counter->value = abs($decrement) * -1;
-    $counter->name  = $column;
+    $counter->name  = $this->prepareDataType($this->columnDataType(), $column);
     try
     {
       $this->_client()->add($key, $parent, $counter, $level);
@@ -665,7 +679,7 @@ class ColumnFamily
     $key          = $this->keyDataType()->pack($key);
     $level        = $this->consistencyLevel();
     $path         = $this->_columnPath();
-    $path->column = $column;
+    $path->column = $this->prepareDataType($this->columnDataType(), $column);
     try
     {
       $this->_client()->remove_counter($key, $path, $level);
