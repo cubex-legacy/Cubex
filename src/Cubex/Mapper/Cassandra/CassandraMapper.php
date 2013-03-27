@@ -8,6 +8,7 @@ namespace Cubex\Mapper\Cassandra;
 use Cubex\Data\Attribute;
 use Cubex\Facade\Cassandra;
 use Cubex\KvStore\Cassandra\ColumnAttribute;
+use Cubex\KvStore\Cassandra\DataType\CassandraType;
 use Cubex\Mapper\KeyValue\KvMapper;
 
 class CassandraMapper extends KvMapper
@@ -110,5 +111,23 @@ class CassandraMapper extends KvMapper
     {
       return false;
     }
+  }
+
+  protected function _setColumnDataType(CassandraType $type)
+  {
+    $this->getCf()->setColumnDataType($type);
+    return $this;
+  }
+
+  protected function _setSubColumnDataType(CassandraType $type)
+  {
+    $this->getCf()->setSubColumnDataType($type);
+    return $this;
+  }
+
+  protected function _setKeyDataType(CassandraType $type)
+  {
+    $this->getCf()->setKeyDataType($type);
+    return $this;
   }
 }
