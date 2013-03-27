@@ -5,11 +5,9 @@
 
 namespace Cubex\KvStore\Cassandra;
 
-use Thrift\Exception\TException;
-
 class CassandraException extends \Exception
 {
-  public function __construct($msg = "", $code = 0, TException $previous = null)
+  public function __construct($msg = "", $code = 0, \Exception $previous = null)
   {
     if($previous !== null)
     {
