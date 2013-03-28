@@ -8,7 +8,7 @@ use Cubex\Container\Container;
 use Cubex\Dispatch\Dependency\Image;
 use Cubex\Dispatch\Dependency\Resource;
 use Cubex\Dispatch\Event;
-use Cubex\Dispatch\FileSystem;
+use Cubex\FileSystem\FileSystem;
 use Cubex\Events\EventManager;
 
 trait ListenerTrait

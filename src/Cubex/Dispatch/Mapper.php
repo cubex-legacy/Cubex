@@ -5,6 +5,7 @@
 namespace Cubex\Dispatch;
 
 use Cubex\Container\Container;
+use Cubex\FileSystem\FileSystem;
 use Cubex\Foundation\Config\ConfigGroup;
 
 class Mapper extends Dispatcher
@@ -20,6 +21,10 @@ class Mapper extends Dispatcher
   private $_configLines = [];
   private $_externalProjects = [];
 
+  /**
+   * @param ConfigGroup                   $configGroup
+   * @param \Cubex\FileSystem\FileSystem  $fileSystem
+   */
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
     parent::__construct($configGroup, $fileSystem);

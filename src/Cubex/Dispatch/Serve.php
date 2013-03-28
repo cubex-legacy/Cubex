@@ -4,6 +4,7 @@
  */
 namespace Cubex\Dispatch;
 
+use Cubex\FileSystem\FileSystem;
 use Cubex\Core\Http\Dispatchable;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
@@ -21,7 +22,7 @@ class Serve extends Dispatcher implements Dispatchable
 
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
-   * @param FileSystem                           $fileSystem
+   * @param \Cubex\FileSystem\FileSystem         $fileSystem
    * @param Path                                 $dispatchPath
    */
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem,

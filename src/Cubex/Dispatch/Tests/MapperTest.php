@@ -4,7 +4,7 @@
  */
 namespace Cubex\Dispatch\Tests;
 
-use Cubex\Dispatch\FileSystem;
+use Cubex\FileSystem\FileSystem;
 use Cubex\Dispatch\Mapper;
 use Cubex\Tests\TestCase;
 use Cubex\Container\Container;
@@ -24,7 +24,7 @@ class MapperTest extends TestCase
   public function testFindEntities()
   {
     $fileSystemMock = $this->getMock(
-      "\\Cubex\\Dispatch\\FileSystem",
+      "\\Cubex\\FileSystem\\FileSystem",
       ["isDir", "listDirectory"]
     );
 
@@ -64,7 +64,7 @@ class MapperTest extends TestCase
     ];
 
     $fileSystemMock = $this->getMock(
-      "\\Cubex\\Dispatch\\FileSystem",
+      "\\Cubex\\FileSystem\\FileSystem",
       ["listDirectory", "isDir", "fileExists", "readFile"]
     );
 

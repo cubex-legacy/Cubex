@@ -4,7 +4,7 @@
  */
 namespace Cubex\Dispatch\Mapper;
 
-use Cubex\Dispatch\FileSystem;
+use Cubex\FileSystem\FileSystem;
 use Cubex\Loader;
 
 class CliInit

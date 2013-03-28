@@ -5,7 +5,7 @@
 namespace Cubex\Dispatch\Tests;
 
 use Cubex\Dispatch\Dispatcher;
-use Cubex\Dispatch\FileSystem;
+use Cubex\FileSystem\FileSystem;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Tests\TestCase;
 
@@ -135,7 +135,7 @@ class DispatcherTest extends TestCase
   public function testGetFileMerge()
   {
     $fileSystemMock = $this->getMock(
-      "\\Cubex\\Dispatch\\FileSystem",
+      "\\Cubex\\FileSystem\\FileSystem",
       ["fileExists", "readFile"]
     );
     $fileSystemMock->expects($this->exactly(3))
@@ -152,7 +152,7 @@ class DispatcherTest extends TestCase
     // Here we replicate an exception being thrown by the file system object
     // caused by a file not existing or unable to be read
     $fileSystemMock = $this->getMock(
-      "\\Cubex\\Dispatch\\FileSystem",
+      "\\Cubex\\FileSystem\\FileSystem",
       ["fileExists", "readFile"]
     );
     $fileSystemMock->expects($this->exactly(3))

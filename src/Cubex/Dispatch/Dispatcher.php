@@ -5,6 +5,7 @@
 namespace Cubex\Dispatch;
 
 use Cubex\Container\Container;
+use Cubex\FileSystem\FileSystem;
 use Cubex\Core\Http\Request;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Foundation\Config\Config;
@@ -65,7 +66,7 @@ class Dispatcher
 
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
-   * @param FileSystem                           $fileSystem
+   * @param \Cubex\FileSystem\FileSystem         $fileSystem
    */
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {

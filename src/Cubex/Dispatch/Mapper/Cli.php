@@ -5,7 +5,7 @@
 namespace Cubex\Dispatch\Mapper;
 
 use Cubex\Cli\Shell;
-use Cubex\Dispatch\FileSystem;
+use Cubex\FileSystem\FileSystem;
 use Cubex\Dispatch\Mapper;
 use Cubex\Foundation\Config\ConfigGroup;
 

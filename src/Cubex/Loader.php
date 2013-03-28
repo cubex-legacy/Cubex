@@ -325,7 +325,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
     if($pathEnd === "ico")
     {
       $dispatchImage = new \Cubex\Dispatch\Dependency\Image(
-        $this->getConfig(), new \Cubex\Dispatch\FileSystem()
+        $this->getConfig(), new \Cubex\FileSystem\FileSystem()
       );
       $faviconPath   = $dispatchImage->getFaviconPath(
         $this->request()->path(),
@@ -339,7 +339,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       $dispatchPath  = new \Cubex\Dispatch\Path($this->request()->path());
       $dispatchServe = new \Cubex\Dispatch\Serve(
         $this->getConfig(),
-        new \Cubex\Dispatch\FileSystem(),
+        new \Cubex\FileSystem\FileSystem(),
         $dispatchPath
       );
 
