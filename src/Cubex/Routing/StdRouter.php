@@ -121,21 +121,26 @@ class StdRouter implements Router
         return false;
       }
     }
+
     $routePattern = $route->pattern();
-    $appendEnd    = substr($routePattern, -1) == '$';
+    $routePattern = ltrim($routePattern, "^");
+    $routePattern = rtrim($routePattern, "$");
+
     if($routePattern == '$')
     {
       $routePattern = '/$';
     }
 
-    if(!$appendEnd && substr($pattern, -1) !== '/')
+    if(substr($pattern, -1) !== '/')
     {
       $pattern = $pattern . '/';
     }
-    if(!$appendEnd && substr($routePattern, -1) !== '/')
+
+    if(substr($routePattern, -1) !== '/')
     {
       $routePattern = $routePattern . '/?';
     }
+
     if(substr($routePattern, 0, 1) !== '/')
     {
       $routePattern = '/' . $routePattern;
@@ -143,12 +148,12 @@ class StdRouter implements Router
 
     $matchedOn = 1;
     $matches   = array();
-    $match     = preg_match("#^$routePattern#", $pattern, $matches);
+    $match     = preg_match("#^$routePattern$#", $pattern, $matches);
 
     if(!$match)
     {
       $routePattern = $this->convertSimpleRoute($routePattern);
-      $match        = preg_match("#^$routePattern#", $pattern, $matches);
+      $match        = preg_match("#^$routePattern$#", $pattern, $matches);
       $matchedOn    = 2;
     }
 
