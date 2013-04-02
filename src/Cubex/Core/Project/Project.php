@@ -134,11 +134,7 @@ abstract class Project
     $this->_request  = $request;
     $this->_response = $response;
 
-    $this->init();
-    $this->_configure();
-
-    $this->addDefaultBundles();
-    $this->initialiseBundles();
+    $this->prepareProject();
 
     $app = $this->getApplication($request);
     $app->setServiceManager($this->getServiceManager());
@@ -157,6 +153,15 @@ abstract class Project
     $this->shutdownBundles();
 
     return $return;
+  }
+
+  public function prepareProject()
+  {
+    $this->init();
+    $this->_configure();
+    $this->addDefaultBundles();
+    $this->initialiseBundles();
+    return $this;
   }
 
   /**

@@ -6,6 +6,7 @@ namespace Cubex;
 
 use Cubex\Cli\CliTask;
 use Cubex\Core\Http\DispatchInjection;
+use Cubex\Core\Project\Project;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
@@ -371,13 +372,8 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
 
   public function presumeDispatchable()
   {
-    $dispatch = $this->_namespace . '\Project';
-    if(substr($dispatch, 0, 1) != '\\')
-    {
-      $dispatch = '\\' . $dispatch;
-    }
-
-    if(class_exists($dispatch))
+    $dispatch = $this->getMainProjectClass();
+    if($dispatch !== null)
     {
       $dispatch = new $dispatch;
       if($dispatch instanceof Dispatchable)
@@ -388,10 +384,25 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
 
     if($this->_dispatcher === null)
     {
-      $this->_dispatcher = $dispatch;
+      $this->_dispatcher = $this->getMainProjectClass(true);
     }
 
     return null;
+  }
+
+  public function getMainProjectClass($classOnly = false)
+  {
+    $dispatch = $this->_namespace . '\Project';
+    if(substr($dispatch, 0, 1) != '\\')
+    {
+      $dispatch = '\\' . $dispatch;
+    }
+
+    if(class_exists($dispatch))
+    {
+      return $dispatch;
+    }
+    return $classOnly ? $dispatch : null;
   }
 
   /**
@@ -581,7 +592,9 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
    *
    * @param array $args
    *
-   * @return \Cubex\Core\Http\Response
+   * @return Response
+   * @throws \RuntimeException
+   * @throws \Exception
    */
   public function respondToCliRequest(array $args)
   {
@@ -643,6 +656,16 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
 
       if($canLoadClass)
       {
+        $projectClass = $this->getMainProjectClass();
+        if($projectClass !== null)
+        {
+          $project = new $projectClass;
+          if($project instanceof Project)
+          {
+            $project->prepareProject();
+          }
+        }
+
         $obj = new $command($this, $args);
 
         if($obj instanceof Configurable)
