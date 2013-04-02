@@ -17,7 +17,16 @@ class RenderGroup implements Renderable
 
   public function __construct()
   {
-    foreach(func_get_args() as $arg)
+    if(func_num_args() === 1 && is_array(func_get_arg(0)))
+    {
+      $args = func_get_arg(0);
+    }
+    else
+    {
+      $args = func_get_args();
+    }
+
+    foreach($args as $arg)
     {
       $this->add($arg);
     }
@@ -58,5 +67,15 @@ class RenderGroup implements Renderable
   public function __toString()
   {
     return $this->render();
+  }
+
+  public static function fromArray(array $renderables)
+  {
+    $formed = new self;
+    foreach($renderables as $render)
+    {
+      $formed->add($render);
+    }
+    return $formed;
   }
 }
