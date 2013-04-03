@@ -158,7 +158,7 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
 
   public function setData($data)
   {
-    if($data == $this->_data)
+    if($data === $this->_data)
     {
       return $this;
     }
