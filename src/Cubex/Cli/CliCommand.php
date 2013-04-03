@@ -86,7 +86,7 @@ abstract class CliCommand implements CliTask
   {
   }
 
-  protected function _compiledArguements()
+  protected function _compiledArguments()
   {
     return $this->_args;
   }
@@ -147,7 +147,7 @@ abstract class CliCommand implements CliTask
    */
   protected function _argumentsList()
   {
-    return $this->_compiledArguements();
+    return $this->_compiledArguments();
   }
 
   /**
@@ -225,7 +225,7 @@ abstract class CliCommand implements CliTask
     $text .= wordwrap(
       $arg->description,
       $descriptionWidth,
-    "\n" . str_repeat(" ", $labelWidth)
+      ("\n" . str_repeat(" ", $labelWidth))
     );
 
     echo $text . "\n";
