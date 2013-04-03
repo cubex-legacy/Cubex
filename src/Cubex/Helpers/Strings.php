@@ -78,4 +78,19 @@ class Strings
   {
     return strtolower(static::hyphenate($url));
   }
+
+  public static function docCommentLines($comment)
+  {
+    $comments = [];
+    $comment  = substr($comment, 3, -2);
+    foreach(explode("\n", $comment) as $comment)
+    {
+      $comment = trim(ltrim(trim($comment), '*'));
+      if(!empty($comment))
+      {
+        $comments[] = $comment;
+      }
+    }
+    return $comments;
+  }
 }

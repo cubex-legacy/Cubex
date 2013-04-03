@@ -136,7 +136,7 @@ class DBBuilder
       )->getDocComment();
       if(!empty($comment))
       {
-        $comments = $this->_docExplosion($comment);
+        $comments = Strings::docCommentLines($comment);
         $comment  = '';
         foreach($comments as $comm)
         {
@@ -283,7 +283,7 @@ class DBBuilder
   protected function _getIndexes()
   {
     $indexes  = [];
-    $comments = $this->_docExplosion($this->_reflect->getDocComment());
+    $comments = Strings::docCommentLines($this->_reflect->getDocComment());
     foreach($comments as $comment)
     {
       list($type, $desc) = explode(" ", $comment, 2);
