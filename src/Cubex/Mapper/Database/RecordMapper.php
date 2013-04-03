@@ -615,8 +615,7 @@ abstract class RecordMapper extends DataMapper
     }
     else
     {
-      $pattern = 'UPDATE %T SET ' . implode(', ', $updates);
-      $pattern .= ' WHERE ' . $this->idPattern();
+      $pattern = 'UPDATE %T SET #UPDATES# WHERE ' . $this->idPattern();
 
       $idAttr = $this->getAttribute($this->getIdKey());
       if($idAttr instanceof CompositeAttribute)
@@ -644,6 +643,7 @@ abstract class RecordMapper extends DataMapper
       }
 
       $query = ParseQuery::parse($connection, $args);
+      $query = str_replace('#UPDATES#', implode(', ', $updates), $query);
     }
 
     $result = $connection->query($query);
