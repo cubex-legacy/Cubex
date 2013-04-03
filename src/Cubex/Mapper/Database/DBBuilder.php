@@ -121,9 +121,11 @@ class DBBuilder
     }
     $uname = Strings::variableToUnderScore($name);
 
+    $emptyAttribute = $this->_emptyMapper->getAttribute($name);
+
     $unsigned   = false;
     $allowNull  = true;
-    $default    = $this->_emptyMapper->getAttribute($name)->defaultValue();
+    $default    = $emptyAttribute->serialize($emptyAttribute->defaultValue());
     $options    = 150;
     $dataType   = DataType::VARCHAR;
     $annotation = [];
