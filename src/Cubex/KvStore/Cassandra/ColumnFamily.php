@@ -39,6 +39,9 @@ class ColumnFamily
   protected $_cqlVersion = 3;
   protected $_returnAttribute = true;
 
+  protected $_processingBatch = false;
+  protected $_batchMutation;
+
   /**
    * @var DataType\BytesType
    */
@@ -519,14 +522,31 @@ class ColumnFamily
 
     try
     {
-      if(count($columns) === 1 && $column instanceof Column)
+      if($this->isBatchOpen())
       {
-        $this->_client()->insert($key, $parent, $column, $level);
+        if(isset($this->_batchMutation[$key][$this->name()]))
+        {
+          $this->_batchMutation[$key][$this->name()] = array_merge(
+            (array)$this->_batchMutation[$key][$this->name()],
+            $mutations
+          );
+        }
+        else
+        {
+          $this->_batchMutation[$key][$this->name()] = $mutations;
+        }
       }
       else
       {
-        $mutationMap[$key][$this->name()] = $mutations;
-        $this->_client()->batch_mutate($mutationMap, $level);
+        if(count($columns) === 1 && $column instanceof Column)
+        {
+          $this->_client()->insert($key, $parent, $column, $level);
+        }
+        else
+        {
+          $mutationMap[$key][$this->name()] = $mutations;
+          $this->_client()->batch_mutate($mutationMap, $level);
+        }
       }
     }
     catch(\Exception $e)
@@ -829,6 +849,44 @@ class ColumnFamily
     }
 
     return $column;
+  }
+
+  public function openBatch()
+  {
+    $this->_processingBatch = true;
+    return $this;
+  }
+
+  public function isBatchOpen()
+  {
+    return (bool)$this->_processingBatch;
+  }
+
+  public function flushBatch()
+  {
+    if($this->_batchMutation === null || empty($this->_batchMutation))
+    {
+      return $this;
+    }
+
+    $level = $this->consistencyLevel();
+    try
+    {
+      $this->_client()->batch_mutate($this->_batchMutation, $level);
+    }
+    catch(\Exception $e)
+    {
+      throw $this->formException($e);
+    }
+    $this->_batchMutation = null;
+    return $this;
+  }
+
+  public function closeBatch()
+  {
+    $this->flushBatch();
+    $this->_processingBatch = false;
+    return $this;
   }
 
   public function timestamp()
