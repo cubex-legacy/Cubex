@@ -638,13 +638,13 @@ class ColumnFamily
     $this->_remove($key, $superColumn, $columns, $timestamp);
   }
 
-  public function incement($key, $column, $incement = 1)
+  public function increment($key, $column, $increment = 1)
   {
     $key            = $this->keyDataType()->pack($key);
     $level          = $this->consistencyLevel();
     $parent         = $this->_columnParent();
     $counter        = new CounterColumn();
-    $counter->value = abs($incement);
+    $counter->value = abs($increment);
     $counter->name  = $this->prepareDataType($this->columnDataType(), $column);
     try
     {
