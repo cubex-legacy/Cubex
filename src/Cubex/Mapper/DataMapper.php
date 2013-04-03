@@ -959,9 +959,11 @@ abstract class DataMapper
   }
 
   /**
-   * @return mixed
+   * @param bool $plural
+   *
+   * @return string
    */
-  public function getTableName()
+  public function getTableName($plural = true)
   {
     if($this->_tableName === null)
     {
@@ -989,8 +991,11 @@ abstract class DataMapper
         $table = Strings::variableToUnderScore($table);
       }
 
-      $table            = strtolower(str_replace('\\', '_', $table));
-      $this->_tableName = Inflection::pluralise($table);
+      $this->_tableName = strtolower(str_replace('\\', '_', $table));
+      if($plural)
+      {
+        $this->_tableName = Inflection::pluralise($this->_tableName);
+      }
     }
     return $this->_tableName;
   }

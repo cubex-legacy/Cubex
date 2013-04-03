@@ -68,39 +68,46 @@ class PivotMapper extends RecordMapper
 
     if($this->_tableName === null)
     {
-      $class  = strtolower(class_shortname($pivota));
-      $eClass = strtolower(class_shortname($pivotb));
-
-      $sT     = $pivota->getTableName();
-      $prefix = strrev(
-        strip_start(strrev($sT), strrev(Inflection::pluralise($class)))
-      );
-      $prefix = trim($prefix, '_');
-
-      if($eClass > $class)
+      if(__CLASS__ === get_called_class())
       {
-        $table = implode(
-          '_',
-          [
-          $prefix,
-          Inflection::pluralise($class),
-          Inflection::pluralise($eClass)
-          ]
+        $class  = strtolower(class_shortname($pivota));
+        $eClass = strtolower(class_shortname($pivotb));
+
+        $sT     = $pivota->getTableName();
+        $prefix = strrev(
+          strip_start(strrev($sT), strrev(Inflection::pluralise($class)))
         );
+        $prefix = trim($prefix, '_');
+
+        if($eClass > $class)
+        {
+          $table = implode(
+            '_',
+            [
+            $prefix,
+            Inflection::pluralise($class),
+            Inflection::pluralise($eClass)
+            ]
+          );
+        }
+        else
+        {
+          $table = implode(
+            '_',
+            [
+            $prefix,
+            Inflection::pluralise($eClass),
+            Inflection::pluralise($class)
+            ]
+          );
+        }
+
+        $table = ltrim($table, '_');
       }
       else
       {
-        $table = implode(
-          '_',
-          [
-          $prefix,
-          Inflection::pluralise($eClass),
-          Inflection::pluralise($class)
-          ]
-        );
+        $table = $this->getTableName(false);
       }
-
-      $table = ltrim($table, '_');
 
       $this->setTableName($table);
     }
