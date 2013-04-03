@@ -606,14 +606,14 @@ class ColumnFamily
 
     try
     {
-      if($numKeys == 1 && $columns === null)
+      if($numKeys == 1 && $columns === null && !$this->isBatchOpen())
       {
         foreach($keys as $key)
         {
           $this->_client()->remove($key, $path, $timestamp, $level);
         }
       }
-      else if($numKeys == 1 && count($columns) == 1)
+      else if($numKeys == 1 && count($columns) == 1 && !$this->isBatchOpen())
       {
         $path->column = head($columns);
         foreach($keys as $key)
@@ -635,14 +635,35 @@ class ColumnFamily
             ['column_names' => $columns]
           );
         }
-        $mutations   = [new Mutation(['deletion' => $deletion])];
-        $mutationMap = [];
+        $mutations = [new Mutation(['deletion' => $deletion])];
 
-        foreach($keys as $key)
+        if(!$this->isBatchOpen())
         {
-          $mutationMap[$key][$this->name()] = $mutations;
+          $mutationMap = [];
+
+          foreach($keys as $key)
+          {
+            $mutationMap[$key][$this->name()] = $mutations;
+          }
+          $this->_client()->batch_mutate($mutationMap, $level);
         }
-        $this->_client()->batch_mutate($mutationMap, $level);
+        else
+        {
+          foreach($keys as $key)
+          {
+            if(isset($this->_batchMutation[$key][$this->name()]))
+            {
+              $this->_batchMutation[$key][$this->name()] = array_merge(
+                (array)$this->_batchMutation[$key][$this->name()],
+                $mutations
+              );
+            }
+            else
+            {
+              $this->_batchMutation[$key][$this->name()] = $mutations;
+            }
+          }
+        }
       }
     }
     catch(\Exception $e)
