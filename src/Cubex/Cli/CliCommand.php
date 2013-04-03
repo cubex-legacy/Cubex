@@ -6,6 +6,7 @@
 namespace Cubex\Cli;
 
 use Cubex\Foundation\Config\ConfigTrait;
+use Cubex\Helpers\Strings;
 use Cubex\Loader;
 
 abstract class CliCommand implements CliTask
@@ -40,6 +41,11 @@ abstract class CliCommand implements CliTask
    * @var string[]
    */
   protected $_rawPositionalArgs;
+
+  /**
+   * @var CliArgument[]
+   */
+  protected $_args;
 
   /**
    * @param Loader   $loader
@@ -80,8 +86,14 @@ abstract class CliCommand implements CliTask
   {
   }
 
+  protected function _compiledArguements()
+  {
+    return $this->_args;
+  }
+
   protected function _initArguments()
   {
+    $this->_buildArguments();
     $args = $this->_argumentsList();
 
     $seenArrayArg = false;
@@ -135,7 +147,7 @@ abstract class CliCommand implements CliTask
    */
   protected function _argumentsList()
   {
-    return [];
+    return $this->_compiledArguements();
   }
 
   /**
@@ -213,7 +225,7 @@ abstract class CliCommand implements CliTask
     $text .= wordwrap(
       $arg->description,
       $descriptionWidth,
-      "\n" . str_repeat(" ", $labelWidth)
+    "\n" . str_repeat(" ", $labelWidth)
     );
 
     echo $text . "\n";
@@ -489,5 +501,75 @@ abstract class CliCommand implements CliTask
   public function positionalArgCount()
   {
     return count($this->_rawPositionalArgs);
+  }
+
+  protected function _buildArguments()
+  {
+    $usedShorts = [];
+    $class      = new \ReflectionClass(get_class($this));
+    foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
+    {
+      $propName     = $p->getName();
+      $defaultValue = $p->getValue($this);
+
+      $shortCode = strtolower(substr($propName, 0, 1));
+      if(isset($usedShorts[$shortCode]))
+      {
+        $shortCode = '';
+      }
+      else
+      {
+        $usedShorts[$shortCode] = true;
+      }
+
+      $required         = false;
+      $valueOption      = CliArgument::VALUE_NONE;
+      $valueDescription = '';
+
+      $description = [];
+      $docBlock    = Strings::docCommentLines($p->getDocComment());
+      foreach($docBlock as $docLine)
+      {
+        if(substr($docLine, 0, 1) !== '@')
+        {
+          $description[] = $docLine;
+        }
+        else
+        {
+          $parts = explode(" ", substr($docLine, 1), 2);
+          switch(strtolower($parts[0]))
+          {
+            case 'required':
+              $required = true;
+              break;
+            case 'valuerequired':
+              $valueOption = CliArgument::VALUE_REQUIRED;
+              break;
+            case 'optional':
+              $valueOption = CliArgument::VALUE_OPTIONAL;
+              break;
+            case 'example':
+              $valueDescription = $parts[1];
+              break;
+          }
+        }
+      }
+
+      if(empty($description))
+      {
+        $description[] = $propName;
+      }
+
+      $this->_args[$propName] = new CliArgument(
+        $propName, implode(' ', $description), $shortCode,
+        $valueOption, $valueDescription, $required, $defaultValue
+      );
+      unset($this->$propName);
+    }
+  }
+
+  public function __get($name)
+  {
+    return $this->argumentValue($name);
   }
 }
