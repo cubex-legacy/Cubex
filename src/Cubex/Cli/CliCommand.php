@@ -108,10 +108,22 @@ abstract class CliCommand implements CliTask
         $this->_options[] = $arg;
         if($arg->hasShortName())
         {
+          if(isset($this->_argsByShortName[$arg->shortName]))
+          {
+            throw new \Exception(
+              'Short argument name used for more than one argument: -' . $arg->shortName
+            );
+          }
           $this->_argsByShortName[$arg->shortName] = $arg;
         }
       }
 
+      if(isset($this->_argsByName[$arg->name]))
+      {
+        throw new \Exception(
+          'Argument name used for more than one argument: ' . $arg->name
+        );
+      }
       $this->_argsByName[$arg->name] = $arg;
     }
   }
