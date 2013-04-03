@@ -25,6 +25,11 @@ class CompositeAttribute extends Attribute
     $this->_hidden   = $hidden;
   }
 
+  public function saveToDatabase()
+  {
+    return false;
+  }
+
   public function setParent(DataMapper $mapper)
   {
     $this->_parent = $mapper;
@@ -189,10 +194,5 @@ class CompositeAttribute extends Attribute
         $this->addSubAttribute(clone $attr);
       }
     }
-  }
-
-  public function saveToDatabase()
-  {
-    return false;
   }
 }
