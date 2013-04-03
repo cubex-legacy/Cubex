@@ -862,6 +862,13 @@ class ColumnFamily
     return (bool)$this->_processingBatch;
   }
 
+  public function cancelBatch()
+  {
+    $this->_batchMutation = null;
+    $this->closeBatch();
+    return $this;
+  }
+
   public function flushBatch()
   {
     if($this->_batchMutation === null || empty($this->_batchMutation))
