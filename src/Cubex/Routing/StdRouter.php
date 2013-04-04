@@ -18,7 +18,7 @@ class StdRouter implements Router
    */
   public function __construct(array $routes, $httpVerb = null)
   {
-    $this->_routes    = $routes;
+    $this->_routes = $routes;
     $this->_verbMatch = $httpVerb;
   }
 
@@ -150,12 +150,20 @@ class StdRouter implements Router
 
     $matchedOn = 1;
     $matches   = array();
-    $match     = preg_match("#^{$routePattern}{$routeEnd}#", $pattern, $matches);
+    $match     = preg_match(
+      "#^{$routePattern}{$routeEnd}#",
+      $pattern,
+      $matches
+    );
 
     if(!$match)
     {
       $routePattern = $this->convertSimpleRoute($routePattern);
-      $match        = preg_match("#^{$routePattern}{$routeEnd}#", $pattern, $matches);
+      $match        = preg_match(
+        "#^{$routePattern}{$routeEnd}#",
+        $pattern,
+        $matches
+      );
       $matchedOn    = 2;
     }
 

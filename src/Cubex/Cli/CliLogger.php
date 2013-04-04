@@ -58,7 +58,10 @@ class CliLogger
    * @param string $logFile
    * @param string $instanceName
    */
-  public function __construct($echoLevel = LogLevel::ERROR, $logLevel = LogLevel::WARNING, $logFile = "", $instanceName = "")
+  public function __construct(
+    $echoLevel = LogLevel::ERROR, $logLevel = LogLevel::WARNING, $logFile = "",
+    $instanceName = ""
+  )
   {
     $this->_echoLevel = $echoLevel;
     $this->_logLevel  = $logLevel;
@@ -77,20 +80,29 @@ class CliLogger
     $this->_dateFormat  = $this->_getConfigOption('date_format', 'd/m/Y H:i:s');
 
     $logDir = dirname($this->_logFilePath);
-    if(! file_exists($logDir))
+    if(!file_exists($logDir))
     {
       mkdir($logDir, 0755, true);
     }
 
     EventManager::listen(EventManager::CUBEX_LOG, [$this, 'handleLogEvent']);
-    EventManager::listen(EventManager::CUBEX_PHP_ERROR, [$this, 'handlePhpError']);
-    EventManager::listen(EventManager::CUBEX_UNHANDLED_EXCEPTION, [$this, 'handleException']);
+    EventManager::listen(
+      EventManager::CUBEX_PHP_ERROR,
+      [$this, 'handlePhpError']
+    );
+    EventManager::listen(
+      EventManager::CUBEX_UNHANDLED_EXCEPTION,
+      [$this, 'handleException']
+    );
   }
 
   public static function getDefaultLogPath($instanceName = "")
   {
-    $logsDir  = realpath(dirname(WEB_ROOT)) . DS . 'logs';
-    if($instanceName != "") $logsDir .= DS . $instanceName;
+    $logsDir = realpath(dirname(WEB_ROOT)) . DS . 'logs';
+    if($instanceName != "")
+    {
+      $logsDir .= DS . $instanceName;
+    }
     return $logsDir;
   }
 
@@ -109,9 +121,12 @@ class CliLogger
 
     if($logFile == "")
     {
-      $logsDir  = self::getDefaultLogPath($instanceName);
-      $fileName = (isset($_REQUEST['__path__']) ? $_REQUEST['__path__'] : 'logfile') . '.log';
-      $logFile  = $logsDir . DS . $fileName;
+      $logsDir = self::getDefaultLogPath($instanceName);
+
+      $fileName = (isset($_REQUEST['__path__'])
+      ? $_REQUEST['__path__'] : 'logfile') . '.log';
+
+      $logFile = $logsDir . DS . $fileName;
     }
 
     return $logFile;
@@ -119,7 +134,10 @@ class CliLogger
 
   private function _logLevelLessThanOrEqual($checkLevel, $baselineLevel)
   {
-    return array_search($checkLevel, $this->_allLogLevels) <= array_search($baselineLevel, $this->_allLogLevels);
+    return array_search($checkLevel, $this->_allLogLevels) <= array_search(
+      $baselineLevel,
+      $this->_allLogLevels
+    );
   }
 
   private function _logLevelToDisplay($level)
@@ -130,8 +148,10 @@ class CliLogger
       $spaces = 0;
     }
     $startSpaces = floor($spaces / 2);
-    $endSpaces = $spaces - $startSpaces;
-    return '[' . str_repeat(' ', $startSpaces) . strtoupper($level) . str_repeat(' ', $endSpaces) . ']';
+    $endSpaces   = $spaces - $startSpaces;
+    return '[' . str_repeat(' ', $startSpaces) . strtoupper(
+      $level
+    ) . str_repeat(' ', $endSpaces) . ']';
   }
 
 
@@ -139,7 +159,9 @@ class CliLogger
   {
     $logData = $event->getData();
     $level   = $logData['level'];
-    $fullMsg = date($this->_dateFormat) . " " . $this->_logLevelToDisplay($level) . " " . $logData['message'];
+    $fullMsg = date($this->_dateFormat) . " " . $this->_logLevelToDisplay(
+      $level
+    ) . " " . $logData['message'];
 
     if($this->_logLevelLessThanOrEqual($level, $this->_echoLevel))
     {
@@ -173,7 +195,9 @@ class CliLogger
     {
       $errMsg = 'PHP ERROR';
     }
-    $errMsg .= ' in ' . $event->getStr('errFile') . ' at line ' . $event->getInt('errLine') . ' : '
+    $errMsg .= ' in ' . $event->getStr(
+      'errFile'
+    ) . ' at line ' . $event->getInt('errLine') . ' : '
     . $event->getStr('errMsg');
     switch($event->getInt('errNo'))
     {

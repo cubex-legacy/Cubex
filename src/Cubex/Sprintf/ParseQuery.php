@@ -31,7 +31,8 @@ use Cubex\Mapper\Database\SearchObject;
  * %Ls = implode string array
  * %LC = implode column names
  *
- * If null is passed as the value, the output will be NULL rather than a formatted value
+ * If null is passed as the value,
+ * the output will be NULL rather than a formatted value
  * %nd = nullable int
  * %ns = nullable string
  * %nf = nullable float

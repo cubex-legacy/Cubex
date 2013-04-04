@@ -17,14 +17,20 @@ class CliArgument extends CliArgumentBase
   public $valueDescription;
 
   /**
-   * @param string     $longName         The long argument name. Must only contain numbers, letters and hyphens.
+   * @param string     $longName         The long argument name.
+   *                                     Must only contain numbers,
+   *                                     letters and hyphens.
    * @param string     $description      The description to show in the help
-   * @param string     $shortName        The short argument name. Must be a single letter.
-   * @param int        $valueOption      Specify whether this argument needs a value
-   * @param string     $valueDescription The name of the value to show in the help
+   * @param string     $shortName        The short argument name.
+   *                                     Must be a single letter.
+   * @param int        $valueOption      Specify whether this argument
+   *                                     needs a value
+   * @param string     $valueDescription The name of the value to
+   *                                     show in the help
    * @param bool       $required         True if this option is required
-   * @param mixed      $defaultValue     The default value to use if this argument is not specified.
-   * @param callable[] $validators       Validators to use on this argument's value
+   * @param mixed      $defaultValue     The default value to use if this
+   *                                     argument is not specified.
+   * @param callable[] $validators       Validators to use on argument's value
    *
    * @throws \Exception
    */

@@ -104,7 +104,8 @@ abstract class CliCommand implements CliTask
         if($seenArrayArg)
         {
           throw new \Exception(
-            'No more positional arguments can be specified after an ArrayArgument'
+            'No more positional arguments can be specified' .
+            ' after an ArrayArgument'
           );
         }
 
@@ -123,7 +124,8 @@ abstract class CliCommand implements CliTask
           if(isset($this->_argsByShortName[$arg->shortName]))
           {
             throw new \Exception(
-              'Short argument name used for more than one argument: -' . $arg->shortName
+              'Short argument name used for more than one argument: -' .
+              $arg->shortName
             );
           }
           $this->_argsByShortName[$arg->shortName] = $arg;
@@ -151,7 +153,8 @@ abstract class CliCommand implements CliTask
   }
 
   /**
-   * Display usage information. Invoked automatically if --help is specified on the command-line
+   * Display usage information.
+   * Invoked automatically if --help is specified on the command-line
    */
   protected function _help()
   {
@@ -300,7 +303,9 @@ abstract class CliCommand implements CliTask
               }
               else
               {
-                throw new ArgumentException('Argument --' . $argName . ' needs a value');
+                throw new ArgumentException(
+                  'Argument --' . $argName . ' needs a value'
+                );
               }
             }
             else
@@ -350,7 +355,9 @@ abstract class CliCommand implements CliTask
                   }
                   else
                   {
-                    throw new ArgumentException('Argument -' . $thisArg . ' needs a value');
+                    throw new ArgumentException(
+                      'Argument -' . $thisArg . ' needs a value'
+                    );
                   }
                 }
               }
@@ -458,7 +465,8 @@ abstract class CliCommand implements CliTask
   }
 
   /**
-   * Get the value of a command-line argument. Returns null if the argument does not exist.
+   * Get the value of a command-line argument.
+   * Returns null if the argument does not exist.
    *
    * @param string $longArgName
    * @param mixed  $default The default value to return if the argument is
@@ -492,7 +500,8 @@ abstract class CliCommand implements CliTask
    */
   public function positionalArgValue($argNum, $default = null)
   {
-    return isset($this->_rawPositionalArgs[$argNum]) ? $this->_rawPositionalArgs[$argNum] : $default;
+    return isset($this->_rawPositionalArgs[$argNum])
+    ? $this->_rawPositionalArgs[$argNum] : $default;
   }
 
   /**

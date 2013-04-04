@@ -156,7 +156,8 @@ class Build
           $this->_msgFmt . ' -o "' . $tfile . '.mo" "' . $tfile . '.po"'
         );
 
-        echo $this->_msgFmt . ' -o "' . $tfile . '.mo" "' . $tfile . '.po"' . "\n";
+        echo $this->_msgFmt . ' -o "' . $tfile . '.mo" "';
+        echo $tfile . '.po"' . "\n";
       }
     }
   }

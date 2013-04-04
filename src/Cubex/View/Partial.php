@@ -38,8 +38,10 @@ class Partial implements Renderable
    * @param null   $variables (array of variables e.g. ["name","description"];
    * @param bool   $escapeInput
    */
-  public function __construct($template = '', $variables = null,
-                              $escapeInput = true)
+  public function __construct(
+    $template = '', $variables = null,
+    $escapeInput = true
+  )
   {
     $this->_escapeInput = $escapeInput;
     $this->_template    = $template;
@@ -51,6 +53,7 @@ class Partial implements Renderable
    * Switch escaping of input
    *
    * @param $escape
+   *
    * @return $this
    */
   public function escapeInput($escape)
@@ -71,12 +74,16 @@ class Partial implements Renderable
 
   /**
    * @param $args
+   *
    * @return $this
    */
   protected function _addItem($args)
   {
     $element = $this->_template;
-    //Allow for changing the template at a later point in time, or handling in render
+    /**
+     * Allow for changing the templateat a later point in time,
+     * or handling in render
+     */
     $this->_elementData[] = $args;
 
     foreach($this->_variables as $arg => $key)
@@ -145,7 +152,8 @@ class Partial implements Renderable
   public function render()
   {
     return implode(
-      $this->_glue === null ? '' : $this->_glue, $this->_elements
+      $this->_glue === null ? '' : $this->_glue,
+      $this->_elements
     );
   }
 

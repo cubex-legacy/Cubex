@@ -17,10 +17,7 @@ use Cubex\Foundation\Config\Configurable;
  */
 class Dictionary implements Configurable
 {
-  use ConfigTrait
-  {
-  configure as protected _configure;
-  }
+  use ConfigTrait;
 
   protected $_map = [];
 
@@ -63,16 +60,16 @@ class Dictionary implements Configurable
   public function defaultTasks()
   {
     return [
-      'dispatch' => '\Cubex\Dispatch\Mapper\CliInit',
-      'branding' => '\Cubex\View\Branding\ViewMapper',
+      'dispatch'  => '\Cubex\Dispatch\Mapper\CliInit',
+      'branding'  => '\Cubex\View\Branding\ViewMapper',
       'translate' => '\Cubex\I18n\Processor\Cli',
     ];
   }
 
   public function configure(ConfigGroup $config)
   {
-    $this->_configure($config);
-    $conf = $this->_configuration->get("cli_dictionary");
+    $this->_configuration = $config;
+    $conf                 = $this->_configuration->get("cli_dictionary");
     if($conf !== null)
     {
       foreach($conf as $name => $class)

@@ -17,10 +17,10 @@ class DateFormat extends AbstractFormat
   public static function format($time, $format = 'd MMM y')
   {
     $fmt = new \IntlDateFormatter(
-      static::getLocale(),
+      static::_getLocale(),
       \IntlDateFormatter::FULL,
       \IntlDateFormatter::FULL,
-      static::getTimezone(),
+      static::_getTimezone(),
       \IntlDateFormatter::GREGORIAN
     );
     $fmt->setPattern($format);

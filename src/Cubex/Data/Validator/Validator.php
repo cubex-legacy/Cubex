@@ -141,7 +141,8 @@ class Validator
 
   public static function timestamp($input)
   {
-    if((string)(int)$input === (string)$input && ($input <= PHP_INT_MAX) && ($input >= ~PHP_INT_MAX)
+    if((string)(int)$input === (string)$input
+    && ($input <= PHP_INT_MAX) && ($input >= ~PHP_INT_MAX)
     )
     {
       return true;

@@ -107,6 +107,6 @@ class Layout implements Renderable, NamespaceAware
         return $try;
       }
     }
-    return;
+    return null;
   }
 }

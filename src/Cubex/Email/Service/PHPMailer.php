@@ -49,9 +49,9 @@ final class PHPMailer implements EmailService
     switch($config->getStr("transport", "mail"))
     {
       case "smtp":
-        $mailer->Mailer = "smtp";
-        $mailer->Host = $config->getStr("smtp.host", "localhost");
-        $mailer->Port = $config->getInt("smtp.port", 25);
+        $mailer->Mailer     = "smtp";
+        $mailer->Host       = $config->getStr("smtp.host", "localhost");
+        $mailer->Port       = $config->getInt("smtp.port", 25);
         $mailer->SMTPSecure = $config->getStr("smtp.security", '');
 
         if($config->getExists("smtp.username"))

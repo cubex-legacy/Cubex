@@ -12,7 +12,7 @@ class NumberFormat extends AbstractFormat
   {
     if($locale === null)
     {
-      $locale = static::getLocale();
+      $locale = static::_getLocale();
     }
 
     $fmt = new \NumberFormatter(
@@ -28,7 +28,7 @@ class NumberFormat extends AbstractFormat
   {
     if($locale === null)
     {
-      $locale = static::getLocale();
+      $locale = static::_getLocale();
     }
 
     $fmt = new \NumberFormatter(

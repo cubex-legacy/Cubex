@@ -144,7 +144,7 @@ class RecordCollection extends Collection
       if(is_array($pattern))
       {
         $pattern = $this->_mapperType->queryArrayParse($pattern);
-        $args = ["%QA", $pattern];
+        $args    = ["%QA", $pattern];
       }
       else if(is_object($pattern))
       {
@@ -226,7 +226,10 @@ class RecordCollection extends Collection
 
     $rows = [];
 
-    if($this->_columns == ['*'] && $this->_limit === null && $this->_groupBy == null)
+    if($this->_columns == ['*']
+    && $this->_limit === null
+    && $this->_groupBy == null
+    )
     {
       $queries = EphemeralCache::getCache("sqlqueries", $this, []);
       $matches = array();

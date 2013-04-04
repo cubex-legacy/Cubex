@@ -407,7 +407,10 @@ class Analyse
 
         $lastSpace = $current;
       }
-      elseif($current - $lastStart >= $width && $cut && $lastStart >= $lastSpace)
+      elseif($current - $lastStart >= $width
+      && $cut
+      && $lastStart >= $lastSpace
+      )
       {
         $result .=
         iconv_substr($string, $lastStart, $current - $lastStart, $charset)

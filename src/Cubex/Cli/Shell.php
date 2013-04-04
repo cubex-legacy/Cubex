@@ -109,8 +109,10 @@ class Shell
    *
    * @return string
    */
-  public static function colourText($string, $foreground = null,
-                                    $background = null)
+  public static function colourText(
+    $string, $foreground = null,
+    $background = null
+  )
   {
     $existingForeground = self::$_foregroundColour;
     $existingBackground = self::$_backgroundColour;
@@ -179,7 +181,8 @@ class Shell
   }
 
   /**
-   * Checks whether the output of the current script is a TTY or a pipe / redirect
+   * Checks whether the output of the current script
+   * is a TTY or a pipe / redirect
    *
    * @return bool Output being piped
    */
@@ -199,12 +202,17 @@ class Shell
   /**
    * Clear the current line
    *
-   * @param bool $cursorToStart If true then return the cursor to the start of the line, otherwise leave it where it is
+   * @param bool $cursorToStart If true then return the cursor to
+   *                            the start of the line,
+   *                            otherwise leave it where it is
    */
   public static function clearLine($cursorToStart = true)
   {
     echo "\033[2K";
-    if($cursorToStart) echo "\r";
+    if($cursorToStart)
+    {
+      echo "\r";
+    }
   }
 
   /**

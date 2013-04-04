@@ -29,20 +29,25 @@ class MapperTest extends TestCase
     );
 
     $fileSystemMock->expects($this->any())
-      ->method("isDir")
-      ->will($this->returnValue(true));
+    ->method("isDir")
+    ->will($this->returnValue(true));
 
     $fileSystemMock->expects($this->exactly(3))
-      ->method("listDirectory")
-      ->will($this->onConsecutiveCalls(
-        ["Applications", "res"], ["Www"], ["res"]
-      ));
+    ->method("listDirectory")
+    ->will(
+      $this->onConsecutiveCalls(
+        ["Applications", "res"],
+        ["Www"],
+        ["res"]
+      )
+    );
 
-    $mapper = new Mapper($this->_configGroup, $fileSystemMock);
+    $mapper   = new Mapper($this->_configGroup, $fileSystemMock);
     $entities = $mapper->findEntities("");
 
     $this->assertEquals(
-      ["Project/Applications/Www/res", "Project/res"], $entities
+      ["Project/Applications/Www/res", "Project/res"],
+      $entities
     );
 
     $mapper     = new Mapper($this->_configGroup, new FileSystem());
@@ -55,12 +60,15 @@ class MapperTest extends TestCase
 
   /**
    * @depends testFindEntities
+   *
    * @param array $entity
    */
   public function testMapEntity($entity)
   {
     $cssContentsArr = [
-      "pre random content", "random content", "post random content"
+      "pre random content",
+      "random content",
+      "post random content"
     ];
 
     $fileSystemMock = $this->getMock(
@@ -69,38 +77,48 @@ class MapperTest extends TestCase
     );
 
     $fileSystemMock->expects($this->exactly(6))
-      ->method("listDirectory")
-      ->will(
-        $this->onConsecutiveCalls(
-          ["css"], ["test.css"], [], ["css"], ["test.css"], []
-        )
-      );
+    ->method("listDirectory")
+    ->will(
+      $this->onConsecutiveCalls(
+        ["css"],
+        ["test.css"],
+        [],
+        ["css"],
+        ["test.css"],
+        []
+      )
+    );
 
     $fileSystemMock->expects($this->any())
-      ->method("fileExists")
-      ->will($this->returnValue(true));
+    ->method("fileExists")
+    ->will($this->returnValue(true));
 
     $fileSystemMock->expects($this->exactly(4))
-      ->method("isDir")
-      ->will(
-        $this->onConsecutiveCalls(true, false, true, false)
-      );
+    ->method("isDir")
+    ->will(
+      $this->onConsecutiveCalls(true, false, true, false)
+    );
 
     $fileSystemMock->expects($this->exactly(6))
-      ->method("readFile")
-      ->will(
-        $this->onConsecutiveCalls(
-          $cssContentsArr[0], $cssContentsArr[1], $cssContentsArr[2],
-          $cssContentsArr[0], $cssContentsArr[1], $cssContentsArr[2]
-        )
-      );
+    ->method("readFile")
+    ->will(
+      $this->onConsecutiveCalls(
+        $cssContentsArr[0],
+        $cssContentsArr[1],
+        $cssContentsArr[2],
+        $cssContentsArr[0],
+        $cssContentsArr[1],
+        $cssContentsArr[2]
+      )
+    );
 
-    $mapper = new Mapper($this->_configGroup, $fileSystemMock);
+    $mapper    = new Mapper($this->_configGroup, $fileSystemMock);
     $entityMap = $mapper->mapEntity($entity);
 
     $this->assertArrayHasKey("css/test.css", $entityMap);
     $this->assertEquals(
-      md5(implode("", $cssContentsArr)), $entityMap["css/test.css"]
+      md5(implode("", $cssContentsArr)),
+      $entityMap["css/test.css"]
     );
 
     // Test map entities

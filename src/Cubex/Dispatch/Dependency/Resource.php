@@ -39,7 +39,7 @@ class Resource extends Dependency
       "bootstrap" => [
         "2.3.0" => "netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"
       ],
-      "jquery" => [
+      "jquery"    => [
         "1.9.1" => "ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js",
         "1.9.0" => "ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js",
         "1.8.3" => "ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js",
@@ -51,7 +51,7 @@ class Resource extends Dependency
         "2.2" => "ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js",
         "2.1" => "ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js"
       ],
-      "jqueryui" => [
+      "jqueryui"  => [
         "1.10.1" => "ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js",
         "1.10.0" => "ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js",
         "1.9.2"  => "ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js",
@@ -74,7 +74,8 @@ class Resource extends Dependency
     foreach(self::$_requires[(string)$type] as $resource)
     {
       if(!isset(self::$_requires["packages"][$type . "_" . $resource["group"]])
-        || $resource["resource"] === "package")
+      || $resource["resource"] === "package"
+      )
       {
         if(!array_key_exists($resource["uri"], $sentUris))
         {
@@ -159,7 +160,10 @@ class Resource extends Dependency
       {
         if(strpos($externalUri, $protocol) === 0)
         {
-          $strippedUri = substr($externalUri, strlen($protocol));
+          $strippedUri                                    = substr(
+            $externalUri,
+            strlen($protocol)
+          );
           $externalUriByProtocol[$protocol][$strippedUri] = $originalKey;
         }
       }
@@ -180,7 +184,8 @@ class Resource extends Dependency
     elseif(array_key_exists(
       $event->getFile(),
       self::$_thirdpartyLibraries[(string)$event->getType()]
-    ))
+    )
+    )
     {
       $this->requireThirdpartyResource(
         $event,
@@ -231,8 +236,9 @@ class Resource extends Dependency
   }
 
   /**
-   * @param \Cubex\Dispatch\Event $event
+   * @param \Cubex\Dispatch\Event    $event
    * @param \Cubex\Core\Http\Request $request
+   *
    * @throws \InvalidArgumentException
    */
   public function requireThirdpartyResource(Event $event, Request $request)
@@ -250,21 +256,23 @@ class Resource extends Dependency
 
     if($version === null)
     {
-      $uri  = current(self::$_thirdpartyLibraries[(string)$type][$library]);
+      $uri = current(self::$_thirdpartyLibraries[(string)$type][$library]);
     }
     else
     {
       if(!array_key_exists(
-        $version, self::$_thirdpartyLibraries[(string)$type][$library]
-      ))
+        $version,
+        self::$_thirdpartyLibraries[(string)$type][$library]
+      )
+      )
       {
         throw new \InvalidArgumentException(
-          "Version '{$version}' of the {$type} '{$library}' library is not ".
+          "Version '{$version}' of the {$type} '{$library}' library is not " .
           "available"
         );
       }
 
-      $uri  = self::$_thirdpartyLibraries[(string)$type][$library][$version];
+      $uri = self::$_thirdpartyLibraries[(string)$type][$library][$version];
     }
 
     $event->setFile($request->protocol() . $uri);
@@ -273,7 +281,7 @@ class Resource extends Dependency
 
   /**
    * @param \Cubex\Dispatch\Event $event
-   * @param bool $external
+   * @param bool                  $external
    */
   protected function _requireResource(Event $event, $external = false)
   {
@@ -336,8 +344,8 @@ class Resource extends Dependency
     $dispatchPackagePath = $this->getDispatchPath($event, $request);
 
     $dispatchPackagePath->setResourceHash("pkg")
-      ->setPathToResource($event->getFile() . "." . $event->getType())
-      ->getDispatchPath(true);
+    ->setPathToResource($event->getFile() . "." . $event->getType())
+    ->getDispatchPath(true);
 
     return $dispatchPackagePath;
   }

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ruleset name="Cubex Code Standard">
+  <description>Code standards</description>
+
+  <!-- Unit Tests -->
+  <exclude-pattern>*/Tests/*</exclude-pattern>
+  <!-- PHPMailer does not follow PSR naming standards -->
+  <exclude-pattern>*Cubex/Email/Service/PHPMailer.php</exclude-pattern>
+  <!-- External Phutil -->
+  <exclude-pattern>*Cubex/Foundation/Generics/_Phutil.php</exclude-pattern>
+  <!-- Logger interface does not follow standards for _method -->
+  <exclude-pattern>*Cubex/Log/Logger.php</exclude-pattern>
+  <rule ref="CubexCodeStandards"/>
+</ruleset>

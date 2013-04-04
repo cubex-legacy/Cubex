@@ -41,7 +41,9 @@ class TemplatedViewModel extends ViewModel
   public function getFilePath()
   {
     $this->_calculate();
-    return $this->_baseDirectory . DS . $this->_filePath . '.' . $this->_fileExt;
+    $filePath = $this->_baseDirectory . DS;
+    $filePath .= $this->_filePath . '.' . $this->_fileExt;
+    return $filePath;
   }
 
   public function setTemplateDirectory($directory)

@@ -46,12 +46,18 @@ class PidFile
     if($path == "")
     {
       $conf = Container::config()->get('pidfile');
-      if($conf) $path = $conf->getStr('path', "");
+      if($conf)
+      {
+        $path = $conf->getStr('path', "");
+      }
     }
     if($path == "")
     {
       $filename = $_REQUEST['__path__'];
-      if($instanceName != "") $filename .= "." . $instanceName;
+      if($instanceName != "")
+      {
+        $filename .= "." . $instanceName;
+      }
       $filename .= ".pid";
 
       if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
@@ -68,24 +74,32 @@ class PidFile
 
   private function _createPidFile()
   {
-    if(! $this->_enabled) return;
+    if(!$this->_enabled)
+    {
+      return;
+    }
 
     if(file_exists($this->_pidFilePath))
     {
       $oldpid = trim(file_get_contents($this->_pidFilePath));
       if(file_exists('/proc/' . $oldpid))
       {
-        $cmdLine = explode(chr(0), file_get_contents('/proc/' . $oldpid . '/cmdline'));
+        $cmdLine = explode(
+          chr(0),
+          file_get_contents('/proc/' . $oldpid . '/cmdline')
+        );
         if(in_array($_REQUEST['__path__'], $cmdLine))
         {
-          throw new \Exception('Another instance is already running, PID ' . $oldpid);
+          throw new \Exception(
+            'Another instance is already running, PID ' . $oldpid
+          );
         }
       }
       unlink($this->_pidFilePath);
     }
 
     file_put_contents($this->_pidFilePath, getmypid());
-    if(! file_exists($this->_pidFilePath))
+    if(!file_exists($this->_pidFilePath))
     {
       throw new \Exception('Failed to create PID file');
     }
@@ -93,6 +107,9 @@ class PidFile
 
   private function _deletePidFile()
   {
-    if($this->_enabled && file_exists($this->_pidFilePath)) unlink($this->_pidFilePath);
+    if($this->_enabled && file_exists($this->_pidFilePath))
+    {
+      unlink($this->_pidFilePath);
+    }
   }
 }
