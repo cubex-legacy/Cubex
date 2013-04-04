@@ -25,8 +25,10 @@ class Serve extends Dispatcher implements Dispatchable
    * @param \Cubex\FileSystem\FileSystem         $fileSystem
    * @param Path                                 $dispatchPath
    */
-  public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem,
-                              Path $dispatchPath)
+  public function __construct(
+    ConfigGroup $configGroup, FileSystem $fileSystem,
+    Path $dispatchPath
+  )
   {
     parent::__construct($configGroup, $fileSystem);
 
@@ -46,7 +48,7 @@ class Serve extends Dispatcher implements Dispatchable
 
     $resourceHash = $dispatchPath->getResourceHash();
     $this->setDispatchPath($dispatchPath)
-      ->setUseMap($resourceHash !== $this->getNomapHash());
+    ->setUseMap($resourceHash !== $this->getNomapHash());
   }
 
   /**
@@ -63,14 +65,17 @@ class Serve extends Dispatcher implements Dispatchable
     $resourceHash = $this->getDispatchPath()->getResourceHash();
 
     if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
-      && $debugString !== self::getNocacheDebugString()
-      && $resourceHash !== $this->getNomapHash())
+    && $debugString !== self::getNocacheDebugString()
+    && $resourceHash !== $this->getNomapHash()
+    )
     {
       $this->_setCacheHeaders($response);
     }
     else if(preg_match(
-      "@(//|\.\.)@", $this->getDispatchPath()->getPathToResource()
-    ))
+      "@(//|\.\.)@",
+      $this->getDispatchPath()->getPathToResource()
+    )
+    )
     {
       // Stop possible hacks for disk paths, e.g. /js/../../../etc/passwd
       $response->fromRenderable(new Error404())->setStatusCode(404);
@@ -140,7 +145,7 @@ class Serve extends Dispatcher implements Dispatchable
    */
   public function getData($domain)
   {
-    $data = "";
+    $data            = "";
     $locatedFileKeys = [];
 
     $pathToResource = $this->getDispatchPath()->getPathToResource();
@@ -152,7 +157,10 @@ class Serve extends Dispatcher implements Dispatchable
     $fullEntityPath .= $this->getEntityPathByHash($entityHash);
 
     $locateList = $this->buildResourceLocateDirectoryList(
-      $fullEntityPath, $pathToFile, $filename, $domain
+      $fullEntityPath,
+      $pathToFile,
+      $filename,
+      $domain
     );
 
     foreach($locateList as $fileKey => $files)
@@ -167,7 +175,7 @@ class Serve extends Dispatcher implements Dispatchable
         try
         {
           $fileData = $this->getFileSystem()->readFile($file);
-          $data     .= $this->dispatchContent($fileData);
+          $data .= $this->dispatchContent($fileData);
 
           $locatedFileKeys[$fileKey] = true;
         }
@@ -187,12 +195,13 @@ class Serve extends Dispatcher implements Dispatchable
 
   public function getPackageData($domain)
   {
-    $data = "";
+    $data      = "";
     $entityMap = false;
 
     $mapper = new Mapper($this->getConfig(), $this->getFileSystem());
     $entity = $this->findEntityFromHash(
-      $this->getDispatchPath()->getEntityHash(), $mapper
+      $this->getDispatchPath()->getEntityHash(),
+      $mapper
     );
     if($entity)
     {
@@ -201,7 +210,7 @@ class Serve extends Dispatcher implements Dispatchable
 
     if(!$entityMap)
     {
-      $mapper = new Mapper($this->getConfig(), $this->getFileSystem());
+      $mapper    = new Mapper($this->getConfig(), $this->getFileSystem());
       $entityMap = $this->findAndSaveEntityMap($entity, $mapper);
     }
 
@@ -257,6 +266,11 @@ class Serve extends Dispatcher implements Dispatchable
    */
   public function dispatchContent($data)
   {
+    if(\strpos($data, '@' . 'do-not-parse') !== false)
+    {
+      return $data;
+    }
+
     $data = preg_replace_callback(
       '@url\s*\((\s*[\'"]?.*?)\)@s',
       array($this, "dispatchUrlWrappedUrl"),
@@ -292,13 +306,15 @@ class Serve extends Dispatcher implements Dispatchable
    *
    * @return array
    */
-  public function buildResourceLocateDirectoryList($fullEntityPath, $pathToFile,
-                                                   $filename, $domain)
+  public function buildResourceLocateDirectoryList(
+    $fullEntityPath, $pathToFile,
+    $filename, $domain
+  )
   {
-    $locateList = [];
-    $filenames = $this->getRelatedFilenamesOrdered($filename);
+    $locateList     = [];
+    $filenames      = $this->getRelatedFilenamesOrdered($filename);
     $filenamesOrder = array_keys($filenames);
-    $domainPaths = array_reverse($this->getDomainPaths($domain));
+    $domainPaths    = array_reverse($this->getDomainPaths($domain));
 
     // Keep the pre and post files in order
     foreach($filenamesOrder as $filenameOrder)
@@ -342,7 +358,7 @@ class Serve extends Dispatcher implements Dispatchable
     foreach($domainParts as $domainPart)
     {
       // Prepend with . on domain to avoid conflicts in standard resources
-      $domainPath   .= ".$domainPart";
+      $domainPath .= ".$domainPart";
       $domainPaths[] = $domainPath;
     }
 
@@ -355,9 +371,9 @@ class Serve extends Dispatcher implements Dispatchable
   private function _setCacheHeaders(Response $response)
   {
     $response->addHeader("X-Powere-By", "Cubex:Dispatch")
-      ->setStatusCode(304)
-      ->cacheFor($this->_cacheTime)
-      ->lastModified(time());
+    ->setStatusCode(304)
+    ->cacheFor($this->_cacheTime)
+    ->lastModified(time());
   }
 
   /**
@@ -368,11 +384,11 @@ class Serve extends Dispatcher implements Dispatchable
   private function _setResponseHeaders(Response $response, $data, $resourceType)
   {
     $response->from($data)
-      ->addHeader("Content-Type", $this->getSupportedTypes()[$resourceType])
-      ->addHeader("X-Powered-By", "Cubex:Dispatch")
-      ->setStatusCode(200)
-      ->cacheFor($this->_cacheTime)
-      ->lastModified(time());
+    ->addHeader("Content-Type", $this->getSupportedTypes()[$resourceType])
+    ->addHeader("X-Powered-By", "Cubex:Dispatch")
+    ->setStatusCode(200)
+    ->cacheFor($this->_cacheTime)
+    ->lastModified(time());
   }
 
   /**
