@@ -47,6 +47,8 @@ abstract class CliCommand implements CliTask
    */
   protected $_args;
 
+  protected $_publicMethods;
+
   /**
    * @param Loader   $loader
    * @param string[] $rawArgs
@@ -159,9 +161,20 @@ abstract class CliCommand implements CliTask
   protected function _help()
   {
     $usage = "Usage: " . $_REQUEST['__path__'];
+    if(count($this->_publicMethods) > 0)
+    {
+      $usage .= "[:method]";
+    }
     if(count($this->_options) > 0)
     {
       $usage .= " [option]...";
+    }
+
+    if(count($this->_publicMethods) > 0)
+    {
+      $usage .= "\nAvailable Methods: ";
+      $usage .= implode(', ', $this->_publicMethods);
+      $usage .= "\n";
     }
 
     if(count($this->_positionalArgs) > 0)
@@ -516,6 +529,17 @@ abstract class CliCommand implements CliTask
   {
     $usedShorts = [];
     $class      = new \ReflectionClass(get_class($this));
+
+    foreach($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $m)
+    {
+      $methodName = $m->getName();
+
+      if(!in_array($methodName, $this->nonCallableMethods()))
+      {
+        $this->_publicMethods[] = $methodName;
+      }
+    }
+
     foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
     {
       $propName     = $p->getName();
@@ -580,5 +604,23 @@ abstract class CliCommand implements CliTask
   public function __get($name)
   {
     return $this->argumentValue($name);
+  }
+
+  public function nonCallableMethods()
+  {
+    return [
+      'nonCallableMethods',
+      'execute',
+      '__construct',
+      'init',
+      'argumentIsSet',
+      'argumentValue',
+      'positionalArgValue',
+      'positionalArgCount',
+      '__get',
+      'configure',
+      'getConfig',
+      'config'
+    ];
   }
 }
