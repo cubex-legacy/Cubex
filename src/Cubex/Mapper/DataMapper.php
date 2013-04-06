@@ -354,7 +354,7 @@ abstract class DataMapper
     }
   }
 
-  public function &getData($attribute)
+  public function getData($attribute)
   {
     $this->_checkAttributes();
     if($this->attributeExists($attribute))
@@ -391,7 +391,7 @@ abstract class DataMapper
    *
    * @return bool|DataMapper|mixed
    */
-  public function &__get($name)
+  public function __get($name)
   {
     return $this->getData($name);
   }
