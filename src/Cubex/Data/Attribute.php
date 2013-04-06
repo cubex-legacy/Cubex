@@ -185,7 +185,7 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
     return $this->_data;
   }
 
-  public function data()
+  public function &data()
   {
     return $this->filter($this->rawData());
   }
