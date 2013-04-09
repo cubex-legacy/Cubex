@@ -183,3 +183,14 @@ if(!function_exists("url"))
     return \Cubex\Container\Container::request()->urlSprintf($format);
   }
 }
+
+if(!function_exists("msleep"))
+{
+  /**
+   * @param $milliseconds
+   */
+  function msleep($milliseconds)
+  {
+    usleep($milliseconds * 1000);
+  }
+}
