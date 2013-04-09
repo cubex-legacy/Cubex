@@ -185,7 +185,7 @@ abstract class CliCommand implements CliTask
 
     if(count($this->_publicMethods) > 0)
     {
-      $usage .= "\nAvailable Methods: ";
+      $usage .= "\n\nAvailable Methods: ";
       $usage .= implode(', ', $this->_publicMethods);
     }
 
