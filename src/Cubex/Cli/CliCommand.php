@@ -160,6 +160,20 @@ abstract class CliCommand implements CliTask
    */
   protected function _help()
   {
+    echo "\n";
+    $reflected    = new \ReflectionClass(get_called_class());
+    $commentLines = Strings::docCommentLines($reflected->getDocComment());
+    if(!empty($commentLines))
+    {
+      foreach($commentLines as $helpLine)
+      {
+        if(substr($helpLine, 0, 1) !== '@')
+        {
+          echo $helpLine . "\n";
+        }
+      }
+    }
+
     $usage = "Usage: " . $_REQUEST['__path__'];
     if(count($this->_publicMethods) > 0)
     {
