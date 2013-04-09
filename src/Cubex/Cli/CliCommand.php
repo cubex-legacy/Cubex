@@ -160,7 +160,6 @@ abstract class CliCommand implements CliTask
    */
   protected function _help()
   {
-    echo "\n";
     $reflected    = new \ReflectionClass(get_called_class());
     $commentLines = Strings::docCommentLines($reflected->getDocComment());
     if(!empty($commentLines))
@@ -188,7 +187,6 @@ abstract class CliCommand implements CliTask
     {
       $usage .= "\nAvailable Methods: ";
       $usage .= implode(', ', $this->_publicMethods);
-      $usage .= "\n";
     }
 
     if(count($this->_positionalArgs) > 0)
@@ -571,7 +569,11 @@ abstract class CliCommand implements CliTask
 
       $required         = false;
       $valueOption      = CliArgument::VALUE_NONE;
-      $valueDescription = '';
+      $valueDescription = $defaultValue;
+      if(empty($valueDescription))
+      {
+        $valueDescription = 'value';
+      }
 
       $description = [];
       $docBlock    = Strings::docCommentLines($p->getDocComment());
