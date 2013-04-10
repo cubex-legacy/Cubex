@@ -23,25 +23,23 @@ class FileSystem
 
     if(System::isWindows())
     {
-      if(function_exists('openssl_random_pseudo_bytes'))
-      {
-        return openssl_random_pseudo_bytes($bytes);
-      }
-      else
-      {
-        throw new FilesystemException(
-          '', "openssl_random_pseudo_bytes is unavailable"
-        );
-      }
+      return static::_pseudoBytes($bytes);
     }
 
     $urandom = @fopen('/dev/urandom', 'rb');
     if(!$urandom)
     {
-      throw new FilesystemException(
-        '/dev/urandom',
-        'Failed to open /dev/urandom for reading!'
-      );
+      try
+      {
+        return static::_pseudoBytes($bytes);
+      }
+      catch(\Exception $e)
+      {
+        throw new FilesystemException(
+          '/dev/urandom',
+          'Failed to open /dev/urandom for reading!'
+        );
+      }
     }
 
     $data = @fread($urandom, $bytes);
@@ -58,6 +56,20 @@ class FileSystem
     return $data;
   }
 
+  protected static function _pseudoBytes($bytes)
+  {
+    if(function_exists('openssl_random_pseudo_bytes'))
+    {
+      return openssl_random_pseudo_bytes($bytes);
+    }
+    else
+    {
+      throw new FilesystemException(
+        '', "openssl_random_pseudo_bytes is unavailable"
+      );
+    }
+  }
+
   /**
    * Read random alphanumeric characters from /dev/urandom or equivalent. This
    * method operates like @{method:readRandomBytes} but produces alphanumeric
@@ -65,6 +77,7 @@ class FileSystem
    * where it needs to be human readable.
    *
    * @param   $numberOfCharacters int     Number of characters to read.
+   *
    * @return  string  Random character string of the provided length.
    *
    * @task file
