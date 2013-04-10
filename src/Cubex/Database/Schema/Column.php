@@ -78,18 +78,18 @@ class Column
     $sql .= ($this->_allowNull ? '' : ' NOT') . ' NULL ';
 
     $banDefaultDataType = [
-      'tinytext',
-      'text',
-      'mediumtext',
-      'longtext',
-      'tinyblob',
-      'blob',
-      'mediumblob',
-      'longblob'
+      DataType::TINYTEXT,
+      DataType::TEXT,
+      DataType::MEDIUMTEXT,
+      DataType::LONGTEXT,
+      DataType::TINYBLOB,
+      DataType::BLOB,
+      DataType::MEDIUMBLOB,
+      DataType::LONGBLOB
     ];
 
     if($this->_default !== null
-    && !in_array(strtolower($this->_dataType), $banDefaultDataType)
+    && !in_array($this->_dataType, $banDefaultDataType)
     )
     {
       if(is_int($this->_default))
