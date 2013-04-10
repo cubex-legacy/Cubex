@@ -93,4 +93,18 @@ class Strings
     }
     return $comments;
   }
+
+  public static function stringToRange($string)
+  {
+    preg_match_all("/([0-9]{1,2})-?([0-9]{0,2}) ?,?;?/", $string, $match);
+    $n = array();
+    foreach($match[1] as $k => $v)
+    {
+      $n = array_merge(
+        $n,
+        range($v, (empty($match[2][$k]) ? $v : $match[2][$k]))
+      );
+    }
+    return ($n);
+  }
 }
