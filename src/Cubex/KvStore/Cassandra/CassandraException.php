@@ -21,7 +21,7 @@ class CassandraException extends \Exception
         $prevMsg = $previous->getMessage();
       }
 
-      if(!empty($prevMsg))
+      if((!empty($prevMsg)) && ($prevMsg != $msg))
       {
         $msg = $prevMsg . "\n" . $msg;
       }
