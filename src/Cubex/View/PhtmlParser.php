@@ -15,20 +15,20 @@ trait PhtmlParser
   }
 
   /**
-   * @param      $file
-   * @param bool $checkExists
+   * @param      $cubexRenderFile
+   * @param bool $cubexCheckExists
    *
    * @return string
    * @throws \Exception
    */
-  protected function _renderFile($file, $checkExists = false)
+  protected function _renderFile($cubexRenderFile, $cubexCheckExists = false)
   {
-    $rendered = '';
+    $cubexRenderedOutput = '';
 
-    if(!$checkExists || file_exists($file))
+    if(!$cubexCheckExists || file_exists($cubexRenderFile))
     {
-      $raw = file_get_contents($file);
-      $raw = $this->processRaw($raw);
+      $cubexRawFileTemplate = file_get_contents($cubexRenderFile);
+      $cubexRawFileTemplate = $this->processRaw($cubexRawFileTemplate);
       ob_start();
       set_error_handler(
         function ($num, $msg, $file, $line, $context)
@@ -45,7 +45,7 @@ trait PhtmlParser
       /* Close PHP tags to allow for html and opening tags */
       try
       {
-        eval('?>' . $raw);
+        eval('?>' . $cubexRawFileTemplate);
       }
       catch(\Exception $e)
       {
@@ -54,10 +54,10 @@ trait PhtmlParser
         throw $e;
       }
       restore_error_handler();
-      $rendered = ob_get_clean();
+      $cubexRenderedOutput = ob_get_clean();
     }
 
-    return $rendered;
+    return $cubexRenderedOutput;
   }
 
   /**
