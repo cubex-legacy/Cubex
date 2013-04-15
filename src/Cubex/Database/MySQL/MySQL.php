@@ -255,7 +255,7 @@ class MySQL implements DatabaseService
     $rows         = array();
     $keyField     = $valueKey = null;
     $valueAsArray = true;
-    if($result->{'num_rows'} > 0)
+    if($result && ($result->{'num_rows'} > 0))
     {
       while($row = $result->fetch_object())
       {
