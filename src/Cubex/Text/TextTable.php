@@ -40,26 +40,36 @@ class TextTable
 
     foreach($data as $i => $value)
     {
-      $length = strlen($value);
-      if(!isset($this->_columnWidths[$i]))
-      {
-        $this->_columnWidths[$i] = $length;
-      }
-      else
-      {
-        if($this->_columnWidths[$i] < $length)
-        {
-          $this->_columnWidths[$i] = $length;
-        }
-      }
+      $data[$i] = " $value ";
+      $this->_ackColumnLength($i, strlen($value) + 2);
     }
 
     $this->_rows[] = $data;
   }
 
+  protected function _ackColumnLength($column, $length)
+  {
+    if(!isset($this->_columnWidths[$column]))
+    {
+      $this->_columnWidths[$column] = $length;
+    }
+    else
+    {
+      if($this->_columnWidths[$column] < $length)
+      {
+        $this->_columnWidths[$column] = $length;
+      }
+    }
+  }
+
   public function setColumnHeaders($headers)
   {
     $this->_headers = is_array($headers) ? $headers : func_get_args();
+    foreach($this->_headers as $i => $header)
+    {
+      $this->_headers[$i] = " $header ";
+      $this->_ackColumnLength($i, strlen($header) + 2);
+    }
     return $this;
   }
 
@@ -95,28 +105,29 @@ class TextTable
     }
     $return = \SplFixedArray::fromArray($array);
     $return->setSize($this->_columnCount);
-    return $return->toArray();
+    $data = $return->toArray();
+    foreach($data as $i => $value)
+    {
+      if(strlen($value) > $this->_calculateColumnWidth($i))
+      {
+        $data[$i] = ltrim($value);
+      }
+    }
+
+    return $data;
   }
 
   protected function _outputLineFormat(
-    $spacer = ' | ', $pad = '', $leftBorder = null, $rightBorder = null,
-    $lastSpace = ' '
+    $spacer = '|', $pad = '', $leftBorder = null, $rightBorder = null
   )
   {
     $format = $leftBorder === null ? $this->_leftBorder() : $leftBorder;
 
     for($i = 1; $i <= $this->_columnCount; $i++)
     {
-      if($i === $this->_columnCount)
-      {
-        $end = $lastSpace;
-      }
-      else
-      {
-        $end = $spacer;
-      }
-      $width = $this->_calculateColumnWidth($i) + 1;
-      $format .= '%' . $pad . $width . 's' . $end;
+      $end   = $i === $this->_columnCount ? '' : $spacer;
+      $width = $this->_calculateColumnWidth($i);
+      $format .= '%' . $pad . $width . '.' . $width . 's' . $end;
     }
 
     $format .= $rightBorder === null ? $this->_rightBorder() : $rightBorder;
@@ -126,12 +137,12 @@ class TextTable
 
   protected function _topBorder()
   {
-    return $this->_horizonBorder("\n", "");
+    return $this->_horizonBorder("\n");
   }
 
   protected function _headerBorder()
   {
-    return $this->_horizonBorder("", "");
+    return $this->_horizonBorder();
   }
 
   protected function _horizonBorder($prepend = '', $append = '')
@@ -150,7 +161,7 @@ class TextTable
 
   protected function _bottomBorder()
   {
-    return $this->_horizonBorder("", "\n");
+    return $this->_horizonBorder();
   }
 
   protected function _edgeBorder()
@@ -170,12 +181,12 @@ class TextTable
 
   protected function _columnSplit()
   {
-    return ' | ';
+    return '|';
   }
 
   protected function _headerSplit()
   {
-    return '-+-';
+    return '+';
   }
 
   protected function _calculateColumnWidth($column = 1)
