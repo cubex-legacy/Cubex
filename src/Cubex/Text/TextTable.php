@@ -113,7 +113,7 @@ class TextTable
     $data = $return->toArray();
     foreach($data as $i => $value)
     {
-      if(strlen($value) > $this->_calculateColumnWidth($i))
+      if(strlen($value) > $this->_calculateColumnWidth($i + 1))
       {
         $data[$i] = ltrim($value);
       }
@@ -216,7 +216,11 @@ class TextTable
     }
     else
     {
-      $width = $this->_columnWidths[$column - 1];
+      $width = 10;
+      if(isset($this->_columnWidths[$column - 1]))
+      {
+        $width = $this->_columnWidths[$column - 1];
+      }
     }
     if($this->_maxColumnWidth !== null && $width > $this->_maxColumnWidth)
     {
