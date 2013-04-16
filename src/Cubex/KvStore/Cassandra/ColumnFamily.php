@@ -173,6 +173,11 @@ class ColumnFamily
     return $this->_connection;
   }
 
+  public function disconnect()
+  {
+    $this->_connection->disconnect();
+  }
+
   public function keyspace()
   {
     return $this->_keyspace;
