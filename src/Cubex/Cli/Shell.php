@@ -216,6 +216,14 @@ class Shell
   }
 
   /**
+   * Clear from the cursor the end of the current line
+   */
+  public static function clearToEol()
+  {
+    echo "\033[K";
+  }
+
+  /**
    * Determine if the current CLI Shell can support color. This may need
    * updating and is likely not accurate. More importantly there may be ways
    * around to support color for these but they've not been implemented here
