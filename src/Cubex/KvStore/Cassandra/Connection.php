@@ -140,6 +140,12 @@ class Connection
     return $this->_connected;
   }
 
+  public function disconnect()
+  {
+    $this->_client = null;
+    $this->_connected = false;
+  }
+
   public function setKeyspace($keyspace)
   {
     try
