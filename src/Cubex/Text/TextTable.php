@@ -13,6 +13,8 @@ class TextTable
   protected $_fixedColumnWidth = null;
   protected $_columnWidths = [];
   protected $_fixedLayout = false;
+  protected $_maxColumnWidth = null;
+  protected $_maxTableWidth = null;
 
   public function __construct()
   {
@@ -191,18 +193,33 @@ class TextTable
 
   protected function _calculateColumnWidth($column = 1)
   {
-    if($this->_fixedLayout)
+    if($this->_maxTableWidth !== null
+    && array_sum($this->_columnWidths) > $this->_maxTableWidth
+    )
+    {
+      $width = ceil($this->_maxTableWidth / $this->_columnCount);
+      $width = $width - 2;
+    }
+    else if($this->_fixedLayout)
     {
       if($this->_fixedColumnWidth === null)
       {
-        return max($this->_columnWidths);
+        $width = max($this->_columnWidths);
       }
-      return $this->_fixedColumnWidth;
+      else
+      {
+        $width = $this->_fixedColumnWidth;
+      }
     }
     else
     {
-      return $this->_columnWidths[$column - 1];
+      $width = $this->_columnWidths[$column - 1];
     }
+    if($this->_maxColumnWidth !== null && $width > $this->_maxColumnWidth)
+    {
+      $width = $this->_maxColumnWidth;
+    }
+    return $width;
   }
 
   public function setFixedLayout($enabled = true)
@@ -214,6 +231,18 @@ class TextTable
   public function setColumnWidth($width = 20)
   {
     $this->_fixedColumnWidth = $width;
+    return $this;
+  }
+
+  public function setMaxColumnWidth($width = 50)
+  {
+    $this->_maxColumnWidth = $width;
+    return $this;
+  }
+
+  public function setMaxTableWidth($width = 300)
+  {
+    $this->_maxTableWidth = $width;
     return $this;
   }
 }
