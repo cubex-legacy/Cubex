@@ -79,12 +79,15 @@ class TextTable
   {
     $out = $this->_topBorder();
 
-    $out .= vsprintf(
-      $this->_outputLineFormat($this->_columnSplit()),
-      $this->_padArray($this->_headers)
-    );
+    if(!empty($this->_headers))
+    {
+      $out .= vsprintf(
+        $this->_outputLineFormat($this->_columnSplit()),
+        $this->_padArray($this->_headers)
+      );
 
-    $out .= $this->_headerBorder();
+      $out .= $this->_headerBorder();
+    }
 
     foreach($this->_rows as $row)
     {
