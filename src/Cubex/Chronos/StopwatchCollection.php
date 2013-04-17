@@ -73,7 +73,10 @@ class StopwatchCollection
       {
         $report[] = [
           $sw->getName(),
-          Numbers::formatMicroTime($sw->getTime(), $this->_precision)
+          Numbers::formatMicroTime($sw->minTime(), $this->_precision),
+          Numbers::formatMicroTime($sw->maxTime(), $this->_precision),
+          Numbers::formatMicroTime($sw->averageTime(), $this->_precision),
+          Numbers::formatMicroTime($sw->totalTime(), $this->_precision)
         ];
       }
     }
