@@ -82,6 +82,7 @@ class StopwatchCollection
           Numbers::formatMicroTime(max($sw->minTime(), 0), $this->_precision),
           Numbers::formatMicroTime($sw->maxTime(), $this->_precision),
           Numbers::formatMicroTime($sw->averageTime(), $this->_precision),
+          Numbers::formatMicroTime($sw->lastTime(), $this->_precision),
           Numbers::formatMicroTime($swTotal, $this->_precision),
           sprintf("%.1f%%", $percent)
         ];
@@ -94,7 +95,7 @@ class StopwatchCollection
   public function displayReport()
   {
     $t = new TextTable();
-    $t->setColumnHeaders('Name', 'Min', 'Max', 'Avg', 'Total', '%');
+    $t->setColumnHeaders('Name', 'Min', 'Max', 'Avg', 'Last', 'Total', '%');
     $t->appendRows($this->getReportData());
     echo $t;
   }

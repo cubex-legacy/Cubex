@@ -13,6 +13,7 @@ class Stopwatch implements StopwatchIf
   private $_minTime;
   private $_maxTime;
   private $_eventCount;
+  private $_lastTime;
 
   public function __construct($name)
   {
@@ -27,10 +28,11 @@ class Stopwatch implements StopwatchIf
 
   public function reset()
   {
-    $this->_totalTime = 0;
-    $this->_minTime = -1;
-    $this->_maxTime = 0;
+    $this->_totalTime  = 0;
+    $this->_minTime    = -1;
+    $this->_maxTime    = 0;
     $this->_eventCount = 0;
+    $this->_lastTime   = 0;
   }
 
   public function start($reset = false)
@@ -44,7 +46,8 @@ class Stopwatch implements StopwatchIf
 
   public function stop()
   {
-    $duration = microtime(true) - $this->_startTime;
+    $duration        = microtime(true) - $this->_startTime;
+    $this->_lastTime = $duration;
     $this->_totalTime += $duration;
 
     $this->_eventCount++;
@@ -62,16 +65,24 @@ class Stopwatch implements StopwatchIf
   {
     return $this->_totalTime;
   }
+
   public function minTime()
   {
-    return $this->_minTime;
+    return max($this->_minTime, 0);
   }
+
   public function maxTime()
   {
     return $this->_maxTime;
   }
+
   public function averageTime()
   {
     return $this->_totalTime / $this->_eventCount;
+  }
+
+  public function lastTime()
+  {
+    return $this->_lastTime;
   }
 }

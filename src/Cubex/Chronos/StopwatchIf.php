@@ -23,6 +23,10 @@ interface StopwatchIf
    * @return int
    */
   public function averageTime();
+  /**
+   * @return int
+   */
+  public function lastTime();
 
   /**
    * @return string
