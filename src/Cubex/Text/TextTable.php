@@ -5,6 +5,8 @@
 
 namespace Cubex\Text;
 
+use Cubex\Cli\Shell;
+
 class TextTable
 {
   protected $_rows;
@@ -18,6 +20,10 @@ class TextTable
 
   public function __construct()
   {
+    if(CUBEX_CLI)
+    {
+      $this->setMaxTableWidth(Shell::columns());
+    }
   }
 
   public function appendRows($rows)
@@ -30,7 +36,7 @@ class TextTable
 
   public function appendRow($data)
   {
-    if(!is_array($data))
+    if(func_num_args() > 1 || is_scalar($data))
     {
       $data = func_get_args();
     }
