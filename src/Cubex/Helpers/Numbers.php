@@ -40,32 +40,11 @@ class Numbers
   public static function formatMicroTime($seconds, $precision = 0)
   {
     $seconds = round($seconds, $precision);
-    if($seconds == 1)
-    {
-      return '1 second';
-    }
-    if($seconds < 60)
-    {
-      return $seconds . ' seconds';
-    }
-
     $hours = floor($seconds / 3600);
     $seconds -= $hours * 3600;
     $mins = floor($seconds / 60);
     $seconds -= $mins * 60;
 
-    $str = '';
-    if($hours > 0)
-    {
-      $str .= $hours . ':';
-    }
-    $str .= str_pad($mins, 2, '0', STR_PAD_LEFT) . ':';
-    if($seconds < 10)
-    {
-      $str .= '0';
-    }
-    $str .= $seconds;
-
-    return $str;
+    return sprintf("%d:%02d:%02.3f", $hours, $mins, $seconds);
   }
 }
