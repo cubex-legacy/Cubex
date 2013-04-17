@@ -35,7 +35,8 @@ class ColumnFamily
   protected $_connection;
   protected $_name;
   protected $_keyspace;
-  protected $_consistency;
+  protected $_readConsistency;
+  protected $_writeConsistency;
   protected $_cqlVersion = 3;
   protected $_returnAttribute = true;
 
@@ -200,23 +201,45 @@ class ColumnFamily
 
   public function setConsistencyLevel($level = ConsistencyLevel::QUORUM)
   {
-    $this->_consistency = $level;
+    $this->setReadConsistencyLevel($level);
+    $this->setWriteConsistencyLevel($level);
     return $this;
   }
 
-  public function consistencyLevel()
+  public function setReadConsistencyLevel($level = ConsistencyLevel::QUORUM)
   {
-    if($this->_consistency === null)
+    $this->_readConsistency = $level;
+    return $this;
+  }
+
+  public function readConsistencyLevel()
+  {
+    if($this->_readConsistency === null)
     {
-      $this->_consistency = ConsistencyLevel::QUORUM;
+      $this->_readConsistency = ConsistencyLevel::QUORUM;
     }
-    return $this->_consistency;
+    return $this->_readConsistency;
+  }
+
+  public function setWriteConsistencyLevel($level = ConsistencyLevel::QUORUM)
+  {
+    $this->_writeConsistency = $level;
+    return $this;
+  }
+
+  public function writeConsistencyLevel()
+  {
+    if($this->_writeConsistency === null)
+    {
+      $this->_writeConsistency = ConsistencyLevel::QUORUM;
+    }
+    return $this->_writeConsistency;
   }
 
   public function columnCount($key, array $columnNames = null)
   {
     $parent = $this->_columnParent();
-    $level  = $this->consistencyLevel();
+    $level  = $this->readConsistencyLevel();
     $slice  = new SlicePredicate(['column_names' => $columnNames]);
     try
     {
@@ -252,7 +275,7 @@ class ColumnFamily
     $columns = $this->prepareDataType($this->columnDataType(), $columns);
 
     $result = null;
-    $level  = $this->consistencyLevel();
+    $level  = $this->readConsistencyLevel();
 
     if(count($columns) === 1)
     {
@@ -299,7 +322,7 @@ class ColumnFamily
     $result = null;
 
     $key   = $this->prepareDataType($this->keyDataType(), $key);
-    $level = $this->consistencyLevel();
+    $level = $this->readConsistencyLevel();
     $range = $this->makeSlice($start, $finish, $reverse, $limit);
     $slice = new SlicePredicate(['slice_range' => $range]);
 
@@ -326,7 +349,7 @@ class ColumnFamily
     $result = null;
     $keys   = $this->prepareDataType($this->keyDataType(), $keys);
 
-    $level = $this->consistencyLevel();
+    $level = $this->readConsistencyLevel();
     $range = $this->makeSlice($start, $finish, $reverse, $limit);
     $slice = new SlicePredicate(['slice_range' => $range]);
 
@@ -389,7 +412,7 @@ class ColumnFamily
     $keys    = $this->prepareDataType($this->keyDataType(), $keys);
     $columns = $this->prepareDataType($this->columnDataType(), $columns);
     $result  = null;
-    $level   = $this->consistencyLevel();
+    $level   = $this->readConsistencyLevel();
     $parent  = $this->_columnParent();
     $slice   = new SlicePredicate(['column_names' => $columns]);
 
@@ -463,7 +486,7 @@ class ColumnFamily
   protected function _getRangeSlice(KeyRange $range, $predicate)
   {
     $final  = null;
-    $level  = $this->consistencyLevel();
+    $level  = $this->readConsistencyLevel();
     $parent = $this->_columnParent();
 
     try
@@ -505,7 +528,7 @@ class ColumnFamily
 
     $mutationMap = $mutations = [];
     $column      = null;
-    $level       = $this->consistencyLevel();
+    $level       = $this->writeConsistencyLevel();
     $parent      = $this->_columnParent();
 
     foreach($columns as $columnName => $columnValue)
@@ -601,7 +624,7 @@ class ColumnFamily
       $numKeys = count($keys);
     }
 
-    $level = $this->consistencyLevel();
+    $level = $this->writeConsistencyLevel();
     $path  = $this->_columnPath();
 
     if($timestamp === null)
@@ -687,7 +710,7 @@ class ColumnFamily
   public function increment($key, $column, $increment = 1)
   {
     $key            = $this->keyDataType()->pack($key);
-    $level          = $this->consistencyLevel();
+    $level          = $this->writeConsistencyLevel();
     $parent         = $this->_columnParent();
     $counter        = new CounterColumn();
     $counter->value = abs($increment);
@@ -705,7 +728,7 @@ class ColumnFamily
   public function decrement($key, $column, $decrement = 1)
   {
     $key            = $this->keyDataType()->pack($key);
-    $level          = $this->consistencyLevel();
+    $level          = $this->writeConsistencyLevel();
     $parent         = $this->_columnParent();
     $counter        = new CounterColumn();
     $counter->value = abs($decrement) * -1;
@@ -723,7 +746,7 @@ class ColumnFamily
   public function removeCounter($key, $column)
   {
     $key          = $this->keyDataType()->pack($key);
-    $level        = $this->consistencyLevel();
+    $level        = $this->writeConsistencyLevel();
     $path         = $this->_columnPath();
     $path->column = $this->prepareDataType($this->columnDataType(), $column);
     try
@@ -738,6 +761,25 @@ class ColumnFamily
 
   public function runQuery($query, $compression = Compression::NONE)
   {
+    switch(strtoupper(substr($query, 0, 3)))
+    {
+      case 'INS':
+      case 'UPD':
+      case 'DEL':
+      case 'TRU':
+      case 'BAT':
+      case 'CRE':
+      case 'DRO':
+      case 'ALT':
+        $consistency = $this->writeConsistencyLevel();
+        break;
+      case 'SEL':
+      case 'USE':
+      default:
+        $consistency = $this->readConsistencyLevel();
+        break;
+    }
+
     $result = null;
     try
     {
@@ -746,7 +788,7 @@ class ColumnFamily
         $result = $this->_client()->execute_cql3_query(
           $query,
           $compression,
-          $this->consistencyLevel()
+          $consistency
         );
       }
       else
@@ -902,7 +944,7 @@ class ColumnFamily
       return $this;
     }
 
-    $level = $this->consistencyLevel();
+    $level = $this->writeConsistencyLevel();
     try
     {
       $this->_client()->batch_mutate($this->_batchMutation, $level);
