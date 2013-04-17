@@ -83,7 +83,7 @@ class StopwatchCollection
           Numbers::formatMicroTime($sw->maxTime(), $this->_precision),
           Numbers::formatMicroTime($sw->averageTime(), $this->_precision),
           Numbers::formatMicroTime($swTotal, $this->_precision),
-          round($percent, 1) . "%"
+          sprintf("%.1f%%", $percent)
         ];
       }
     }
