@@ -22,18 +22,22 @@ class ProfilingStats
     $memoryStats   = $this->_getMemoryStats();
 
     return [
-      'Included Files'  => $includedFiles->numFiles .
-      ' (total ' . Numbers::bytesToHumanReadable(
-        $includedFiles->totalSize
-      ) . ')',
-      'Peak Memory Use' => Numbers::bytesToHumanReadable(
-        $memoryStats->used
-      ) . '/' .
-      Numbers::bytesToHumanReadable($memoryStats->limit),
-      'Total Run Time'  => Numbers::formatMicroTime(
-        $this->_scriptRunTime(),
-        $this->_timePrecision
-      )
+      [
+        'Included Files',
+        $includedFiles->numFiles . ' (total ' .
+        Numbers::bytesToHumanReadable($includedFiles->totalSize) . ')'
+      ],
+      [
+        'Peak Memory Use',
+        Numbers::bytesToHumanReadable($memoryStats->used) . '/' .
+        Numbers::bytesToHumanReadable($memoryStats->limit)
+      ],
+      [
+        'Total Run Time' => Numbers::formatMicroTime(
+          $this->_scriptRunTime(),
+          $this->_timePrecision
+        )
+      ]
     ];
   }
 

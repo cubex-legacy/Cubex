@@ -8,8 +8,11 @@ namespace Cubex\Chronos;
 class Stopwatch implements StopwatchIf
 {
   private $_name;
-  private $_time;
+  private $_totalTime;
   private $_startTime;
+  private $_minTime;
+  private $_maxTime;
+  private $_eventCount;
 
   public function __construct($name)
   {
@@ -24,7 +27,10 @@ class Stopwatch implements StopwatchIf
 
   public function reset()
   {
-    $this->_time = 0;
+    $this->_totalTime = 0;
+    $this->_minTime = -1;
+    $this->_maxTime = 0;
+    $this->_eventCount = 0;
   }
 
   public function start($reset = false)
@@ -38,11 +44,34 @@ class Stopwatch implements StopwatchIf
 
   public function stop()
   {
-    $this->_time += microtime(true) - $this->_startTime;
+    $duration = microtime(true) - $this->_startTime;
+    $this->_totalTime += $duration;
+
+    $this->_eventCount++;
+    if(($this->_minTime == -1) || ($duration < $this->_minTime))
+    {
+      $this->_minTime = $duration;
+    }
+    if($duration > $this->_maxTime)
+    {
+      $this->_maxTime = $duration;
+    }
   }
 
-  public function getTime()
+  public function totalTime()
   {
-    return $this->_time;
+    return $this->_totalTime;
+  }
+  public function minTime()
+  {
+    return $this->_minTime;
+  }
+  public function maxTime()
+  {
+    return $this->_maxTime;
+  }
+  public function averageTime()
+  {
+    return $this->_totalTime / $this->_eventCount;
   }
 }

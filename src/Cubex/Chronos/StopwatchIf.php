@@ -10,7 +10,19 @@ interface StopwatchIf
   /**
    * @return int
    */
-  public function getTime();
+  public function totalTime();
+  /**
+   * @return int
+   */
+  public function minTime();
+  /**
+   * @return int
+   */
+  public function maxTime();
+  /**
+   * @return int
+   */
+  public function averageTime();
 
   /**
    * @return string

@@ -61,16 +61,20 @@ class StopwatchCollection
   public function getReportData()
   {
     $report = [
-      'Total Run Time' =>
-      Numbers::formatMicroTime($this->scriptRunTime(), $this->_precision)
+      [
+        'Total Run Time',
+        Numbers::formatMicroTime($this->scriptRunTime(), $this->_precision)
+      ]
     ];
 
     if(count($this->_stopwatches) > 0)
     {
       foreach($this->_stopwatches as $sw)
       {
-        $report[$sw->getName()] =
-        Numbers::formatMicroTime($sw->getTime(), $this->_precision);
+        $report[] = [
+          $sw->getName(),
+          Numbers::formatMicroTime($sw->getTime(), $this->_precision)
+        ];
       }
     }
 
