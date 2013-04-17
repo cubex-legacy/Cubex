@@ -662,7 +662,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
           $project = new $projectClass;
           if($project instanceof Project)
           {
-            $project->prepareProject();
+            $project->prepareProject(true);
           }
         }
 

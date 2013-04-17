@@ -11,7 +11,6 @@ use Cubex\Core\Http\Dispatchable;
 use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
-use Cubex\Foundation\Config\Configurable;
 use Cubex\ServiceManager\ServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
@@ -155,9 +154,17 @@ abstract class Project
     return $return;
   }
 
-  public function prepareProject()
+  public function prepareProject($isCli = false)
   {
     $this->init();
+    if($isCli)
+    {
+      $this->initCli();
+    }
+    else
+    {
+      $this->initWeb();
+    }
     $this->_configure();
     $this->addDefaultBundles();
     $this->initialiseBundles();
@@ -184,6 +191,22 @@ abstract class Project
    * Initialise Project
    */
   public function init()
+  {
+    return $this;
+  }
+
+  /**
+   * Initialise For Web Only
+   */
+  public function initWeb()
+  {
+    return $this;
+  }
+
+  /**
+   * Initialise For CLI Only
+   */
+  public function initCli()
   {
     return $this;
   }
