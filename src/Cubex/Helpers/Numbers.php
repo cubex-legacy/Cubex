@@ -45,6 +45,22 @@ class Numbers
     $mins = floor($seconds / 60);
     $seconds -= $mins * 60;
 
-    return sprintf("%d:%02d:%06.3f", $hours, $mins, $seconds);
+    $formatString = "";
+    $numbers = [];
+    if($hours > 0)
+    {
+      $formatString .= "%d:";
+      $numbers[] = $hours;
+    }
+    $secsDigits = $precision + 2;
+    if($mins > 0)
+    {
+      $formatString .= "%02d:";
+      $numbers[] = $mins;
+      $secsDigits++;
+    }
+    $formatString .= "%0" . $secsDigits . "." . $precision . "f";
+    $numbers[] = $seconds;
+    return vsprintf($formatString, $numbers);
   }
 }
