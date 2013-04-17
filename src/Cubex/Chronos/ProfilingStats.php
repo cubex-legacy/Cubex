@@ -33,10 +33,8 @@ class ProfilingStats
         Numbers::bytesToHumanReadable($memoryStats->limit)
       ],
       [
-        'Total Run Time' => Numbers::formatMicroTime(
-          $this->_scriptRunTime(),
-          $this->_timePrecision
-        )
+        'Total Run Time',
+        Numbers::formatMicroTime($this->_scriptRunTime(), $this->_timePrecision)
       ]
     ];
   }
