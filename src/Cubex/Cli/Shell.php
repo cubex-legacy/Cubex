@@ -280,15 +280,8 @@ class Shell
    */
   public static function redrawScreen($newContent)
   {
-    $output = "";
-    $lines  = explode("\n", $newContent);
-    foreach($lines as $line)
-    {
-      $output .= $line . "\033[K\n";
-    }
-
     self::home();
-    echo $output;
+    echo str_replace("\n", "\033[K\n", $newContent);
     self::clearToEndOfScreen();
   }
 }
