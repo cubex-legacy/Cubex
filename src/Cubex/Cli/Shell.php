@@ -138,12 +138,13 @@ class Shell
    */
   public static function columns()
   {
-    if(System::isWindows())
+    $cols = (int)exec('tput cols');
+    if($cols < 1 && System::isWindows())
     {
       return static::_windowsColumns();
     }
 
-    return (int)exec('/usr/bin/env tput cols');
+    return $cols;
   }
 
   /**
@@ -280,7 +281,7 @@ class Shell
   public static function redrawScreen($newContent)
   {
     $output = "";
-    $lines = explode("\n", $newContent);
+    $lines  = explode("\n", $newContent);
     foreach($lines as $line)
     {
       $output .= $line . "\033[K\n";
