@@ -22,7 +22,7 @@ class TextTable
   {
     if(CUBEX_CLI)
     {
-      $this->setMaxTableWidth(Shell::columns());
+      $this->setMaxTableWidth(Shell::columns() - 10);
     }
   }
 
@@ -40,6 +40,7 @@ class TextTable
     {
       $data = func_get_args();
     }
+
 
     if(count($data) > $this->_columnCount)
     {
