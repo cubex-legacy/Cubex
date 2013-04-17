@@ -66,6 +66,7 @@ class StopwatchCollection
     $report = [
       [
         'Total Run Time',
+        '', '', '', '',
         Numbers::formatMicroTime($totalTime, $this->_precision)
       ]
     ];
