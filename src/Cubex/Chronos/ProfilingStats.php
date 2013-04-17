@@ -10,10 +10,14 @@ use Cubex\Helpers\Numbers;
 class ProfilingStats
 {
   private $_timePrecision;
+  private $_includedFiles;
+  private $_memoryLimit;
 
   public function __construct()
   {
     $this->_timePrecision = 3;
+    $this->_includedFiles = false;
+    $this->_memoryLimit = -1;
   }
 
   public function getReportData()
@@ -46,52 +50,57 @@ class ProfilingStats
 
   private function _getIncludedFiles()
   {
-    $result            = new \stdClass();
-    $result->numFiles  = 0;
-    $result->totalSize = 0;
-    $result->files     = [];
-
-    $files = get_included_files();
-    foreach($files as $file)
+    if(! $this->_includedFiles)
     {
-      $result->numFiles++;
-      $fileInfo           = new \stdClass();
-      $fileInfo->filename = $file;
-      if(file_exists($file))
-      {
-        $size           = filesize($file);
-        $fileInfo->size = $size;
-        $result->totalSize += $size;
-      }
-      else
-      {
-        $fileInfo->size = 'unknown';
-      }
-      $result->files[] = $fileInfo;
-    }
+      $result            = new \stdClass();
+      $result->numFiles  = 0;
+      $result->totalSize = 0;
+      $result->files     = [];
 
-    return $result;
+      $files = get_included_files();
+      foreach($files as $file)
+      {
+        $result->numFiles++;
+        $fileInfo           = new \stdClass();
+        $fileInfo->filename = $file;
+        if(file_exists($file))
+        {
+          $size           = filesize($file);
+          $fileInfo->size = $size;
+          $result->totalSize += $size;
+        }
+        else
+        {
+          $fileInfo->size = 'unknown';
+        }
+        $result->files[] = $fileInfo;
+      }
+      $this->_includedFiles = $result;
+    }
+    return $this->_includedFiles;
   }
 
   private function _getMemoryStats()
   {
-    $stats       = new \stdClass();
-    $stats->used = memory_get_peak_usage();
-
-    // get the memory limit in bytes
-    $limit    = trim(ini_get('memory_limit'));
-    $intLimit = intval($limit);
-    switch(strtolower(substr($limit, -1)))
+    if($this->_memoryLimit == -1)
     {
-      case 'g':
-        $intLimit *= 1024;
-      case 'm':
-        $intLimit *= 1024;
-      case 'k':
-        $intLimit *= 1024;
+      // get the memory limit in bytes
+      $limit              = trim(ini_get('memory_limit'));
+      $this->_memoryLimit = intval($limit);
+      switch(strtolower(substr($limit, -1)))
+      {
+        case 'g':
+          $this->_memoryLimit *= 1024;
+        case 'm':
+          $this->_memoryLimit *= 1024;
+        case 'k':
+          $this->_memoryLimit *= 1024;
+      }
     }
 
-    $stats->limit = $intLimit;
+    $stats       = new \stdClass();
+    $stats->used = memory_get_peak_usage();
+    $stats->limit = $this->_memoryLimit;
     return $stats;
   }
 }
