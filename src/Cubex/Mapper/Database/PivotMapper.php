@@ -247,4 +247,28 @@ class PivotMapper extends RecordMapper
     }
     return null;
   }
+
+  public static function with(
+    RecordMapper $pivota, RecordMapper $pivotb, $load = false
+  )
+  {
+    $pivot = new PivotMapper();
+    $pivot->pivotOn($pivota, $pivotb);
+    if($load)
+    {
+      $pivot->load($pivota, $pivotb);
+    }
+    return $pivot;
+  }
+
+  public static function create(
+    RecordMapper $pivota, RecordMapper $pivotb
+  )
+  {
+    $pivot = new PivotMapper();
+    $pivot->pivotOn($pivota, $pivotb);
+    $pivot->load($pivota, $pivotb);
+    $pivot->saveChanges();
+    return $pivot;
+  }
 }
