@@ -271,5 +271,24 @@ class Shell
   {
     self::setCursorPos(1, 1);
   }
+
+  /**
+   * Redraw the screen without clearing it first to avoid flicker
+   *
+   * @param string $newContent
+   */
+  public static function redrawScreen($newContent)
+  {
+    $output = "";
+    $lines = explode("\n", $newContent);
+    foreach($lines as $line)
+    {
+      $output .= $line . "\033[K\n";
+    }
+
+    self::home();
+    echo $output;
+    self::clearToEndOfScreen();
+  }
 }
 
