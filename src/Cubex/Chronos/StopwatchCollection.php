@@ -7,6 +7,7 @@ namespace Cubex\Chronos;
 
 use Cubex\Cli\Shell;
 use Cubex\Helpers\Numbers;
+use Cubex\Text\TextTable;
 
 class StopwatchCollection
 {
@@ -60,10 +61,12 @@ class StopwatchCollection
 
   public function getReportData()
   {
+    $totalTime = $this->scriptRunTime();
+
     $report = [
       [
         'Total Run Time',
-        Numbers::formatMicroTime($this->scriptRunTime(), $this->_precision)
+        Numbers::formatMicroTime($totalTime, $this->_precision)
       ]
     ];
 
@@ -71,16 +74,28 @@ class StopwatchCollection
     {
       foreach($this->_stopwatches as $sw)
       {
+        $swTotal = $sw->totalTime();
+        $percent = ($swTotal * 100) / $totalTime;
+
         $report[] = [
           $sw->getName(),
-          Numbers::formatMicroTime($sw->minTime(), $this->_precision),
+          Numbers::formatMicroTime(max($sw->minTime(), 0), $this->_precision),
           Numbers::formatMicroTime($sw->maxTime(), $this->_precision),
           Numbers::formatMicroTime($sw->averageTime(), $this->_precision),
-          Numbers::formatMicroTime($sw->totalTime(), $this->_precision)
+          Numbers::formatMicroTime($swTotal, $this->_precision),
+          round($percent, 1) . "%"
         ];
       }
     }
 
     return $report;
+  }
+
+  public function displayReport()
+  {
+    $t = new TextTable();
+    $t->setColumnHeaders('Name', 'Min', 'Max', 'Avg', 'Total', '%');
+    $t->appendRows($this->getReportData());
+    echo $t;
   }
 }
