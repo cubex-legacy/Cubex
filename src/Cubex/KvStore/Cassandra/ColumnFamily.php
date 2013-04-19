@@ -5,6 +5,7 @@
 
 namespace Cubex\KvStore\Cassandra;
 
+use Cubex\Data\Attribute;
 use Cubex\KvStore\Cassandra\DataType\BytesType;
 use Cubex\KvStore\Cassandra\DataType\CassandraType;
 use Thrift\Exception\TApplicationException;
@@ -534,17 +535,21 @@ class ColumnFamily
     foreach($columns as $columnName => $columnValue)
     {
       $columnExpiry = $ttlSeconds;
-      if($columnValue instanceof ColumnAttribute)
+      if($columnValue instanceof Attribute)
       {
         if($columnName !== $columnValue->name())
         {
           $columnName = $columnValue->name();
         }
+
+        $columnValue = $columnValue->serialize();
+      }
+      if($columnValue instanceof ColumnAttribute)
+      {
         if($columnValue->expiryTime() !== null)
         {
           $columnExpiry = $columnValue->expiryTime();
         }
-        $columnValue = $columnValue->serialize();
       }
       $column            = new Column();
       $column->name      = $this->columnDataType()->pack($columnName);

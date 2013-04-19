@@ -155,7 +155,7 @@ class CassandraMapper extends KvMapper
           }
         }
 
-        if($attr->isModified())
+        if($attr->isModified() && $attr->saveToDatabase())
         {
           if(
             !$this->_autoTimestamp

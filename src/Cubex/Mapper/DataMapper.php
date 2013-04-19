@@ -7,6 +7,8 @@ namespace Cubex\Mapper;
 use Cubex\Data\Attribute;
 use Cubex\Data\CallbackAttribute;
 use Cubex\Data\CompositeAttribute;
+use Cubex\Data\CompoundAttribute;
+use Cubex\Data\Multribute;
 use Cubex\Data\PolymorphicAttribute;
 use Cubex\Exception\CubexException;
 use Cubex\Helpers\Inflection;
@@ -422,7 +424,30 @@ abstract class DataMapper
     $name, array $attributes, $createSubs = true
   )
   {
-    $composite = new CompositeAttribute($name);
+    return $this->_addMultribute(
+      new CompositeAttribute($name),
+      $name,
+      $attributes,
+      $createSubs
+    );
+  }
+
+  protected function _addCompoundAttribute(
+    $name, array $attributes, $createSubs = true
+  )
+  {
+    return $this->_addMultribute(
+      new CompoundAttribute($name),
+      $name,
+      $attributes,
+      $createSubs
+    );
+  }
+
+  protected function _addMultribute(
+    Multribute $multribute, $name, array $attributes, $createSubs = true
+  )
+  {
     foreach($attributes as $attr)
     {
       if(is_scalar($attr))
@@ -439,10 +464,10 @@ abstract class DataMapper
 
       if($attr !== null)
       {
-        $composite->addSubAttribute($attr);
+        $multribute->addSubAttribute($attr);
       }
     }
-    $this->_addAttribute($composite);
+    $this->_addAttribute($multribute);
     return true;
   }
 
@@ -845,7 +870,7 @@ abstract class DataMapper
           }
         }
 
-        if($attr->isModified())
+        if($attr->isModified() && $attr->saveToDatabase())
         {
           if(
             !$this->_autoTimestamp

@@ -33,6 +33,7 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
   protected $_populated = false;
   protected $_hidden = false;
   protected $_requireUnserialize = false;
+  protected $_saveable = true;
 
   public function __construct(
     $name,
@@ -327,6 +328,12 @@ class Attribute implements Validatable, Filterable, \JsonSerializable
 
   public function saveToDatabase()
   {
-    return true;
+    return $this->_saveable;
+  }
+
+  public function setSaveToDatabase($enabled=true)
+  {
+    $this->_saveable = (bool)$enabled;
+    return $this;
   }
 }
