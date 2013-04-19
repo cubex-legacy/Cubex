@@ -88,6 +88,11 @@ abstract class CliCommand implements CliTask
   {
   }
 
+  public function methodCallArgs()
+  {
+    return $this->_rawPositionalArgs;
+  }
+
   protected function _compiledArguments()
   {
     return $this->_args;
@@ -626,6 +631,7 @@ abstract class CliCommand implements CliTask
   {
     return [
       'nonCallableMethods',
+      'methodCallArgs',
       'execute',
       '__construct',
       'init',

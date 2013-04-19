@@ -4,6 +4,7 @@
  */
 namespace Cubex;
 
+use Cubex\Cli\CliCommand;
 use Cubex\Cli\CliTask;
 use Cubex\Core\Http\DispatchInjection;
 use Cubex\Core\Project\Project;
@@ -691,7 +692,17 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
             );
           }
 
-          $result = $obj->$action();
+          if($obj instanceof CliCommand)
+          {
+            $args = $obj->methodCallArgs();
+          }
+          else
+          {
+            $args = [];
+          }
+
+          $result = call_user_func_array([$obj, $action], $args);
+
           if(is_numeric($result))
           {
             $this->_response->setStatusCode($result);
