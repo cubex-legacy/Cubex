@@ -522,7 +522,7 @@ class ColumnFamily
     return $final;
   }
 
-  public function insert($key, array $columns, $expiry = null)
+  public function insert($key, array $columns, $ttlSeconds = null)
   {
     $key = $this->prepareDataType($this->keyDataType(), $key);
 
@@ -533,10 +533,23 @@ class ColumnFamily
 
     foreach($columns as $columnName => $columnValue)
     {
+      $columnExpiry = $ttlSeconds;
+      if($columnValue instanceof ColumnAttribute)
+      {
+        if($columnName !== $columnValue->name())
+        {
+          $columnName = $columnValue->name();
+        }
+        if($columnValue->expiryTime() !== null)
+        {
+          $columnExpiry = $columnValue->expiryTime();
+        }
+        $columnValue = $columnValue->serialize();
+      }
       $column            = new Column();
       $column->name      = $this->columnDataType()->pack($columnName);
       $column->value     = $columnValue;
-      $column->ttl       = $expiry;
+      $column->ttl       = $columnExpiry;
       $column->timestamp = $this->timestamp();
 
       $mutations[] = new Mutation(

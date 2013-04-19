@@ -70,7 +70,11 @@ class KvMapper extends DataMapper
     {
       $columns[$k] = $data['after'];
     }
-    $this->connection()->insert($this->getTableName(), $this->id(), $columns);
+    return $this->connection()->insert(
+      $this->getTableName(),
+      $this->id(),
+      $columns
+    );
   }
 
   public function delete(array $columns = null)

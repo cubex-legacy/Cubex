@@ -6,6 +6,7 @@
 namespace Cubex\Mapper\Cassandra;
 
 use Cubex\Data\Attribute;
+use Cubex\Data\CallbackAttribute;
 use Cubex\Facade\Cassandra;
 use Cubex\KvStore\Cassandra\ColumnAttribute;
 use Cubex\KvStore\Cassandra\DataType\CassandraType;
@@ -129,5 +130,54 @@ class CassandraMapper extends KvMapper
   {
     $this->getCf()->setKeyDataType($type);
     return $this;
+  }
+
+  public function saveChanges($globalTtlSeconds = null)
+  {
+    $this->_changes = $columns = [];
+    $modified       = $this->getModifiedAttributes();
+    if(!empty($modified))
+    {
+      $this->_updateTimestamps();
+      $modified = $this->getModifiedAttributes();
+    }
+
+    foreach($modified as $attr)
+    {
+      if($attr instanceof Attribute)
+      {
+        if($attr instanceof CallbackAttribute)
+        {
+          $attr->saveAttribute();
+          if(!$attr->storeOriginal())
+          {
+            continue;
+          }
+        }
+
+        if($attr->isModified())
+        {
+          if(
+            !$this->_autoTimestamp
+            || ($attr->name() != $this->createdAttribute()
+            && $attr->name() != $this->updatedAttribute())
+          )
+          {
+            $columns[$attr->name()]        = $attr;
+            $this->_changes[$attr->name()] = [
+              'before' => $attr->originalData(),
+              'after'  => $attr->serialize()
+            ];
+          }
+        }
+      }
+    }
+
+    return $this->connection()->insert(
+      $this->getTableName(),
+      $this->id(),
+      $columns,
+      $globalTtlSeconds
+    );
   }
 }
