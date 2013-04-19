@@ -553,7 +553,15 @@ abstract class CliCommand implements CliTask
 
       if(!in_array($methodName, $this->nonCallableMethods()))
       {
-        $this->_publicMethods[] = $methodName;
+        $params = [];
+        foreach($m->getParameters() as $param)
+        {
+          $params[] = '$' . $param->name . '' .
+          ($param->isDefaultValueAvailable()
+          ? '=' . $param->getDefaultValue() : '');
+        }
+        $this->_publicMethods[] = $methodName .
+        (empty($params) ? '' : '(' . implode(',', $params) . ')');
       }
     }
 
