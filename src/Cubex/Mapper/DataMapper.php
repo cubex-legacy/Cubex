@@ -461,6 +461,13 @@ abstract class DataMapper
           $this->_addAttribute($attr);
         }
       }
+      else if($attr instanceof Attribute)
+      {
+        if(!$this->attributeExists($attr->name()))
+        {
+          $this->_addAttribute($attr);
+        }
+      }
 
       if($attr !== null)
       {
@@ -496,19 +503,19 @@ abstract class DataMapper
   /**
    * @param $name
    *
-   * @return \Cubex\Data\CompositeAttribute
+   * @return \Cubex\Data\Multribute
    * @throws \Exception
    */
   public function getCompAttribute($name)
   {
     $attr = $this->_attribute($name);
-    if($attr instanceof CompositeAttribute)
+    if($attr instanceof Multribute)
     {
       return $attr;
     }
     else
     {
-      throw new \Exception("Invalid Composite Attribute");
+      throw new \Exception("Invalid Multribute Attribute");
     }
   }
 
