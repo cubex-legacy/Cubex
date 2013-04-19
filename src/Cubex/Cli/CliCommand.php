@@ -90,7 +90,7 @@ abstract class CliCommand implements CliTask
 
   public function methodCallArgs()
   {
-    return $this->_rawPositionalArgs;
+    return (array)$this->_rawPositionalArgs;
   }
 
   protected function _compiledArguments()
