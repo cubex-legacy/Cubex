@@ -40,7 +40,7 @@ abstract class CliCommand implements CliTask
   /**
    * @var string[]
    */
-  protected $_rawPositionalArgs;
+  protected $_rawPositionalArgs = [];
 
   /**
    * @var CliArgument[]
