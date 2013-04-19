@@ -135,13 +135,26 @@ class Shell
    * Returns the number of columns the current shell has for display.
    *
    * @return int  The number of columns.
+   *
+   * @param int $default
+   *
    */
-  public static function columns()
+  public static function columns($default = 80)
   {
-    $cols = (int)exec('tput cols');
+    $cols = null;
+    if(self::commandExists("tput"))
+    {
+      $cols = (int)exec('tput cols');
+    }
+
     if($cols < 1 && System::isWindows())
     {
       return static::_windowsColumns();
+    }
+
+    if($cols === null)
+    {
+      return $default;
     }
 
     return $cols;
@@ -154,6 +167,10 @@ class Shell
    */
   protected static function _windowsColumns()
   {
+    if(!self::commandExists("mode"))
+    {
+      return null;
+    }
     $columns = 0;
     exec("mode", $output);
 
@@ -283,6 +300,20 @@ class Shell
     self::home();
     echo str_replace("\n", "\033[K\n", $newContent);
     self::clearToEndOfScreen();
+  }
+
+  public static function commandExists($cmd)
+  {
+    if(System::isWindows())
+    {
+      system("where $cmd /Q", $returnVal);
+      return $returnVal === 0;
+    }
+    else
+    {
+      system("which $cmd", $returnVal);
+      return $returnVal === 0;
+    }
   }
 }
 
