@@ -36,7 +36,8 @@ class CompoundAttribute extends Multribute
     if(stristr($data, chr(self::COMPOUND_SEPARATOR_CHAR)))
     {
       $data = explode(chr(self::COMPOUND_SEPARATOR_CHAR), $data);
+      return parent::setData($data);
     }
-    parent::setData($data);
+    return call_user_func_array(['parent', 'setData'], func_get_args());
   }
 }
