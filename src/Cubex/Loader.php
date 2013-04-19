@@ -636,7 +636,8 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
         $action = 'execute';
       }
 
-      $attempts = [
+      $attempted = [];
+      $attempts  = [
         '',
         $this->_namespace . '.',
         $this->_namespace . '.Cli.',
@@ -647,6 +648,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       {
         $command      = $try . $originalCommand;
         $command      = $dictionary->match($command);
+        $attempted[]  = $command;
         $canLoadClass = class_exists($command);
         if($canLoadClass)
         {
@@ -705,7 +707,11 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       else
       {
         $this->handleException(
-          new \RuntimeException($command . " could not be loaded")
+          new \RuntimeException(
+            "Your CLI command '$originalCommand' could not be located." .
+            "\n\nThe following classes (in order) were attempted: \n\n\t" .
+            implode("\n\t", $attempted), 404
+          )
         );
       }
     }
