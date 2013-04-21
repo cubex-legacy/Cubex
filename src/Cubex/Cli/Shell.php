@@ -306,12 +306,12 @@ class Shell
   {
     if(System::isWindows())
     {
-      system("where $cmd /Q", $returnVal);
+      exec("where $cmd /Q", $output, $returnVal);
       return $returnVal === 0;
     }
     else
     {
-      system("which $cmd", $returnVal);
+      exec("which $cmd", $output, $returnVal);
       return $returnVal === 0;
     }
   }
