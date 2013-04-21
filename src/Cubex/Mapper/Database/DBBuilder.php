@@ -123,12 +123,13 @@ class DBBuilder
 
     $emptyAttribute = $this->_emptyMapper->getAttribute($name);
 
-    $unsigned   = false;
-    $allowNull  = true;
-    $default    = $emptyAttribute->serialize($emptyAttribute->defaultValue());
-    $options    = 150;
-    $dataType   = DataType::VARCHAR;
-    $annotation = [];
+    $unsigned     = false;
+    $allowNull    = true;
+    $characterSet = $collation = null;
+    $default      = $emptyAttribute->serialize($emptyAttribute->defaultValue());
+    $options      = 150;
+    $dataType     = DataType::VARCHAR;
+    $annotation   = [];
     try
     {
       $comment = $this->_reflect->getProperty(
@@ -218,6 +219,18 @@ class DBBuilder
           case 'datatype':
             $dataType = $v;
             break;
+          case 'characterset':
+          case 'charset':
+            $characterSet = $v;
+            break;
+          case 'collation':
+          case 'collate':
+            $collation = $v;
+            if($characterSet === null)
+            {
+              $characterSet = head(explode('_', $collation));
+            }
+            break;
           case 'allownull':
             $allowNull = (bool)$v;
             break;
@@ -227,7 +240,7 @@ class DBBuilder
 
     return new Column(
       $name, $dataType, $options, $unsigned, $allowNull, $default,
-      false, $comment, $zero, $collation
+      false, $comment, $zero, $characterSet, $collation
     );
   }
 
@@ -269,13 +282,17 @@ class DBBuilder
 
   public function createDB()
   {
-    $columns = $this->_columnSqls();
-    $indexes = $this->_getIndexes();
-    $content = array_merge((array)$columns, (array)$indexes);
+    $columns    = $this->_columnSqls();
+    $indexes    = $this->_getIndexes();
+    $properties = $this->_getTableProperties();
+    $content    = array_merge((array)$columns, (array)$indexes);
 
     $sql = "CREATE TABLE ";
-    $sql .= "`" . $this->_database . "`.`" . $this->_tableName . "`" .
-    "(" . implode(",", $content) . ") ENGINE = MYISAM";
+    $sql .= "`" . $this->_database . "`.`" . $this->_tableName . "`";
+    $sql .= "(" . implode(",", $content) . ") ";
+    $sql .= implode(" ", $properties);
+
+    echo "\n\n" . $sql . "\n\n";
 
     return $sql;
   }
@@ -302,6 +319,63 @@ class DBBuilder
       }
     }
     return $indexes;
+  }
+
+  protected function _getTableProperties()
+  {
+    $engine   = 'MYISAM';
+    $comments = [];
+    $charset  = $collation = null;
+    $doclines = Strings::docCommentLines($this->_reflect->getDocComment());
+    foreach($doclines as $docline)
+    {
+      list($type, $val) = explode(" ", $docline, 2);
+      switch($type)
+      {
+        case '@engine':
+          $engine = $val;
+          break;
+        case '@comment':
+          $comments[] = $val;
+          break;
+        case '@collate':
+        case '@collation':
+          $collation = $val;
+          if($charset === null)
+          {
+            $charset = head(explode('_', $val));
+          }
+          break;
+        case '@charset':
+        case '@characterset':
+          $charset = head(explode('_', $val));
+          break;
+        default:
+          if(substr($type, 0, 1) !== '@')
+          {
+            $comments[] = $val;
+          }
+          break;
+      }
+    }
+
+    $props[] = 'ENGINE = ' . $engine;
+
+    if($charset !== null)
+    {
+      $props[] = 'CHARACTER SET ' . $charset;
+    }
+
+    if($collation !== null)
+    {
+      $props[] = 'COLLATE ' . $collation;
+    }
+    if(!empty($comments))
+    {
+      $props[] = " COMMENT = '" . addslashes(implode(", ", $comments)) . "'";
+    }
+
+    return $props;
   }
 
   protected function _columnSqls()

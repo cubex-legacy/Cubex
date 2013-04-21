@@ -22,7 +22,7 @@ class Column
   public function __construct(
     $name, $dataType = DataType::VARCHAR, $options = 250, $unsigned = false,
     $allowNull = true, $default = null, $autoIncrement = false, $comment = null,
-    $zerofill = null
+    $zerofill = null, $characterSet = null, $collation = null
   )
   {
     $this->_autoIncrement = $autoIncrement;
@@ -34,6 +34,8 @@ class Column
     $this->_zerofill      = $zerofill;
     $this->_default       = $default;
     $this->_comment       = $comment;
+    $this->_characterSet  = $characterSet;
+    $this->_collation     = $collation;
   }
 
   public function name()
@@ -68,6 +70,16 @@ class Column
           $sql .= "('" . implode("','", $opts) . "') ";
         }
         break;
+    }
+
+    if($this->_characterSet !== null)
+    {
+      $sql .= " CHARACTER SET " . $this->_characterSet . " ";
+    }
+
+    if($this->_collation !== null)
+    {
+      $sql .= " COLLATE " . $this->_collation . " ";
     }
 
     if($this->_unsigned)
