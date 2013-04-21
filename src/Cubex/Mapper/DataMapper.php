@@ -1033,6 +1033,17 @@ abstract class DataMapper
   }
 
   /**
+   * @param bool $plural
+   *
+   * @return string
+   */
+  public static function tableName($plural=true)
+  {
+    $current = new static;
+    return $current->getTableName($plural);
+  }
+
+  /**
    * @throws \Exception
    */
   public function connection()
