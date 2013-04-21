@@ -292,8 +292,6 @@ class DBBuilder
     $sql .= "(" . implode(",", $content) . ") ";
     $sql .= implode(" ", $properties);
 
-    echo "\n\n" . $sql . "\n\n";
-
     return $sql;
   }
 
