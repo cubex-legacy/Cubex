@@ -8,6 +8,7 @@ namespace Cubex\Cli;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Helpers\Strings;
 use Cubex\Loader;
+use Psr\Log\LogLevel;
 
 abstract class CliCommand implements CliTask
 {
@@ -628,6 +629,76 @@ abstract class CliCommand implements CliTask
       );
       unset($this->$propName);
     }
+  }
+
+  public function logInfo($text)
+  {
+    return $this->logLine(LogLevel::INFO, $text);
+  }
+
+  public function logNotice($text)
+  {
+    return $this->logLine(LogLevel::NOTICE, $text);
+  }
+
+  public function logWarning($text)
+  {
+    return $this->logLine(LogLevel::WARNING, $text);
+  }
+
+  public function logCritical($text)
+  {
+    return $this->logLine(LogLevel::CRITICAL, $text);
+  }
+
+  public function logLine($level, $text)
+  {
+    $color = null;
+    switch($level)
+    {
+      case LogLevel::ALERT:
+        $color = Shell::COLOUR_FOREGROUND_LIGHT_BLUE;
+        break;
+      case LogLevel::CRITICAL:
+        $color = Shell::COLOUR_FOREGROUND_RED;
+        break;
+      case LogLevel::DEBUG:
+        $color = Shell::COLOUR_FOREGROUND_LIGHT_PURPLE;
+        break;
+      case LogLevel::EMERGENCY:
+        $color = Shell::COLOUR_FOREGROUND_RED;
+        break;
+      case LogLevel::ERROR:
+        $color = Shell::COLOUR_FOREGROUND_LIGHT_RED;
+        break;
+      case LogLevel::INFO:
+        $color = Shell::COLOUR_FOREGROUND_LIGHT_BLUE;
+        break;
+      case LogLevel::NOTICE:
+        $color = Shell::COLOUR_FOREGROUND_GREEN;
+        break;
+      case LogLevel::WARNING:
+        $color = Shell::COLOUR_FOREGROUND_YELLOW;
+        break;
+    }
+
+    $output = [];
+
+    $levelText = strtoupper(substr($level, 0, 4));
+
+    if($color !== null)
+    {
+      $output[] = Shell::colourText($levelText, $color);
+    }
+    else
+    {
+      $output[] = $levelText;
+    }
+
+    $output[] = date("Y-m-d H:i:s");
+    $output[] = $text;
+
+    return vsprintf("\n%s [%s] %s", $output);
   }
 
   public function __get($name)
