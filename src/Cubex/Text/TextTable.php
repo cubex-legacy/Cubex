@@ -18,6 +18,8 @@ class TextTable
   protected $_maxColumnWidth = null;
   protected $_maxTableWidth = null;
 
+  const SPACER = 'spacer';
+
   public function __construct()
   {
     if(CUBEX_CLI)
@@ -32,6 +34,11 @@ class TextTable
     {
       $this->appendRow($row);
     }
+  }
+
+  public function appendSpacer()
+  {
+    $this->_rows[] = self::SPACER;
   }
 
   public function appendRow($data)
@@ -83,27 +90,42 @@ class TextTable
 
   public function __toString()
   {
-    $out = $this->_topBorder();
-
-    if(!empty($this->_headers))
+    try
     {
-      $out .= vsprintf(
-        $this->_outputLineFormat($this->_columnSplit()),
-        $this->_padArray($this->_headers)
-      );
+      $out = $this->_topBorder();
 
-      $out .= $this->_headerBorder();
+      if(!empty($this->_headers))
+      {
+        $out .= vsprintf(
+          $this->_outputLineFormat($this->_columnSplit()),
+          $this->_padArray($this->_headers)
+        );
+
+        $out .= $this->_headerBorder();
+      }
+
+      foreach($this->_rows as $row)
+      {
+        if($row === self::SPACER)
+        {
+          $out .= $this->_headerBorder();
+        }
+        else
+        {
+          $out .= vsprintf(
+            $this->_outputLineFormat($this->_columnSplit()),
+            $this->_padArray($row)
+          );
+        }
+      }
+
+      $out .= $this->_bottomBorder();
     }
-
-    foreach($this->_rows as $row)
+    catch(\Exception $e)
     {
-      $out .= vsprintf(
-        $this->_outputLineFormat($this->_columnSplit()),
-        $this->_padArray($row)
-      );
+      $out = $e->getMessage();
+      $out .= $e->getLine();
     }
-
-    $out .= $this->_bottomBorder();
 
     return $out;
   }
@@ -114,7 +136,7 @@ class TextTable
     {
       $array = [];
     }
-    $return = \SplFixedArray::fromArray($array);
+    $return = \SplFixedArray::fromArray(array_values($array));
     $return->setSize($this->_columnCount);
     $data = $return->toArray();
     foreach($data as $i => $value)
@@ -257,5 +279,31 @@ class TextTable
   {
     $this->_maxTableWidth = $width;
     return $this;
+  }
+
+  public static function fromArray(array $data)
+  {
+    $keys  = [];
+    $table = new self();
+
+    foreach($data as $k => $v)
+    {
+      if(is_array($v))
+      {
+        foreach($v as $key => $value)
+        {
+          $keys[$key] = true;
+        }
+      }
+      else
+      {
+        $keys[$k] = true;
+      }
+      $table->appendRow($v);
+    }
+
+    $table->setColumnHeaders(array_keys($keys));
+
+    return $table;
   }
 }
