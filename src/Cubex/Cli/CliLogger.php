@@ -260,5 +260,15 @@ class CliLogger
       Log::error("\n" . $event->getStr('formatted_message'));
     }
   }
+
+  public function setLogLevel($logLevel)
+  {
+    $this->_logLevel = $logLevel;
+  }
+
+  public function setEchoLevel($echoLevel)
+  {
+    $this->_echoLevel = $echoLevel;
+  }
 }
 
