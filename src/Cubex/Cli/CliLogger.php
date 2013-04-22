@@ -59,8 +59,8 @@ class CliLogger
    * @param string $instanceName
    */
   public function __construct(
-    $echoLevel = LogLevel::ERROR, $logLevel = LogLevel::WARNING, $logFile = "",
-    $instanceName = ""
+    $echoLevel = LogLevel::ERROR, $logLevel = LogLevel::WARNING,
+    $logFile = null, $instanceName = ""
   )
   {
     $this->_echoLevel = $echoLevel;
@@ -76,13 +76,15 @@ class CliLogger
       }
     }
 
-    $this->_logFilePath = $this->_getLogFilePath($logFile, $instanceName);
-    $this->_dateFormat  = $this->_getConfigOption('date_format', 'd/m/Y H:i:s');
-
-    $logDir = dirname($this->_logFilePath);
-    if(!file_exists($logDir))
+    $this->_dateFormat = $this->_getConfigOption('date_format', 'd/m/Y H:i:s');
+    if($logFile !== null)
     {
-      mkdir($logDir, 0755, true);
+      $this->_logFilePath = $this->_getLogFilePath($logFile, $instanceName);
+      $logDir             = dirname($this->_logFilePath);
+      if(!file_exists($logDir))
+      {
+        mkdir($logDir, 0755, true);
+      }
     }
 
     EventManager::listen(EventManager::CUBEX_LOG, [$this, 'handleLogEvent']);
@@ -159,16 +161,48 @@ class CliLogger
   {
     $logData = $event->getData();
     $level   = $logData['level'];
-    $fullMsg = date($this->_dateFormat) . " " . $this->_logLevelToDisplay(
-      $level
-    ) . " " . $logData['message'];
+    $fullMsg = date($this->_dateFormat) . " ";
 
     if($this->_logLevelLessThanOrEqual($level, $this->_echoLevel))
     {
+      $color = null;
+      switch($level)
+      {
+        case LogLevel::ALERT:
+          $color = Shell::COLOUR_FOREGROUND_LIGHT_BLUE;
+          break;
+        case LogLevel::CRITICAL:
+          $color = Shell::COLOUR_FOREGROUND_RED;
+          break;
+        case LogLevel::DEBUG:
+          $color = Shell::COLOUR_FOREGROUND_LIGHT_PURPLE;
+          break;
+        case LogLevel::EMERGENCY:
+          $color = Shell::COLOUR_FOREGROUND_RED;
+          break;
+        case LogLevel::ERROR:
+          $color = Shell::COLOUR_FOREGROUND_LIGHT_RED;
+          break;
+        case LogLevel::INFO:
+          $color = Shell::COLOUR_FOREGROUND_LIGHT_BLUE;
+          break;
+        case LogLevel::NOTICE:
+          $color = Shell::COLOUR_FOREGROUND_GREEN;
+          break;
+        case LogLevel::WARNING:
+          $color = Shell::COLOUR_FOREGROUND_YELLOW;
+          break;
+      }
+      $fullMsg .= Shell::colourText($this->_logLevelToDisplay($level), $color);
+      $fullMsg .= " " . $logData['message'];
       echo $fullMsg . "\n";
     }
 
-    if($this->_logLevelLessThanOrEqual($level, $this->_logLevel))
+    $fullMsg .= $this->_logLevelToDisplay($level) . " " . $logData['message'];
+
+    if($this->_logFilePath !== null
+    && $this->_logLevelLessThanOrEqual($level, $this->_logLevel)
+    )
     {
       $fp = fopen($this->_logFilePath, "a");
       if($fp)

@@ -15,6 +15,15 @@ abstract class CliCommand implements CliTask
   use ConfigTrait;
 
   /**
+   * Automatically log to screen
+   */
+  protected $_autoLog = true;
+  protected $_echoLevel = LogLevel::ERROR;
+  /**
+   * @var CliLogger
+   */
+  protected $_logger;
+  /**
    * @var Loader
    */
   protected $_loader;
@@ -56,6 +65,14 @@ abstract class CliCommand implements CliTask
    */
   public function __construct($loader, $rawArgs)
   {
+    /**
+     * If you wish to log to a file, or use CLI logger in a more detailed way,
+     * Set _autoLog to false and initiate the CliLogger within your class
+     */
+    if($this->_autoLog)
+    {
+      $this->_logger = new CliLogger($this->_echoLevel, LogLevel::EMERGENCY);
+    }
     $this->_loader  = $loader;
     $this->_rawArgs = $rawArgs;
 
@@ -629,76 +646,6 @@ abstract class CliCommand implements CliTask
       );
       unset($this->$propName);
     }
-  }
-
-  public function logInfo($text)
-  {
-    return $this->logLine(LogLevel::INFO, $text);
-  }
-
-  public function logNotice($text)
-  {
-    return $this->logLine(LogLevel::NOTICE, $text);
-  }
-
-  public function logWarning($text)
-  {
-    return $this->logLine(LogLevel::WARNING, $text);
-  }
-
-  public function logCritical($text)
-  {
-    return $this->logLine(LogLevel::CRITICAL, $text);
-  }
-
-  public function logLine($level, $text)
-  {
-    $color = null;
-    switch($level)
-    {
-      case LogLevel::ALERT:
-        $color = Shell::COLOUR_FOREGROUND_LIGHT_BLUE;
-        break;
-      case LogLevel::CRITICAL:
-        $color = Shell::COLOUR_FOREGROUND_RED;
-        break;
-      case LogLevel::DEBUG:
-        $color = Shell::COLOUR_FOREGROUND_LIGHT_PURPLE;
-        break;
-      case LogLevel::EMERGENCY:
-        $color = Shell::COLOUR_FOREGROUND_RED;
-        break;
-      case LogLevel::ERROR:
-        $color = Shell::COLOUR_FOREGROUND_LIGHT_RED;
-        break;
-      case LogLevel::INFO:
-        $color = Shell::COLOUR_FOREGROUND_LIGHT_BLUE;
-        break;
-      case LogLevel::NOTICE:
-        $color = Shell::COLOUR_FOREGROUND_GREEN;
-        break;
-      case LogLevel::WARNING:
-        $color = Shell::COLOUR_FOREGROUND_YELLOW;
-        break;
-    }
-
-    $output = [];
-
-    $levelText = strtoupper(substr($level, 0, 4));
-
-    if($color !== null)
-    {
-      $output[] = Shell::colourText($levelText, $color);
-    }
-    else
-    {
-      $output[] = $levelText;
-    }
-
-    $output[] = date("Y-m-d H:i:s");
-    $output[] = $text;
-
-    return vsprintf("\n%s [%s] %s", $output);
   }
 
   public function __get($name)
