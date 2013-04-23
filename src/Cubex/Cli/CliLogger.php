@@ -90,10 +90,6 @@ class CliLogger
       EventManager::CUBEX_PHP_ERROR,
       [$this, 'handlePhpError']
     );
-    EventManager::listen(
-      EventManager::CUBEX_UNHANDLED_EXCEPTION,
-      [$this, 'handleException']
-    );
   }
 
   public static function getDefaultLogPath($instanceName = "")
@@ -114,7 +110,7 @@ class CliLogger
 
   private function _getLogFilePath($logFile = "", $instanceName = "")
   {
-    if(! $logFile)
+    if(!$logFile)
     {
       $logFile = $this->_getConfigOption('log_file', "");
     }
@@ -227,10 +223,11 @@ class CliLogger
     {
       $errMsg = 'PHP ERROR';
     }
-    $errMsg .= ' in ' . $event->getStr(
-      'errFile'
-    ) . ' at line ' . $event->getInt('errLine') . ' : '
-    . $event->getStr('errMsg');
+
+    $errMsg .= ' in ' . $event->getStr('errFile');
+    $errMsg .= ' at line ' . $event->getInt('errLine') . ' : ';
+    $errMsg .= $event->getStr('errMsg');
+
     switch($event->getInt('errNo'))
     {
       case E_ERROR:
@@ -256,7 +253,9 @@ class CliLogger
     if($this->logUnhandledExceptions)
     {
       Log::error("\n" . $event->getStr('formatted_message'));
+      return true;
     }
+    return false;
   }
 
   public function setLogLevel($logLevel)
