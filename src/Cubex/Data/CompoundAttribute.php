@@ -14,7 +14,7 @@ class CompoundAttribute extends Multribute
 
   public function serialize($args = null)
   {
-    if(!is_array($args))
+    if($args !== null && !is_array($args))
     {
       throw new \Exception(
         "Only arrays can be serialized through compound attributes"
