@@ -12,8 +12,14 @@ class CompoundAttribute extends Multribute
 
   const COMPOUND_SEPARATOR_CHAR = 28;
 
-  public function serialize(array $args = null)
+  public function serialize($args = null)
   {
+    if(!is_array($args))
+    {
+      throw new \Exception(
+        "Only arrays can be serialized through compound attributes"
+      );
+    }
     if($args === null)
     {
       $args = [];
