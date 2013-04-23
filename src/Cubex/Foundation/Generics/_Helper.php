@@ -34,6 +34,19 @@ if(!function_exists("var_dump_json"))
   }
 }
 
+if(!function_exists("json_pretty"))
+{
+  /**
+   * @param $object
+   *
+   * @return string
+   */
+  function json_pretty($object)
+  {
+    return json_encode($object, JSON_PRETTY_PRINT);
+  }
+}
+
 if(!function_exists("class_shortname"))
 {
   /**
