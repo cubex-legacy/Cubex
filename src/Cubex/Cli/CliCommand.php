@@ -34,11 +34,11 @@ abstract class CliCommand implements CliTask
   /**
    * @var CliArgument[]
    */
-  protected $_options;
+  protected $_options = [];
   /**
    * @var PositionalArgument[]
    */
-  protected $_positionalArgs;
+  protected $_positionalArgs = [];
   /**
    * @var CliArgument[]
    */
@@ -55,7 +55,7 @@ abstract class CliCommand implements CliTask
   /**
    * @var CliArgument[]
    */
-  protected $_args;
+  protected $_args = [];
 
   protected $_publicMethods;
 
@@ -252,7 +252,7 @@ abstract class CliCommand implements CliTask
 
   private function _showHelpArg(CliArgument $arg, $showShortArg = true)
   {
-    $screenWidth = Shell::columns();
+    $screenWidth      = Shell::columns();
     $labelWidth       = 30;
     $descriptionWidth = ($screenWidth - $labelWidth) - 1;
 
