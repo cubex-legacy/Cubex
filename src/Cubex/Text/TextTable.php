@@ -53,10 +53,12 @@ class TextTable
       $this->_columnCount = count($data);
     }
 
+    $x = 0;
     foreach($data as $i => $value)
     {
       $data[$i] = " $value ";
-      $this->_ackColumnLength($i, strlen($value) + 2);
+      $this->_ackColumnLength($x, strlen($value) + 2);
+      $x++;
     }
 
     $this->_rows[] = $data;
@@ -254,6 +256,7 @@ class TextTable
     {
       $width = $this->_maxColumnWidth;
     }
+
     return $width;
   }
 
@@ -269,7 +272,7 @@ class TextTable
     return $this;
   }
 
-  public function setMaxColumnWidth($width = 50)
+  public function setMaxColumnWidth($width = 100)
   {
     $this->_maxColumnWidth = $width;
     return $this;
@@ -281,25 +284,28 @@ class TextTable
     return $this;
   }
 
-  public static function fromArray(array $data)
+  public static function fromArray($data)
   {
     $keys  = [];
     $table = new self();
 
     foreach($data as $k => $v)
     {
-      if(is_array($v))
+      if(is_array($v) || is_object($v))
       {
+        $row = [];
         foreach($v as $key => $value)
         {
           $keys[$key] = true;
+          $row[$key]  = $value;
         }
+        $table->appendRow($row);
       }
       else
       {
         $keys[$k] = true;
+        $table->appendRow($v);
       }
-      $table->appendRow($v);
     }
 
     $table->setColumnHeaders(array_keys($keys));
