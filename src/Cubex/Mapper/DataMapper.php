@@ -782,6 +782,7 @@ abstract class DataMapper
     {
       if($v instanceof Attribute)
       {
+        $k = $this->_cleanAttributeName($v->name());
         $this->_addAttribute($v);
         if($setUnmodified)
         {
@@ -790,6 +791,7 @@ abstract class DataMapper
       }
       else
       {
+        $k = $this->_cleanAttributeName($k);
         $exists = $this->attributeExists($k);
         if(!$exists && $createAttributes)
         {
