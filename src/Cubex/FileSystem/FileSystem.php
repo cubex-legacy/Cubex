@@ -84,7 +84,7 @@ class FileSystem
    */
   public static function readRandomCharacters($numberOfCharacters)
   {
-    $map = array_merge(range('a', 'z'), range('2', '7'));
+    $map = array_merge(range('a', 'z'), range('A', 'Z'), range('2', '7'));
 
     $result = '';
     $bytes  = self::readRandomBytes($numberOfCharacters);
