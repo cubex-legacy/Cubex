@@ -43,7 +43,7 @@ class CassandraMapper extends KvMapper
     return $this->connection()->cf($this->getTableName());
   }
 
-  public function setData($attribute, $value, $ttl = null)
+  public function setData($attribute, $value, $ttl = null, $serialized = false)
   {
     if(!$this->attributeExists($attribute))
     {
@@ -51,7 +51,7 @@ class CassandraMapper extends KvMapper
       $a->setExpiry($ttl);
       $this->_addAttribute($a);
     }
-    return parent::setData($attribute, $value);
+    return parent::setData($attribute, $value, $serialized);
   }
 
   public function setExpiry($attribute, $ttl)
