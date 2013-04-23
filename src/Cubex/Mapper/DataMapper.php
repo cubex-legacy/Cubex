@@ -410,6 +410,17 @@ abstract class DataMapper
   }
 
   /**
+   * @param $attribute
+   *
+   * @return bool
+   */
+  public function __isset($attribute)
+  {
+    $name = $this->_cleanAttributeName($attribute);
+    return isset($this->_attributes[$name]);
+  }
+
+  /**
    * @return array
    */
   public function getConfiguration()
@@ -1037,7 +1048,7 @@ abstract class DataMapper
    *
    * @return string
    */
-  public static function tableName($plural=true)
+  public static function tableName($plural = true)
   {
     $current = new static;
     return $current->getTableName($plural);
