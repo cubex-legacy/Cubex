@@ -271,4 +271,18 @@ class PivotMapper extends RecordMapper
     $pivot->saveChanges();
     return $pivot;
   }
+
+  public static function createOnId($id1, $id2)
+  {
+    $pivot = new static();
+    if($pivot->_pivotaKey === null)
+    {
+      throw new \RuntimeException(
+        "You can only call this method on preconfigured mappers", 500
+      );
+    }
+    $pivot->load($id1, $id2);
+    $pivot->saveChanges();
+    return $pivot;
+  }
 }
