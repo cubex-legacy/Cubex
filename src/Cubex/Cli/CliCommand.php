@@ -233,25 +233,40 @@ abstract class CliCommand implements CliTask
 
     echo "\n" . $usage . "\n\n";
 
+    // are there any short arguments?
+    $hasShortArgs = false;
     foreach($this->_options as $arg)
     {
-      $this->_showHelpArg($arg);
+      if($arg->hasShortName())
+      {
+        $hasShortArgs = true;
+        break;
+      }
+    }
+
+    foreach($this->_options as $arg)
+    {
+      $this->_showHelpArg($arg, $hasShortArgs);
     }
   }
 
-  private function _showHelpArg(CliArgument $arg)
+  private function _showHelpArg(CliArgument $arg, $showShortArg = true)
   {
+    $screenWidth = Shell::columns();
     $labelWidth       = 30;
-    $descriptionWidth = 50;
+    $descriptionWidth = ($screenWidth - $labelWidth) - 1;
 
     $text = "  ";
-    if($arg->hasShortName())
+    if($showShortArg)
     {
-      $text .= '-' . $arg->shortName . ', ';
-    }
-    else
-    {
-      $text .= '    ';
+      if($arg->hasShortName())
+      {
+        $text .= '-' . $arg->shortName . ', ';
+      }
+      else
+      {
+        $text .= '    ';
+      }
     }
 
     $text .= '--' . $arg->longName;
