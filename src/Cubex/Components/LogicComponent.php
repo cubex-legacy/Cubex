@@ -15,8 +15,9 @@ abstract class LogicComponent implements Component, NamespaceAware
 {
   public function __construct()
   {
-    if(static::$_interfaces === null)
+    if(!isset(static::$_interfaces[get_called_class()]))
     {
+      static::$_interfaces[get_called_class()] = [];
       $this->init();
     }
   }
@@ -106,14 +107,14 @@ abstract class LogicComponent implements Component, NamespaceAware
       $serviceName = $interface;
     }
 
-    static::$_interfaces[$interface] = $serviceName;
+    static::$_interfaces[get_called_class()][$interface] = $serviceName;
 
     return $this;
   }
 
   public function interfaceHandled($interface)
   {
-    return isset(static::$_interfaces[$interface]);
+    return isset(static::$_interfaces[get_called_class()][$interface]);
   }
 
   public function getByInterface($interface)
@@ -124,13 +125,15 @@ abstract class LogicComponent implements Component, NamespaceAware
     }
     else
     {
-      return $this->_getServiceManager()->get(static::$_interfaces[$interface]);
+      return $this->_getServiceManager()->get(
+        static::$_interfaces[get_called_class()][$interface]
+      );
     }
   }
 
   public function getAvailableInterfaces()
   {
-    return array_keys(static::$_interfaces);
+    return array_keys(static::$_interfaces[get_called_class()]);
   }
 
   /**
