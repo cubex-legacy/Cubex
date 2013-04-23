@@ -252,7 +252,10 @@ class PivotMapper extends RecordMapper
     RecordMapper $pivota, RecordMapper $pivotb, $load = false
   )
   {
-    $pivot = new PivotMapper();
+    $pivot = new static;
+    /**
+     * @var $pivot \Cubex\Mapper\Database\PivotMapper
+     */
     $pivot->pivotOn($pivota, $pivotb);
     if($load)
     {
@@ -265,7 +268,10 @@ class PivotMapper extends RecordMapper
     RecordMapper $pivota, RecordMapper $pivotb
   )
   {
-    $pivot = new PivotMapper();
+    $pivot = new static;
+    /**
+     * @var $pivot \Cubex\Mapper\Database\PivotMapper
+     */
     $pivot->pivotOn($pivota, $pivotb);
     $pivot->load($pivota, $pivotb);
     $pivot->saveChanges();
@@ -274,7 +280,10 @@ class PivotMapper extends RecordMapper
 
   public static function createOnId($id1, $id2)
   {
-    $pivot = new static();
+    $pivot = new static;
+    /**
+     * @var $pivot \Cubex\Mapper\Database\PivotMapper
+     */
     if($pivot->_pivotaKey === null)
     {
       throw new \RuntimeException(
