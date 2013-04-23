@@ -77,14 +77,12 @@ class CliLogger
     }
 
     $this->_dateFormat = $this->_getConfigOption('date_format', 'd/m/Y H:i:s');
-    if($logFile !== null)
+
+    $this->_logFilePath = $this->_getLogFilePath($logFile, $instanceName);
+    $logDir             = dirname($this->_logFilePath);
+    if(!file_exists($logDir))
     {
-      $this->_logFilePath = $this->_getLogFilePath($logFile, $instanceName);
-      $logDir             = dirname($this->_logFilePath);
-      if(!file_exists($logDir))
-      {
-        mkdir($logDir, 0755, true);
-      }
+      mkdir($logDir, 0755, true);
     }
 
     EventManager::listen(EventManager::CUBEX_LOG, [$this, 'handleLogEvent']);
@@ -116,7 +114,7 @@ class CliLogger
 
   private function _getLogFilePath($logFile = "", $instanceName = "")
   {
-    if($logFile == "")
+    if(! $logFile)
     {
       $logFile = $this->_getConfigOption('log_file', "");
     }
