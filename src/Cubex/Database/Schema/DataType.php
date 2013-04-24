@@ -38,4 +38,5 @@ class DataType extends Enum
   const DATETIME   = "datetime";
   const TIMESTAMP  = "timestamp";
   const ENUM       = "enum";
+  const BOOL       = "bool";
 }

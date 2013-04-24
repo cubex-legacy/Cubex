@@ -10,6 +10,7 @@ use Cubex\Database\DatabaseService;
 use Cubex\Database\Schema\Column;
 use Cubex\Database\Schema\DataType;
 use Cubex\Helpers\Strings;
+use Cubex\Mapper\DataMapper;
 use Cubex\Sprintf\ParseQuery;
 
 class DBBuilder
@@ -32,6 +33,7 @@ class DBBuilder
   protected $_column;
   protected $_passed;
   protected $_mapperClass;
+  protected $_addedAutoId = false;
 
   public function __construct(DatabaseService $connection, RecordMapper $mapper)
   {
@@ -114,11 +116,22 @@ class DBBuilder
     {
       return null;
     }
-    $name = $this->_mapper->stringToColumnName($attr->name());
+
+    $primarykey = false;
+    $name       = $this->_mapper->stringToColumnName($attr->name());
+
     if($this->_mapper->getIdKey() == $name)
     {
-      return null;
+      if($this->_addedAutoId)
+      {
+        return null;
+      }
+      else
+      {
+        $primarykey = true;
+      }
     }
+
     $uname = Strings::variableToUnderScore($name);
 
     $emptyAttribute = $this->_emptyMapper->getAttribute($name);
@@ -234,13 +247,20 @@ class DBBuilder
           case 'allownull':
             $allowNull = (bool)$v;
             break;
+          case 'unsigned':
+            $unsigned = true;
+            break;
+          case 'zerofill':
+          case 'zero':
+            $zero = $v;
+            break;
         }
       }
     }
 
     return new Column(
       $name, $dataType, $options, $unsigned, $allowNull, $default,
-      false, $comment, $zero, $characterSet, $collation
+      false, $comment, $zero, $characterSet, $collation, $primarykey
     );
   }
 
@@ -263,9 +283,14 @@ class DBBuilder
   {
     $attrs = $this->_mapper->getRawAttributes();
 
-    if(!$this->_mapper->isCompositeId())
+    $conf = $this->_mapper->getConfiguration();
+    if(isset($conf[RecordMapper::CONFIG_IDS])
+    && $conf[RecordMapper::CONFIG_IDS] === RecordMapper::ID_AUTOINCREMENT
+    && !$this->_mapper->isCompositeId()
+    )
     {
-      $this->_columns[] = new Column(
+      $this->_addedAutoId = true;
+      $this->_columns[]   = new Column(
         $this->_mapper->getIdKey(), DataType::INT, 10, true, false, null, true
       );
     }
@@ -275,7 +300,14 @@ class DBBuilder
       $col = $this->_columnFromAttribute($attr);
       if($col !== null)
       {
-        $this->_columns[] = $col;
+        if($col->isPrimary())
+        {
+          array_unshift($this->_columns, $col);
+        }
+        else
+        {
+          $this->_columns[] = $col;
+        }
       }
     }
   }

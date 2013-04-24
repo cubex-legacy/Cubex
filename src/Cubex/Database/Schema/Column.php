@@ -18,11 +18,12 @@ class Column
   protected $_default;
   protected $_comment;
   protected $_autoIncrement;
+  protected $_primaryKey;
 
   public function __construct(
     $name, $dataType = DataType::VARCHAR, $options = 250, $unsigned = false,
     $allowNull = true, $default = null, $autoIncrement = false, $comment = null,
-    $zerofill = null, $characterSet = null, $collation = null
+    $zerofill = null, $characterSet = null, $collation = null, $primary = false
   )
   {
     $this->_autoIncrement = $autoIncrement;
@@ -36,6 +37,7 @@ class Column
     $this->_comment       = $comment;
     $this->_characterSet  = $characterSet;
     $this->_collation     = $collation;
+    $this->_primaryKey    = $primary;
   }
 
   public function name()
@@ -45,6 +47,11 @@ class Column
 
   public function createSql()
   {
+    if($this->_dataType === 'string')
+    {
+      $this->_dataType = 'varchar';
+    }
+
     $sql = "`" . $this->_name . "` ";
 
     $sql .= strtoupper($this->_dataType);
@@ -124,9 +131,19 @@ class Column
 
     if($this->_autoIncrement)
     {
-      $sql .= " AUTO_INCREMENT PRIMARY KEY";
+      $sql .= " AUTO_INCREMENT";
+    }
+
+    if($this->_autoIncrement || $this->_primaryKey)
+    {
+      $sql .= " PRIMARY KEY";
     }
 
     return $sql;
+  }
+
+  public function isPrimary()
+  {
+    return (bool)$this->_primaryKey;
   }
 }
