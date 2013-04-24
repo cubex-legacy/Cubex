@@ -27,6 +27,10 @@ class DBBuilder
    * @var Column[]
    */
   protected $_columns = [];
+  /**
+   * @var Column[]
+   */
+  protected $_primaryColumns = [];
   protected $_tableName;
   protected $_database;
   protected $_connection;
@@ -289,10 +293,19 @@ class DBBuilder
     && !$this->_mapper->isCompositeId()
     )
     {
-      $this->_addedAutoId = true;
-      $this->_columns[]   = new Column(
+      $this->_addedAutoId      = true;
+      $this->_primaryColumns[] = new Column(
         $this->_mapper->getIdKey(), DataType::INT, 10, true, false, null, true
       );
+    }
+
+    $priKeys = ['id'];
+    if($this->_mapper->isCompositeId())
+    {
+      $idcomp  = $this->_mapper->getCompAttribute(
+        $this->_mapper->getIdKey()
+      );
+      $priKeys = $idcomp->attributeOrder();
     }
 
     foreach($attrs as $attr)
@@ -300,9 +313,9 @@ class DBBuilder
       $col = $this->_columnFromAttribute($attr);
       if($col !== null)
       {
-        if($col->isPrimary())
+        if($col->isPrimary() || in_array($col->name(), $priKeys))
         {
-          array_unshift($this->_columns, $col);
+          $this->_primaryColumns[] = $col;
         }
         else
         {
@@ -424,16 +437,14 @@ class DBBuilder
       $primaryIds = [];
     }
 
-    foreach($this->_columns as $col)
+    $columns = array_merge($this->_primaryColumns, $this->_columns);
+
+    foreach($columns as $col)
     {
-      if(in_array($col->name(), $primaryIds))
-      {
-        array_unshift($cols, $col->createSql());
-      }
-      else
-      {
-        $cols[] = $col->createSql();
-      }
+      /**
+       * @var $col Column
+       */
+      $cols[] = $col->createSql();
     }
 
     if($this->_mapper->isCompositeId())
