@@ -7,5 +7,5 @@
 
     "lint.engine" : "ArcanistSingleLintEngine",
     "lint.engine.single.linter" : "ArcanistPhpcsLinter",
-    "lint.phpcs.standard" : "cubex_code_standards"
+    "lint.phpcs.standard" : "CubexCodeStandards"
 }

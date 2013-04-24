@@ -205,7 +205,7 @@ abstract class Application
         $matchRoute = $router->getMatchedRoute();
         if($matchRoute !== null)
         {
-          $matchedUri = $matchRoute->pattern();
+          $matchedUri = $matchRoute->pattern(true);
           $dispatcher->setBaseUri($matchedUri);
         }
         $dispatcher->setApplication($this);

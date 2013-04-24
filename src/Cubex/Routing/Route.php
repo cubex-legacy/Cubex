@@ -15,9 +15,11 @@ interface Route
   /**
    * Get Pattern
    *
+   * @param bool $clean
+   *
    * @return string
    */
-  public function pattern();
+  public function pattern($clean = false);
 
   /**
    * @param string $pattern

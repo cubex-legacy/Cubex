@@ -46,11 +46,23 @@ class StdRoute implements Route, HandlerInterface, \JsonSerializable
   /**
    * Get Pattern
    *
+   * If clean is set to true we strip a regex catch all from the end of the
+   * pattern before returning.
+   *
+   * @param bool $clean
+   *
    * @return string
    */
-  public function pattern()
+  public function pattern($clean = false)
   {
-    return $this->_pattern;
+    if($clean)
+    {
+      return rtrim(str_replace("/(.*)", "", $this->_pattern), "/");
+    }
+    else
+    {
+      return $this->_pattern;
+    }
   }
 
   /**
