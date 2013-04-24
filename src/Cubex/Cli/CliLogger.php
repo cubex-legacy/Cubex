@@ -155,7 +155,7 @@ class CliLogger
   {
     $logData = $event->getData();
     $level   = $logData['level'];
-    $fullMsg = date($this->_dateFormat) . " ";
+    $logDate = date($this->_dateFormat) . " ";
 
     if($this->_logLevelLessThanOrEqual($level, $this->_echoLevel))
     {
@@ -187,12 +187,14 @@ class CliLogger
           $color = Shell::COLOUR_FOREGROUND_YELLOW;
           break;
       }
-      $fullMsg .= Shell::colourText($this->_logLevelToDisplay($level), $color);
-      $fullMsg .= " " . $logData['message'];
-      echo $fullMsg . "\n";
+      $echoMsg = $logDate;
+      $echoMsg .= Shell::colourText($this->_logLevelToDisplay($level), $color);
+      $echoMsg .= " " . $logData['message'];
+      echo $echoMsg . "\n";
     }
 
-    $fullMsg .= $this->_logLevelToDisplay($level) . " " . $logData['message'];
+    $logMsg = $logDate;
+    $logMsg .= $this->_logLevelToDisplay($level) . " " . $logData['message'];
 
     if($this->_logFilePath !== null
     && $this->_logLevelLessThanOrEqual($level, $this->_logLevel)
@@ -201,7 +203,7 @@ class CliLogger
       $fp = fopen($this->_logFilePath, "a");
       if($fp)
       {
-        fputs($fp, $fullMsg . "\n");
+        fputs($fp, $logMsg . "\n");
         fclose($fp);
       }
     }
