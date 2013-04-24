@@ -771,11 +771,12 @@ abstract class DataMapper
    * @param array $data
    * @param bool  $setUnmodified
    * @param bool  $createAttributes
+   * @param bool  $raw
    *
    * @return $this
    */
   public function hydrate(
-    array $data, $setUnmodified = false, $createAttributes = false
+    array $data, $setUnmodified = false, $createAttributes = false, $raw = true
   )
   {
     foreach($data as $k => $v)
@@ -791,7 +792,7 @@ abstract class DataMapper
       }
       else
       {
-        $k = $this->_cleanAttributeName($k);
+        $k      = $this->_cleanAttributeName($k);
         $exists = $this->attributeExists($k);
         if(!$exists && $createAttributes)
         {
@@ -801,7 +802,7 @@ abstract class DataMapper
 
         if($exists)
         {
-          $this->setData($k, $v, true);
+          $this->setData($k, $v, $raw);
           if($setUnmodified)
           {
             $this->_attribute($k)->unsetModified();
@@ -811,6 +812,20 @@ abstract class DataMapper
     }
 
     return $this;
+  }
+
+  /**
+   * @param array $data
+   * @param bool  $setUnmodified
+   * @param bool  $createAttributes
+   *
+   * @return $this
+   */
+  public function hydrateFromUnserialized(
+    array $data, $setUnmodified = false, $createAttributes = false
+  )
+  {
+    return $this->hydrate($data, $setUnmodified, $createAttributes, false);
   }
 
   public function hydrateFromMapper(DataMapper $mapper)
