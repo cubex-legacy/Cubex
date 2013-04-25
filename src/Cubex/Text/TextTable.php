@@ -56,6 +56,10 @@ class TextTable
     $x = 0;
     foreach($data as $i => $value)
     {
+      if(!is_scalar($value))
+      {
+        $value = json_encode($value);
+      }
       $data[$i] = " $value ";
       $this->_ackColumnLength($x, strlen($value) + 2);
       $x++;
