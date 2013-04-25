@@ -222,6 +222,12 @@ class Resource extends Dependency
       $file = "$file.$type";
     }
 
+    if(preg_match("~#(\w+/\w+)#(.*)~", $file, $matches))
+    {
+      $event->setPackage($matches[1]);
+      $file = $matches[2];
+    }
+
     if(substr($file, 0, 1) === "/")
     {
       $file = "/$type$file";

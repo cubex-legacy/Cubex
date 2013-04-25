@@ -11,6 +11,7 @@ class Path
   private $_entityHash;
   private $_resourceHash;
   private $_debugString;
+  private $_marker;
   private $_pathToResource;
 
   public function __construct($dispatchPath)
@@ -28,17 +29,24 @@ class Path
       );
     }
 
+    if(strstr($dispatchPathParts[1], ";") === false)
+    {
+      $dispatchPathParts[1] .= ";";
+    }
+
     if(strstr($dispatchPathParts[2], ";") === false)
     {
       $dispatchPathParts[2] .= ";";
     }
 
+    list($entityHash, $marker)        = explode(";", $dispatchPathParts[1], 2);
     list($resourceHash, $debugString) = explode(";", $dispatchPathParts[2], 2);
 
     $this->setDomainHash($dispatchPathParts[0])
-      ->setEntityHash($dispatchPathParts[1])
+      ->setEntityHash($entityHash)
       ->setResourceHash($resourceHash)
       ->setDebugString($debugString)
+      ->setMarker($marker)
       ->setPathToResource($dispatchPathParts[3]);
   }
 
@@ -118,6 +126,26 @@ class Path
   public function setDebugString($debugString)
   {
     $this->_debugString = $debugString;
+
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getMarker()
+  {
+    return $this->_marker;
+  }
+
+  /**
+   * @param string $marker
+   *
+   * @return \Cubex\Dispatch\Path
+   */
+  public function setMarker($marker)
+  {
+    $this->_marker = $marker;
 
     return $this;
   }

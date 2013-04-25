@@ -17,11 +17,16 @@ class Dependency extends Dispatcher
    */
   public function getDispatchPath(Event $event, Request $request)
   {
-    $path   = ltrim($event->getFile(), "/");
-    $base   = substr($event->getFile(), 0, 1) === "/";
-    $domain = $request->domain() . "." . $request->tld();
+    $path    = ltrim($event->getFile(), "/");
+    $base    = substr($event->getFile(), 0, 1) === "/";
+    $domain  = $request->domain() . "." . $request->tld();
+    $package = $event->getPackage();
 
-    if($base)
+    if($package)
+    {
+      $entity = $package;
+    }
+    else if($base)
     {
       $entity = $this->getProjectNamespace() . "/";
       $entity .= $this->getResourceDirectory();
@@ -35,6 +40,11 @@ class Dependency extends Dispatcher
     $domainHash        = $this->generateDomainHash($domain);
     $entityHash        = $this->generateEntityHash($entity);
     $resourceHash      = $this->getNomapHash();
+
+    if($package)
+    {
+      $entityHash .= ";" . $this->getExternalHash();
+    }
 
     $ini = $this->getDispatchIni($entity);
     if(array_key_exists($path, $ini))

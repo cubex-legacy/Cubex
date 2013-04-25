@@ -19,13 +19,15 @@ class Dispatcher
   private $_fileSystem;
   private $_domainMap;
   private $_entityMap;
+  private $_lnretxMap;
   private $_buildOptions;
   private $_dispatchIniFilename;
   private $_resourceDirectory;
   private $_projectNamespace;
   private $_projectBase;
-  private $_baseHash = "esabot";
-  private $_nomapHash = "pamon";
+  private $_baseHash       = "esabot";
+  private $_externalHash   = "lnretx";
+  private $_nomapHash      = "pamon";
   private $_supportedTypes = [
     "ico"   => "image/x-icon",
     "css"   => "text/css; charset=utf-8",
@@ -113,6 +115,7 @@ class Dispatcher
     // correct config file directory
     $dispatchIniConfig = $this->getBaseDispatchConfig();
     $this->_entityMap  = $dispatchIniConfig->getArr("entity_map", []);
+    $this->_lnretxMap  = $dispatchIniConfig->getArr("lnretx_map", []);
   }
 
   /**
@@ -129,6 +132,14 @@ class Dispatcher
   public function getEntityMap()
   {
     return $this->_entityMap;
+  }
+
+  /**
+   * @return array
+   */
+  public function getLnretxMap()
+  {
+    return $this->_lnretxMap;
   }
 
   /**
@@ -226,6 +237,14 @@ class Dispatcher
   public function getBaseHash()
   {
     return $this->_baseHash;
+  }
+
+  /**
+   * @return string
+   */
+  public function getExternalHash()
+  {
+    return $this->_externalHash;
   }
 
   /**
@@ -336,6 +355,7 @@ class Dispatcher
   {
     $baseEntity = $this->getProjectNamespace() . "/";
     $baseEntity .= $this->getResourceDirectory();
+
     if($entity === $baseEntity)
     {
       return $this->getBaseHash();
@@ -353,6 +373,17 @@ class Dispatcher
   public function generateDomainHash($domain, $length = 6)
   {
     return substr(md5($domain), 0, $length);
+  }
+
+  /**
+   * @param string $package
+   * @param int    $length
+   *
+   * @return string
+   */
+  public function generatePackageHash($package, $length = 6)
+  {
+    return substr(md5($package), 0, $length);
   }
 
   /**

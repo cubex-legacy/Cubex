@@ -75,9 +75,10 @@ trait RequireTrait
   }
 
   /**
-   * @param string                                       $file
-   * @param \Cubex\Dispatch\Dependency\Resource\TypeEnum $type
-   * @param null|string                                  $version
+   * @param string      $file
+   * @param TypeEnum    $type
+   * @param null|string $version
+   * @param null|string $namespace
    */
   protected function _requireResource(
     $file, TypeEnum $type, $version = null, $namespace = null

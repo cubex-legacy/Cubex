@@ -48,7 +48,7 @@ class Serve extends Dispatcher implements Dispatchable
 
     $resourceHash = $dispatchPath->getResourceHash();
     $this->setDispatchPath($dispatchPath)
-    ->setUseMap($resourceHash !== $this->getNomapHash());
+      ->setUseMap($resourceHash !== $this->getNomapHash());
   }
 
   /**
@@ -65,16 +65,14 @@ class Serve extends Dispatcher implements Dispatchable
     $resourceHash = $this->getDispatchPath()->getResourceHash();
 
     if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
-    && $debugString !== self::getNocacheDebugString()
-    && $resourceHash !== $this->getNomapHash()
+      && $debugString !== self::getNocacheDebugString()
+      && $resourceHash !== $this->getNomapHash()
     )
     {
       $this->_setCacheHeaders($response);
     }
-    else if(preg_match(
-      "@(//|\.\.)@",
-      $this->getDispatchPath()->getPathToResource()
-    )
+    else if(
+      preg_match("@(//|\.\.)@", $this->getDispatchPath()->getPathToResource())
     )
     {
       // Stop possible hacks for disk paths, e.g. /js/../../../etc/passwd
@@ -147,14 +145,31 @@ class Serve extends Dispatcher implements Dispatchable
   {
     $data            = "";
     $locatedFileKeys = [];
+    $fullEntityPath  = "";
 
     $pathToResource = $this->getDispatchPath()->getPathToResource();
     $filePathParts  = explode("/", $pathToResource);
     $filename       = array_pop($filePathParts);
     $pathToFile     = implode("/", $filePathParts);
     $entityHash     = $this->getDispatchPath()->getEntityHash();
-    $fullEntityPath = $this->getProjectBase() . DS;
-    $fullEntityPath .= $this->getEntityPathByHash($entityHash);
+
+    if($this->getDispatchPath()->getMarker() === $this->getExternalHash())
+    {
+      if(isset($this->getLnretxMap()[$entityHash]))
+      {
+        $package        = $this->getLnretxMap()[$entityHash];
+        $fullEntityPath = $this->getEntityMap()[$package];
+      }
+    }
+    else
+    {
+      $fullEntityPath = $this->getEntityPathByHash($entityHash);
+    }
+
+    if(!$this->getFileSystem()->isAbsolute($fullEntityPath))
+    {
+      $fullEntityPath = $this->getProjectBase() . DS . $fullEntityPath;
+    }
 
     $locateList = $this->buildResourceLocateDirectoryList(
       $fullEntityPath,

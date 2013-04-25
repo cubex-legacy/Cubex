@@ -407,6 +407,7 @@ class Mapper extends Dispatcher
   public function writeConfig()
   {
     $config = "";
+    sort($this->_configLines);
 
     foreach($this->_configLines as $configLine)
     {
@@ -433,7 +434,7 @@ class Mapper extends Dispatcher
 
   public function setConfigLine($line)
   {
-    $this->_configLines[] = $line;
+    $this->_configLines[md5($line)] = $line;
   }
 
   public function setEntityMapConfigLines(array $entities)
@@ -442,23 +443,45 @@ class Mapper extends Dispatcher
 
     foreach($entities as $entity)
     {
-      $fullEntity = $entity;
+      $entityHash = null;
+      $entityTemp = $entity;
+      $fullPath   = $this->getFileSystem()->resolvePath($entity);
 
-      if($this->getFileSystem()->resolvePath($entity) !== false)
+      if($fullPath !== false)
       {
         foreach($this->_externalProjects as $externalProject)
         {
-          if(stristr($entity, $externalProject) !== false)
+          if(strpos($entity, $externalProject["base"]) !== false)
           {
-            $entityEnd = last(explode($externalProject, $entity));
-            $entity = $externalProject . $entityEnd;
+            $entityTemp = stristr($entity, $externalProject["base"]);
+
+            if(strpos($fullPath, $this->getProjectPath()) !== 0)
+            {
+              if(!strpos($entity, $externalProject["package"]) !== false)
+              {
+                continue;
+              }
+
+              $package     = $externalProject["package"];
+              $entityHash  = $package;
+              $packageHash = $this->generatePackageHash($package);
+
+              $this->setConfigLine("lnretx_map[$packageHash] = $package");
+            }
+            else
+            {
+              $entityHash = $this->generateEntityHash($entityTemp);
+            }
             break;
           }
         }
       }
 
-      $entityHash = $this->generateEntityHash($entity);
-      $this->setConfigLine("entity_map[$entityHash] = $fullEntity");
+      if($entityHash === null)
+      {
+        $entityHash = $this->generateEntityHash($entityTemp);
+      }
+      $this->setConfigLine("entity_map[$entityHash] = $entity");
     }
 
     $this->_changeWorkingDir();
@@ -527,13 +550,43 @@ class Mapper extends Dispatcher
    */
   protected function _setExternalProjects()
   {
-    foreach($this->_getAutoloader()->getPrefixes() as $baseNamespaces => $dirs)
+    foreach($this->_getAutoloader()->getPrefixes() as $namespace => $dirs)
     {
-      $baseNamespacesParts = explode("\\", $baseNamespaces);
-      $baseNamespace       = $baseNamespacesParts[0];
+      $path    = current($dirs);
+      $package = $this->_extractPackage($namespace, $path);
+      $base    = reset(explode("\\", $namespace));
 
-      $this->_externalProjects[$baseNamespace] = $baseNamespace;
+      if($package)
+      {
+        $this->_externalProjects[$namespace] = [
+          "package" => $package,
+          "path"    => $path,
+          "base"    => $base,
+        ];
+      }
     }
+  }
+
+  /**
+   * @param string $namespace
+   * @param string $path
+   *
+   * @return bool|string
+   */
+  protected function _extractPackage($namespace, $path)
+  {
+    if(substr_count($namespace, "\\") === 3)
+    {
+      $package = last(explode("\\", $namespace, 2));
+      $cleanPackage = rtrim(str_replace("\\", "/", strtolower($package)), "/");
+
+      if(stripos($path, $cleanPackage) !== false)
+      {
+        return $cleanPackage;
+      }
+    }
+
+    return false;
   }
 
   /**

@@ -13,6 +13,7 @@ class Event extends StdEvent
   protected $_type;
   protected $_namespace;
   protected $_version;
+  protected $_package;
 
   public function __construct($name, array $args = array(), $source = null)
   {
@@ -103,6 +104,26 @@ class Event extends StdEvent
   public function setVersion($version)
   {
     $this->_version = $version;
+
+    return $this;
+  }
+
+  /**
+   * @return string|null
+   */
+  public function getPackage()
+  {
+    return $this->_package;
+  }
+
+  /**
+   * @param string $package
+   *
+   * @return $this
+   */
+  public function setPackage($package)
+  {
+    $this->_package = $package;
 
     return $this;
   }
