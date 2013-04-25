@@ -189,8 +189,13 @@ class CliLogger
       }
       $echoMsg = $logDate;
       $echoMsg .= Shell::colourText($this->_logLevelToDisplay($level), $color);
-      $echoMsg .= " " . $logData['message'];
-      echo $echoMsg . "\n";
+      $echoMsg .= " ";
+      $len = 32;
+      echo $echoMsg;
+
+      $wrap = "\n" . str_repeat(" ", $len);
+      echo wordwrap($logData['message'], Shell::columns() - $len, $wrap, false);
+      echo "\n";
     }
 
     $logMsg = $logDate;
