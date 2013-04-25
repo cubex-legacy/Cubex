@@ -418,6 +418,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
       \Cubex\Container\Container::REQUEST,
       $this->_request
     );
+    EventManager::trigger(EventManager::CUBEX_REQUEST_BIND);
 
     return $this;
   }

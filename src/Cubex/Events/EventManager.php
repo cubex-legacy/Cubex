@@ -15,6 +15,8 @@ class EventManager
   const CUBEX_RESPONSE_PREPARE = 'cubex.response.start';
   const CUBEX_RESPONSE_SENT    = 'cubex.response.sent';
 
+  const CUBEX_REQUEST_BIND = 'cubex.request.bind';
+
   const CUBEX_PAGE_TITLE = 'cubex.page.title';
 
   const CUBEX_TRANSLATE_T = 'cubex.translation.t';
