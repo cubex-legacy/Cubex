@@ -127,6 +127,11 @@ abstract class RecordMapper extends DataMapper
     {
       return "%C = %d";
     }
+    else if($config[static::CONFIG_IDS] == static::ID_COMPOSITE)
+    {
+      $checks = array_fill(0, count($this->_getCompositeKeys()), "%C = %s");
+      return implode(" AND ", $checks);
+    }
     else
     {
       return "%C = %s";
