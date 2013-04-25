@@ -144,6 +144,23 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
             $service,
             $shared
           );
+
+          $autoload = $conf->getBool("autoload", false);
+
+          if(!$autoload)
+          {
+            $autoload = $conf->getBool("autoloadweb", false) && CUBEX_WEB;
+          }
+
+          if(!$autoload)
+          {
+            $autoload = $conf->getBool("autoloadcli", false) && CUBEX_CLI;
+          }
+
+          if($autoload)
+          {
+            $sm->get($conf->getStr('register_service_as', $section));
+          }
         }
       }
     }
