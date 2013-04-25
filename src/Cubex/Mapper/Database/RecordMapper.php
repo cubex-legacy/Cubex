@@ -436,6 +436,10 @@ abstract class RecordMapper extends DataMapper
    */
   protected function _getCompositeKeys()
   {
+    if($this->isCompositeId())
+    {
+      return $this->getCompAttribute($this->getIdKey())->attributeOrder();
+    }
     return array();
   }
 
