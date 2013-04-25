@@ -323,8 +323,7 @@ abstract class DataMapper
         $this->setData(substr($method, 3), $args[0]);
         break;
       case 'get':
-        $this->getData(substr($method, 3));
-        break;
+        return $this->getData(substr($method, 3));
     }
     return true;
   }
