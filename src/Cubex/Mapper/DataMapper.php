@@ -315,7 +315,7 @@ abstract class DataMapper
    * @return bool|DataMapper|mixed
    * @throws \Exception
    */
-  protected function _doCall($method, $args)
+  protected function _doCall($method, $args = null)
   {
     switch(substr($method, 0, 3))
     {
@@ -395,7 +395,7 @@ abstract class DataMapper
    */
   public function __get($name)
   {
-    return $this->getData($name);
+    return $this->_doCall("get" . $name);
   }
 
   /**
@@ -406,7 +406,7 @@ abstract class DataMapper
    */
   public function __set($name, $value)
   {
-    return $this->setData($name, $value);
+    return $this->_doCall("set" . $name, [$value]);
   }
 
   /**
@@ -416,8 +416,7 @@ abstract class DataMapper
    */
   public function __isset($attribute)
   {
-    $name = $this->_cleanAttributeName($attribute);
-    return isset($this->_attributes[$name]);
+    return $this->attributeExists($attribute);
   }
 
   /**
