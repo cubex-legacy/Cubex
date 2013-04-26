@@ -85,4 +85,19 @@ class CliArgument extends CliArgumentBase
   {
     return $this->shortName ? true : false;
   }
+
+  public function setData($data)
+  {
+    // Use default value for optional arguments
+    if(($this->valueOption == CliArgument::VALUE_OPTIONAL) &&
+      ($data === true) && ($this->defaultValue !== null)
+    )
+    {
+      $this->_data = $this->defaultValue;
+    }
+    else
+    {
+      parent::setData($data);
+    }
+  }
 }
