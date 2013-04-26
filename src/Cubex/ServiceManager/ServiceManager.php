@@ -19,13 +19,16 @@ class ServiceManager
   protected $_alias = array();
 
   /**
-   * @param $name
+   * @param string $name
    *
    * @return Service
    * @throws \InvalidArgumentException
    */
-  public function get($name)
+  public function get($name /*[, mixed $constructParam, ...]*/)
   {
+    $constructParams = func_get_args();
+    array_shift($constructParams);
+
     if($this->exists($name))
     {
       if(isset($this->_shared[$name]) && $this->_shared[$name] !== null)
@@ -34,12 +37,12 @@ class ServiceManager
       }
       else
       {
-        return $this->_create($name);
+        return $this->_create($name, $constructParams);
       }
     }
     else if(class_exists($name))
     {
-      return $this->_buildClass($name);
+      return $this->_buildClass($name, null, $constructParams);
     }
     else
     {
@@ -157,14 +160,15 @@ class ServiceManager
   }
 
   /**
-   * @param $name
+   * @param string $name
+   * @param array  $constructParams
    *
    * @return Service
    * @throws \RuntimeException
    * @throws \InvalidArgumentException
    * @throws \Exception
    */
-  protected function _create($name)
+  protected function _create($name, array $constructParams = [])
   {
     if($this->exists($name))
     {
@@ -178,7 +182,7 @@ class ServiceManager
         {
           if(class_exists($provider))
           {
-            $service = $this->_buildClass($provider, $name);
+            $service = $this->_buildClass($provider, $name, $constructParams);
 
             if($service instanceof Service)
             {
@@ -223,7 +227,7 @@ class ServiceManager
           if($this->_services[$name]['shared'])
           {
             $this->bindInstance($name, $service);
-            return $this->get($name);
+            return $this->get($name, $constructParams);
           }
           else
           {
@@ -260,7 +264,16 @@ class ServiceManager
     }
   }
 
-  protected function _buildClass($class, $name = null)
+  /**
+   * @param string       $class
+   * @param string|null  $name
+   * @param array        $constructParams
+   *
+   * @return object
+   * @throws \RuntimeException
+   */
+  protected function _buildClass($class, $name = null,
+                                 array $constructParams = [])
   {
     $reflection = new \ReflectionClass($class);
 
@@ -277,28 +290,45 @@ class ServiceManager
     }
 
     return $reflection->newInstanceArgs(
-      $this->_getConstructorArgs($constructor->getParameters(), $name)
+      $this->_getConstructorArgs(
+        $constructor->getParameters(),
+        $name,
+        $constructParams
+      )
     );
   }
 
-  protected function _getConstructorArgs(array $params, $name = null)
+  /**
+   * @param array $params
+   * @param null  $name
+   * @param array $constructParams
+   *
+   * @return array
+   * @throws \RuntimeException
+   */
+  protected function _getConstructorArgs(array $params, $name = null,
+                                         array $constructParams = [])
   {
     $args = [];
-    foreach($params as $param)
+    foreach($params as $ii => $param)
     {
       /** @var $param \ReflectionParameter */
       $class = $param->getClass();
       if($class === null)
       {
-        if(!$param->isDefaultValueAvailable())
+        if(isset($constructParams[$ii]))
+        {
+          $args[] = $constructParams[$ii];
+        }
+        else if($param->isDefaultValueAvailable())
+        {
+          $args[] = $param->getDefaultValue();
+        }
+        else
         {
           throw new \RuntimeException(
             "Unable to resolve dependency on $name [$param]"
           );
-        }
-        else
-        {
-          $args[] = $param->getDefaultValue();
         }
       }
       else
@@ -318,8 +348,12 @@ class ServiceManager
    * @return $this
    * @throws \InvalidArgumentException
    */
-  public function reBind($name, ServiceConfig $config, $shared = true)
+  public function reBind($name, ServiceConfig $config, $shared = true
+                          /*[, mixed $constructParam, ...]*/)
   {
+    $constructParams = func_get_args();
+    array_shift($constructParams);
+    
     if($this->exists($name))
     {
       $this->_services[$name] = array(
@@ -327,7 +361,7 @@ class ServiceManager
         'shared' => $shared
       );
 
-      $this->_create($name);
+      $this->_create($name, $constructParams);
 
       return $this;
     }
