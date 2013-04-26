@@ -740,6 +740,14 @@ abstract class DataMapper
   }
 
   /**
+   * @return bool
+   */
+  public function isModified()
+  {
+    return $this->getModifiedAttributes() > 0;
+  }
+
+  /**
    * @param null $name
    *
    * @return DataMapper
