@@ -73,6 +73,11 @@ class StdRouter implements Router
       $this->_matchedRoute = array_shift($routeMatches);
     }
 
+    if($this->_matchedRoute instanceof StdRoute)
+    {
+      $this->_matchedRoute->process();
+    }
+
     return $this->_matchedRoute;
   }
 

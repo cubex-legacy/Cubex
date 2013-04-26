@@ -4,6 +4,7 @@
  */
 namespace Cubex\Routing;
 
+use Cubex\Facade\Redirect;
 use Cubex\Foundation\DataHandler\HandlerInterface;
 use Cubex\Foundation\DataHandler\HandlerTrait;
 
@@ -257,5 +258,20 @@ class StdRoute implements Route, HandlerInterface, \JsonSerializable
   {
     $this->_matchOn = $number;
     return $this;
+  }
+
+  /**
+   * Processed when is a successful route
+   */
+  public function process()
+  {
+    if(preg_match('/^(.*tps?:\/\/|\/|#@)/', $this->_result))
+    {
+      if(substr($this->_result, 0, 2) == '#@')
+      {
+        $this->_result = substr($this->_result, 2);
+      }
+      Redirect::to($this->_result)->now();
+    }
   }
 }
