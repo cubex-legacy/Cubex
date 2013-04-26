@@ -77,13 +77,7 @@ class CliLogger
     }
 
     $this->_dateFormat = $this->_getConfigOption('date_format', 'd/m/Y H:i:s');
-
     $this->_logFilePath = $this->_getLogFilePath($logFile, $instanceName);
-    $logDir             = dirname($this->_logFilePath);
-    if(!file_exists($logDir))
-    {
-      mkdir($logDir, 0755, true);
-    }
 
     EventManager::listen(EventManager::CUBEX_LOG, [$this, 'handleLogEvent']);
     EventManager::listen(
@@ -126,6 +120,25 @@ class CliLogger
     }
 
     return $logFile;
+  }
+
+  private function _writeToLogFile($logMsg)
+  {
+    if($this->_logFilePath !== null)
+    {
+      $logDir = dirname($this->_logFilePath);
+      if(!file_exists($logDir))
+      {
+        mkdir($logDir, 0755, true);
+      }
+
+      $fp = fopen($this->_logFilePath, "a");
+      if($fp)
+      {
+        fputs($fp, $logMsg . "\n");
+        fclose($fp);
+      }
+    }
   }
 
   private function _logLevelLessThanOrEqual($checkLevel, $baselineLevel)
@@ -201,16 +214,9 @@ class CliLogger
     $logMsg = $logDate;
     $logMsg .= $this->_logLevelToDisplay($level) . " " . $logData['message'];
 
-    if($this->_logFilePath !== null
-    && $this->_logLevelLessThanOrEqual($level, $this->_logLevel)
-    )
+    if($this->_logLevelLessThanOrEqual($level, $this->_logLevel))
     {
-      $fp = fopen($this->_logFilePath, "a");
-      if($fp)
-      {
-        fputs($fp, $logMsg . "\n");
-        fclose($fp);
-      }
+      $this->_writeToLogFile($logMsg);
     }
   }
 
