@@ -54,11 +54,12 @@ class Form extends DataMapper implements Renderable
    * @param array $data
    * @param bool  $setUnmodified
    * @param bool  $createAttributes
+   * @param bool  $raw
    *
    * @return $this
    */
   public function hydrate(
-    array $data, $setUnmodified = false, $createAttributes = false
+    array $data, $setUnmodified = false, $createAttributes = false, $raw = true
   )
   {
     $rawAttributes     = mpull($this->getRawAttributes(), "name", "name");
