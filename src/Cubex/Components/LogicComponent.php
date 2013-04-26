@@ -117,7 +117,7 @@ abstract class LogicComponent implements Component, NamespaceAware
     return isset(static::$_interfaces[get_called_class()][$interface]);
   }
 
-  public function getByInterface($interface)
+  public function getByInterface($interface /*[, mixed $constructParam, ...]*/)
   {
     if(!$this->interfaceHandled($interface))
     {
@@ -125,8 +125,15 @@ abstract class LogicComponent implements Component, NamespaceAware
     }
     else
     {
-      return $this->_getServiceManager()->get(
-        static::$_interfaces[get_called_class()][$interface]
+      $constructParams = func_get_args();
+      array_shift($constructParams);
+      $params = array_merge(
+        [static::$_interfaces[get_called_class()][$interface]],
+        $constructParams
+      );
+
+      return call_user_func_array(
+        [$this->_getServiceManager(), "get"], $params
       );
     }
   }
