@@ -75,6 +75,6 @@ abstract class BaseAuthService implements AuthService
 
   public function logout()
   {
-    Cookies::delete("CUBEXLOGIN");
+    Cookies::delete("CUBEXLOGIN", "/", url(".%d.%t"));
   }
 }

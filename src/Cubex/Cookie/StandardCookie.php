@@ -47,7 +47,7 @@ class StandardCookie implements CookieInterface
    */
   public function isRead()
   {
-    return $this->_mode === self::MODE_READ;
+    return true;
   }
 
   /**
@@ -55,7 +55,7 @@ class StandardCookie implements CookieInterface
    */
   public function isWrite()
   {
-    return !$this->isRead();
+    return $this->_mode === self::MODE_WRITE;
   }
 
   /**
@@ -133,17 +133,9 @@ class StandardCookie implements CookieInterface
 
   /**
    * @return int
-   * @throws \BadMethodCallException
    */
   public function getExpire()
   {
-    if($this->isRead())
-    {
-      throw new \BadMethodCallException(
-        "getExpire() is only available in write mode."
-      );
-    }
-
     return $this->_expire;
   }
 
@@ -179,17 +171,9 @@ class StandardCookie implements CookieInterface
 
   /**
    * @return string|null
-   * @throws \BadMethodCallException
    */
   public function getPath()
   {
-    if($this->isRead())
-    {
-      throw new \BadMethodCallException(
-        "getPath() is only available in write mode."
-      );
-    }
-
     return $this->_path;
   }
 
@@ -208,17 +192,9 @@ class StandardCookie implements CookieInterface
 
   /**
    * @return string|null
-   * @throws \BadMethodCallException
    */
   public function getDomain()
   {
-    if($this->isRead())
-    {
-      throw new \BadMethodCallException(
-        "getDomain() is only available in write mode."
-      );
-    }
-
     return $this->_domain;
   }
 
@@ -237,17 +213,9 @@ class StandardCookie implements CookieInterface
 
   /**
    * @return bool
-   * @throws \BadMethodCallException
    */
   public function isSecure()
   {
-    if($this->isRead())
-    {
-      throw new \BadMethodCallException(
-        "isSecure() is only available in write mode."
-      );
-    }
-
     return $this->_secure;
   }
 
@@ -266,24 +234,16 @@ class StandardCookie implements CookieInterface
 
   /**
    * @return bool
-   * @throws \BadMethodCallException
    */
   public function isHttponly()
   {
-    if($this->isRead())
-    {
-      throw new \BadMethodCallException(
-        "isHttponly() is only available in write mode."
-      );
-    }
-
     return $this->_httponly;
   }
 
   /**
    * @param bool $httponly
    *
-   * @return StandardCookie
+   * @return $this
    */
   public function setHttponly($httponly)
   {
@@ -293,10 +253,16 @@ class StandardCookie implements CookieInterface
     return $this;
   }
 
-  public function delete()
+  /**
+   * @param string|null $path
+   * @param string|null $domain
+   */
+  public function delete($path = null, $domain = null)
   {
-    $this->setExpire(time() - 31536001);
-    $this->setValue("");
+    $this->setExpire(time() - 31536001)
+      ->setValue("")
+      ->setPath($path)
+      ->setDomain($domain);
   }
 
   /**
@@ -321,7 +287,7 @@ class StandardCookie implements CookieInterface
       }
     }
 
-    if($this->getPath() !== "/")
+    if($this->getPath() !== null)
     {
       $str .= "; path=".$this->getPath();
     }

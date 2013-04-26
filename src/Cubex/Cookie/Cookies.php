@@ -122,11 +122,13 @@ class Cookies
   }
 
   /**
-   * @param string $name
+   * @param string      $name
+   * @param string|null $path
+   * @param string|null $domain
    *
    * @throws \InvalidArgumentException
    */
-  public static function delete($name)
+  public static function delete($name, $path = null, $domain = null)
   {
     self::_init();
     if(!array_key_exists($name, self::$_cookies))
@@ -136,7 +138,7 @@ class Cookies
       );
     }
 
-    self::$_cookies[$name]->delete();
+    self::$_cookies[$name]->delete($path, $domain);
   }
 
   /**
