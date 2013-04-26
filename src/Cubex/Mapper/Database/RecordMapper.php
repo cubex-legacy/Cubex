@@ -477,11 +477,23 @@ abstract class RecordMapper extends DataMapper
   }
 
   /**
+   * @param bool $validate
+   * @param bool $processAll Process all validators, or fail on first
+   * @param bool $failFirst  Perform all checks within a specific validator
+   *
    * @return bool|mixed
    * @throws \Exception
    */
-  public function saveChanges()
+  public function saveChanges(
+    $validate = false, $processAll = false, $failFirst = false
+  )
   {
+    $this->_saveValidation(
+      $validate,
+      $processAll,
+      $failFirst
+    );
+
     $callbackAttributes = [];
     if(!$this->exists())
     {

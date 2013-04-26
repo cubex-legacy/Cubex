@@ -58,11 +58,22 @@ class KvMapper extends DataMapper
 
 
   /**
-   * @return bool|mixed
-   * @throws \Exception
+   * @param bool $validate
+   * @param bool $processAll Process all validators, or fail on first
+   * @param bool $failFirst  Perform all checks within a specific validator
+   *
+   * @return bool
    */
-  public function saveChanges()
+  public function saveChanges(
+    $validate = false, $processAll = false, $failFirst = false
+  )
   {
+    $this->_saveValidation(
+      $validate,
+      $processAll,
+      $failFirst
+    );
+
     parent::saveChanges();
     $changes = parent::getSavedChanges();
     $columns = [];

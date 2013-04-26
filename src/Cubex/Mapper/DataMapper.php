@@ -38,6 +38,10 @@ abstract class DataMapper
   const SCHEMA_PASCALCASE = 'pascal';
   const SCHEMA_AS_IS      = 'asis';
 
+  const VALIDATION_ONSAVE    = 'validate_onsave';
+  const VALIDATION_ONSET     = 'validate_onset';
+  const VALIDATION_ONREQUEST = 'validate_onrequest';
+
   protected $_tableName;
   protected $_underscoreTable = true;
 
@@ -53,6 +57,7 @@ abstract class DataMapper
 
   protected $_idType = self::ID_MANUAL;
   protected $_schemaType = self::SCHEMA_UNDERSCORE;
+  protected $_validationType = self::VALIDATION_ONREQUEST;
 
   protected $_attributeType = '\Cubex\Data\Attribute';
 
@@ -333,18 +338,35 @@ abstract class DataMapper
     return $this->attributeExists($attribute);
   }
 
-  public function setData($attribute, $value, $serialized = false)
+  public function setData(
+    $attribute, $value, $serialized = false, $bypassValidation = false
+  )
   {
     if($this->attributeExists($attribute))
     {
       $this->_checkAttributes();
+      $attr = $this->_attribute($attribute);
+
+      if($this->_validationType === self::VALIDATION_ONSET
+      && !$bypassValidation
+      )
+      {
+        $valid = $attr->isValid(
+          !$serialized ? $attr->serialize($value) : $value
+        );
+        if(!$valid)
+        {
+          throw new \Exception("$attribute cannot be set to $value", 400);
+        }
+      }
+
       if($serialized)
       {
-        $this->_attribute($attribute)->setRawData($value);
+        $attr->setRawData($value);
       }
       else
       {
-        $this->_attribute($attribute)->setData($value);
+        $attr->setData($value);
       }
 
       return $this;
@@ -808,7 +830,7 @@ abstract class DataMapper
 
         if($exists)
         {
-          $this->setData($k, $v, $raw);
+          $this->setData($k, $v, $raw, true);
           if($setUnmodified)
           {
             $this->_attribute($k)->unsetModified();
@@ -888,8 +910,58 @@ abstract class DataMapper
     return $this;
   }
 
-  public function saveChanges()
+  protected function _saveValidation(
+    $validate = false, $processAllValidators = false, $failFirst = false
+  )
   {
+    if($this->_validationType === self::VALIDATION_ONSAVE)
+    {
+      $validate = true;
+    }
+
+    if($validate)
+    {
+      if($validate === true)
+      {
+        $valid = $this->isValid(null, $processAllValidators, $failFirst);
+      }
+      else if(is_array($validate))
+      {
+        $valid = $this->isValid($validate, $processAllValidators, $failFirst);
+      }
+      else
+      {
+        throw new \Exception("saveChanges(\$Validate) must be bool or array");
+      }
+      if(!$valid)
+      {
+        $invalidAttrs = array_keys($this->_invalidAttributes);
+        throw new \Exception(
+          "The data specified on [" .
+          implode(', ', $invalidAttrs)
+          . "] does not validate", 400
+        );
+      }
+    }
+  }
+
+  /**
+   * @param bool $validate
+   * @param bool $processAll Process all validators, or fail on first
+   * @param bool $failFirst  Perform all checks within a specific validator
+   *
+   * @return bool
+   */
+  public function saveChanges(
+    $validate = false, $processAll = false, $failFirst = false
+  )
+  {
+    $this->_saveValidation(
+      $validate,
+      $processAll,
+      $failFirst
+    );
+
     $this->_changes = [];
     $modified       = $this->getModifiedAttributes();
     if(!empty($modified))

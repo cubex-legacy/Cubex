@@ -132,8 +132,26 @@ class CassandraMapper extends KvMapper
     return $this;
   }
 
-  public function saveChanges($globalTtlSeconds = null)
+  /**
+   * @param bool $validate
+   * @param bool $processAll Process all validators, or fail on first
+   * @param bool $failFirst  Perform all checks within a specific validator
+   * @param null $globalTtlSeconds
+   *
+   * @return bool|mixed
+   */
+  public function saveChanges(
+    $validate = false, $processAll = false, $failFirst = false,
+    $globalTtlSeconds = null
+  )
   {
+
+    $this->_saveValidation(
+      $validate,
+      $processAll,
+      $failFirst
+    );
+
     $this->_changes = $columns = [];
     $modified       = $this->getModifiedAttributes();
     if(!empty($modified))
