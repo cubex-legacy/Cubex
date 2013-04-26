@@ -58,9 +58,9 @@ class KvMapper extends DataMapper
 
 
   /**
-   * @param bool $validate
-   * @param bool $processAll Process all validators, or fail on first
-   * @param bool $failFirst  Perform all checks within a specific validator
+   * @param bool|array $validate   all fields, or array of fields to validate
+   * @param bool       $processAll Process all validators, or fail on first
+   * @param bool       $failFirst  Perform all checks within a validator
    *
    * @return bool
    */
