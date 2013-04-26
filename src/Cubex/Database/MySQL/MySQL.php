@@ -359,4 +359,15 @@ class MySQL implements DatabaseService
   {
     return $this->_connection->insert_id;
   }
+
+  /**
+   * Number of affected rows
+   *
+   * @return int
+   */
+
+  public function affectedRows()
+  {
+    return $this->_connection->affected_rows;
+  }
 }

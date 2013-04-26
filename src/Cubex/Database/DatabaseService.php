@@ -124,4 +124,11 @@ interface DatabaseService extends Service
    * @return mixed
    */
   public function errorMsg();
+
+  /**
+   * Number of rows affected by the last query
+   *
+   * @return int
+   */
+  public function affectedRows();
 }

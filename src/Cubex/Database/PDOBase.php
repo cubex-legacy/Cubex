@@ -291,4 +291,14 @@ abstract class PDOBase implements DatabaseService
   {
     return $this->_connection->lastInsertId();
   }
+
+  /**
+   * Number of affected rows
+   *
+   * @return int
+   */
+  public function affectedRows()
+  {
+    return $this->_affectedRows;
+  }
 }
