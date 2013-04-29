@@ -5,11 +5,10 @@
 
 namespace Cubex\I18n\Processor;
 
-use Cubex\Cli\CliTask;
+use Cubex\Cli\CliCommand;
 use Cubex\Foundation\Config\ConfigTrait;
-use Cubex\I18n\Translator\Jumbler;
 
-class Cli implements CliTask
+class Cli extends CliCommand
 {
   use ConfigTrait;
 
@@ -18,15 +17,12 @@ class Cli implements CliTask
    */
   protected $_builder;
 
-  public function __construct()
-  {
-  }
-
-  public function init()
+  public function execute()
   {
     $conf           = $this->config("i18n");
     $translator     = $conf->getStr(
-      "translator", '\Cubex\I18n\Translator\NoTranslator'
+      "translator",
+      '\Cubex\I18n\Translator\NoTranslator'
     );
     $this->_builder = new Build(
       $this->getConfig()->get("_cubex_")->getStr(
@@ -35,7 +31,8 @@ class Cli implements CliTask
     );
 
     $this->_builder->addArea(
-      $this->getConfig()->get("project")->getStr('namespace', 'Project'), 2
+      $this->getConfig()->get("project")->getStr('namespace', 'Project'),
+      2
     );
 
     if(\Cubex\Helpers\System::isWindows())
@@ -56,6 +53,8 @@ class Cli implements CliTask
     }
 
     $this->run();
+
+    return 0;
   }
 
   public function run()
