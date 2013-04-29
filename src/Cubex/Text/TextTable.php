@@ -17,15 +17,28 @@ class TextTable
   protected $_fixedLayout = false;
   protected $_maxColumnWidth = null;
   protected $_maxTableWidth = null;
+  /**
+   * @var ITextTableDecorator
+   */
+  protected $_decorator;
 
-  const SPACER = 'spacer';
+  const SPACER     = 'spacer';
+  const SUBHEADING = 'table_subheading:';
 
-  public function __construct()
+  public function __construct(ITextTableDecorator $decorator = null)
   {
     if(CUBEX_CLI)
     {
       $this->setMaxTableWidth(Shell::columns() - 5);
     }
+
+    $this->setDecorator($decorator ? $decorator : new TextTableDecorator());
+  }
+
+  public function setDecorator(ITextTableDecorator $decorator)
+  {
+    $this->_decorator = $decorator;
+    $this->_decorator->setTable($this);
   }
 
   public function appendRows($rows)
@@ -68,6 +81,11 @@ class TextTable
     $this->_rows[] = $data;
   }
 
+  public function appendSubHeading($text)
+  {
+    $this->_rows[] = self::SUBHEADING . $text;
+  }
+
   protected function _ackColumnLength($column, $length)
   {
     if(!isset($this->_columnWidths[$column]))
@@ -94,38 +112,42 @@ class TextTable
     return $this;
   }
 
+  public function columnCount()
+  {
+    return $this->_columnCount;
+  }
+
   public function __toString()
   {
     try
     {
-      $out = $this->_topBorder();
+      $out = "";
+      $out .= $this->_decorator->renderTopBorder();
 
       if(!empty($this->_headers))
       {
-        $out .= vsprintf(
-          $this->_outputLineFormat($this->_columnSplit()),
-          $this->_padArray($this->_headers)
-        );
-
-        $out .= $this->_headerBorder();
+        $out .= $this->_decorator->renderColumnHeaders($this->_headers);
       }
 
       foreach($this->_rows as $row)
       {
         if($row === self::SPACER)
         {
-          $out .= $this->_headerBorder();
+          $out .= $this->_decorator->renderSpacerRow();
+        }
+        else if(is_string($row) && (strpos($row, self::SUBHEADING) === 0))
+        {
+          $out .= $this->_decorator->renderSubHeading(
+            substr($row, strlen(self::SUBHEADING))
+          );
         }
         else
         {
-          $out .= vsprintf(
-            $this->_outputLineFormat($this->_columnSplit()),
-            $this->_padArray($row)
-          );
+          $out .= $this->_decorator->renderDataRow($row);
         }
       }
 
-      $out .= $this->_bottomBorder();
+      $out .= $this->_decorator->renderBottomBorder();
     }
     catch(\Exception $e)
     {
@@ -136,99 +158,7 @@ class TextTable
     return $out;
   }
 
-  protected function _padArray($array)
-  {
-    if(!is_array($array))
-    {
-      $array = [];
-    }
-    $return = \SplFixedArray::fromArray(array_values($array));
-    $return->setSize($this->_columnCount);
-    $data = $return->toArray();
-    foreach($data as $i => $value)
-    {
-      if(strlen($value) > $this->_calculateColumnWidth($i + 1))
-      {
-        $data[$i] = ltrim($value);
-      }
-    }
-
-    return $data;
-  }
-
-  protected function _outputLineFormat(
-    $spacer = '|', $pad = '', $leftBorder = null, $rightBorder = null
-  )
-  {
-    $format = $leftBorder === null ? $this->_leftBorder() : $leftBorder;
-
-    for($i = 1; $i <= $this->_columnCount; $i++)
-    {
-      $end   = $i === $this->_columnCount ? '' : $spacer;
-      $width = $this->_calculateColumnWidth($i);
-      $format .= '%' . $pad . $width . '.' . $width . 's' . $end;
-    }
-
-    $format .= $rightBorder === null ? $this->_rightBorder() : $rightBorder;
-    $format .= "\n";
-    return $format;
-  }
-
-  protected function _topBorder()
-  {
-    return $this->_horizonBorder("\n");
-  }
-
-  protected function _headerBorder()
-  {
-    return $this->_horizonBorder();
-  }
-
-  protected function _horizonBorder($prepend = '', $append = '')
-  {
-    return $prepend . vsprintf(
-      $this->_outputLineFormat(
-        $this->_headerSplit(),
-        "'-",
-        $this->_edgeBorder(),
-        $this->_edgeBorder(),
-        '-'
-      ),
-      (array)new \SplFixedArray($this->_columnCount)
-    ) . $append;
-  }
-
-  protected function _bottomBorder()
-  {
-    return $this->_horizonBorder();
-  }
-
-  protected function _edgeBorder()
-  {
-    return '+';
-  }
-
-  protected function _leftBorder()
-  {
-    return '|';
-  }
-
-  protected function _rightBorder()
-  {
-    return '|';
-  }
-
-  protected function _columnSplit()
-  {
-    return '|';
-  }
-
-  protected function _headerSplit()
-  {
-    return '+';
-  }
-
-  protected function _calculateColumnWidth($column = 1)
+  public function calculateColumnWidth($column = 1)
   {
     if($this->_maxTableWidth !== null
     && array_sum($this->_columnWidths) > $this->_maxTableWidth
@@ -262,6 +192,16 @@ class TextTable
     }
 
     return $width;
+  }
+
+  public function calculateTableWidth()
+  {
+    $w = 0;
+    for($i = 1; $i <= $this->_columnCount; $i++)
+    {
+      $w += $this->calculateColumnWidth($i);
+    }
+    return $w;
   }
 
   public function setFixedLayout($enabled = true)
