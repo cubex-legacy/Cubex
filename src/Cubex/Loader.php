@@ -130,36 +130,39 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
           }
         }
 
-        $factory           = $conf->getRaw("factory", false);
-        $serviceProvider   = $conf->getRaw("service_provider", false);
         $registerServiceAs = $conf->getRaw("register_service_as", false);
 
-        if(($factory || $serviceProvider) && $registerServiceAs)
+        if($registerServiceAs)
         {
-          $service = new ServiceConfig();
-          $service->fromConfig($conf);
-          $shared = $conf->getBool('register_service_shared', true);
-          $sm->register(
-            $conf->getStr('register_service_as', $section),
-            $service,
-            $shared
-          );
-
-          $autoload = $conf->getBool("autoload", false);
-
-          if(!$autoload)
+          $factory         = $conf->getRaw("factory", false);
+          $serviceProvider = $conf->getRaw("service_provider", false);
+          if($factory || $serviceProvider)
           {
-            $autoload = $conf->getBool("autoloadweb", false) && CUBEX_WEB;
-          }
+            $service = new ServiceConfig();
+            $service->fromConfig($conf);
+            $shared = $conf->getBool('register_service_shared', true);
+            $sm->register(
+              $conf->getStr('register_service_as', $section),
+              $service,
+              $shared
+            );
 
-          if(!$autoload)
-          {
-            $autoload = $conf->getBool("autoloadcli", false) && CUBEX_CLI;
-          }
+            $autoload = $conf->getBool("autoload", false);
 
-          if($autoload)
-          {
-            $sm->get($conf->getStr('register_service_as', $section));
+            if(!$autoload)
+            {
+              $autoload = $conf->getBool("autoloadweb", false) && CUBEX_WEB;
+            }
+
+            if(!$autoload)
+            {
+              $autoload = $conf->getBool("autoloadcli", false) && CUBEX_CLI;
+            }
+
+            if($autoload)
+            {
+              $sm->get($conf->getStr('register_service_as', $section));
+            }
           }
         }
       }
