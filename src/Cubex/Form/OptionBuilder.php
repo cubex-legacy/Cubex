@@ -38,7 +38,9 @@ class OptionBuilder
 
   public function fromRecordMapper(RecordMapper $map)
   {
-    if($map->fromRelationshipType() == RecordMapper::RELATIONSHIP_BELONGSTO)
+    if($map->fromRelationshipType() == RecordMapper::RELATIONSHIP_BELONGSTO
+    || $map->fromRelationshipType() == RecordMapper::RELATIONSHIP_HASONE
+    )
     {
       $collection = new RecordCollection($map);
       $collection->loadAll();
