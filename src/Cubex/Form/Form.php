@@ -88,12 +88,21 @@ class Form extends DataMapper implements Renderable
     return $this;
   }
 
-  public function saveChanges()
+  /**
+   * @param bool|array $validate   all fields, or array of fields to validate
+   * @param bool       $processAll Process all validators, or fail on first
+   * @param bool       $failFirst  Perform all checks within a validator
+   *
+   * @return bool
+   */
+  public function saveChanges(
+    $validate = false, $processAll = false, $failFirst = false
+  )
   {
     if($this->_mapper !== null)
     {
       $this->_mapper->hydrateFromMapper($this);
-      $this->_mapper->saveChanges();
+      $this->_mapper->saveChanges($validate, $processAll, $failFirst);
     }
     return $this;
   }
