@@ -58,7 +58,7 @@ final class LogicComponent extends \Cubex\Components\LogicComponent
     return false;
   }
 
-  public function revertTempBinds()
+  public static function revertTempBinds()
   {
     foreach(static::$_tempBind as $parentComponent => $interfaces)
     {
