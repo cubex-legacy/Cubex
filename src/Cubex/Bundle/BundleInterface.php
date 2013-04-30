@@ -37,7 +37,7 @@ interface BundleInterface
   public function getPath();
 
   /**
-   * @return array|\Cubex\Routing\Route[]
+   * @return array|\Cubex\Routing\IRoute[]
    */
   public function getRoutes();
 }

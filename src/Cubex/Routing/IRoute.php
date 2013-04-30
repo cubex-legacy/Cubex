@@ -4,7 +4,7 @@
  */
 namespace Cubex\Routing;
 
-interface Route
+interface IRoute
 {
   /**
    * @param $pattern
@@ -44,16 +44,16 @@ interface Route
   public function setResult($result);
 
   /**
-   * @return Route[]
+   * @return IRoute[]
    */
   public function subRoutes();
 
   /**
-   * @param Route $route
+   * @param IRoute $route
    *
    * @return static
    */
-  public function addSubRoute(Route $route);
+  public function addSubRoute(IRoute $route);
 
   /**
    * @return bool

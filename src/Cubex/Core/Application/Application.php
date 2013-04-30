@@ -20,7 +20,7 @@ use Cubex\Core\Project\Project;
 use Cubex\I18n\Translatable;
 use Cubex\I18n\Translation;
 use Cubex\I18n\TranslatorAccess;
-use Cubex\Routing\Route;
+use Cubex\Routing\IRoute;
 use Cubex\Routing\StdRoute;
 use Cubex\Routing\StdRouter;
 use Cubex\ServiceManager\ServiceManagerAware;
@@ -141,7 +141,7 @@ abstract class Application
     {
       throw new \Exception("No Controller or Dispatchable class available");
     }
-    else if($dispatcherRoute instanceof Route)
+    else if($dispatcherRoute instanceof IRoute)
     {
       $dispatcherResult = $dispatcherRoute->result();
     }
@@ -310,7 +310,7 @@ abstract class Application
   }
 
   /**
-   * @return Route[]
+   * @return IRoute[]
    */
   protected function _getRoutes()
   {
@@ -328,7 +328,7 @@ abstract class Application
     {
       foreach($routes as $routePattern => $routeResult)
       {
-        if($routeResult instanceof Route)
+        if($routeResult instanceof IRoute)
         {
           $finalRoutes[] = $routeResult;
         }
@@ -353,7 +353,7 @@ abstract class Application
   }
 
   /**
-   * @return array|Route[]
+   * @return array|IRoute[]
    */
   public function getRoutes()
   {

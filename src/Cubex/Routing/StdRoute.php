@@ -8,7 +8,7 @@ use Cubex\Facade\Redirect;
 use Cubex\Foundation\DataHandler\HandlerInterface;
 use Cubex\Foundation\DataHandler\HandlerTrait;
 
-class StdRoute implements Route, HandlerInterface, \JsonSerializable
+class StdRoute implements IRoute, HandlerInterface, \JsonSerializable
 {
   use HandlerTrait;
 
@@ -17,7 +17,7 @@ class StdRoute implements Route, HandlerInterface, \JsonSerializable
   protected $_verbs;
   protected $_matchOn = 0;
   /**
-   * @var Route[]
+   * @var IRoute[]
    */
   protected $_subRoutes;
 
@@ -158,7 +158,7 @@ class StdRoute implements Route, HandlerInterface, \JsonSerializable
   }
 
   /**
-   * @return Route[]
+   * @return IRoute[]
    */
   public function subRoutes()
   {
@@ -166,11 +166,11 @@ class StdRoute implements Route, HandlerInterface, \JsonSerializable
   }
 
   /**
-   * @param Route $route
+   * @param IRoute $route
    *
    * @return static
    */
-  public function addSubRoute(Route $route)
+  public function addSubRoute(IRoute $route)
   {
     $this->_subRoutes[] = $route;
   }
@@ -186,7 +186,7 @@ class StdRoute implements Route, HandlerInterface, \JsonSerializable
   /**
    * @param array $routes
    *
-   * @return Route[]
+   * @return IRoute[]
    */
   public static function fromArray(array $routes)
   {

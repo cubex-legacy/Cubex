@@ -5,9 +5,9 @@
 namespace Cubex\Routing\Templates;
 
 use Cubex\Routing\StdRoute;
-use Cubex\Routing\Template;
+use Cubex\Routing\IRouteTemplate;
 
-class ResourceTemplate implements Template
+class ResourceTemplate implements IRouteTemplate
 {
   /**
    * @return StdRoute[]

@@ -4,19 +4,19 @@
  */
 namespace Cubex\Routing;
 
-interface Router
+interface IRouter
 {
   /**
    * Initiate Router
    *
-   * @param Route[] $routes
+   * @param IRoute[] $routes
    */
   public function __construct(array $routes);
 
   /**
    * Add an array of routes
    *
-   * @param Route[] $route
+   * @param IRoute[] $route
    */
   public function addRoutes(array $route);
 
@@ -25,7 +25,7 @@ interface Router
    *
    * @param $pattern
    *
-   * @return Route|null
+   * @return IRoute|null
    */
   public function getRoute($pattern);
 }

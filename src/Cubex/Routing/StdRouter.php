@@ -4,7 +4,7 @@
  */
 namespace Cubex\Routing;
 
-class StdRouter implements Router
+class StdRouter implements IRouter
 {
   protected $_routes;
   protected $_verbMatch;
@@ -25,7 +25,7 @@ class StdRouter implements Router
   /**
    * Add an array of routes
    *
-   * @param Route[] $route
+   * @param IRoute[] $route
    */
   public function addRoutes(array $route)
   {

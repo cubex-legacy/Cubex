@@ -4,7 +4,7 @@
  */
 namespace Cubex\Routing;
 
-interface Template
+interface IRouteTemplate
 {
   /**
    * @return array

@@ -17,7 +17,7 @@ use Cubex\Core\Http\Response;
 use Cubex\Foundation\Renderable;
 use Cubex\I18n\Translatable;
 use Cubex\I18n\TranslateTraits;
-use Cubex\Routing\Route;
+use Cubex\Routing\IRoute;
 use Cubex\Routing\StdRoute;
 use Cubex\Routing\StdRouter;
 use Cubex\ServiceManager\ServiceManagerAware;
@@ -365,7 +365,7 @@ class BaseController
   /**
    * @param array $routes
    *
-   * @return \Cubex\Routing\Route|null
+   * @return \Cubex\Routing\IRoute|null
    */
   protected function _attemptRoutes(array $routes)
   {
@@ -415,7 +415,7 @@ class BaseController
   /**
    * @param array $routes
    *
-   * @return Route[]
+   * @return IRoute[]
    */
   protected function _getRoutes(array $routes)
   {
@@ -429,7 +429,7 @@ class BaseController
     {
       foreach($routes as $routePattern => $routeResult)
       {
-        if($routeResult instanceof Route)
+        if($routeResult instanceof IRoute)
         {
           $finalRoutes[] = $routeResult;
         }
@@ -454,7 +454,7 @@ class BaseController
   }
 
   /**
-   * @return array|Route[]
+   * @return array|IRoute[]
    */
   public function getRoutes()
   {
@@ -462,7 +462,7 @@ class BaseController
   }
 
   /**
-   * @return array|Route[]
+   * @return array|IRoute[]
    */
   public function getPostRoutes()
   {
@@ -470,7 +470,7 @@ class BaseController
   }
 
   /**
-   * @return array|Route[]
+   * @return array|IRoute[]
    */
   public function getAjaxRoutes()
   {
