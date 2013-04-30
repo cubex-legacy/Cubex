@@ -8,7 +8,7 @@ namespace Cubex\View;
 use Cubex\Foundation\IRenderable;
 use Cubex\Core\Http\Response;
 
-interface ResponseAwareRenderable extends IRenderable
+interface IResponseAwareRenderable extends IRenderable
 {
   public function setResponse(Response $response);
 }

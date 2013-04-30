@@ -18,11 +18,11 @@ use Cubex\View\HtmlElement;
 use Cubex\View\Layout;
 use Cubex\View\Partial;
 use Cubex\View\RenderGroup;
-use Cubex\View\ResponseAwareRenderable;
+use Cubex\View\IResponseAwareRenderable;
 use Cubex\View\Templates\Exceptions\ExceptionView;
 
 class Webpage implements
-  ResponseAwareRenderable,
+  IResponseAwareRenderable,
   IDispatchInjection,
   IDispatchableAccess
 {
