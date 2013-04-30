@@ -6,7 +6,7 @@ namespace Cubex\Platform\Detection;
 
 use Cubex\ServiceManager\IService;
 
-interface DetectionService extends IService
+interface IDetectionService extends IService
 {
   /**
    * @return bool

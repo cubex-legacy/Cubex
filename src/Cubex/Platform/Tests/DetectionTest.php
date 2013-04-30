@@ -36,7 +36,7 @@ class DetectionTest extends TestCase
       ->will($this->returnValue(true));
 
     /**
-     * @var \Cubex\Platform\Detection\DetectionService $detectionMock
+     * @var \Cubex\Platform\Detection\IDetectionService $detectionMock
      */
 
     $this->assertFalse($detectionMock->isMobile());

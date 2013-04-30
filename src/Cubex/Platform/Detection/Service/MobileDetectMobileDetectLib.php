@@ -4,10 +4,10 @@
  */
 namespace Cubex\Platform\Detection\Service;
 
-use Cubex\Platform\Detection\DetectionService;
+use Cubex\Platform\Detection\IDetectionService;
 use Cubex\ServiceManager\ServiceConfig;
 
-class MobileDetectMobileDetectLib implements DetectionService
+class MobileDetectMobileDetectLib implements IDetectionService
 {
   /**
    * @var \Mobile_Detect

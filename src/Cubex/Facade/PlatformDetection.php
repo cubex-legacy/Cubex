@@ -7,7 +7,7 @@ namespace Cubex\Facade;
 class PlatformDetection extends BaseFacade
 {
   /**
-   * @return \Cubex\Platform\Detection\DetectionService
+   * @return \Cubex\Platform\Detection\IDetectionService
    */
   public static function getAccessor()
   {
