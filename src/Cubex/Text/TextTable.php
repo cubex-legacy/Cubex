@@ -164,8 +164,35 @@ class TextTable
     && array_sum($this->_columnWidths) > $this->_maxTableWidth
     )
     {
-      $width = ceil($this->_maxTableWidth / $this->_columnCount);
-      $width = $width - 2;
+      if($this->_fixedLayout ||
+        ($this->_columnWidths[0] > $this->_maxTableWidth)
+      )
+      {
+        $width = ceil($this->_maxTableWidth / $this->_columnCount);
+        $width = $width - 2;
+      }
+      else
+      {
+        $sumWidth = 0;
+        $width = 10;
+        for($i = 1; $i <= $this->_columnCount; $i++)
+        {
+          $colWidth = $this->_columnWidths[$i - 1];
+          $sumWidth += $colWidth;
+          if($sumWidth >= $this->_maxTableWidth)
+          {
+            $sumWidth -= $colWidth;
+            $remaining = $this->_maxTableWidth - $sumWidth;
+            $width = $remaining / ($this->_columnCount - ($i - 1));
+            break;
+          }
+          else if($i == $column)
+          {
+            $width = $this->_columnWidths[$column - 1];
+            break;
+          }
+        }
+      }
     }
     else if($this->_fixedLayout)
     {
@@ -191,6 +218,7 @@ class TextTable
       $width = $this->_maxColumnWidth;
     }
 
+    $width = ceil($width);
     return $width;
   }
 
