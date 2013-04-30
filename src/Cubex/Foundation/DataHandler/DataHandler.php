@@ -5,7 +5,7 @@
 
 namespace Cubex\Foundation\DataHandler;
 
-class DataHandler implements HandlerInterface
+class DataHandler implements IDataHandler
 {
   use HandlerTrait;
 }

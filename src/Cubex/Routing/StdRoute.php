@@ -5,10 +5,10 @@
 namespace Cubex\Routing;
 
 use Cubex\Facade\Redirect;
-use Cubex\Foundation\DataHandler\HandlerInterface;
+use Cubex\Foundation\DataHandler\IDataHandler;
 use Cubex\Foundation\DataHandler\HandlerTrait;
 
-class StdRoute implements IRoute, HandlerInterface, \JsonSerializable
+class StdRoute implements IRoute, IDataHandler, \JsonSerializable
 {
   use HandlerTrait;
 

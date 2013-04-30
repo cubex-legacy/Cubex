@@ -8,7 +8,7 @@ namespace Cubex\Foundation\DataHandler;
 /**
  * Data Handler Interface
  */
-interface HandlerInterface
+interface IDataHandler
 {
   /**
    * @param $name

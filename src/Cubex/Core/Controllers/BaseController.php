@@ -9,7 +9,7 @@ use Cubex\Core\Application\Controller;
 use Cubex\Core\Http\Redirect;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
-use Cubex\Foundation\DataHandler\HandlerInterface;
+use Cubex\Foundation\DataHandler\IDataHandler;
 use Cubex\Foundation\DataHandler\HandlerTrait;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
@@ -24,7 +24,7 @@ use Cubex\ServiceManager\ServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
 class BaseController
-  implements Controller, HandlerInterface, ITranslatable, ServiceManagerAware
+  implements Controller, IDataHandler, ITranslatable, ServiceManagerAware
 {
   use HandlerTrait;
   use ConfigTrait;

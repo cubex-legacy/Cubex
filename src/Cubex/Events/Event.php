@@ -4,9 +4,9 @@
  */
 namespace Cubex\Events;
 
-use Cubex\Foundation\DataHandler\HandlerInterface;
+use Cubex\Foundation\DataHandler\IDataHandler;
 
-interface Event extends HandlerInterface
+interface Event extends IDataHandler
 {
   public function __construct($name, array $args = array(), $source = null);
 
