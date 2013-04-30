@@ -8,7 +8,7 @@ namespace Cubex\Database;
 use Cubex\Events\EventManager;
 use Cubex\ServiceManager\ServiceConfig;
 
-abstract class PDOBase implements DatabaseService
+abstract class PDOBase implements IDatabaseService
 {
   /**
    * @var \PDO

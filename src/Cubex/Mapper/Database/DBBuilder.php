@@ -6,7 +6,7 @@
 namespace Cubex\Mapper\Database;
 
 use Cubex\Data\Attribute;
-use Cubex\Database\DatabaseService;
+use Cubex\Database\IDatabaseService;
 use Cubex\Database\Schema\Column;
 use Cubex\Database\Schema\DataType;
 use Cubex\Helpers\Strings;
@@ -39,7 +39,7 @@ class DBBuilder
   protected $_mapperClass;
   protected $_addedAutoId = false;
 
-  public function __construct(DatabaseService $connection, RecordMapper $mapper)
+  public function __construct(IDatabaseService $connection, RecordMapper $mapper)
   {
     $this->_connection  = $connection;
     $this->_mapper      = $mapper;

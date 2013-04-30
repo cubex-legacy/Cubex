@@ -12,7 +12,7 @@ class DB extends BaseFacade
   /**
    * @param string $name
    *
-   * @return \Cubex\Database\DatabaseService|void
+   * @return \Cubex\Database\IDatabaseService|void
    */
   public static function getAccessor($name = 'db')
   {

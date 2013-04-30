@@ -6,7 +6,7 @@
 namespace Cubex\Sprintf;
 
 use Cubex\Data\Validator\Validator;
-use Cubex\Database\DatabaseService;
+use Cubex\Database\IDatabaseService;
 use Cubex\Mapper\Database\SearchObject;
 
 /**
@@ -93,7 +93,7 @@ class ParseQuery implements IFormatter
     }
   }
 
-  public static function parse(DatabaseService $connection, $args = [])
+  public static function parse(IDatabaseService $connection, $args = [])
   {
     if(func_num_args() > 2)
     {
@@ -111,7 +111,7 @@ class ParseQuery implements IFormatter
 
   public function format($connection, &$pattern, &$pos, &$value, &$length)
   {
-    if($connection instanceof DatabaseService)
+    if($connection instanceof IDatabaseService)
     {
       $type = $pattern[$pos];
       $next = (strlen($pattern) > $pos + 1) ? $pattern[$pos + 1] : null;

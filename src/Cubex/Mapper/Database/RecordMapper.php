@@ -11,7 +11,7 @@ use Cubex\Data\CallbackAttribute;
 use Cubex\Data\CompositeAttribute;
 use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Database\ConnectionMode;
-use Cubex\Database\DatabaseService;
+use Cubex\Database\IDatabaseService;
 use Cubex\Mapper\DataMapper;
 use Cubex\Sprintf\ParseQuery;
 
@@ -337,7 +337,7 @@ abstract class RecordMapper extends DataMapper
   /**
    * @param \Cubex\Database\ConnectionMode $mode
    *
-   * @return \Cubex\Database\DatabaseService
+   * @return \Cubex\Database\IDatabaseService
    */
   public static function conn(ConnectionMode $mode = null)
   {
@@ -358,7 +358,7 @@ abstract class RecordMapper extends DataMapper
   /**
    * @param \Cubex\Database\ConnectionMode $mode
    *
-   * @return \Cubex\Database\DatabaseService
+   * @return \Cubex\Database\IDatabaseService
    */
   public function connection(ConnectionMode $mode = null)
   {
@@ -880,7 +880,7 @@ abstract class RecordMapper extends DataMapper
     return new RecordCollection(new static);
   }
 
-  protected function _handleError(DatabaseService $connection)
+  protected function _handleError(IDatabaseService $connection)
   {
     switch($connection->errorNo())
     {

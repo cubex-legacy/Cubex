@@ -16,7 +16,7 @@ class DatabaseFactory implements IServiceFactory
   /**
    * @param \Cubex\ServiceManager\ServiceConfig $config
    *
-   * @return \Cubex\Database\DatabaseService
+   * @return \Cubex\Database\IDatabaseService
    * @throws \Exception
    */
   public function createService(ServiceConfig $config)

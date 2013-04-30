@@ -7,7 +7,7 @@ namespace Cubex\Database;
 
 use Cubex\ServiceManager\IService;
 
-interface DatabaseService extends IService
+interface IDatabaseService extends IService
 {
 
   /**

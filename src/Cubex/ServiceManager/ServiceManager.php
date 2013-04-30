@@ -8,7 +8,7 @@ namespace Cubex\ServiceManager;
  * Container for services
  */
 use Cubex\Cache\CacheService;
-use Cubex\Database\DatabaseService;
+use Cubex\Database\IDatabaseService;
 use Cubex\Session\ISessionService;
 use Psr\Log\InvalidArgumentException;
 
@@ -390,13 +390,13 @@ class ServiceManager
   /**
    * @param string $connection
    *
-   * @return \Cubex\Database\DatabaseService
+   * @return \Cubex\Database\IDatabaseService
    * @throws \Exception
    */
   public function db($connection = 'db')
   {
     $database = $this->get($connection);
-    if($database instanceof DatabaseService)
+    if($database instanceof IDatabaseService)
     {
       return $database;
     }
