@@ -7,10 +7,10 @@
  */
 namespace Cubex\Encryption\Service;
 
-use Cubex\Encryption\EncryptionService;
+use Cubex\Encryption\IEncryptionService;
 use Cubex\ServiceManager\ServiceConfig;
 
-class IlluminateEncryption implements EncryptionService
+class IlluminateEncryption implements IEncryptionService
 {
   private $_key;
 

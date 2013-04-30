@@ -13,7 +13,7 @@ class EncryptionTest extends TestCase
   private $_valueReversed;
 
   /**
-   * @var \Cubex\Encryption\EncryptionService $_encryption
+   * @var \Cubex\Encryption\IEncryptionService $_encryption
    */
   private $_encryption;
 

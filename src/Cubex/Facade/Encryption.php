@@ -8,7 +8,7 @@ namespace Cubex\Facade;
 class Encryption extends BaseFacade
 {
   /**
-   * @return \Cubex\Encryption\EncryptionService
+   * @return \Cubex\Encryption\IEncryptionService
    */
   public static function getAccessor()
   {

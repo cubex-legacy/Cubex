@@ -4,10 +4,10 @@
  */
 namespace Cubex\Encryption\Service;
 
-use Cubex\Encryption\EncryptionService;
+use Cubex\Encryption\IEncryptionService;
 use Cubex\ServiceManager\ServiceConfig;
 
-class TestEncryption implements EncryptionService
+class TestEncryption implements IEncryptionService
 {
   public function configure(ServiceConfig $config)
   {

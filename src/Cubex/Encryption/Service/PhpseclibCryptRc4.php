@@ -7,10 +7,10 @@
  */
 namespace Cubex\Encryption\Service;
 
-use Cubex\Encryption\EncryptionService;
+use Cubex\Encryption\IEncryptionService;
 use Cubex\ServiceManager\ServiceConfig;
 
-class PhpseclibCryptRc4 implements EncryptionService
+class PhpseclibCryptRc4 implements IEncryptionService
 {
   /**
    * @var \Crypt_RC4 $_encrypter
