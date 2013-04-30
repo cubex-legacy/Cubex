@@ -18,7 +18,7 @@ class DetectionTest extends TestCase
   public function setUp()
   {
     $this->_detectionMock = $this->getMock(
-      "\\Cubex\\Platform\\Detection\\DetectionService"
+      "\\Cubex\\Platform\\Detection\\IDetectionService"
     );
   }
 
