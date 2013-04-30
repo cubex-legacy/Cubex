@@ -5,7 +5,7 @@
 
 namespace Cubex\Components;
 
-interface Component
+interface IComponent
 {
   public function name();
 

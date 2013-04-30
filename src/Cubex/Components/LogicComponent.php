@@ -11,7 +11,7 @@ use Cubex\ServiceManager\ServiceManager;
 /**
  * A Logic component should contain Interface typehints
  */
-abstract class LogicComponent implements Component, INamespaceAware
+abstract class LogicComponent implements IComponent, INamespaceAware
 {
   public function __construct()
   {
