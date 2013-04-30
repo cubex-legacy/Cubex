@@ -9,7 +9,7 @@ namespace Cubex\I18n\Translator;
 
 use Cubex\Foundation\Config\ConfigTrait;
 
-class GoogleTranslator implements Translator
+class GoogleTranslator implements ITranslator
 {
   use ConfigTrait;
 

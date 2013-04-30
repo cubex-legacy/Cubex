@@ -14,7 +14,7 @@ trait Translation
   protected $_boundTd = false;
 
   /**
-   * @return \Cubex\I18n\Loader\Loader
+   * @return \Cubex\I18n\Loader\ITanslationLoader
    */
   public function getTranslator()
   {

@@ -4,7 +4,7 @@
  */
 namespace Cubex\I18n;
 
-interface Translatable
+interface ITranslatable
 {
   /**
    * Translate string

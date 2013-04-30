@@ -5,7 +5,7 @@
 
 namespace Cubex\I18n\Loader;
 
-interface Loader
+interface ITanslationLoader
 {
 
   /**

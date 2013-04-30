@@ -15,7 +15,7 @@ use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 
 use Cubex\Foundation\Renderable;
-use Cubex\I18n\Translatable;
+use Cubex\I18n\ITranslatable;
 use Cubex\I18n\TranslateTraits;
 use Cubex\Routing\IRoute;
 use Cubex\Routing\StdRoute;
@@ -24,7 +24,7 @@ use Cubex\ServiceManager\ServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
 class BaseController
-  implements Controller, HandlerInterface, Translatable, ServiceManagerAware
+  implements Controller, HandlerInterface, ITranslatable, ServiceManagerAware
 {
   use HandlerTrait;
   use ConfigTrait;

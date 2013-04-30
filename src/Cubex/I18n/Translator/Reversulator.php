@@ -9,7 +9,7 @@ namespace Cubex\I18n\Translator;
 
 use Cubex\Foundation\Config\ConfigTrait;
 
-class Reversulator implements Translator
+class Reversulator implements ITranslator
 {
   use ConfigTrait;
 

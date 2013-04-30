@@ -6,7 +6,7 @@ namespace Cubex\I18n\Translator;
 
 use Cubex\Foundation\Config\Configurable;
 
-interface Translator extends Configurable
+interface ITranslator extends Configurable
 {
 
   /**

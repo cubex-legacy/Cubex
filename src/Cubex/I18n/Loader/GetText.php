@@ -8,7 +8,7 @@ namespace Cubex\I18n\Loader;
 /**
  * Gettext
  */
-class GetText implements Loader
+class GetText implements ITanslationLoader
 {
 
   /**

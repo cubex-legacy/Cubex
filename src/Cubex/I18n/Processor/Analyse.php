@@ -8,7 +8,7 @@ namespace Cubex\I18n\Processor;
 /**
  * Analyse codebase
  */
-use Cubex\I18n\Translator\Translator;
+use Cubex\I18n\Translator\ITranslator;
 
 class Analyse
 {
@@ -173,13 +173,13 @@ class Analyse
 
   /**
    * @param            $language
-   * @param Translator $translator
+   * @param ITranslator $translator
    * @param string     $sourceLanguage
    *
    * @return string
    */
   public function generatePO(
-    $language, Translator $translator,
+    $language, ITranslator $translator,
     $sourceLanguage = 'en'
   )
   {

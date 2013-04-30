@@ -8,7 +8,7 @@ namespace Cubex\I18n\Loader;
 /**
  * Gettext
  */
-class Reverser implements Loader
+class Reverser implements ITanslationLoader
 {
 
   /**

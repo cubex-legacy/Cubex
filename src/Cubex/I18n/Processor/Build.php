@@ -9,7 +9,7 @@ namespace Cubex\I18n\Processor;
  * Build
  */
 use Cubex\I18n\Translator\NoTranslator;
-use Cubex\I18n\Translator\Translator;
+use Cubex\I18n\Translator\ITranslator;
 
 class Build
 {
@@ -31,13 +31,13 @@ class Build
   protected $_areas = array();
   protected $_translator;
 
-  public function __construct($projectDir, Translator $translator)
+  public function __construct($projectDir, ITranslator $translator)
   {
     $this->_projectDir = $projectDir;
     $this->setTranslator($translator);
   }
 
-  public function setTranslator(Translator $translator)
+  public function setTranslator(ITranslator $translator)
   {
     $this->_translator = $translator;
     return $this;
