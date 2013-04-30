@@ -9,7 +9,7 @@ use Cubex\Exception\CubexException;
 
 class SprintfEngine
 {
-  public function __invoke(FormatterInterface $formatter, $userData, $argv)
+  public function __invoke(IFormatter $formatter, $userData, $argv)
   {
     $argc     = count($argv);
     $arg      = 0;

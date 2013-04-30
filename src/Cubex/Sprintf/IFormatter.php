@@ -5,7 +5,7 @@
 
 namespace Cubex\Sprintf;
 
-interface FormatterInterface
+interface IFormatter
 {
   public function format($userData, &$pattern, &$pos, &$value, &$length);
 }

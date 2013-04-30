@@ -47,7 +47,7 @@ use Cubex\Mapper\Database\SearchObject;
  *
  */
 
-class ParseQuery implements FormatterInterface
+class ParseQuery implements IFormatter
 {
 
   public static function valueType($value)
