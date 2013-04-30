@@ -12,7 +12,7 @@ use Cubex\Mapper\DataMapper;
 class KvMapper extends DataMapper
 {
   /**
-   * @return \Cubex\KvStore\KvService
+   * @return \Cubex\KvStore\IKvService
    */
   public function connection()
   {
@@ -20,7 +20,7 @@ class KvMapper extends DataMapper
   }
 
   /**
-   * @return \Cubex\KvStore\KvService
+   * @return \Cubex\KvStore\IKvService
    */
   public static function conn()
   {
