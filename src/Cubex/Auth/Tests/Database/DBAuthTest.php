@@ -25,7 +25,7 @@ class DBAuthTest extends TestCase
   public function setUp()
   {
     $this->_mockDbConnection = $this->getMock(
-      "\\Cubex\\Database\\DatabaseService"
+      "\\Cubex\\Database\\IDatabaseService"
     );
     $this->_serviceManager = Container::get(Container::SERVICE_MANAGER);
   }
@@ -71,7 +71,7 @@ class DBAuthTest extends TestCase
     $return->id = 1;
     $return->username = "username";
 
-    $credentialsMock = $this->getMock("\\Cubex\\Auth\\LoginCredentials");
+    $credentialsMock = $this->getMock("\\Cubex\\Auth\\ILoginCredentials");
 
     $credentialsMock->expects($this->exactly(2))
       ->method("username")
