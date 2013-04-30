@@ -4,9 +4,9 @@
  */
 namespace Cubex\I18n\Translator;
 
-use Cubex\Foundation\Config\Configurable;
+use Cubex\Foundation\Config\IConfigurable;
 
-interface ITranslator extends Configurable
+interface ITranslator extends IConfigurable
 {
 
   /**

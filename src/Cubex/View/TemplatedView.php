@@ -8,10 +8,10 @@ use Cubex\Core\Application\Controller;
 use Cubex\Core\Interfaces\DirectoryAware;
 use Cubex\Core\Interfaces\NamespaceAware;
 use Cubex\Dispatch\Utils\RequireTrait;
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 use Cubex\I18n\TranslateTraits;
 
-class TemplatedView implements Renderable, NamespaceAware
+class TemplatedView implements IRenderable, NamespaceAware
 {
   use PhtmlParser;
   use TranslateTraits;

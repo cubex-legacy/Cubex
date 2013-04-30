@@ -5,9 +5,9 @@
 
 namespace Cubex\Form;
 
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 
-class FormRender implements Renderable
+class FormRender implements IRenderable
 {
   protected $_form;
 

@@ -5,9 +5,9 @@
 
 namespace Cubex\Core\Http;
 
-use Cubex\Foundation\Config\Configurable;
+use Cubex\Foundation\Config\IConfigurable;
 
-interface Dispatchable extends Configurable
+interface Dispatchable extends IConfigurable
 {
   /**
    * @param \Cubex\Core\Http\Request       $request

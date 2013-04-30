@@ -6,10 +6,10 @@
 namespace Cubex\Form;
 
 use Cubex\Data\Attribute;
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 use Cubex\Helpers\Strings;
 
-class FormElement extends Attribute implements Renderable
+class FormElement extends Attribute implements IRenderable
 {
 
   const TEXT           = 'text';

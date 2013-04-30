@@ -8,11 +8,11 @@ use Cubex\Container\Container;
 use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\DataHandler\HandlerTrait;
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 use Cubex\I18n\ITranslatable;
 use Cubex\I18n\TranslateTraits;
 
-abstract class ViewModel implements Renderable, ITranslatable
+abstract class ViewModel implements IRenderable, ITranslatable
 {
   use TranslateTraits;
   use RequireTrait;

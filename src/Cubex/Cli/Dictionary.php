@@ -7,7 +7,7 @@ namespace Cubex\Cli;
 
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
-use Cubex\Foundation\Config\Configurable;
+use Cubex\Foundation\Config\IConfigurable;
 
 /**
  * To create shortcuts for CLI, add a cli_dictionary to your config e.g.
@@ -15,7 +15,7 @@ use Cubex\Foundation\Config\Configurable;
  * [cli_dictionary]
  * d = Cubex\Dispatch\Mapper\CliInit
  */
-class Dictionary implements Configurable
+class Dictionary implements IConfigurable
 {
   use ConfigTrait;
 

@@ -5,7 +5,7 @@
 
 namespace Cubex\Remarkup;
 
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 
 /**
  * Class Produce
@@ -52,7 +52,7 @@ use Cubex\Foundation\Renderable;
  * [[/fewjkhfrweh]]
  *
  */
-class Producer implements Renderable
+class Producer implements IRenderable
 {
   public function __construct($raw, array $rules = null)
   {

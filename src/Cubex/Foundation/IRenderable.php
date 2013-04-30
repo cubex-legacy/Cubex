@@ -7,7 +7,7 @@ namespace Cubex\Foundation;
 /**
  * An object that can be rendered with __toString() or with render()
  */
-interface Renderable
+interface IRenderable
 {
   /**
    * @return string

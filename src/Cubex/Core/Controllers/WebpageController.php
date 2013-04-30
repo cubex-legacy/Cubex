@@ -9,7 +9,7 @@ use Cubex\Core\Http\Response;
 use Cubex\Core\Response\Webpage;
 use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Events\EventManager;
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 use Cubex\View\Impart;
 use Cubex\View\Layout;
 use Cubex\View\Templates\Exceptions\ExceptionView;
@@ -84,19 +84,19 @@ class WebpageController extends BaseController
     $this->_layout = $layout;
   }
 
-  public function nest($name, Renderable $content)
+  public function nest($name, IRenderable $content)
   {
     $this->webpage()->layout()->nest($name, $content);
     return $this;
   }
 
-  public function renderBefore($name, Renderable $item)
+  public function renderBefore($name, IRenderable $item)
   {
     $this->webpage()->layout()->renderBefore($name, $item);
     return $this;
   }
 
-  public function renderAfter($name, Renderable $item)
+  public function renderAfter($name, IRenderable $item)
   {
     $this->webpage()->layout()->renderAfter($name, $item);
     return $this;
@@ -142,7 +142,7 @@ class WebpageController extends BaseController
     {
       return $actionResponse;
     }
-    else if($actionResponse instanceof Renderable)
+    else if($actionResponse instanceof IRenderable)
     {
       $this->_webpage->addRenderable($actionResponse);
     }
@@ -187,7 +187,7 @@ class WebpageController extends BaseController
     {
       $this->_renderingEsiAction = true;
       $resp                      = $this->_processAction($action, $params);
-      if(!($resp instanceof Renderable))
+      if(!($resp instanceof IRenderable))
       {
         if(is_scalar($resp))
         {

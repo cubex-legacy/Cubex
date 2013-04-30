@@ -4,7 +4,7 @@
  */
 namespace Cubex\Core\Http;
 
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 use Cubex\Events\EventManager;
 
 class Response
@@ -61,7 +61,7 @@ class Response
     {
       $this->fromRedirect($source);
     }
-    else if($source instanceof Renderable)
+    else if($source instanceof IRenderable)
     {
       $this->fromRenderable($source);
     }
@@ -172,11 +172,11 @@ class Response
   /**
    * Set the response to be a renderable object
    *
-   * @param \Cubex\Foundation\Renderable $item
+   * @param \Cubex\Foundation\IRenderable $item
    *
    * @return Response
    */
-  public function fromRenderable(Renderable $item)
+  public function fromRenderable(IRenderable $item)
   {
     $this->_responseObject = $item;
     $this->_renderType     = self::RENDER_RENDERABLE;
@@ -234,7 +234,7 @@ class Response
 
         /* Render header before content to allow browser to start loading css */
         \ob_implicit_flush(true);
-        if($this->_responseObject instanceof Renderable)
+        if($this->_responseObject instanceof IRenderable)
         {
           echo $this->_responseObject->render();
         }

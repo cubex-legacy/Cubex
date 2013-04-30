@@ -12,7 +12,7 @@ use Cubex\Dispatch\Dependency\Resource;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Events\Event;
 use Cubex\Events\EventManager as EM;
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 use Cubex\Core\Http\DispatchInjection;
 use Cubex\View\HtmlElement;
 use Cubex\View\Layout;
@@ -209,14 +209,14 @@ class Webpage implements
   /**
    * Render body content or captured content
    *
-   * @return Renderable
+   * @return IRenderable
    */
   public function body()
   {
     $renderGroup = new RenderGroup();
     foreach($this->_renderables as $render)
     {
-      if($render instanceof Renderable)
+      if($render instanceof IRenderable)
       {
         $renderGroup->add($render);
       }
@@ -391,7 +391,7 @@ class Webpage implements
     return $this->renderHead() . $body . $this->renderClosing();
   }
 
-  public function addRenderable(Renderable $render, $name = null)
+  public function addRenderable(IRenderable $render, $name = null)
   {
     if($name === null)
     {

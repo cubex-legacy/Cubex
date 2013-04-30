@@ -11,9 +11,9 @@ namespace Cubex\View;
 /**
  * Simple HTML Render
  */
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 
-class HtmlElement implements Renderable
+class HtmlElement implements IRenderable
 {
 
   protected $_tag = '';
@@ -93,11 +93,11 @@ class HtmlElement implements Renderable
   }
 
   /**
-   * @param Renderable $item
+   * @param IRenderable $item
    *
    * @return HTMLElement
    */
-  public function nest(Renderable $item)
+  public function nest(IRenderable $item)
   {
     $this->_nested[] = $item;
 
@@ -143,7 +143,7 @@ class HtmlElement implements Renderable
 
     foreach($this->_nested as $nest)
     {
-      if($nest instanceof Renderable)
+      if($nest instanceof IRenderable)
       {
         $return .= $nest->render();
       }
@@ -173,13 +173,13 @@ class HtmlElement implements Renderable
     return \htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
   }
 
-  public function renderBefore(Renderable $item)
+  public function renderBefore(IRenderable $item)
   {
     $this->_preRender->add($item);
     return $this;
   }
 
-  public function renderAfter(Renderable $item)
+  public function renderAfter(IRenderable $item)
   {
     $this->_postRender->add($item);
     return $this;

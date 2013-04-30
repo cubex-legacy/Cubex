@@ -4,7 +4,7 @@
  */
 namespace Cubex\Foundation\Config;
 
-interface Configurable
+interface IConfigurable
 {
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configuration

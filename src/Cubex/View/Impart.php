@@ -8,9 +8,9 @@ namespace Cubex\View;
 /**
  * Basic render object
  */
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 
-class Impart implements Renderable
+class Impart implements IRenderable
 {
   protected $_content = '';
 

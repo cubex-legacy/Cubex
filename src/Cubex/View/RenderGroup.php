@@ -8,9 +8,9 @@
 
 namespace Cubex\View;
 
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 
-class RenderGroup implements Renderable
+class RenderGroup implements IRenderable
 {
 
   protected $_items = array();
@@ -41,7 +41,7 @@ class RenderGroup implements Renderable
       {
         $itm = new Impart($itm);
       }
-      if($itm instanceof Renderable)
+      if($itm instanceof IRenderable)
       {
         $this->_items[] = $itm;
       }
@@ -55,7 +55,7 @@ class RenderGroup implements Renderable
     $render = '';
     foreach($this->_items as $item)
     {
-      if($item instanceof Renderable)
+      if($item instanceof IRenderable)
       {
         $render .= $item->render();
       }

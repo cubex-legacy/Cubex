@@ -9,10 +9,10 @@ use Cubex\Core\Interfaces\DirectoryAware;
 use Cubex\Core\Interfaces\NamespaceAware;
 use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Foundation\DataHandler\HandlerTrait;
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 use Cubex\I18n\TranslateTraits;
 
-class Layout implements Renderable, NamespaceAware
+class Layout implements IRenderable, NamespaceAware
 {
   use PhtmlParser;
   use TranslateTraits;

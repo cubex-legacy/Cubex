@@ -14,7 +14,7 @@ use Cubex\Foundation\DataHandler\HandlerTrait;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 use Cubex\I18n\ITranslatable;
 use Cubex\I18n\TranslateTraits;
 use Cubex\Routing\IRoute;
@@ -107,7 +107,7 @@ class BaseController
       $canProcess = $this->canProcess();
       if($canProcess !== true)
       {
-        if($canProcess instanceof Redirect || $canProcess instanceof Renderable)
+        if($canProcess instanceof Redirect || $canProcess instanceof IRenderable)
         {
           $actionResponse = $canProcess;
         }

@@ -12,7 +12,7 @@ use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
-use Cubex\Foundation\Config\Configurable;
+use Cubex\Foundation\Config\IConfigurable;
 use Cubex\Core\Http\Dispatchable;
 use Cubex\Core\Http\DispatchableAccess;
 use Cubex\Core\Http\Request;
@@ -24,7 +24,7 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
 /**
  * Cubex Loader
  */
-class Loader implements Configurable, DispatchableAccess, DispatchInjection,
+class Loader implements IConfigurable, DispatchableAccess, DispatchInjection,
                         ServiceManagerAware
 {
   use ConfigTrait;
@@ -692,7 +692,7 @@ class Loader implements Configurable, DispatchableAccess, DispatchInjection,
 
         $obj = new $command($this, $args);
 
-        if($obj instanceof Configurable)
+        if($obj instanceof IConfigurable)
         {
           $obj->configure($this->getConfig());
         }

@@ -10,12 +10,12 @@ use Cubex\Core\Http\Request;
 use Cubex\Data\Attribute;
 use Cubex\Data\Validator\Validator;
 use Cubex\Facade\Session;
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 use Cubex\Helpers\Strings;
 use Cubex\Mapper\DataMapper;
 use Cubex\Mapper\Database\RecordMapper;
 
-class Form extends DataMapper implements Renderable
+class Form extends DataMapper implements IRenderable
 {
   const LABEL_AFTER          = 'after';
   const LABEL_BEFORE         = 'before';

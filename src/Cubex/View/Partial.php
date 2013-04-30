@@ -4,9 +4,9 @@
  */
 namespace Cubex\View;
 
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 
-class Partial implements Renderable
+class Partial implements IRenderable
 {
   /**
    * @var bool

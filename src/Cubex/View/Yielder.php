@@ -5,7 +5,7 @@
 
 namespace Cubex\View;
 
-use Cubex\Foundation\Renderable;
+use Cubex\Foundation\IRenderable;
 
 trait Yielder
 {
@@ -23,7 +23,7 @@ trait Yielder
     return isset($this->_nested[$name]);
   }
 
-  public function nest($name, Renderable $view)
+  public function nest($name, IRenderable $view)
   {
     $this->_nested[$name] = $view;
     return $this;
@@ -43,7 +43,7 @@ trait Yielder
     {
       foreach($this->_renderHooks['before'][$name] as $renderHook)
       {
-        if($renderHook instanceof Renderable)
+        if($renderHook instanceof IRenderable)
         {
           $rendered .= $renderHook->render();
         }
@@ -53,7 +53,7 @@ trait Yielder
     if(isset($this->_nested[$name]))
     {
       $nest = $this->_nested[$name];
-      if($nest instanceof Renderable)
+      if($nest instanceof IRenderable)
       {
         $rendered .= $nest->render();
       }
@@ -63,7 +63,7 @@ trait Yielder
     {
       foreach($this->_renderHooks['after'][$name] as $renderHook)
       {
-        if($renderHook instanceof Renderable)
+        if($renderHook instanceof IRenderable)
         {
           $rendered .= $renderHook->render();
         }
@@ -88,20 +88,20 @@ trait Yielder
   /**
    * @param                              $when
    * @param                              $nest
-   * @param \Cubex\Foundation\Renderable $render
+   * @param \Cubex\Foundation\IRenderable $render
    */
-  protected function _hookRender($when, $nest, Renderable $render)
+  protected function _hookRender($when, $nest, IRenderable $render)
   {
     $this->_renderHooks[$when][$nest][] = $render;
   }
 
   /**
    * @param                              $nest
-   * @param \Cubex\Foundation\Renderable $render
+   * @param \Cubex\Foundation\IRenderable $render
    *
    * @return Layout
    */
-  public function renderBefore($nest, Renderable $render)
+  public function renderBefore($nest, IRenderable $render)
   {
     $this->_hookRender("before", $nest, $render);
     return $this;
@@ -109,11 +109,11 @@ trait Yielder
 
   /**
    * @param                              $nest
-   * @param \Cubex\Foundation\Renderable $render
+   * @param \Cubex\Foundation\IRenderable $render
    *
    * @return Layout
    */
-  public function renderAfter($nest, Renderable $render)
+  public function renderAfter($nest, IRenderable $render)
   {
     $this->_hookRender("after", $nest, $render);
     return $this;
