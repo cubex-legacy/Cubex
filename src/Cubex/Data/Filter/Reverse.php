@@ -8,7 +8,7 @@ namespace Cubex\Data\Filter;
 /**
  * Example / Test Filter
  */
-class Reverse implements FilterInterface
+class Reverse implements IFilter
 {
   public function setOptions(array $options = [])
   {

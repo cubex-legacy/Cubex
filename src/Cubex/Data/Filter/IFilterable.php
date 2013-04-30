@@ -8,7 +8,7 @@ namespace Cubex\Data\Filter;
 /**
  * Class can be filtered
  */
-interface Filterable
+interface IFilterable
 {
   /**
    * @param       $filter

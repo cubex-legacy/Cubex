@@ -127,7 +127,7 @@ trait ValidatableTrait
         }
       }
 
-      if($validator instanceof ValidatorInterface)
+      if($validator instanceof IValidator)
       {
         $validator->setOptions($options);
         $valid  = $validator->isValid($value);

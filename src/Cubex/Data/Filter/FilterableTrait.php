@@ -98,7 +98,7 @@ trait FilterableTrait
         }
       }
 
-      if($filter instanceof FilterInterface)
+      if($filter instanceof IFilter)
       {
         $filter->setOptions($options);
         $value = $filter->filter($value);

@@ -5,13 +5,13 @@
 
 namespace Cubex\Data;
 
-use Cubex\Data\Filter\Filterable;
+use Cubex\Data\Filter\IFilterable;
 use Cubex\Data\Filter\FilterableTrait;
-use Cubex\Data\Validator\Validatable;
+use Cubex\Data\Validator\IValidatable;
 use Cubex\Data\Validator\ValidatableTrait;
 use Cubex\Type\Enum;
 
-class Attribute implements Validatable, Filterable, \JsonSerializable
+class Attribute implements IValidatable, IFilterable, \JsonSerializable
 {
   use ValidatableTrait;
   use FilterableTrait;

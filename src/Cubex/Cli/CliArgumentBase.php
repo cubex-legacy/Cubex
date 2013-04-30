@@ -5,12 +5,12 @@
 
 namespace Cubex\Cli;
 
-use Cubex\Data\Filter\Filterable;
+use Cubex\Data\Filter\IFilterable;
 use Cubex\Data\Filter\FilterableTrait;
-use Cubex\Data\Validator\Validatable;
+use Cubex\Data\Validator\IValidatable;
 use Cubex\Data\Validator\ValidatableTrait;
 
-class CliArgumentBase implements Validatable, Filterable
+class CliArgumentBase implements IValidatable, IFilterable
 {
   use ValidatableTrait;
   use FilterableTrait;

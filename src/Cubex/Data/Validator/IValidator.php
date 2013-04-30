@@ -5,7 +5,7 @@
 
 namespace Cubex\Data\Validator;
 
-interface ValidatorInterface
+interface IValidator
 {
   /**
    * Set options

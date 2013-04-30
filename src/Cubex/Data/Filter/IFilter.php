@@ -8,7 +8,7 @@ namespace Cubex\Data\Filter;
 /**
  * Filter input
  */
-interface FilterInterface
+interface IFilter
 {
   /**
    * Set options

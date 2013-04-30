@@ -8,7 +8,7 @@ namespace Cubex\Data\Validator;
 /**
  * Class can be filtered
  */
-interface Validatable
+interface IValidatable
 {
   /**
    * @param       $validator
