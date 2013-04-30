@@ -4,7 +4,7 @@
  */
 namespace Cubex\I18n;
 
-interface TranslatorAccess
+interface ITranslatorAccess
 {
   /**
    * @return \Cubex\I18n\Loader\ITanslationLoader

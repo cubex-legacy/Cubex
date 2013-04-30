@@ -19,7 +19,7 @@ use Cubex\Core\Http\Response;
 use Cubex\Core\Project\Project;
 use Cubex\I18n\ITranslatable;
 use Cubex\I18n\Translation;
-use Cubex\I18n\TranslatorAccess;
+use Cubex\I18n\ITranslatorAccess;
 use Cubex\Routing\IRoute;
 use Cubex\Routing\StdRoute;
 use Cubex\Routing\StdRouter;
@@ -31,7 +31,7 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
  */
 abstract class Application
   implements IDispatchable, IDispatchableAccess,
-             IDirectoryAware, ITranslatable, TranslatorAccess,
+             IDirectoryAware, ITranslatable, ITranslatorAccess,
              INamespaceAware, IServiceManagerAware
 {
   use ConfigTrait;

@@ -55,10 +55,10 @@ class Locale
      */
     $sm = Container::get(Container::SERVICE_MANAGER);
     /**
-     * @var \Cubex\I18n\LocaleService $localeService
+     * @var \Cubex\I18n\ILocaleService $localeService
      */
     $localeService = $sm->get("locale");
-    if($localeService instanceof LocaleService)
+    if($localeService instanceof ILocaleService)
     {
       $locale = $localeService->getLocale();
     }

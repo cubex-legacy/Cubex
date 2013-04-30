@@ -9,10 +9,10 @@ use Cubex\Container\Container;
 use Cubex\Cookie\ICookie;
 use Cubex\Cookie\Cookies;
 use Cubex\Cookie\StandardCookie;
-use Cubex\I18n\LocaleService;
+use Cubex\I18n\ILocaleService;
 use Cubex\ServiceManager\ServiceConfig;
 
-class PersistentCookie implements LocaleService
+class PersistentCookie implements ILocaleService
 {
   public function configure(ServiceConfig $config)
   {
