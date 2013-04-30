@@ -10,7 +10,7 @@ use Cubex\Helpers\Strings;
 use Cubex\Loader;
 use Psr\Log\LogLevel;
 
-abstract class CliCommand implements CliTask
+abstract class CliCommand implements ICliTask
 {
   use ConfigTrait;
 

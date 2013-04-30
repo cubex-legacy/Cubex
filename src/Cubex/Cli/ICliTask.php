@@ -7,7 +7,7 @@ namespace Cubex\Cli;
 
 use Cubex\Foundation\Config\IConfigurable;
 
-interface CliTask extends IConfigurable
+interface ICliTask extends IConfigurable
 {
   public function init();
 

@@ -5,12 +5,12 @@
 
 namespace Cubex\View\Branding;
 
-use Cubex\Cli\CliTask;
+use Cubex\Cli\ICliTask;
 use Cubex\Cli\Shell;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Loader;
 
-class ViewMapper implements CliTask
+class ViewMapper implements ICliTask
 {
   use ConfigTrait;
 

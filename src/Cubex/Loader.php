@@ -5,7 +5,7 @@
 namespace Cubex;
 
 use Cubex\Cli\CliCommand;
-use Cubex\Cli\CliTask;
+use Cubex\Cli\ICliTask;
 use Cubex\Core\Http\IDispatchInjection;
 use Cubex\Core\Project\Project;
 use Cubex\Events\EventManager;
@@ -702,7 +702,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
           $obj->setServiceManager($this->getServiceManager());
         }
 
-        if($obj instanceof CliTask)
+        if($obj instanceof ICliTask)
         {
           $obj->init();
 
