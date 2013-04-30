@@ -65,6 +65,8 @@ class Form extends DataMapper implements Renderable
     $rawAttributes     = mpull($this->getRawAttributes(), "name", "name");
     $missingAttributes = array_diff_key($rawAttributes, $data);
 
+    // Checkboxes get set to true by default. If we haven't got one being sent
+    // through then it needs to be set to false, we do that here.
     foreach($missingAttributes as $missingAttribute)
     {
       $attribute = $this->getAttribute($missingAttribute);
@@ -78,7 +80,22 @@ class Form extends DataMapper implements Renderable
       }
     }
 
-    parent::hydrate($data, $setUnmodified, $createAttributes);
+    // We don't want to hydrate password fields, strip them out here before we
+    // get any further
+    foreach($data as $attributeKey => $dataValue)
+    {
+      $attribute = $this->getAttribute($attributeKey);
+
+      if($attribute instanceof FormElement)
+      {
+        if($attribute->type() === FormElement::PASSWORD)
+        {
+          unset($data[$attributeKey]);
+        }
+      }
+    }
+
+    parent::hydrate($data, $setUnmodified, $createAttributes, $raw);
   }
 
   public function bindMapper(DataMapper $mapper, $relations = true)
