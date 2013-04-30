@@ -7,6 +7,7 @@ namespace Cubex\Chronos;
 
 use Cubex\Cli\Shell;
 use Cubex\Helpers\Numbers;
+use Cubex\I18n\Format\NumberFormat;
 use Cubex\Text\TextTable;
 
 class StopwatchCollection
@@ -80,6 +81,7 @@ class StopwatchCollection
 
         $report[] = [
           $sw->getName(),
+          NumberFormat::format($sw->eventCount(), \NumberFormatter::TYPE_INT32),
           Numbers::formatMicroTime(max($sw->minTime(), 0), $this->_precision),
           Numbers::formatMicroTime($sw->maxTime(), $this->_precision),
           Numbers::formatMicroTime($sw->averageTime(), $this->_precision),
@@ -96,7 +98,9 @@ class StopwatchCollection
   public function displayReport()
   {
     $t = new TextTable();
-    $t->setColumnHeaders('Name', 'Min', 'Max', 'Avg', 'Last', 'Total', '%');
+    $t->setColumnHeaders(
+      'Name', 'Count', 'Min', 'Max', 'Avg', 'Last', 'Total', '%'
+    );
     $t->appendRows($this->getReportData());
     echo $t;
   }

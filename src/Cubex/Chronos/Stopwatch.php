@@ -85,4 +85,9 @@ class Stopwatch implements StopwatchIf
   {
     return $this->_lastTime;
   }
+
+  public function eventCount()
+  {
+    return $this->_eventCount;
+  }
 }
