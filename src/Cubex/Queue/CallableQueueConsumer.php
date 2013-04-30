@@ -5,7 +5,7 @@
 
 namespace Cubex\Queue;
 
-class CallableQueueConsumer implements QueueConsumer
+class CallableQueueConsumer implements IQueueConsumer
 {
   protected $_callback;
   protected $_waitTime;
@@ -24,7 +24,7 @@ class CallableQueueConsumer implements QueueConsumer
    *
    * @return bool
    */
-  public function process(Queue $queue, $data)
+  public function process(IQueue $queue, $data)
   {
     $cb = $this->_callback;
     if($cb instanceof \Closure)

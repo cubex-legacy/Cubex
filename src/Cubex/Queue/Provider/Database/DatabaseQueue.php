@@ -7,19 +7,19 @@ namespace Cubex\Queue\Provider\Database;
 
 use Cubex\Helpers\Strings;
 use Cubex\Mapper\Database\RecordCollection;
-use Cubex\Queue\Queue;
-use Cubex\Queue\QueueConsumer;
-use Cubex\Queue\QueueProvider;
+use Cubex\Queue\IQueue;
+use Cubex\Queue\IQueueConsumer;
+use Cubex\Queue\IQueueProvider;
 use Cubex\ServiceManager\ServiceConfigTrait;
 use Cubex\Sprintf\ParseQuery;
 
-class DatabaseQueue implements QueueProvider
+class DatabaseQueue implements IQueueProvider
 {
   use ServiceConfigTrait;
 
   protected $_map;
 
-  public function push(Queue $queue, $data = null)
+  public function push(IQueue $queue, $data = null)
   {
     $mapper            = $this->_queueMapper(true);
     $mapper->queueName = $queue->name();
@@ -27,7 +27,7 @@ class DatabaseQueue implements QueueProvider
     $mapper->saveChanges();
   }
 
-  public function consume(Queue $queue, QueueConsumer $consumer)
+  public function consume(IQueue $queue, IQueueConsumer $consumer)
   {
     $maxAttempts = $this->config()->getInt("max_attempts", 3);
     $ownkey      = \Cubex\FileSystem\FileSystem::readRandomCharacters(30);

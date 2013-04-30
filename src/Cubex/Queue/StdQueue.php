@@ -5,7 +5,7 @@
 
 namespace Cubex\Queue;
 
-class StdQueue implements Queue
+class StdQueue implements IQueue
 {
   protected $_name;
 

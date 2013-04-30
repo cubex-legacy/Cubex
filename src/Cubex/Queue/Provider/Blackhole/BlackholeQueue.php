@@ -5,21 +5,21 @@
 
 namespace Cubex\Queue\Provider\Blackhole;
 
-use Cubex\Queue\Queue;
-use Cubex\Queue\QueueConsumer;
-use Cubex\Queue\QueueProvider;
+use Cubex\Queue\IQueue;
+use Cubex\Queue\IQueueConsumer;
+use Cubex\Queue\IQueueProvider;
 use Cubex\ServiceManager\ServiceConfigTrait;
 
-class BlackholeQueue implements QueueProvider
+class BlackholeQueue implements IQueueProvider
 {
   use ServiceConfigTrait;
 
-  public function push(Queue $queue, $data = null)
+  public function push(IQueue $queue, $data = null)
   {
     return true;
   }
 
-  public function consume(Queue $queue, QueueConsumer $consumer)
+  public function consume(IQueue $queue, IQueueConsumer $consumer)
   {
     $consumer->process($queue, ['processor' => 'blackhole']);
   }

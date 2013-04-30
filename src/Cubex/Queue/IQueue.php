@@ -5,7 +5,7 @@
 
 namespace Cubex\Queue;
 
-interface Queue
+interface IQueue
 {
   public function name();
 }

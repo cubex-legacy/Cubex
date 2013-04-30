@@ -5,7 +5,7 @@
 
 namespace Cubex\Facade;
 
-use Cubex\Queue\QueueConsumer;
+use Cubex\Queue\IQueueConsumer;
 
 class Queue extends BaseFacade
 {
@@ -20,7 +20,7 @@ class Queue extends BaseFacade
   /**
    * @param string $queue Queue Provider Service
    *
-   * @return \Cubex\Queue\QueueProvider|null
+   * @return \Cubex\Queue\IQueueProvider|null
    */
   public static function getAccessor($queue = null)
   {
@@ -31,13 +31,13 @@ class Queue extends BaseFacade
     return static::getServiceManager()->get($queue);
   }
 
-  public static function push(\Cubex\Queue\Queue $queue, $message)
+  public static function push(\Cubex\Queue\IQueue $queue, $message)
   {
     return static::getAccessor()->push($queue, $message);
   }
 
   public static function consume(
-    \Cubex\Queue\Queue $queue, QueueConsumer $consumer
+    \Cubex\Queue\IQueue $queue, IQueueConsumer $consumer
   )
   {
     return static::getAccessor()->consume($queue, $consumer);

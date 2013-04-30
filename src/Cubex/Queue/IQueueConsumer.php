@@ -5,7 +5,7 @@
 
 namespace Cubex\Queue;
 
-interface QueueConsumer
+interface IQueueConsumer
 {
   /**
    * @param $queue
@@ -13,7 +13,7 @@ interface QueueConsumer
    *
    * @return bool
    */
-  public function process(Queue $queue, $data);
+  public function process(IQueue $queue, $data);
 
   /**
    * Seconds to wait before re-attempting, false to exit
