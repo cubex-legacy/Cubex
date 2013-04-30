@@ -15,7 +15,7 @@ class Numbers
   public static function bytesToHumanReadable($bytes)
   {
     $unitsList  = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB'];
-    $num        = $bytes;
+    $num        = (int)$bytes;
     $finalUnits = ' bytes';
     foreach($unitsList as $units)
     {
@@ -40,13 +40,13 @@ class Numbers
   public static function formatMicroTime($seconds, $precision = 0)
   {
     $seconds = round($seconds, $precision);
-    $hours = floor($seconds / 3600);
+    $hours   = floor($seconds / 3600);
     $seconds -= $hours * 3600;
     $mins = floor($seconds / 60);
     $seconds -= $mins * 60;
 
     $formatString = "";
-    $numbers = [];
+    $numbers      = [];
     if($hours > 0)
     {
       $formatString .= "%d:";
