@@ -66,14 +66,16 @@ class TextTableDecorator extends BaseTextTableDecorator
     {
       $out = $this->_headerBorder();
     }
-    $out .= $this->_leftBorder();
-    $out .= str_pad(
-      ' ' . $text,
-      $this->_table->calculateTableWidth() + 1,
-      ' ',
-      STR_PAD_RIGHT
+
+    $width = $this->_table->calculateTableWidth() + 1;
+    $space = strlen($text) < $width ? ' ' : '';
+    $out .= sprintf(
+      $this->_leftBorder() .
+      "%-" . $width . "." . $width . "s" .
+      $this->_rightBorder() . "\n",
+      $space . $text
     );
-    $out .= $this->_rightBorder() . "\n";
+
     $out .= $this->_headerBorder();
     $this->_lastRowWasBorder = true;
     return $out;
