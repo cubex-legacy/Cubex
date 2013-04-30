@@ -9,7 +9,7 @@ use Cubex\Core\Controllers\BaseController;
 use Cubex\Core\Interfaces\DirectoryAware;
 use Cubex\Core\Interfaces\NamespaceAware;
 use Cubex\Dispatch\Utils\ListenerTrait;
-use Cubex\Events\Event;
+use Cubex\Events\IEvent;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Core\Http\Dispatchable;
@@ -395,7 +395,7 @@ abstract class Application
   {
     EventManager::listen(
       EventManager::CUBEX_TRANSLATE_T,
-      function (Event $e)
+      function (IEvent $e)
       {
         return call_user_func([$this, 't'], $e->getStr("text"));
       },
@@ -404,7 +404,7 @@ abstract class Application
 
     EventManager::listen(
       EventManager::CUBEX_TRANSLATE_P,
-      function (Event $e)
+      function (IEvent $e)
       {
         $args = [
           $e->getStr("singular"),

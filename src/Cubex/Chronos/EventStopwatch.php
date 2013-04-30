@@ -2,7 +2,7 @@
 
 namespace Cubex\Chronos;
 
-use Cubex\Events\Event;
+use Cubex\Events\IEvent;
 use Cubex\Events\EventManager;
 
 /**
@@ -18,12 +18,12 @@ class EventStopwatch extends Stopwatch
     EventManager::listen($stopEvent, [$this, 'handleStopEvent']);
   }
 
-  public function handleStartEvent(Event $event)
+  public function handleStartEvent(IEvent $event)
   {
     $this->start();
   }
 
-  public function handleStopEvent(Event $event)
+  public function handleStopEvent(IEvent $event)
   {
     $this->stop();
   }

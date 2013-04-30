@@ -152,14 +152,14 @@ class EventManager
 
   /**
    * @param       $eventName
-   * @param Event $event
+   * @param IEvent $event
    * @param bool  $returnFirst
    * @param null  $namespace
    *
    * @return array|mixed|null
    */
   public static function triggerWithEvent(
-    $eventName, Event $event, $returnFirst = false, $namespace = null
+    $eventName, IEvent $event, $returnFirst = false, $namespace = null
   )
   {
     if(isset(self::$_nsListenEvents[$eventName]))

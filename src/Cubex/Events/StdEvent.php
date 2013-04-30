@@ -6,7 +6,7 @@ namespace Cubex\Events;
 
 use Cubex\Foundation\DataHandler\HandlerTrait;
 
-class StdEvent implements Event
+class StdEvent implements IEvent
 {
   use HandlerTrait;
 
@@ -61,7 +61,7 @@ class StdEvent implements Event
   /**
    * @param string $name
    *
-   * @return \Cubex\Events\Event
+   * @return \Cubex\Events\IEvent
    */
   public function setName($name)
   {
@@ -83,7 +83,7 @@ class StdEvent implements Event
    *
    * @param object|string|null $source
    *
-   * @return \Cubex\Events\Event
+   * @return \Cubex\Events\IEvent
    */
   public function setSource($source)
   {

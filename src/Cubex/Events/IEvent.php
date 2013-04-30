@@ -6,7 +6,7 @@ namespace Cubex\Events;
 
 use Cubex\Foundation\DataHandler\IDataHandler;
 
-interface Event extends IDataHandler
+interface IEvent extends IDataHandler
 {
   public function __construct($name, array $args = array(), $source = null);
 
@@ -32,7 +32,7 @@ interface Event extends IDataHandler
    *
    * @param string $name
    *
-   * @return \Cubex\Events\Event
+   * @return \Cubex\Events\IEvent
    */
   public function setName($name);
 
@@ -46,7 +46,7 @@ interface Event extends IDataHandler
    *
    * @param object|string|null $source
    *
-   * @return \Cubex\Events\Event
+   * @return \Cubex\Events\IEvent
    */
   public function setSource($source);
 

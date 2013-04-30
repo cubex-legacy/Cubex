@@ -6,7 +6,7 @@
 namespace Cubex\Cli;
 
 use Cubex\Container\Container;
-use Cubex\Events\Event;
+use Cubex\Events\IEvent;
 use Cubex\Events\EventManager;
 use Cubex\Log\Log;
 use Psr\Log\LogLevel;
@@ -164,7 +164,7 @@ class CliLogger
   }
 
 
-  public function handleLogEvent(Event $event)
+  public function handleLogEvent(IEvent $event)
   {
     $logData = $event->getData();
     $level   = $logData['level'];
@@ -220,7 +220,7 @@ class CliLogger
     }
   }
 
-  public function handlePhpError(Event $event)
+  public function handlePhpError(IEvent $event)
   {
     if(!$this->logPhpErrors)
     {
@@ -261,7 +261,7 @@ class CliLogger
     }
   }
 
-  public function handleException(Event $event)
+  public function handleException(IEvent $event)
   {
     if($this->logUnhandledExceptions)
     {

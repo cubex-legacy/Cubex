@@ -10,7 +10,7 @@ use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Dispatch\Dependency\Resource;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
-use Cubex\Events\Event;
+use Cubex\Events\IEvent;
 use Cubex\Events\EventManager as EM;
 use Cubex\Foundation\IRenderable;
 use Cubex\Core\Http\DispatchInjection;
@@ -75,7 +75,7 @@ class Webpage implements
    */
   public function setTitle($title)
   {
-    if($title instanceof Event)
+    if($title instanceof IEvent)
     {
       $title = $title->getStr("title");
       if($title !== null)
@@ -439,7 +439,7 @@ class Webpage implements
    */
   public function minifyHtml($html)
   {
-    if($html instanceof Event)
+    if($html instanceof IEvent)
     {
       $html = $html->getStr("content");
     }
