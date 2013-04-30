@@ -493,6 +493,24 @@ abstract class CliCommand implements CliTask
         'The following arguments are required: ' . implode(", ", $missingArgs)
       );
     }
+
+    // Check for conflicting arguments
+    foreach($this->_options as $argObj)
+    {
+      if($argObj->hasData())
+      {
+        foreach($argObj->conflictingArgs as $otherArg)
+        {
+          if($this->argumentIsSet($otherArg))
+          {
+            throw new ArgumentException(
+              'The arguments --' . $argObj->name . ' and --' . $otherArg .
+              ' cannot be specified at the same time.'
+            );
+          }
+        }
+      }
+    }
   }
 
   /**

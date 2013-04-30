@@ -15,6 +15,7 @@ class CliArgument extends CliArgumentBase
   public $longName;
   public $valueOption;
   public $valueDescription;
+  public $conflictingArgs;
 
   /**
    * @param string     $longName         The long argument name.
@@ -31,16 +32,19 @@ class CliArgument extends CliArgumentBase
    * @param mixed      $defaultValue     The default value to use if this
    *                                     argument is not specified.
    * @param callable[] $validators       Validators to use on argument's value
+   * @param string[]   $conflictingArgs  A list of arguments that cannot be
+   *                                     specified on the same command line as
+   *                                     this argument
    *
    * @throws \Exception
    */
   public function __construct(
     $longName, $description, $shortName = "",
     $valueOption = CliArgument::VALUE_NONE, $valueDescription = "value",
-    $required = false, $defaultValue = null, $validators = []
+    $required = false, $defaultValue = null, $validators = [],
+    $conflictingArgs = []
   )
   {
-
     if(!$this->_isValidLongName($longName))
     {
       throw new \Exception('Invalid long option name: ' . $longName);
@@ -66,6 +70,21 @@ class CliArgument extends CliArgumentBase
     {
       $this->addValidator($validator);
     }
+
+    $this->setConflictingArgs($conflictingArgs);
+  }
+
+  /**
+   * @param string|array $args A list of arguments that cannot be specified at
+   *                           the same time as this one
+   */
+  public function setConflictingArgs($args)
+  {
+    if(!is_array($args))
+    {
+      $args = [$args];
+    }
+    $this->conflictingArgs = $args;
   }
 
   private function _isValidShortName($name)
@@ -90,7 +109,7 @@ class CliArgument extends CliArgumentBase
   {
     // Use default value for optional arguments
     if(($this->valueOption == CliArgument::VALUE_OPTIONAL) &&
-      ($data === true) && ($this->defaultValue !== null)
+    ($data === true) && ($this->defaultValue !== null)
     )
     {
       $this->_data = $this->defaultValue;
