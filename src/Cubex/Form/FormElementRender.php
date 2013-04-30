@@ -132,15 +132,21 @@ class FormElementRender implements IRenderable
     return $out;
   }
 
-  public function renderInput($type = 'text')
+  public function renderInput($type = FormElement::TEXT)
   {
+    $value = esc($this->_element->data());
+    if($type === FormElement::PASSWORD)
+    {
+      $value = "";
+    }
+
     $out = '<input';
     $out .= $this->_renderAttributes(
       [
       "type"  => $type,
       "name"  => $this->_element->name(),
       "id"    => $this->_element->id(),
-      "value" => esc($this->_element->data()),
+      "value" => $value,
       ]
     );
     $out .= $this->_renderAttributes();
