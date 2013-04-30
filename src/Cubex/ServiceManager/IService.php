@@ -8,7 +8,7 @@ namespace Cubex\ServiceManager;
  * Standard Service Provider
  */
 
-interface Service
+interface IService
 {
   /**
    * @param ServiceConfig $config

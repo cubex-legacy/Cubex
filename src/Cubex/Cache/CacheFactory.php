@@ -9,9 +9,9 @@ namespace Cubex\Cache;
  */
 use Cubex\Cache\Memcache\Memcache;
 use Cubex\ServiceManager\ServiceConfig;
-use Cubex\ServiceManager\ServiceFactory;
+use Cubex\ServiceManager\IServiceFactory;
 
-class Factory implements ServiceFactory
+class Factory implements IServiceFactory
 {
   /**
    * @param \Cubex\ServiceManager\ServiceConfig $config

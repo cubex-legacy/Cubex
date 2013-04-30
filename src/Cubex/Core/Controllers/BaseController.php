@@ -20,11 +20,11 @@ use Cubex\I18n\TranslateTraits;
 use Cubex\Routing\IRoute;
 use Cubex\Routing\StdRoute;
 use Cubex\Routing\StdRouter;
-use Cubex\ServiceManager\ServiceManagerAware;
+use Cubex\ServiceManager\IServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
 class BaseController
-  implements IController, IDataHandler, ITranslatable, ServiceManagerAware
+  implements IController, IDataHandler, ITranslatable, IServiceManagerAware
 {
   use HandlerTrait;
   use ConfigTrait;

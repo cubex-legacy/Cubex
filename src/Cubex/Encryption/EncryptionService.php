@@ -4,9 +4,9 @@
  */
 namespace Cubex\Encryption;
 
-use Cubex\ServiceManager\Service;
+use Cubex\ServiceManager\IService;
 
-interface EncryptionService extends Service
+interface EncryptionService extends IService
 {
   public function encrypt($value, array $options = []);
   public function decrypt($value, array $options = []);

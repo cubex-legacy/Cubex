@@ -21,7 +21,7 @@ class ServiceManager
   /**
    * @param string $name
    *
-   * @return Service
+   * @return IService
    * @throws \InvalidArgumentException
    */
   public function get($name /*[, mixed $constructParam, ...]*/)
@@ -163,7 +163,7 @@ class ServiceManager
    * @param string $name
    * @param array  $constructParams
    *
-   * @return Service
+   * @return IService
    * @throws \RuntimeException
    * @throws \InvalidArgumentException
    * @throws \Exception
@@ -184,7 +184,7 @@ class ServiceManager
           {
             $service = $this->_buildClass($provider, $name, $constructParams);
 
-            if($service instanceof Service)
+            if($service instanceof IService)
             {
               $service->configure($config);
             }
@@ -201,7 +201,7 @@ class ServiceManager
         {
           $factoryClass = $config->getFactory();
           $factory      = new $factoryClass();
-          if($factory instanceof ServiceFactory)
+          if($factory instanceof IServiceFactory)
           {
             $service = $factory->createService($config);
           }
@@ -217,12 +217,12 @@ class ServiceManager
           $service->configure($config);
         }
 
-        if($service instanceof ServiceManagerAware)
+        if($service instanceof IServiceManagerAware)
         {
           $service->setServiceManager($this);
         }
 
-        if($service instanceof Service)
+        if($service instanceof IService)
         {
           if($this->_services[$name]['shared'])
           {

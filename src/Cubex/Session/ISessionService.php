@@ -11,9 +11,9 @@ namespace Cubex\Session;
 /**
  * Session container
  */
-use Cubex\ServiceManager\Service;
+use Cubex\ServiceManager\IService;
 
-interface ISessionService extends Service
+interface ISessionService extends IService
 {
   /**
    * @return $this

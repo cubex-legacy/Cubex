@@ -5,9 +5,9 @@
 
 namespace Cubex\KvStore;
 
-use Cubex\ServiceManager\Service;
+use Cubex\ServiceManager\IService;
 
-interface KvService extends Service
+interface KvService extends IService
 {
   public function connect();
 

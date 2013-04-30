@@ -9,9 +9,9 @@ namespace Cubex\Database;
  */
 use Cubex\Database\MySQL\MySQL;
 use Cubex\ServiceManager\ServiceConfig;
-use Cubex\ServiceManager\ServiceFactory;
+use Cubex\ServiceManager\IServiceFactory;
 
-class DatabaseFactory implements ServiceFactory
+class DatabaseFactory implements IServiceFactory
 {
   /**
    * @param \Cubex\ServiceManager\ServiceConfig $config

@@ -18,14 +18,14 @@ use Cubex\Core\Http\IDispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\ServiceManager\ServiceConfig;
-use Cubex\ServiceManager\ServiceManagerAware;
+use Cubex\ServiceManager\IServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
 /**
  * Cubex Loader
  */
 class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
-                        ServiceManagerAware
+                        IServiceManagerAware
 {
   use ConfigTrait;
   use ServiceManagerAwareTrait;
@@ -582,7 +582,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
         $dispatcher->configure($this->_configuration);
 
-        if($dispatcher instanceof ServiceManagerAware)
+        if($dispatcher instanceof IServiceManagerAware)
         {
           $dispatcher->setServiceManager($this->getServiceManager());
         }
@@ -697,7 +697,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
           $obj->configure($this->getConfig());
         }
 
-        if($obj instanceof ServiceManagerAware)
+        if($obj instanceof IServiceManagerAware)
         {
           $obj->setServiceManager($this->getServiceManager());
         }

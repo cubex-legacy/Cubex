@@ -5,9 +5,9 @@
 
 namespace Cubex\Queue;
 
-use Cubex\ServiceManager\Service;
+use Cubex\ServiceManager\IService;
 
-interface IQueueProvider extends Service
+interface IQueueProvider extends IService
 {
   public function push(IQueue $queue, $data = null);
 

@@ -11,9 +11,9 @@ namespace Cubex\Auth;
 /**
  * Session container
  */
-use Cubex\ServiceManager\Service;
+use Cubex\ServiceManager\IService;
 
-interface IAuthService extends Service
+interface IAuthService extends IService
 {
   /**
    * @param $id

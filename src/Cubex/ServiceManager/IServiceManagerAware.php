@@ -4,7 +4,7 @@
  */
 namespace Cubex\ServiceManager;
 
-interface ServiceManagerAware
+interface IServiceManagerAware
 {
   /**
    * Set the service manager

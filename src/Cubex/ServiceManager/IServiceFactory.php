@@ -7,12 +7,12 @@ namespace Cubex\ServiceManager;
 /**
  * Service Factory
  */
-interface ServiceFactory
+interface IServiceFactory
 {
   /**
    * @param ServiceConfig $config
    *
-   * @return Service
+   * @return IService
    */
   public function createService(ServiceConfig $config);
 }

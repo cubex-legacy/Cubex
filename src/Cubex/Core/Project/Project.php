@@ -11,7 +11,7 @@ use Cubex\Core\Http\IDispatchable;
 use Cubex\Core\Http\IDispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
-use Cubex\ServiceManager\ServiceManagerAware;
+use Cubex\ServiceManager\IServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
 /**
@@ -21,7 +21,7 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
  *
  */
 abstract class Project
-  implements IDispatchable, IDispatchableAccess, ServiceManagerAware
+  implements IDispatchable, IDispatchableAccess, IServiceManagerAware
 {
   use ServiceManagerAwareTrait;
   use ConfigTrait;

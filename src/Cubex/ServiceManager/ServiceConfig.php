@@ -20,18 +20,18 @@ class ServiceConfig extends Config
   /**
    * Callable for generating the service
    *
-   * @param ServiceFactory $factory
+   * @param IServiceFactory $factory
    *
    * @return $this
    */
-  public function setFactory(ServiceFactory $factory)
+  public function setFactory(IServiceFactory $factory)
   {
     $this->_factory = $factory;
     return $this;
   }
 
   /**
-   * @return ServiceFactory
+   * @return IServiceFactory
    */
   public function getFactory()
   {

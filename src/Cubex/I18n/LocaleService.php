@@ -5,9 +5,9 @@
 
 namespace Cubex\I18n;
 
-use Cubex\ServiceManager\Service;
+use Cubex\ServiceManager\IService;
 
-interface LocaleService extends Service
+interface LocaleService extends IService
 {
   public function getLocale();
 }

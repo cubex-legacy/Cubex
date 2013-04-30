@@ -14,11 +14,11 @@ use Cubex\Container\Container;
 use Cubex\Facade\Encryption;
 use Cubex\Facade\Session;
 use Cubex\ServiceManager\ServiceConfig;
-use Cubex\ServiceManager\ServiceManagerAware;
+use Cubex\ServiceManager\IServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 use Cubex\Sprintf\ParseQuery;
 
-class DBAuth extends BaseAuthService implements ServiceManagerAware
+class DBAuth extends BaseAuthService implements IServiceManagerAware
 {
   use ServiceManagerAwareTrait;
 

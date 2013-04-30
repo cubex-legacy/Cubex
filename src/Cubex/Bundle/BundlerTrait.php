@@ -6,7 +6,7 @@
 namespace Cubex\Bundle;
 
 use Cubex\Foundation\Config\IConfigurable;
-use Cubex\ServiceManager\ServiceManagerAware;
+use Cubex\ServiceManager\IServiceManagerAware;
 
 trait BundlerTrait
 {
@@ -47,7 +47,7 @@ trait BundlerTrait
 
   public function addBundle($alias, IBundle $bundle, $handles = null)
   {
-    if($bundle instanceof ServiceManagerAware)
+    if($bundle instanceof IServiceManagerAware)
     {
       $bundle->setServiceManager($this->getServiceManager());
     }

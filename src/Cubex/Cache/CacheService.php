@@ -8,9 +8,9 @@ namespace Cubex\Cache;
 /**
  * Base caching connection
  */
-use Cubex\ServiceManager\Service;
+use Cubex\ServiceManager\IService;
 
-interface CacheService extends Service
+interface CacheService extends IService
 {
 
   /**

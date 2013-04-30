@@ -1158,7 +1158,7 @@ abstract class DataMapper
   }
 
   /**
-   * @return \Cubex\ServiceManager\Service
+   * @return \Cubex\ServiceManager\IService
    */
   public static function conn()
   {

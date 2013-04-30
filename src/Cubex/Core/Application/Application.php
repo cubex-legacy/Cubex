@@ -23,7 +23,7 @@ use Cubex\I18n\TranslatorAccess;
 use Cubex\Routing\IRoute;
 use Cubex\Routing\StdRoute;
 use Cubex\Routing\StdRouter;
-use Cubex\ServiceManager\ServiceManagerAware;
+use Cubex\ServiceManager\IServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
 /**
@@ -32,7 +32,7 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
 abstract class Application
   implements IDispatchable, IDispatchableAccess,
              IDirectoryAware, ITranslatable, TranslatorAccess,
-             INamespaceAware, ServiceManagerAware
+             INamespaceAware, IServiceManagerAware
 {
   use ConfigTrait;
   use Translation;
@@ -211,7 +211,7 @@ abstract class Application
         $dispatcher->setApplication($this);
       }
 
-      if($dispatcher instanceof ServiceManagerAware)
+      if($dispatcher instanceof IServiceManagerAware)
       {
         $dispatcher->setServiceManager($this->getServiceManager());
       }
