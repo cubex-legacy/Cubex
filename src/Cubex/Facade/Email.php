@@ -7,7 +7,7 @@ namespace Cubex\Facade;
 class Email extends BaseFacade
 {
   /**
-   * @return \Cubex\Email\EmailService
+   * @return \Cubex\Email\IEmailService
    */
   public static function getAccessor()
   {

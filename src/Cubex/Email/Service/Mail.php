@@ -5,11 +5,11 @@
 
 namespace Cubex\Email\Service;
 
-use Cubex\Email\EmailService;
+use Cubex\Email\IEmailService;
 use Cubex\FileSystem\FileSystem;
 use Cubex\ServiceManager\ServiceConfig;
 
-class Mail implements EmailService
+class Mail implements IEmailService
 {
 
   protected $_recipients = [];

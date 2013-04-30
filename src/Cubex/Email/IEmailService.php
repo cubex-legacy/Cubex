@@ -7,7 +7,7 @@ namespace Cubex\Email;
 
 use Cubex\ServiceManager\IService;
 
-interface EmailService extends IService
+interface IEmailService extends IService
 {
   public function setSubject($subject);
 

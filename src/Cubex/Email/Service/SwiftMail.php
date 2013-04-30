@@ -5,10 +5,10 @@
 
 namespace Cubex\Email\Service;
 
-use Cubex\Email\EmailService;
+use Cubex\Email\IEmailService;
 use Cubex\ServiceManager\ServiceConfig;
 
-final class SwiftMail implements EmailService
+final class SwiftMail implements IEmailService
 {
   /**
    * @var \Swift_Mailer

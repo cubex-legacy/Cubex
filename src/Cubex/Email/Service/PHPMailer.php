@@ -5,10 +5,10 @@
 
 namespace Cubex\Email\Service;
 
-use Cubex\Email\EmailService;
+use Cubex\Email\IEmailService;
 use Cubex\ServiceManager\ServiceConfig;
 
-final class PHPMailer implements EmailService
+final class PHPMailer implements IEmailService
 {
   /**
    * @var \PHPMailer

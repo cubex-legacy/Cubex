@@ -9,17 +9,17 @@ use Cubex\Container\Container;
 use Cubex\Foundation\Config\Config;
 use Cubex\ServiceManager\ServiceConfig;
 
-class Mailer implements EmailService
+class Mailer implements IEmailService
 {
   protected $_service;
 
-  public function __construct(EmailService $service)
+  public function __construct(IEmailService $service)
   {
     $this->_service = $service;
   }
 
   /**
-   * @return EmailService
+   * @return IEmailService
    */
   public static function fromConfig()
   {
