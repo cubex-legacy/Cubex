@@ -5,7 +5,7 @@
 
 namespace Cubex\Chronos;
 
-interface StopwatchIf
+interface IStopwatch
 {
   /**
    * @return int

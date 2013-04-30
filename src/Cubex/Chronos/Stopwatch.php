@@ -5,7 +5,7 @@
 
 namespace Cubex\Chronos;
 
-class Stopwatch implements StopwatchIf
+class Stopwatch implements IStopwatch
 {
   private $_name;
   private $_totalTime;
