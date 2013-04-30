@@ -14,7 +14,7 @@ class FeatureSwitch extends BaseFacade
   /**
    * @param null $serviceName
    *
-   * @return \Cubex\FeatureSwitch\FeatureSwitch|null
+   * @return \Cubex\FeatureSwitch\IFeatureSwitch|null
    */
   public static function getAccessor($serviceName = null)
   {

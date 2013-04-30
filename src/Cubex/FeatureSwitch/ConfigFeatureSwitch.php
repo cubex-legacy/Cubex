@@ -7,7 +7,7 @@ namespace Cubex\FeatureSwitch;
 
 use Cubex\ServiceManager\ServiceConfig;
 
-class ConfigFeatureSwitch implements FeatureSwitch
+class ConfigFeatureSwitch implements IFeatureSwitch
 {
 
   /**

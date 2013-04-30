@@ -7,7 +7,7 @@ namespace Cubex\FeatureSwitch;
 
 use Cubex\ServiceManager\Service;
 
-interface FeatureSwitch extends Service
+interface IFeatureSwitch extends Service
 {
   public function isEnabled($featureName);
 }

@@ -8,7 +8,7 @@ namespace Cubex\FeatureSwitch;
 use Cubex\Cookie\Cookies;
 use Cubex\ServiceManager\ServiceConfig;
 
-class CookieFeatureSwitch implements FeatureSwitch
+class CookieFeatureSwitch implements IFeatureSwitch
 {
 
   /**
