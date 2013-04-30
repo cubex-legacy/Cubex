@@ -9,7 +9,7 @@ namespace Cubex\ServiceManager;
  */
 use Cubex\Cache\CacheService;
 use Cubex\Database\DatabaseService;
-use Cubex\Session\SessionService;
+use Cubex\Session\ISessionService;
 use Psr\Log\InvalidArgumentException;
 
 class ServiceManager
@@ -353,7 +353,7 @@ class ServiceManager
   {
     $constructParams = func_get_args();
     array_shift($constructParams);
-    
+
     if($this->exists($name))
     {
       $this->_services[$name] = array(
@@ -404,13 +404,13 @@ class ServiceManager
   }
 
   /**
-   * @return \Cubex\Session\SessionService
+   * @return \Cubex\Session\ISessionService
    * @throws \Exception
    */
   public function session()
   {
     $session = $this->get("session");
-    if($session instanceof SessionService)
+    if($session instanceof ISessionService)
     {
       return $session;
     }

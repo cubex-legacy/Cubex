@@ -8,9 +8,9 @@ namespace Cubex\Session\CassandraSession;
 use Cubex\Facade\Cassandra;
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\Session\SessionIdTrait;
-use Cubex\Session\SessionService;
+use Cubex\Session\ISessionService;
 
-class Session implements SessionService
+class Session implements ISessionService
 {
   use SessionIdTrait;
 

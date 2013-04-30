@@ -7,9 +7,9 @@ namespace Cubex\Session\BlackHoleSession;
 
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\Session\SessionIdTrait;
-use Cubex\Session\SessionService;
+use Cubex\Session\ISessionService;
 
-class Session implements SessionService
+class Session implements ISessionService
 {
   use SessionIdTrait;
 

@@ -5,9 +5,9 @@
 namespace Cubex\Session\PhpSession;
 
 use Cubex\ServiceManager\ServiceConfig;
-use Cubex\Session\SessionService;
+use Cubex\Session\ISessionService;
 
-class Session implements SessionService
+class Session implements ISessionService
 {
   /**
    * @param \Cubex\ServiceManager\ServiceConfig $config

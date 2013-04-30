@@ -12,7 +12,7 @@ class Session extends BaseFacade
   const FLASH_KEY = "__FLASH__";
 
   /**
-   * @return \Cubex\Session\SessionService
+   * @return \Cubex\Session\ISessionService
    */
   public static function getAccessor()
   {
@@ -35,7 +35,7 @@ class Session extends BaseFacade
    * @param string $key
    * @param mixed  $value
    *
-   * @return \Cubex\Session\SessionService
+   * @return \Cubex\Session\ISessionService
    */
   public static function set($key, $value)
   {
@@ -77,7 +77,7 @@ class Session extends BaseFacade
   /**
    * @param string $key
    *
-   * @return \Cubex\Session\SessionService
+   * @return \Cubex\Session\ISessionService
    */
   public static function delete($key)
   {
@@ -87,7 +87,7 @@ class Session extends BaseFacade
   }
 
   /**
-   * @return \Cubex\Session\SessionService
+   * @return \Cubex\Session\ISessionService
    */
   public static function flush()
   {
@@ -100,7 +100,7 @@ class Session extends BaseFacade
    * @param string $key
    * @param mixed $value
    *
-   * @return \Cubex\Session\SessionService
+   * @return \Cubex\Session\ISessionService
    */
   public static function flash($key, $value)
   {

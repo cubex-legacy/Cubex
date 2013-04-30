@@ -13,7 +13,7 @@ namespace Cubex\Session;
  */
 use Cubex\ServiceManager\Service;
 
-interface SessionService extends Service
+interface ISessionService extends Service
 {
   /**
    * @return $this
