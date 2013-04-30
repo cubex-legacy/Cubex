@@ -8,6 +8,8 @@ namespace Cubex\Cli;
 /**
  * Basic Shell improvements
  */
+use Cubex\Data\Ephemeral\EphemeralCache;
+use Cubex\Data\Ephemeral\ExpiringEphemeralCache;
 use Cubex\Helpers\System;
 
 class Shell
@@ -141,20 +143,27 @@ class Shell
    */
   public static function columns($default = 80)
   {
-    $cols = null;
-    if(self::commandExists("tput"))
-    {
-      $cols = (int)exec('tput cols');
-    }
-
-    if($cols < 1 && System::isWindows())
-    {
-      return static::_windowsColumns();
-    }
+    $cacheKey = 'columns';
+    $cols = ExpiringEphemeralCache::getCache($cacheKey, __CLASS__, null);
 
     if($cols === null)
     {
-      return $default;
+      if(self::commandExists("tput"))
+      {
+        $cols = (int)exec('tput cols');
+      }
+
+      if($cols < 1 && System::isWindows())
+      {
+        $cols = static::_windowsColumns();
+      }
+
+      if($cols === null)
+      {
+        $cols = $default;
+      }
+
+      ExpiringEphemeralCache::storeCache($cacheKey, $cols, __CLASS__, 2);
     }
 
     return $cols;
@@ -304,16 +313,23 @@ class Shell
 
   public static function commandExists($cmd)
   {
-    if(System::isWindows())
+    $cacheKey = 'commandExists:' . $cmd;
+    $exists = EphemeralCache::getCache($cacheKey, __CLASS__, null);
+    if($exists === null)
     {
-      exec("where $cmd /Q", $output, $returnVal);
-      return $returnVal === 0;
+      if(System::isWindows())
+      {
+        exec("where $cmd /Q", $output, $returnVal);
+        $exists = $returnVal === 0;
+      }
+      else
+      {
+        exec("which $cmd", $output, $returnVal);
+        $exists = $returnVal === 0;
+      }
+      EphemeralCache::storeCache($cacheKey, $exists, __CLASS__);
     }
-    else
-    {
-      exec("which $cmd", $output, $returnVal);
-      return $returnVal === 0;
-    }
+    return $exists;
   }
 }
 
