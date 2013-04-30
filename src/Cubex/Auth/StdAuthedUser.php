@@ -5,7 +5,7 @@
 
 namespace Cubex\Auth;
 
-class StdAuthedUser implements AuthedUser
+class StdAuthedUser implements IAuthedUser
 {
   protected $_id;
   protected $_username;

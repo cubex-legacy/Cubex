@@ -5,7 +5,7 @@
 
 namespace Cubex\Auth;
 
-interface LoginCredentials
+interface ILoginCredentials
 {
   /**
    * @return mixed

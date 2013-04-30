@@ -13,49 +13,49 @@ namespace Cubex\Auth;
  */
 use Cubex\ServiceManager\Service;
 
-interface AuthService extends Service
+interface IAuthService extends Service
 {
   /**
    * @param $id
    *
-   * @return AuthedUser|null
+   * @return IAuthedUser|null
    */
   public function authById($id);
 
   /**
-   * @param LoginCredentials $credentials
+   * @param ILoginCredentials $credentials
    *
-   * @return AuthedUser|null
+   * @return IAuthedUser|null
    */
-  public function authByCredentials(LoginCredentials $credentials);
+  public function authByCredentials(ILoginCredentials $credentials);
 
   /**
    * Security hash for cookie
    *
-   * @param AuthedUser $user
+   * @param IAuthedUser $user
    *
    * @return string
    */
-  public function cookieHash(AuthedUser $user);
+  public function cookieHash(IAuthedUser $user);
 
   /**
    * @param $id
    * @param $username
    * @param $details
    *
-   * @return AuthedUser|null
+   * @return IAuthedUser|null
    */
   public function buildUser($id, $username, $details);
 
   /**
-   * @param AuthedUser $user
+   * @param IAuthedUser $user
    *
    * @return bool
    */
-  public function storeLogin(AuthedUser $user);
+  public function storeLogin(IAuthedUser $user);
 
   /**
-   * @return null|AuthedUser
+   * @return null|IAuthedUser
    */
   public function retrieveLogin();
 

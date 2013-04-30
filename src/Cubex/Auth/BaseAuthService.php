@@ -9,7 +9,7 @@ use Cubex\Container\Container;
 use Cubex\Cookie\Cookies;
 use Cubex\Cookie\EncryptedCookie;
 
-abstract class BaseAuthService implements AuthService
+abstract class BaseAuthService implements IAuthService
 {
   /**
    * @var int|string|\DateTime
@@ -17,11 +17,11 @@ abstract class BaseAuthService implements AuthService
   protected $_loginExpiry = 0;
 
   /**
-   * @param AuthedUser $user
+   * @param IAuthedUser $user
    *
    * @return bool
    */
-  public function storeLogin(AuthedUser $user)
+  public function storeLogin(IAuthedUser $user)
   {
     $security = $this->cookieHash($user);
     Container::bind(Container::AUTHED_USER, $user);
@@ -51,7 +51,7 @@ abstract class BaseAuthService implements AuthService
   }
 
   /**
-   * @return null|AuthedUser
+   * @return null|IAuthedUser
    */
   public function retrieveLogin()
   {

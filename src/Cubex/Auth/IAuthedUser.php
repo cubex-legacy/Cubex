@@ -5,7 +5,7 @@
 
 namespace Cubex\Auth;
 
-interface AuthedUser
+interface IAuthedUser
 {
   /**
    * @return mixed

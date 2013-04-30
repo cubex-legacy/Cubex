@@ -87,7 +87,7 @@ class Container
 
 
   /**
-   * @return \Cubex\Auth\AuthedUser|null
+   * @return \Cubex\Auth\IAuthedUser|null
    */
   public static function authedUser()
   {

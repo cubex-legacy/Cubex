@@ -5,10 +5,10 @@
 
 namespace Cubex\Auth\Database;
 
-use Cubex\Auth\AuthService;
-use Cubex\Auth\AuthedUser;
+use Cubex\Auth\IAuthService;
+use Cubex\Auth\IAuthedUser;
 use Cubex\Auth\BaseAuthService;
-use Cubex\Auth\LoginCredentials;
+use Cubex\Auth\ILoginCredentials;
 use Cubex\Auth\StdAuthedUser;
 use Cubex\Container\Container;
 use Cubex\Facade\Encryption;
@@ -35,7 +35,7 @@ class DBAuth extends BaseAuthService implements ServiceManagerAware
   /**
    * @param $id
    *
-   * @return AuthedUser|null
+   * @return IAuthedUser|null
    */
   public function authById($id)
   {
@@ -74,11 +74,11 @@ class DBAuth extends BaseAuthService implements ServiceManagerAware
   }
 
   /**
-   * @param LoginCredentials $credentials
+   * @param ILoginCredentials $credentials
    *
-   * @return AuthedUser|null
+   * @return IAuthedUser|null
    */
-  public function authByCredentials(LoginCredentials $credentials)
+  public function authByCredentials(ILoginCredentials $credentials)
   {
     return $this->_getResult(
       "%C = %s AND %C = %s",
@@ -112,11 +112,11 @@ class DBAuth extends BaseAuthService implements ServiceManagerAware
   /**
    * Security hash for cookie
    *
-   * @param AuthedUser $user
+   * @param IAuthedUser $user
    *
    * @return string
    */
-  public function cookieHash(AuthedUser $user)
+  public function cookieHash(IAuthedUser $user)
   {
     $encryption = Container::config()->get("encryption");
     $salt       = "+yq09jfFDJX67fxv4jr)9";
@@ -133,7 +133,7 @@ class DBAuth extends BaseAuthService implements ServiceManagerAware
    * @param $username
    * @param $details
    *
-   * @return AuthedUser|null
+   * @return IAuthedUser|null
    */
   public function buildUser($id, $username, $details)
   {

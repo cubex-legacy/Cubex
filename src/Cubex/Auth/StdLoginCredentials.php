@@ -5,7 +5,7 @@
 
 namespace Cubex\Auth;
 
-class StdLoginCredentials implements LoginCredentials
+class StdLoginCredentials implements ILoginCredentials
 {
   protected $_username;
   protected $_password;

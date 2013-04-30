@@ -5,8 +5,8 @@
 
 namespace Cubex\Facade;
 
-use Cubex\Auth\AuthedUser;
-use Cubex\Auth\LoginCredentials;
+use Cubex\Auth\IAuthedUser;
+use Cubex\Auth\ILoginCredentials;
 use Cubex\Container\Container;
 use Cubex\Cookie\Cookies;
 use Cubex\Cookie\EncryptedCookie;
@@ -14,20 +14,20 @@ use Cubex\Cookie\EncryptedCookie;
 class Auth extends BaseFacade
 {
   /**
-   * @return \Cubex\Auth\AuthService|null
+   * @return \Cubex\Auth\IAuthService|null
    */
   public static function getAccessor()
   {
     return static::getServiceManager()->get("auth");
   }
 
-  protected static function _storeLogin(AuthedUser $user)
+  protected static function _storeLogin(IAuthedUser $user)
   {
     return static::getAccessor()->storeLogin($user);
   }
 
   /**
-   * @return null|AuthedUser
+   * @return null|IAuthedUser
    */
   protected static function _retrieveFromCookie()
   {
@@ -37,17 +37,17 @@ class Auth extends BaseFacade
   public static function authById($userId)
   {
     $user = static::getAccessor()->authById($userId);
-    if($user instanceof AuthedUser)
+    if($user instanceof IAuthedUser)
     {
       static::_storeLogin($user);
     }
     return $user;
   }
 
-  public static function authByCredentials(LoginCredentials $credentials)
+  public static function authByCredentials(ILoginCredentials $credentials)
   {
     $user = static::getAccessor()->authByCredentials($credentials);
-    if($user instanceof AuthedUser)
+    if($user instanceof IAuthedUser)
     {
       static::_storeLogin($user);
     }
@@ -62,7 +62,7 @@ class Auth extends BaseFacade
     {
       return false;
     }
-    else if($user instanceof AuthedUser)
+    else if($user instanceof IAuthedUser)
     {
       return true;
     }
