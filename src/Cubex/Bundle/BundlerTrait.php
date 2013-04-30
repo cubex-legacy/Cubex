@@ -11,7 +11,7 @@ use Cubex\ServiceManager\ServiceManagerAware;
 trait BundlerTrait
 {
   /**
-   * @var BundleInterface[]
+   * @var IBundle[]
    */
   protected $_bundles = [];
   protected $_handles = [];
@@ -28,7 +28,7 @@ trait BundlerTrait
     {
       if(!$this->hasBundle($name))
       {
-        if($bundle instanceof BundleInterface)
+        if($bundle instanceof IBundle)
         {
           $this->addBundle($name, $bundle);
         }
@@ -45,7 +45,7 @@ trait BundlerTrait
     return $this->_bundles;
   }
 
-  public function addBundle($alias, BundleInterface $bundle, $handles = null)
+  public function addBundle($alias, IBundle $bundle, $handles = null)
   {
     if($bundle instanceof ServiceManagerAware)
     {

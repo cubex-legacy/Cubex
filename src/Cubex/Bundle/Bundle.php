@@ -5,7 +5,7 @@
 
 namespace Cubex\Bundle;
 
-abstract class Bundle implements BundleInterface
+abstract class Bundle implements IBundle
 {
   protected $_reflect;
 

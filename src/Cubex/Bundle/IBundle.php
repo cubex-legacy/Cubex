@@ -5,7 +5,7 @@
 
 namespace Cubex\Bundle;
 
-interface BundleInterface
+interface IBundle
 {
   /**
    * Initialise bundle
