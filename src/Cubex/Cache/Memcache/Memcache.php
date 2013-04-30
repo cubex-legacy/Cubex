@@ -8,10 +8,10 @@ namespace Cubex\Cache\Memcache;
 /**
  * Memcache connections
  */
-use Cubex\Cache\CacheService;
+use Cubex\Cache\ICacheService;
 use Cubex\ServiceManager\ServiceConfig;
 
-class Memcache implements CacheService
+class Memcache implements ICacheService
 {
   /**
    * @var \Memcache

@@ -10,7 +10,7 @@ namespace Cubex\Cache;
  */
 use Cubex\ServiceManager\IService;
 
-interface CacheService extends IService
+interface ICacheService extends IService
 {
 
   /**

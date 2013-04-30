@@ -8,7 +8,7 @@ namespace Cubex\Facade;
 class Cache extends BaseFacade
 {
   /**
-   * @return \Cubex\Cache\CacheService
+   * @return \Cubex\Cache\ICacheService
    */
   public static function getAccessor()
   {

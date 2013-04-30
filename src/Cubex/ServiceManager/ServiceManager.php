@@ -7,7 +7,7 @@ namespace Cubex\ServiceManager;
 /**
  * Container for services
  */
-use Cubex\Cache\CacheService;
+use Cubex\Cache\ICacheService;
 use Cubex\Database\IDatabaseService;
 use Cubex\Session\ISessionService;
 use Psr\Log\InvalidArgumentException;
@@ -374,13 +374,13 @@ class ServiceManager
   /**
    * @param string $connection
    *
-   * @return \Cubex\Cache\CacheService
+   * @return \Cubex\Cache\ICacheService
    * @throws \Exception
    */
   public function cache($connection = 'cache')
   {
     $cache = $this->get($connection);
-    if($cache instanceof CacheService)
+    if($cache instanceof ICacheService)
     {
       return $cache;
     }

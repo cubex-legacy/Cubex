@@ -16,7 +16,7 @@ class Factory implements IServiceFactory
   /**
    * @param \Cubex\ServiceManager\ServiceConfig $config
    *
-   * @return \Cubex\Cache\CacheService
+   * @return \Cubex\Cache\ICacheService
    */
   public function createService(ServiceConfig $config)
   {
