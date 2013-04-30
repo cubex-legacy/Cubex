@@ -7,7 +7,7 @@ namespace Cubex\Core\Http;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 
-interface DispatchInjection
+interface IDispatchInjection
 {
   /**
    * @param \Cubex\Core\Http\Response $response

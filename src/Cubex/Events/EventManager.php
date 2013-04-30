@@ -5,7 +5,7 @@
 
 namespace Cubex\Events;
 
-use Cubex\Core\Interfaces\NamespaceAware;
+use Cubex\Core\Interfaces\INamespaceAware;
 
 class EventManager
 {
@@ -169,7 +169,7 @@ class EventManager
         $source = $event->source();
         if($source !== null)
         {
-          if($source instanceof NamespaceAware)
+          if($source instanceof INamespaceAware)
           {
             $namespace = $source->getNamespace();
           }

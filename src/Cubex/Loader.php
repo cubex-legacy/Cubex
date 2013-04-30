@@ -6,15 +6,15 @@ namespace Cubex;
 
 use Cubex\Cli\CliCommand;
 use Cubex\Cli\CliTask;
-use Cubex\Core\Http\DispatchInjection;
+use Cubex\Core\Http\IDispatchInjection;
 use Cubex\Core\Project\Project;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Foundation\Config\IConfigurable;
-use Cubex\Core\Http\Dispatchable;
-use Cubex\Core\Http\DispatchableAccess;
+use Cubex\Core\Http\IDispatchable;
+use Cubex\Core\Http\IDispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\ServiceManager\ServiceConfig;
@@ -24,7 +24,7 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
 /**
  * Cubex Loader
  */
-class Loader implements IConfigurable, DispatchableAccess, DispatchInjection,
+class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
                         ServiceManagerAware
 {
   use ConfigTrait;
@@ -41,7 +41,7 @@ class Loader implements IConfigurable, DispatchableAccess, DispatchInjection,
   protected $_response;
 
   /**
-   * @var \Cubex\Core\Http\Dispatchable
+   * @var \Cubex\Core\Http\IDispatchable
    */
   protected $_dispatcher;
 
@@ -312,11 +312,11 @@ class Loader implements IConfigurable, DispatchableAccess, DispatchInjection,
   }
 
   /**
-   * @param \Cubex\Core\Http\Dispatchable $dispatcher
+   * @param \Cubex\Core\Http\IDispatchable $dispatcher
    *
    * @return $this
    */
-  public function setDispatchable(Dispatchable $dispatcher)
+  public function setDispatchable(IDispatchable $dispatcher)
   {
     $this->_dispatcher = $dispatcher;
     return $this;
@@ -327,7 +327,7 @@ class Loader implements IConfigurable, DispatchableAccess, DispatchInjection,
    */
   public function canDispatch()
   {
-    if($this->_dispatcher instanceof Dispatchable)
+    if($this->_dispatcher instanceof IDispatchable)
     {
       return true;
     }
@@ -335,7 +335,7 @@ class Loader implements IConfigurable, DispatchableAccess, DispatchInjection,
   }
 
   /**
-   * @return \Cubex\Core\Http\Dispatchable
+   * @return \Cubex\Core\Http\IDispatchable
    * @throws \RuntimeException
    */
   public function getDispatchable()
@@ -397,7 +397,7 @@ class Loader implements IConfigurable, DispatchableAccess, DispatchInjection,
     if($dispatch !== null)
     {
       $dispatch = new $dispatch;
-      if($dispatch instanceof Dispatchable)
+      if($dispatch instanceof IDispatchable)
       {
         return $dispatch;
       }

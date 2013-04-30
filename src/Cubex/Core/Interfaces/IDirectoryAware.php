@@ -4,7 +4,7 @@
  */
 namespace Cubex\Core\Interfaces;
 
-interface DirectoryAware
+interface IDirectoryAware
 {
   /**
    * Returns the directory of the class

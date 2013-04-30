@@ -4,7 +4,7 @@
  */
 namespace Cubex\Core\Http;
 
-class Redirect implements DispatchableAccess, DispatchInjection
+class Redirect implements IDispatchableAccess, IDispatchInjection
 {
   use DispatchIOTrait;
 

@@ -5,7 +5,7 @@
 namespace Cubex\Core\Response;
 
 use Cubex\Core\Http\DispatchIOTrait;
-use Cubex\Core\Http\DispatchableAccess;
+use Cubex\Core\Http\IDispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Dispatch\Dependency\Resource;
@@ -13,7 +13,7 @@ use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Events\IEvent;
 use Cubex\Events\EventManager as EM;
 use Cubex\Foundation\IRenderable;
-use Cubex\Core\Http\DispatchInjection;
+use Cubex\Core\Http\IDispatchInjection;
 use Cubex\View\HtmlElement;
 use Cubex\View\Layout;
 use Cubex\View\Partial;
@@ -23,8 +23,8 @@ use Cubex\View\Templates\Exceptions\ExceptionView;
 
 class Webpage implements
   ResponseAwareRenderable,
-  DispatchInjection,
-  DispatchableAccess
+  IDispatchInjection,
+  IDispatchableAccess
 {
   use DispatchIOTrait;
 

@@ -4,14 +4,14 @@
  */
 namespace Cubex\View;
 
-use Cubex\Core\Application\Controller;
-use Cubex\Core\Interfaces\DirectoryAware;
-use Cubex\Core\Interfaces\NamespaceAware;
+use Cubex\Core\Application\IController;
+use Cubex\Core\Interfaces\IDirectoryAware;
+use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Foundation\IRenderable;
 use Cubex\I18n\TranslateTraits;
 
-class TemplatedView implements IRenderable, NamespaceAware
+class TemplatedView implements IRenderable, INamespaceAware
 {
   use PhtmlParser;
   use TranslateTraits;
@@ -24,12 +24,12 @@ class TemplatedView implements IRenderable, NamespaceAware
 
   public function __construct($template, $entity)
   {
-    if($entity instanceof Controller)
+    if($entity instanceof IController)
     {
       $entity = $entity->application();
     }
 
-    if(!($entity instanceof DirectoryAware))
+    if(!($entity instanceof IDirectoryAware))
     {
       throw new \Exception(
         "Invalid Entity passed, you must pass a" .
@@ -47,7 +47,7 @@ class TemplatedView implements IRenderable, NamespaceAware
   {
     if($this->_namespaceCache === null)
     {
-      if($this->_entity instanceof NamespaceAware)
+      if($this->_entity instanceof INamespaceAware)
       {
         $this->_namespaceCache = $this->_entity->getNamespace();
       }
@@ -66,7 +66,7 @@ class TemplatedView implements IRenderable, NamespaceAware
   }
 
   /**
-   * @return \Cubex\Core\Interfaces\DirectoryAware
+   * @return \Cubex\Core\Interfaces\IDirectoryAware
    */
   public function entity()
   {

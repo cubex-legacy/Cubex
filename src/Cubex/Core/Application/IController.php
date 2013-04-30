@@ -4,9 +4,9 @@
  */
 namespace Cubex\Core\Application;
 
-use Cubex\Core\Http\Dispatchable;
+use Cubex\Core\Http\IDispatchable;
 
-interface Controller extends Dispatchable
+interface IController extends IDispatchable
 {
   /**
    * @param \Cubex\Core\Application\Application f$app

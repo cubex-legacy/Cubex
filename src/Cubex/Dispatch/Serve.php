@@ -5,14 +5,14 @@
 namespace Cubex\Dispatch;
 
 use Cubex\FileSystem\FileSystem;
-use Cubex\Core\Http\Dispatchable;
+use Cubex\Core\Http\IDispatchable;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\View\Templates\Errors\Error404;
 
-class Serve extends Dispatcher implements Dispatchable
+class Serve extends Dispatcher implements IDispatchable
 {
   private $_cacheTime = 2592000;
   private $_useMap = true;

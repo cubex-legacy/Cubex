@@ -5,7 +5,7 @@
 
 namespace Cubex\Core\Http;
 
-interface DispatchableAccess
+interface IDispatchableAccess
 {
   /**
    * @return \Cubex\Core\Http\Request

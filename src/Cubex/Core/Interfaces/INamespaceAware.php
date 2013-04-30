@@ -4,7 +4,7 @@
  */
 namespace Cubex\Core\Interfaces;
 
-interface NamespaceAware
+interface INamespaceAware
 {
   /**
    * Returns the namespace of the class

@@ -5,13 +5,13 @@
 
 namespace Cubex\Components;
 
-use Cubex\Core\Interfaces\NamespaceAware;
+use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\ServiceManager\ServiceManager;
 
 /**
  * A Logic component should contain Interface typehints
  */
-abstract class LogicComponent implements Component, NamespaceAware
+abstract class LogicComponent implements Component, INamespaceAware
 {
   public function __construct()
   {

@@ -5,7 +5,7 @@
 namespace Cubex\Core\Controllers;
 
 use Cubex\Core\Application\Application;
-use Cubex\Core\Application\Controller;
+use Cubex\Core\Application\IController;
 use Cubex\Core\Http\Redirect;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
@@ -24,7 +24,7 @@ use Cubex\ServiceManager\ServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
 class BaseController
-  implements Controller, IDataHandler, ITranslatable, ServiceManagerAware
+  implements IController, IDataHandler, ITranslatable, ServiceManagerAware
 {
   use HandlerTrait;
   use ConfigTrait;
@@ -393,7 +393,7 @@ class BaseController
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configuration
    *
-   * @return \Cubex\Core\Http\Dispatchable
+   * @return \Cubex\Core\Http\IDispatchable
    */
   public function configure(ConfigGroup $configuration)
   {

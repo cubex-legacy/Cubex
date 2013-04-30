@@ -5,14 +5,14 @@
 
 namespace Cubex\View;
 
-use Cubex\Core\Interfaces\DirectoryAware;
-use Cubex\Core\Interfaces\NamespaceAware;
+use Cubex\Core\Interfaces\IDirectoryAware;
+use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Foundation\DataHandler\HandlerTrait;
 use Cubex\Foundation\IRenderable;
 use Cubex\I18n\TranslateTraits;
 
-class Layout implements IRenderable, NamespaceAware
+class Layout implements IRenderable, INamespaceAware
 {
   use PhtmlParser;
   use TranslateTraits;
@@ -58,7 +58,7 @@ class Layout implements IRenderable, NamespaceAware
   {
     if($this->_namespaceCache === null)
     {
-      if($this->_entity instanceof NamespaceAware)
+      if($this->_entity instanceof INamespaceAware)
       {
         $this->_namespaceCache = $this->_entity->getNamespace();
       }
@@ -77,7 +77,7 @@ class Layout implements IRenderable, NamespaceAware
   }
 
   /**
-   * @return \Cubex\Core\Interfaces\DirectoryAware
+   * @return \Cubex\Core\Interfaces\IDirectoryAware
    */
   public function entity()
   {

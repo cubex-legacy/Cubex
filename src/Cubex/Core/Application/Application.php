@@ -6,14 +6,14 @@ namespace Cubex\Core\Application;
 
 use Cubex\Bundle\BundlerTrait;
 use Cubex\Core\Controllers\BaseController;
-use Cubex\Core\Interfaces\DirectoryAware;
-use Cubex\Core\Interfaces\NamespaceAware;
+use Cubex\Core\Interfaces\IDirectoryAware;
+use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\Dispatch\Utils\ListenerTrait;
 use Cubex\Events\IEvent;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\ConfigTrait;
-use Cubex\Core\Http\Dispatchable;
-use Cubex\Core\Http\DispatchableAccess;
+use Cubex\Core\Http\IDispatchable;
+use Cubex\Core\Http\IDispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Core\Project\Project;
@@ -30,9 +30,9 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
  * Web Application
  */
 abstract class Application
-  implements Dispatchable, DispatchableAccess,
-             DirectoryAware, ITranslatable, TranslatorAccess,
-             NamespaceAware, ServiceManagerAware
+  implements IDispatchable, IDispatchableAccess,
+             IDirectoryAware, ITranslatable, TranslatorAccess,
+             INamespaceAware, ServiceManagerAware
 {
   use ConfigTrait;
   use Translation;
@@ -194,13 +194,13 @@ abstract class Application
       $dispatcher = $dispatcherResult;
     }
 
-    if($dispatcher instanceof Dispatchable)
+    if($dispatcher instanceof IDispatchable)
     {
       if($dispatcher instanceof BaseController)
       {
         $dispatcher->forceAction($action);
       }
-      if($dispatcher instanceof Controller)
+      if($dispatcher instanceof IController)
       {
         $matchRoute = $router->getMatchedRoute();
         if($matchRoute !== null)
@@ -294,7 +294,7 @@ abstract class Application
   }
 
   /**
-   * @return null|\Cubex\Core\Http\Dispatchable
+   * @return null|\Cubex\Core\Http\IDispatchable
    */
   public function defaultDispatcher()
   {
@@ -302,7 +302,7 @@ abstract class Application
   }
 
   /**
-   * @return null|\Cubex\Core\Http\Dispatchable
+   * @return null|\Cubex\Core\Http\IDispatchable
    */
   public function defaultController()
   {

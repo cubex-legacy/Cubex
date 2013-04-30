@@ -7,8 +7,8 @@ namespace Cubex\Core\Project;
 use Cubex\Bundle\BundlerTrait;
 use Cubex\Core\Application\Application;
 use Cubex\Foundation\Config\ConfigTrait;
-use Cubex\Core\Http\Dispatchable;
-use Cubex\Core\Http\DispatchableAccess;
+use Cubex\Core\Http\IDispatchable;
+use Cubex\Core\Http\IDispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\ServiceManager\ServiceManagerAware;
@@ -21,7 +21,7 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
  *
  */
 abstract class Project
-  implements Dispatchable, DispatchableAccess, ServiceManagerAware
+  implements IDispatchable, IDispatchableAccess, ServiceManagerAware
 {
   use ServiceManagerAwareTrait;
   use ConfigTrait;

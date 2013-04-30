@@ -4,7 +4,7 @@
  */
 namespace Cubex\Dispatch\Utils;
 
-use Cubex\Core\Interfaces\NamespaceAware;
+use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Dispatch\Dispatcher;
 use Cubex\Dispatch\Event;
@@ -160,7 +160,7 @@ trait RequireTrait
    */
   protected function _getOrFindNamespace()
   {
-    if($this instanceof NamespaceAware)
+    if($this instanceof INamespaceAware)
     {
       return $this->getNamespace();
     }
