@@ -96,14 +96,45 @@ class Strings
 
   public static function stringToRange($string)
   {
-    preg_match_all("/([0-9]{1,2})-?([0-9]{0,2}) ?,?;?/", $string, $match);
+    preg_match_all(
+      "/([a-zA-Z]*[0-9]{1,2})-?([a-zA-Z]*[0-9]{0,2}) ?,?;?/",
+      $string,
+      $match
+    );
     $n = array();
     foreach($match[1] as $k => $v)
     {
-      $n = array_merge(
-        $n,
-        range($v, (empty($match[2][$k]) ? $v : $match[2][$k]))
-      );
+      if(!empty($match[2][$k]))
+      {
+        $v2 = $match[2][$k];
+        if(is_numeric($v) && is_numeric($v2))
+        {
+          $n = array_merge($n, range($v, $v2));
+        }
+        else
+        {
+          $start = '';
+          $i     = 0;
+          while($v[$i] == $v2[$i] && !is_numeric($v[$i]))
+          {
+            $start .= $v[$i++];
+          }
+          $range1 = str_replace($start, "", $v);
+          $range2 = str_replace($start, "", $v2);
+          if(is_numeric($range1) && is_numeric($range2))
+          {
+            $range = range($range1, $range2);
+            foreach($range as $r)
+            {
+              $n[] = $start . $r;
+            }
+          }
+        }
+      }
+      else
+      {
+        $n[] = $v;
+      }
     }
     return ($n);
   }
