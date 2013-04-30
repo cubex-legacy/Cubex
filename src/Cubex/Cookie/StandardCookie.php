@@ -6,7 +6,7 @@
  */
 namespace Cubex\Cookie;
 
-class StandardCookie implements CookieInterface
+class StandardCookie implements ICookie
 {
   protected $_name;
   protected $_value;

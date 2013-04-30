@@ -4,7 +4,7 @@
  */
 namespace Cubex\Cookie;
 
-interface CookieInterface
+interface ICookie
 {
   public function __construct($name, $value = null, $expire = 0,
                               $path = null, $domain = null, $secure = false,

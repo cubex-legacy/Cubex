@@ -9,7 +9,7 @@ use Cubex\Events\EventManager;
 class Cookies
 {
   /**
-   * @var CookieInterface[]
+   * @var ICookie[]
    */
   private static $_cookies;
   private static $_initialised = false;
@@ -165,11 +165,11 @@ class Cookies
   }
 
   /**
-   * @param CookieInterface $cookie
+   * @param ICookie $cookie
    *
    * @return bool
    */
-  public static function set(CookieInterface $cookie)
+  public static function set(ICookie $cookie)
   {
     self::_init();
     self::$_cookies[$cookie->getName()] = $cookie;

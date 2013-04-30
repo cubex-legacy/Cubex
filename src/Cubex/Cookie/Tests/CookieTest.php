@@ -50,7 +50,7 @@ class CookieTest extends TestCase
     );
 
     /**
-     * @var \Cubex\Cookie\CookieInterface $standardCookie
+     * @var \Cubex\Cookie\ICookie $standardCookie
      */
     $this->assertEquals("cookieTest", $standardCookie->getName());
     $this->assertEquals("cookieValue", $standardCookie->getValue());
@@ -72,7 +72,7 @@ class CookieTest extends TestCase
     );
 
     /**
-     * @var \Cubex\Cookie\CookieInterface $standardCookie
+     * @var \Cubex\Cookie\ICookie $standardCookie
      */
     $this->assertEquals("cookieTest", $encryptedCookie->getName());
     $this->assertEquals("CXENC|eulaVeikooc", $encryptedCookie->getValue());

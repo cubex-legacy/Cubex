@@ -6,7 +6,7 @@
 namespace Cubex\I18n\Service\Locale;
 
 use Cubex\Container\Container;
-use Cubex\Cookie\CookieInterface;
+use Cubex\Cookie\ICookie;
 use Cubex\Cookie\Cookies;
 use Cubex\Cookie\StandardCookie;
 use Cubex\I18n\LocaleService;
@@ -61,11 +61,11 @@ class PersistentCookie implements LocaleService
   }
 
   /**
-   * @param \Cubex\Cookie\CookieInterface $cookie
+   * @param \Cubex\Cookie\ICookie $cookie
    *
    * @return bool
    */
-  protected function _setCookie(CookieInterface $cookie)
+  protected function _setCookie(ICookie $cookie)
   {
     return Cookies::set($cookie);
   }
