@@ -5,7 +5,7 @@
 namespace Cubex\Dispatch\Tests;
 
 use Cubex\FileSystem\FileSystem;
-use Cubex\Dispatch\Mapper;
+use Cubex\Dispatch\DispatchMapper;
 use Cubex\Tests\TestCase;
 use Cubex\Container\Container;
 
@@ -42,7 +42,7 @@ class MapperTest extends TestCase
       )
     );
 
-    $mapper   = new Mapper($this->_configGroup, $fileSystemMock);
+    $mapper   = new DispatchMapper($this->_configGroup, $fileSystemMock);
     $entities = $mapper->findEntities("");
 
     $this->assertEquals(
@@ -50,7 +50,7 @@ class MapperTest extends TestCase
       $entities
     );
 
-    $mapper     = new Mapper($this->_configGroup, new FileSystem());
+    $mapper     = new DispatchMapper($this->_configGroup, new FileSystem());
     $noEntities = $mapper->findEntities("idontexist");
 
     $this->assertEquals([], $noEntities);
@@ -112,7 +112,7 @@ class MapperTest extends TestCase
       )
     );
 
-    $mapper    = new Mapper($this->_configGroup, $fileSystemMock);
+    $mapper    = new DispatchMapper($this->_configGroup, $fileSystemMock);
     $entityMap = $mapper->mapEntity($entity);
 
     $this->assertArrayHasKey("css/test.css", $entityMap);
@@ -127,7 +127,7 @@ class MapperTest extends TestCase
     $this->assertArrayHasKey("css/test.css", current($entitiesMaps));
 
     // Test bad dir
-    $mapper      = new Mapper($this->_configGroup, new FileSystem());
+    $mapper      = new DispatchMapper($this->_configGroup, new FileSystem());
     $noEntityMap = $mapper->mapEntity("idontexist");
 
     $this->assertEquals([], $noEntityMap);

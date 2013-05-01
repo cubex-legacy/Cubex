@@ -4,7 +4,7 @@
  */
 namespace Cubex\Dispatch;
 
-class Path
+class DispatchPath
 {
   private $_dispatchPath;
   private $_domainHash;
@@ -61,7 +61,7 @@ class Path
   /**
    * @param string $domainHash
    *
-   * @return \Cubex\Dispatch\Path
+   * @return \Cubex\Dispatch\DispatchPath
    */
   public function setDomainHash($domainHash)
   {
@@ -81,7 +81,7 @@ class Path
   /**
    * @param string $entityHash
    *
-   * @return \Cubex\Dispatch\Path
+   * @return \Cubex\Dispatch\DispatchPath
    */
   public function setEntityHash($entityHash)
   {
@@ -101,7 +101,7 @@ class Path
   /**
    * @param $resourceHash
    *
-   * @return \Cubex\Dispatch\Path
+   * @return \Cubex\Dispatch\DispatchPath
    */
   public function setResourceHash($resourceHash)
   {
@@ -121,7 +121,7 @@ class Path
   /**
    * @param string $debugString
    *
-   * @return \Cubex\Dispatch\Path
+   * @return \Cubex\Dispatch\DispatchPath
    */
   public function setDebugString($debugString)
   {
@@ -141,7 +141,7 @@ class Path
   /**
    * @param string $marker
    *
-   * @return \Cubex\Dispatch\Path
+   * @return \Cubex\Dispatch\DispatchPath
    */
   public function setMarker($marker)
   {
@@ -161,7 +161,7 @@ class Path
   /**
    * @param string $pathToResource
    *
-   * @return \Cubex\Dispatch\Path
+   * @return \Cubex\Dispatch\DispatchPath
    */
   public function setPathToResource($pathToResource)
   {
@@ -188,7 +188,7 @@ class Path
   /**
    * @param string $dispatchPath
    *
-   * @return \Cubex\Dispatch\Path
+   * @return \Cubex\Dispatch\DispatchPath
    */
   public function setDispatchPath($dispatchPath)
   {
@@ -218,13 +218,13 @@ class Path
    * @param string $resourceHash
    * @param string $pathToResource
    *
-   * @return Path
+   * @return DispatchPath
    */
   public static function fromParams($domainHash, $entityHash, $resourceHash,
                                     $pathToResource)
   {
     $params = func_get_args();
 
-    return new Path(implode("/", $params));
+    return new DispatchPath(implode("/", $params));
   }
 }

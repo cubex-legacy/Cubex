@@ -6,10 +6,10 @@ namespace Cubex\Dispatch\Mapper;
 
 use Cubex\Cli\Shell;
 use Cubex\FileSystem\FileSystem;
-use Cubex\Dispatch\Mapper;
+use Cubex\Dispatch\DispatchMapper;
 use Cubex\Foundation\Config\ConfigGroup;
 
-class Cli extends Mapper
+class Cli extends DispatchMapper
 {
   private $_output = [];
 

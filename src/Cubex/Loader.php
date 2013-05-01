@@ -222,6 +222,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 ##    ASSUMING \'development\'    ##
 ##    Sleeping for 5 seconds    ##
 ##                              ##
+## export CUBEX_ENV=development ##
+##                              ##
 ##    Giving you a chance to    ##
 ##       STOP this script       ##
 ##                              ##
@@ -356,7 +358,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
     try
     {
-      $dispatchPath  = new \Cubex\Dispatch\Path($this->request()->path());
+      $dispatchPath  = new \Cubex\Dispatch\DispatchPath($this->request()->path(
+      ));
       $dispatchServe = new \Cubex\Dispatch\Serve(
         $this->getConfig(),
         new \Cubex\FileSystem\FileSystem(),

@@ -7,7 +7,7 @@ namespace Cubex\Dispatch\Dependency;
 use Cubex\Container\Container;
 use Cubex\Core\Http\Request;
 use Cubex\Dispatch\Dependency;
-use Cubex\Dispatch\Event;
+use Cubex\Dispatch\DispatchEvent;
 
 class Image extends Dependency
 {
@@ -23,7 +23,7 @@ class Image extends Dependency
     return $this->getFileSystem()->normalizePath($path);
   }
 
-  public function getUri(Event $event)
+  public function getUri(DispatchEvent $event)
   {
     $file = $event->getFile();
 

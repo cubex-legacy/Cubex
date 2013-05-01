@@ -23,11 +23,11 @@ class Serve extends Dispatcher implements IDispatchable
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
    * @param \Cubex\FileSystem\FileSystem         $fileSystem
-   * @param Path                                 $dispatchPath
+   * @param DispatchPath                                 $dispatchPath
    */
   public function __construct(
     ConfigGroup $configGroup, FileSystem $fileSystem,
-    Path $dispatchPath
+    DispatchPath $dispatchPath
   )
   {
     parent::__construct($configGroup, $fileSystem);
@@ -43,7 +43,7 @@ class Serve extends Dispatcher implements IDispatchable
       $path                 = ltrim($dispatchPath->getDispatchPath(), "/");
       $pathParts            = explode("/", $path);
       $pathParts            = array_slice($pathParts, $buildOptionPathParts);
-      $dispatchPath         = new Path(implode("/", $pathParts));
+      $dispatchPath         = new DispatchPath(implode("/", $pathParts));
     }
 
     $resourceHash = $dispatchPath->getResourceHash();
@@ -213,7 +213,7 @@ class Serve extends Dispatcher implements IDispatchable
     $data      = "";
     $entityMap = false;
 
-    $mapper = new Mapper($this->getConfig(), $this->getFileSystem());
+    $mapper = new DispatchMapper($this->getConfig(), $this->getFileSystem());
     $entity = $this->findEntityFromHash(
       $this->getDispatchPath()->getEntityHash(),
       $mapper
@@ -225,7 +225,7 @@ class Serve extends Dispatcher implements IDispatchable
 
     if(!$entityMap)
     {
-      $mapper    = new Mapper($this->getConfig(), $this->getFileSystem());
+      $mapper    = new DispatchMapper($this->getConfig(), $this->getFileSystem());
       $entityMap = $this->findAndSaveEntityMap($entity, $mapper);
     }
 
@@ -256,11 +256,11 @@ class Serve extends Dispatcher implements IDispatchable
 
   /**
    * @param string                 $entity
-   * @param \Cubex\Dispatch\Mapper $mapper
+   * @param \Cubex\Dispatch\DispatchMapper $mapper
    *
    * @return array
    */
-  public function findAndSaveEntityMap($entity, Mapper $mapper)
+  public function findAndSaveEntityMap($entity, DispatchMapper $mapper)
   {
     $entityMap = $mapper->mapEntity($entity);
 
@@ -427,7 +427,7 @@ class Serve extends Dispatcher implements IDispatchable
   }
 
   /**
-   * @return \Cubex\Dispatch\Path
+   * @return \Cubex\Dispatch\DispatchPath
    */
   public function getDispatchPath()
   {
@@ -435,11 +435,11 @@ class Serve extends Dispatcher implements IDispatchable
   }
 
   /**
-   * @param Path $dispatchPath
+   * @param DispatchPath $dispatchPath
    *
    * @return \Cubex\Dispatch\Serve
    */
-  public function setDispatchPath(Path $dispatchPath)
+  public function setDispatchPath(DispatchPath $dispatchPath)
   {
     $this->_dispatchPath = $dispatchPath;
 

@@ -8,7 +8,7 @@ use Cubex\Container\Container;
 use Cubex\FileSystem\FileSystem;
 use Cubex\Foundation\Config\ConfigGroup;
 
-class Mapper extends Dispatcher
+class DispatchMapper extends Dispatcher
 {
   /**
    * The array is keyed with the filename to be ignore and the value is ignored.

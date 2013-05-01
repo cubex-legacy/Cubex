@@ -10,12 +10,12 @@ use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 class Dependency extends Dispatcher
 {
   /**
-   * @param \Cubex\Dispatch\Event    $event
+   * @param \Cubex\Dispatch\DispatchEvent    $event
    * @param \Cubex\Core\Http\Request $request
    *
-   * @return \Cubex\Dispatch\Path
+   * @return \Cubex\Dispatch\DispatchPath
    */
-  public function getDispatchPath(Event $event, Request $request)
+  public function getDispatchPath(DispatchEvent $event, Request $request)
   {
     $path    = ltrim($event->getFile(), "/");
     $base    = substr($event->getFile(), 0, 1) === "/";
@@ -52,7 +52,7 @@ class Dependency extends Dispatcher
       $resourceHash = $this->generateResourceHash($ini[$path]);
     }
 
-    return Path::fromParams(
+    return DispatchPath::fromParams(
       $domainHash,
       $entityHash,
       $resourceHash,

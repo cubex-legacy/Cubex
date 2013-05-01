@@ -7,7 +7,7 @@ namespace Cubex\Dispatch\Utils;
 use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Dispatch\Dispatcher;
-use Cubex\Dispatch\Event;
+use Cubex\Dispatch\DispatchEvent;
 use Cubex\Events\EventManager;
 
 trait RequireTrait
@@ -89,7 +89,7 @@ trait RequireTrait
       $namespace = $this->_getOrFindNamespace();
     }
 
-    $event = (new Event(EventManager::DISPATCH_RESOURCE_REQUIRE))
+    $event = (new DispatchEvent(EventManager::DISPATCH_RESOURCE_REQUIRE))
     ->setFile($file)
     ->setType($type)
     ->setVersion($version)
@@ -117,7 +117,7 @@ trait RequireTrait
       $namespace = $this->_getOrFindNamespace();
     }
 
-    $event = (new Event(EventManager::DISPATCH_PACKAGE_REQUIRE))
+    $event = (new DispatchEvent(EventManager::DISPATCH_PACKAGE_REQUIRE))
     ->setFile($package)
     ->setType($type)
     ->setSource($this);
@@ -138,7 +138,7 @@ trait RequireTrait
    */
   public function imgUrl($file, $namespace = null)
   {
-    $event = (new Event(EventManager::DISPATCH_IMG_URL))
+    $event = (new DispatchEvent(EventManager::DISPATCH_IMG_URL))
     ->setFile($file)
     ->setSource($this);
 

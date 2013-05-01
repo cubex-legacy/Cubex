@@ -7,7 +7,7 @@ namespace Cubex\Dispatch\Utils;
 use Cubex\Container\Container;
 use Cubex\Dispatch\Dependency\Image;
 use Cubex\Dispatch\Dependency\Resource;
-use Cubex\Dispatch\Event;
+use Cubex\Dispatch\DispatchEvent;
 use Cubex\FileSystem\FileSystem;
 use Cubex\Events\EventManager;
 
@@ -28,7 +28,7 @@ trait ListenerTrait
 
     EventManager::listen(
       EventManager::DISPATCH_RESOURCE_REQUIRE,
-      function (Event $event) use ($namespace, $fileSystem)
+      function (DispatchEvent $event) use ($namespace, $fileSystem)
       {
         $event->setNamespace($namespace);
 
@@ -42,7 +42,7 @@ trait ListenerTrait
 
     EventManager::listen(
       EventManager::DISPATCH_PACKAGE_REQUIRE,
-      function (Event $event) use ($namespace, $fileSystem)
+      function (DispatchEvent $event) use ($namespace, $fileSystem)
       {
         $event->setNamespace($namespace);
 
@@ -56,7 +56,7 @@ trait ListenerTrait
 
     EventManager::listen(
       EventManager::DISPATCH_IMG_URL,
-      function (Event $event) use ($namespace, $fileSystem)
+      function (DispatchEvent $event) use ($namespace, $fileSystem)
       {
         $event->setNamespace($namespace);
 

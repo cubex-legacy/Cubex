@@ -7,7 +7,7 @@ namespace Cubex\Dispatch;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Events\StdEvent;
 
-class Event extends StdEvent
+class DispatchEvent extends StdEvent
 {
   protected $_file;
   protected $_type;

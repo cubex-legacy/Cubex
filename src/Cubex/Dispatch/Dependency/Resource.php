@@ -8,7 +8,7 @@ use Cubex\Container\Container;
 use Cubex\Core\Http\Request;
 use Cubex\Dispatch\Dependency;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
-use Cubex\Dispatch\Event;
+use Cubex\Dispatch\DispatchEvent;
 
 class Resource extends Dependency
 {
@@ -173,9 +173,9 @@ class Resource extends Dependency
   }
 
   /**
-   * @param \Cubex\Dispatch\Event $event
+   * @param \Cubex\Dispatch\DispatchEvent $event
    */
-  public function requireResource(Event $event)
+  public function requireResource(DispatchEvent $event)
   {
     if($this->isExternalUri($event->getFile()))
     {
@@ -199,18 +199,18 @@ class Resource extends Dependency
   }
 
   /**
-   * @param \Cubex\Dispatch\Event $event
+   * @param \Cubex\Dispatch\DispatchEvent $event
    */
-  public function requireExternalResource(Event $event)
+  public function requireExternalResource(DispatchEvent $event)
   {
     $this->_requireResource($event, true);
     $this->mergeDuplicateExternalUris($event->getType());
   }
 
   /**
-   * @param \Cubex\Dispatch\Event $event
+   * @param \Cubex\Dispatch\DispatchEvent $event
    */
-  public function requireInternalResource(Event $event)
+  public function requireInternalResource(DispatchEvent $event)
   {
     $file = $event->getFile();
     $type = $event->getType();
@@ -242,12 +242,12 @@ class Resource extends Dependency
   }
 
   /**
-   * @param \Cubex\Dispatch\Event    $event
+   * @param \Cubex\Dispatch\DispatchEvent    $event
    * @param \Cubex\Core\Http\Request $request
    *
    * @throws \InvalidArgumentException
    */
-  public function requireThirdpartyResource(Event $event, Request $request)
+  public function requireThirdpartyResource(DispatchEvent $event, Request $request)
   {
     $library = $event->getFile();
     $type    = $event->getType();
@@ -286,10 +286,10 @@ class Resource extends Dependency
   }
 
   /**
-   * @param \Cubex\Dispatch\Event $event
+   * @param \Cubex\Dispatch\DispatchEvent $event
    * @param bool                  $external
    */
-  protected function _requireResource(Event $event, $external = false)
+  protected function _requireResource(DispatchEvent $event, $external = false)
   {
     $resource = $event->getFile();
 
@@ -314,17 +314,17 @@ class Resource extends Dependency
   }
 
   /**
-   * @param \Cubex\Dispatch\Event $event
+   * @param \Cubex\Dispatch\DispatchEvent $event
    */
-  public function requirePackage(Event $event)
+  public function requirePackage(DispatchEvent $event)
   {
     $this->_requirePackage($event);
   }
 
   /**
-   * @param \Cubex\Dispatch\Event $event
+   * @param \Cubex\Dispatch\DispatchEvent $event
    */
-  protected function _requirePackage(Event $event)
+  protected function _requirePackage(DispatchEvent $event)
   {
     $request      = Container::get(Container::REQUEST);
     $dispatchPath = $this->getDispatchPackagePath($event, $request);
@@ -340,12 +340,12 @@ class Resource extends Dependency
   }
 
   /**
-   * @param \Cubex\Dispatch\Event    $event
+   * @param \Cubex\Dispatch\DispatchEvent    $event
    * @param \Cubex\Core\Http\Request $request
    *
-   * @return \Cubex\Dispatch\Path
+   * @return \Cubex\Dispatch\DispatchPath
    */
-  public function getDispatchPackagePath(Event $event, Request $request)
+  public function getDispatchPackagePath(DispatchEvent $event, Request $request)
   {
     $dispatchPackagePath = $this->getDispatchPath($event, $request);
 

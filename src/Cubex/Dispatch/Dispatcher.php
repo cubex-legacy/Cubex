@@ -280,7 +280,7 @@ class Dispatcher
     }
     else
     {
-      $mapper = new Mapper($this->getConfig(), $this->getFileSystem());
+      $mapper = new DispatchMapper($this->getConfig(), $this->getFileSystem());
       $path   = $this->findEntityFromHash($entityHash, $mapper);
 
       if($path === null)
@@ -521,11 +521,11 @@ class Dispatcher
    * the method to call it's self recursively.
    *
    * @param string $hash
-   * @param Mapper $mapper
+   * @param DispatchMapper $mapper
    *
    * @return null|string
    */
-  public function findEntityFromHash($hash, Mapper $mapper)
+  public function findEntityFromHash($hash, DispatchMapper $mapper)
   {
     if(self::$_entities === null)
     {
@@ -646,7 +646,7 @@ class Dispatcher
     $entityMap    = false;
     $resourceHash = $this->getNomapHash();
 
-    $mapper = new Mapper($this->getConfig(), $this->getFileSystem());
+    $mapper = new DispatchMapper($this->getConfig(), $this->getFileSystem());
     $entity = $this->findEntityFromHash($entityHash, $mapper);
     if($entity)
     {
@@ -665,7 +665,7 @@ class Dispatcher
       }
     }
 
-    $dispatchPath = Path::fromParams(
+    $dispatchPath = DispatchPath::fromParams(
       $domainHash,
       $entityHash,
       $resourceHash,
@@ -771,12 +771,12 @@ class Dispatcher
   }
 
   /**
-   * @param Path                     $path
+   * @param DispatchPath                     $path
    * @param \Cubex\Core\Http\Request $request
    *
    * @return string
    */
-  public function getDispatchUrl(Path $path, Request $request)
+  public function getDispatchUrl(DispatchPath $path, Request $request)
   {
     if($this->canDispatchUrl($request))
     {
