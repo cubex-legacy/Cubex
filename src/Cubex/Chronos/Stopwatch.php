@@ -78,7 +78,14 @@ class Stopwatch implements IStopwatch
 
   public function averageTime()
   {
-    return $this->_totalTime / $this->_eventCount;
+    if($this->_eventCount > 0)
+    {
+      return $this->_totalTime / $this->_eventCount;
+    }
+    else
+    {
+      return 0;
+    }
   }
 
   public function lastTime()
