@@ -31,6 +31,22 @@ trait SessionIdTrait
     return $this->_getSessionId();
   }
 
+  /**
+   * @return $this
+   */
+  public function regenerateId()
+  {
+    if(Cookies::exists($this->_sessionIdCookieName))
+    {
+      $this->_sessionId = $this->_generateSessionId();
+      $sessionCookie = Cookies::get($this->_sessionIdCookieName);
+      $sessionCookie->setValue($this->_sessionId);
+      $this->_setSessionCookie();
+    }
+
+    return $this;
+  }
+
   protected function _getSessionId()
   {
     if($this->_sessionId === null)

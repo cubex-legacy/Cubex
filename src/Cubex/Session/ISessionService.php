@@ -60,4 +60,9 @@ interface ISessionService extends IService
    * @return $this
    */
   public function destroy();
+
+  /**
+   * @return $this
+   */
+  public function regenerateId();
 }
