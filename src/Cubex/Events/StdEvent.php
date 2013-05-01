@@ -6,7 +6,7 @@ namespace Cubex\Events;
 
 use Cubex\Foundation\DataHandler\HandlerTrait;
 
-class StdEvent implements IEvent
+class StdEvent implements IEvent, \JsonSerializable
 {
   use HandlerTrait;
 
@@ -108,5 +108,15 @@ class StdEvent implements IEvent
   public function eventTime()
   {
     return $this->_eventTime;
+  }
+
+  public function jsonSerialize()
+  {
+    return [
+      'name'   => $this->name(),
+      'source' => $this->source(),
+      'time'   => $this->eventTime(),
+      'data'   => $this->_data,
+    ];
   }
 }
