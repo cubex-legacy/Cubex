@@ -256,6 +256,14 @@ class CliLogger
       case E_USER_NOTICE:
         Log::notice($errMsg);
         break;
+      case E_STRICT:
+        if(class_exists('\Cubex\Log\Log', false)
+        && class_exists('\Cubex\Log\Logger', false)
+        )
+        {
+          Log::info($errMsg);
+        }
+        break;
       default:
         Log::info($errMsg);
     }
