@@ -241,6 +241,10 @@ class ColumnFamily
   {
     $parent = $this->_columnParent();
     $level  = $this->readConsistencyLevel();
+    $columnNames = $this->prepareDataType(
+      $this->columnDataType(),
+      $columnNames
+    );
     $slice  = new SlicePredicate(['column_names' => $columnNames]);
     try
     {
