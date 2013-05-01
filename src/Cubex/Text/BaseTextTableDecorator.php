@@ -17,6 +17,11 @@ abstract class BaseTextTableDecorator implements ITextTableDecorator
     $this->_table = $table;
   }
 
+  public function cellPadding()
+  {
+    return 1;
+  }
+
   protected function _padArray($array)
   {
     if(!is_array($array))
@@ -28,10 +33,12 @@ abstract class BaseTextTableDecorator implements ITextTableDecorator
     $data = $return->toArray();
     foreach($data as $i => $value)
     {
-      if(strlen($value) > $this->_table->calculateColumnWidth($i + 1))
+      $value = ltrim($value) . " ";
+      if(strlen($value) < $this->_table->calculateColumnWidth($i + 1))
       {
-        $data[$i] = ltrim($value);
+        $value = " " . $value;
       }
+      $data[$i] = $value;
     }
 
     return $data;

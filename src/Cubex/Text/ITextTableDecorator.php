@@ -63,4 +63,11 @@ interface ITextTableDecorator
    * @return string
    */
   public function renderBottomBorder();
+
+  /**
+   * The amount of padding to put on the left and right of the cell contents
+   *
+   * @return int
+   */
+  public function cellPadding();
 }

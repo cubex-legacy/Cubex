@@ -29,7 +29,7 @@ class TextTable
   {
     if(CUBEX_CLI)
     {
-      $this->setMaxTableWidth(Shell::columns() - 5);
+      $this->setMaxTableWidth(Shell::columns());
     }
 
     $this->setDecorator($decorator ? $decorator : new TextTableDecorator());
@@ -73,8 +73,8 @@ class TextTable
       {
         $value = json_encode($value);
       }
-      $data[$i] = " $value ";
-      $this->_ackColumnLength($x, strlen($value) + 2);
+      $data[$i] = $value;
+      $this->_ackColumnLength($x, strlen($value));
       $x++;
     }
 
@@ -106,7 +106,7 @@ class TextTable
     $this->_headers = is_array($headers) ? $headers : func_get_args();
     foreach($this->_headers as $i => $header)
     {
-      $this->_headers[$i] = " $header ";
+      $this->_headers[$i] = $header;
       $this->_ackColumnLength($i, strlen($header) + 2);
     }
     return $this;
@@ -160,37 +160,31 @@ class TextTable
 
   public function calculateColumnWidth($column = 1)
   {
-    if($this->_maxTableWidth !== null
-    && array_sum($this->_columnWidths) > $this->_maxTableWidth
-    )
+    $includePadding = true;
+
+    $width = $this->_columnWidths[$column - 1];
+
+    $maxDataWidth = $this->_calculateMaxDataWidth();
+    $totalDataWidth = array_sum($this->_columnWidths);
+    if($totalDataWidth > $maxDataWidth)
     {
       if($this->_fixedLayout ||
-        ($this->_columnWidths[0] > $this->_maxTableWidth)
+      ($this->_columnWidths[0] > $maxDataWidth)
       )
       {
-        $width = ceil($this->_maxTableWidth / $this->_columnCount);
-        $width = $width - 2;
+        $width = $maxDataWidth / $this->_columnCount;
       }
       else
       {
-        $sumWidth = 0;
-        $width = 10;
-        for($i = 1; $i <= $this->_columnCount; $i++)
+        $widthDiff = $totalDataWidth - $maxDataWidth;
+        $paddingSize = $this->_columnCount * 2 *
+          $this->_decorator->cellPadding();
+
+        $includePadding = false;
+
+        if($widthDiff > $paddingSize)
         {
-          $colWidth = $this->_columnWidths[$i - 1];
-          $sumWidth += $colWidth;
-          if($sumWidth >= $this->_maxTableWidth)
-          {
-            $sumWidth -= $colWidth;
-            $remaining = $this->_maxTableWidth - $sumWidth;
-            $width = $remaining / ($this->_columnCount - ($i - 1));
-            break;
-          }
-          else if($i == $column)
-          {
-            $width = $this->_columnWidths[$column - 1];
-            break;
-          }
+          $width -= $widthDiff / $this->_columnCount;
         }
       }
     }
@@ -205,21 +199,18 @@ class TextTable
         $width = $this->_fixedColumnWidth;
       }
     }
-    else
+
+    if($includePadding)
     {
-      $width = 10;
-      if(isset($this->_columnWidths[$column - 1]))
-      {
-        $width = $this->_columnWidths[$column - 1];
-      }
+      $width += 2 * $this->_decorator->cellPadding();
     }
+
     if($this->_maxColumnWidth !== null && $width > $this->_maxColumnWidth)
     {
       $width = $this->_maxColumnWidth;
     }
 
-    $width = ceil($width);
-    return $width;
+    return ceil($width);
   }
 
   public function calculateTableWidth()
@@ -254,6 +245,20 @@ class TextTable
   {
     $this->_maxTableWidth = $width;
     return $this;
+  }
+
+  protected function _calculateMaxDataWidth()
+  {
+    if($this->_maxTableWidth !== null)
+    {
+      return $this->_maxTableWidth - (
+        ($this->_columnCount * ((2 * $this->_decorator->cellPadding()) + 1)) + 1
+      );
+    }
+    else
+    {
+      return null;
+    }
   }
 
   public static function fromArray($data)
