@@ -107,7 +107,9 @@ class BaseController
       $canProcess = $this->canProcess();
       if($canProcess !== true)
       {
-        if($canProcess instanceof Redirect || $canProcess instanceof IRenderable)
+        if($canProcess instanceof Redirect
+          || $canProcess instanceof IRenderable
+        )
         {
           $actionResponse = $canProcess;
         }
@@ -217,14 +219,16 @@ class BaseController
         );
       }
 
-      if($route === null && $this->request()->is('POST'))
+      if(($route === null || $this->_routeIsEmpty($route))
+        && $this->request()->is('POST')
+      )
       {
         $route = $this->_attemptRoutes(
           $this->_getRoutes($this->getPostRoutes())
         );
       }
 
-      if($route === null)
+      if($route === null || $this->_routeIsEmpty($route))
       {
         $route = $this->_attemptRoutes($this->_getRoutes($this->getRoutes()));
       }
@@ -236,13 +240,16 @@ class BaseController
       }
       else
       {
-        $action = trim($route->result());
-        $params = $route->routeData();
-      }
+        if($this->_routeIsEmpty($route))
+        {
+          $action = $this->defaultAction();
+        }
+        else
+        {
+          $action = $this->_cleanRouteResult($route);
+        }
 
-      if($action == '')
-      {
-        $action = $this->defaultAction();
+        $params = $route->routeData();
       }
 
       $this->appendData($params);
@@ -252,6 +259,16 @@ class BaseController
     $result = $this->_processAction($this->_routeResult, $params);
 
     return $result;
+  }
+
+  protected function _routeIsEmpty(IRoute $route)
+  {
+    return $this->_cleanRouteResult($route) === "";
+  }
+
+  protected function _cleanRouteResult(IRoute $route)
+  {
+    return trim($route->result());
   }
 
   protected function _processAction($action, $params)
