@@ -5,6 +5,7 @@
 namespace Cubex\Dispatch\Mapper;
 
 use Cubex\Cli\Shell;
+use Cubex\Figlet\Figlet;
 use Cubex\FileSystem\FileSystem;
 use Cubex\Dispatch\DispatchMapper;
 use Cubex\Foundation\Config\ConfigGroup;
@@ -26,10 +27,10 @@ class Cli extends DispatchMapper
       Shell::COLOUR_FOREGROUND_DARK_GREY
     );
 
-    $entities = $this->findEntities();
+    $entities         = $this->findEntities();
     $externalEntities = $this->findExternalEntities();
     $this->setEntityMapConfigLines(array_merge($entities, $externalEntities));
-    $maps = $this->mapEntities($entities);
+    $maps      = $this->mapEntities($entities);
     $savedMaps = $this->saveMaps($maps);
     $this->writeConfig();
 
@@ -46,7 +47,7 @@ class Cli extends DispatchMapper
 
   public function mapEntity($entity, $entityPath = "")
   {
-    $shouldOutput      = !$entityPath;
+    $shouldOutput = !$entityPath;
 
     $entityHash = $this->generateEntityHash($entity);
 
@@ -65,7 +66,7 @@ class Cli extends DispatchMapper
       flush();
     }
 
-    $mapped = parent::mapEntity($entity, $entityPath);
+    $mapped    = parent::mapEntity($entity, $entityPath);
     $numMapped = count($mapped);
 
     if($shouldOutput)
@@ -98,7 +99,8 @@ class Cli extends DispatchMapper
     $this->_pushLine(
       "config",
       Shell::colourText(
-        "Writing Main Config:       ", Shell::COLOUR_FOREGROUND_LIGHT_CYAN
+        "Writing Main Config:       ",
+        Shell::COLOUR_FOREGROUND_LIGHT_CYAN
       )
     );
 
@@ -113,33 +115,34 @@ class Cli extends DispatchMapper
 
   private function _startMapper()
   {
-    echo \str_repeat("\n", 100);
-
-    $mapper = '_____________                      _____      ______
-___  __ \__(_)____________________ __  /_________  /_
-__  / / /_  /__  ___/__  __ \  __ `/  __/  ___/_  __ \
-_  /_/ /_  / _(__  )__  /_/ / /_/ // /_ / /__ _  / / /
-/_____/ /_/  /____/ _  .___/\__,_/ \__/ \___/ /_/ /_/
-                    /_/
-______  ___
-___   |/  /_____ _____________________________
-__  /|_/ /_  __ `/__  __ \__  __ \  _ \_  ___/
-_  /  / / / /_/ /__  /_/ /_  /_/ /  __/  /
-/_/  /_/  \__,_/ _  .___/_  .___/\___//_/
-                 /_/     /_/                  ';
-    echo Shell::colourText("\n$mapper\n\n", Shell::COLOUR_FOREGROUND_LIGHT_RED);
+    Shell::clear();
+    $fig = new Figlet("speed");
+    echo "\n";
+    echo Shell::colourText(
+      $fig->render("Dispatch"),
+      Shell::COLOUR_FOREGROUND_LIGHT_RED
+    );
+    echo "\n";
+    echo Shell::colourText(
+      $fig->render("Mapper"),
+      Shell::COLOUR_FOREGROUND_LIGHT_RED
+    );
+    echo "\n\n";
   }
 
   private function _completeMapper()
   {
     echo Shell::colourText(
-      "\n==============================", Shell::COLOUR_FOREGROUND_GREEN
+      "\n==============================",
+      Shell::COLOUR_FOREGROUND_GREEN
     );
     echo Shell::colourText(
-      "\n|  DISPATCH MAPPER COMPLETE  |", Shell::COLOUR_FOREGROUND_LIGHT_GREEN
+      "\n|  DISPATCH MAPPER COMPLETE  |",
+      Shell::COLOUR_FOREGROUND_LIGHT_GREEN
     );
     echo Shell::colourText(
-      "\n==============================", Shell::COLOUR_FOREGROUND_GREEN
+      "\n==============================",
+      Shell::COLOUR_FOREGROUND_GREEN
     );
     echo "\n";
   }
