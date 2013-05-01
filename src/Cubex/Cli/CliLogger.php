@@ -13,17 +13,17 @@ use Psr\Log\LogLevel;
 
 class CliLogger
 {
-  private $_echoLevel;
-  private $_logLevel;
-  private $_logFilePath;
-  private $_dateFormat;
-  private $_longestLevel = 0;
+  protected $_echoLevel;
+  protected $_logLevel;
+  protected $_logFilePath;
+  protected $_dateFormat;
+  protected $_longestLevel = 0;
 
   public $logPhpErrors = true;
   public $logUnhandledExceptions = true;
 
   // Log levels in order of importance
-  private $_allLogLevels = [
+  protected $_allLogLevels = [
     LogLevel::EMERGENCY,
     LogLevel::ALERT,
     LogLevel::CRITICAL,
@@ -34,7 +34,7 @@ class CliLogger
     LogLevel::DEBUG
   ];
 
-  private $_phpErrors = [
+  protected $_phpErrors = [
     E_ERROR             => 'ERROR',
     E_WARNING           => 'WARNING',
     E_PARSE             => 'PARSE',
@@ -76,7 +76,7 @@ class CliLogger
       }
     }
 
-    $this->_dateFormat = $this->_getConfigOption('date_format', 'd/m/Y H:i:s');
+    $this->_dateFormat  = $this->_getConfigOption('date_format', 'd/m/Y H:i:s');
     $this->_logFilePath = $this->_getLogFilePath($logFile, $instanceName);
 
     EventManager::listen(EventManager::CUBEX_LOG, [$this, 'handleLogEvent']);
@@ -96,13 +96,13 @@ class CliLogger
     return $logsDir;
   }
 
-  private function _getConfigOption($option, $default = "")
+  protected function _getConfigOption($option, $default = "")
   {
     $conf = Container::config()->get('cli_logger');
     return $conf ? $conf->getStr($option, $default) : $default;
   }
 
-  private function _getLogFilePath($logFile = "", $instanceName = "")
+  protected function _getLogFilePath($logFile = "", $instanceName = "")
   {
     if(!$logFile)
     {
@@ -122,7 +122,7 @@ class CliLogger
     return $logFile;
   }
 
-  private function _writeToLogFile($logMsg)
+  protected function _writeToLogFile($logMsg)
   {
     if($this->_logFilePath !== null)
     {
@@ -141,7 +141,7 @@ class CliLogger
     }
   }
 
-  private function _logLevelLessThanOrEqual($checkLevel, $baselineLevel)
+  protected function _logLevelLessThanOrEqual($checkLevel, $baselineLevel)
   {
     return array_search($checkLevel, $this->_allLogLevels) <= array_search(
       $baselineLevel,
@@ -149,7 +149,7 @@ class CliLogger
     );
   }
 
-  private function _logLevelToDisplay($level)
+  protected function _logLevelToDisplay($level)
   {
     $spaces = $this->_longestLevel - strlen($level);
     if($spaces < 0)
