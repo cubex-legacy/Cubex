@@ -8,14 +8,17 @@ use Cubex\Core\Application\IController;
 use Cubex\Core\Interfaces\IDirectoryAware;
 use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\Dispatch\Utils\RequireTrait;
+use Cubex\Foundation\DataHandler\HandlerTrait;
+use Cubex\Foundation\DataHandler\IDataHandler;
 use Cubex\Foundation\IRenderable;
 use Cubex\I18n\TranslateTraits;
 
-class TemplatedView implements IRenderable, INamespaceAware
+class TemplatedView implements IRenderable, INamespaceAware, IDataHandler
 {
   use PhtmlParser;
   use TranslateTraits;
   use RequireTrait;
+  use HandlerTrait;
 
   protected $_template = '';
   protected $_directory = '';
@@ -37,7 +40,7 @@ class TemplatedView implements IRenderable, INamespaceAware
       );
     }
 
-    $this->_entity = $entity;
+    $this->_entity    = $entity;
     $this->_directory = $entity->containingDirectory();
     $this->_directory .= '/Templates/';
     $this->setTemplate($template);
@@ -53,8 +56,8 @@ class TemplatedView implements IRenderable, INamespaceAware
       }
       else if($this->_entity !== null)
       {
-        $class = get_class($this->_entity);
-        $reflect = new \ReflectionClass($class);
+        $class                 = get_class($this->_entity);
+        $reflect               = new \ReflectionClass($class);
         $this->_namespaceCache = $reflect->getNamespaceName();
       }
       else
