@@ -255,7 +255,7 @@ class PivotMapper extends RecordMapper
     $pivot->pivotOn($pivota, $pivotb);
     if($load)
     {
-      $pivot->load([$pivota, $pivotb]);
+      $pivot->load([$pivota->id(), $pivotb->id()]);
     }
     return $pivot;
   }
@@ -269,7 +269,7 @@ class PivotMapper extends RecordMapper
      * @var $pivot \Cubex\Mapper\Database\PivotMapper
      */
     $pivot->pivotOn($pivota, $pivotb);
-    $pivot->load([$pivota, $pivotb]);
+    $pivot->load([$pivota->id(), $pivotb->id()]);
     $pivot->saveChanges();
     return $pivot;
   }
