@@ -149,7 +149,12 @@ class PivotMapper extends RecordMapper
 
   public function addAttribute($key)
   {
-    $this->_addAttribute(new Attribute($key));
+    $attribute = $this->_attribute($key);
+    if($attribute === null)
+    {
+      $attribute = new Attribute($key);
+    }
+    $this->_addAttribute($attribute);
     return $this;
   }
 
