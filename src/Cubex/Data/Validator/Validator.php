@@ -95,7 +95,7 @@ class Validator
     {
       return true;
     }
-    if(strlen(intval($input)) == strlen($input))
+    if(is_scalar($input) && strlen((int)$input) == strlen($input))
     {
       return true;
     }
@@ -109,7 +109,7 @@ class Validator
     {
       return true;
     }
-    if(strlen(floatval($input)) == strlen($input))
+    if(is_scalar($input) && strlen((float)$input) == strlen($input))
     {
       return true;
     }
