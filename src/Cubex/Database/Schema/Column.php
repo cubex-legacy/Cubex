@@ -54,6 +54,8 @@ class Column
 
     $sql = "`" . $this->_name . "` ";
 
+    $numericColumn = in_array($this->_dataType, DataType::numericTypes());
+
     $sql .= strtoupper($this->_dataType);
 
     switch($this->_dataType)
@@ -89,7 +91,7 @@ class Column
       $sql .= " COLLATE " . $this->_collation . " ";
     }
 
-    if($this->_unsigned)
+    if($this->_unsigned && $numericColumn)
     {
       $sql .= " UNSIGNED";
     }

@@ -39,4 +39,18 @@ class DataType extends Enum
   const TIMESTAMP  = "timestamp";
   const ENUM       = "enum";
   const BOOL       = "bool";
+
+  public static function numericTypes()
+  {
+    return [
+      self::TINYINT,
+      self::SMALLINT,
+      self::MEDIUMINT,
+      self::INT,
+      self::BIGINT,
+      self::FLOAT,
+      self::DOUBLE,
+      self::DECIMAL,
+    ];
+  }
 }
