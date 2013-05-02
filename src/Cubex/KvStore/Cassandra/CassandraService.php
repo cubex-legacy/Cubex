@@ -212,13 +212,9 @@ class CassandraService implements IKvService
       }
       return true;
     }
-    catch(InvalidRequestException $e)
-    {
-      throw $this->cf($table)->formException($e);
-    }
     catch(\Exception $e)
     {
-      return false;
+      throw $this->cf($table)->formException($e);
     }
   }
 
@@ -229,13 +225,9 @@ class CassandraService implements IKvService
       $this->cf($table)->insert($key, $columns, $ttl);
       return true;
     }
-    catch(InvalidRequestException $e)
-    {
-      throw $this->cf($table)->formException($e);
-    }
     catch(\Exception $e)
     {
-      return false;
+      throw $this->cf($table)->formException($e);
     }
   }
 }
