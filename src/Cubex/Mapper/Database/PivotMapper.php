@@ -108,10 +108,10 @@ class PivotMapper extends RecordMapper
       $this->setTableName($table);
     }
 
-    $foreignKey = $pivotb->stringToColumnName($pivotb->remoteIdKey());
+    $foreignKey = $pivotb->remoteIdKey();
     $this->setPivotAKey($foreignKey);
 
-    $localKey = $pivota->stringToColumnName($pivota->remoteIdKey());
+    $localKey = $pivota->remoteIdKey();
     $this->setPivotBKey($localKey);
 
     $this->addAttribute($foreignKey);
