@@ -597,8 +597,13 @@ abstract class DataMapper
     $attribute = $this->_cleanAttributeName($attribute);
     if(!isset($this->_attributes[$attribute]))
     {
-      return false;
+      throw new \Exception(
+        "You cannot add a filter to '" .
+        $attribute . "' as it does not yet exist",
+        404
+      );
     }
+
     $attr = $this->_attributes[$attribute];
     if($attr instanceof Attribute)
     {
@@ -606,11 +611,9 @@ abstract class DataMapper
         $filter,
         $options
       );
-
-      return true;
     }
 
-    return false;
+    return $this;
   }
 
   protected function _addValidator($attribute, $validator, array $options = [])
@@ -619,8 +622,13 @@ abstract class DataMapper
     $attribute = $this->_cleanAttributeName($attribute);
     if(!isset($this->_attributes[$attribute]))
     {
-      return false;
+      throw new \Exception(
+        "You cannot add a validator to '" .
+        $attribute . "' as it does not yet exist",
+        404
+      );
     }
+
     $attr = $this->_attributes[$attribute];
     if($attr instanceof Attribute)
     {
@@ -628,18 +636,40 @@ abstract class DataMapper
         $validator,
         $options
       );
-
-      return true;
     }
 
-    return false;
+    return $this;
+  }
+
+  protected function _setSerializer(
+    $attribute, $serializer = Attribute::SERIALIZATION_JSON
+  )
+  {
+    $this->_checkAttributes();
+    $attribute = $this->_cleanAttributeName($attribute);
+    if(!isset($this->_attributes[$attribute]))
+    {
+      throw new \Exception(
+        "You cannot set the serializer on '" .
+        $attribute . "' as it does not yet exist",
+        404
+      );
+    }
+
+    $attr = $this->_attributes[$attribute];
+    if($attr instanceof Attribute)
+    {
+      $attr->setSerializer($serializer);
+    }
+    return $this;
   }
 
   /**
    * @param $attribute
    * @param $option
    *
-   * @return bool
+   * @return $this
+   * @throws \Exception
    */
   protected function _addAttributeOption($attribute, $option)
   {
@@ -647,17 +677,19 @@ abstract class DataMapper
     $attribute = $this->_cleanAttributeName($attribute);
     if(!isset($this->_attributes[$attribute]))
     {
-      return false;
+      throw new \Exception(
+        "You cannot add an option to '" .
+        $attribute . "' as it does not yet exist",
+        404
+      );
     }
     $attr = $this->_attributes[$attribute];
     if($attr instanceof Attribute)
     {
       $this->_attributes[$attribute] = $attr->addOption($option);
-
-      return true;
     }
 
-    return false;
+    return $this;
   }
 
   /**
