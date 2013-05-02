@@ -766,7 +766,7 @@ abstract class DataMapper
    */
   public function isModified()
   {
-    return $this->getModifiedAttributes() > 0;
+    return $this->getModifiedAttributes() !== [];
   }
 
   /**
