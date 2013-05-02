@@ -81,7 +81,7 @@ trait HandlerTrait
    */
   public function hydrate($data)
   {
-    $this->_data = $data;
+    $this->_data = (array)$data;
     return $this;
   }
 
@@ -108,7 +108,8 @@ trait HandlerTrait
     {
       return (int)$this->_data[$name];
     }
-    else {
+    else
+    {
       return $default;
     }
   }
@@ -125,7 +126,8 @@ trait HandlerTrait
     {
       return (float)$this->_data[$name];
     }
-    else {
+    else
+    {
       return $default;
     }
   }
@@ -148,11 +150,13 @@ trait HandlerTrait
       {
         return false;
       }
-      else {
+      else
+      {
         return (bool)$this->_data[$name];
       }
     }
-    else {
+    else
+    {
       return $default;
     }
   }
@@ -174,7 +178,8 @@ trait HandlerTrait
         (string)$this->_data[$name]
       );
     }
-    else {
+    else
+    {
       return $default;
     }
   }
@@ -191,7 +196,8 @@ trait HandlerTrait
     {
       return $this->_data[$name];
     }
-    else {
+    else
+    {
       return $default;
     }
   }
@@ -252,11 +258,13 @@ trait HandlerTrait
       {
         return $this->_data[$name];
       }
-      else {
+      else
+      {
         return (object)$this->_data[$name];
       }
     }
-    else {
+    else
+    {
       return $default;
     }
   }
