@@ -43,7 +43,10 @@ class CassandraMapper extends KvMapper
     return $this->connection()->cf($this->getTableName());
   }
 
-  public function setData($attribute, $value, $ttl = null, $serialized = false)
+  public function setData(
+    $attribute, $value, $ttl = null, $serialized = false,
+    $bypassValidation = false
+  )
   {
     if(!$this->attributeExists($attribute))
     {
@@ -51,7 +54,7 @@ class CassandraMapper extends KvMapper
       $a->setExpiry($ttl);
       $this->_addAttribute($a);
     }
-    return parent::setData($attribute, $value, $serialized);
+    return parent::setData($attribute, $value, $serialized, $bypassValidation);
   }
 
   public function setExpiry($attribute, $ttl)
@@ -136,7 +139,7 @@ class CassandraMapper extends KvMapper
    * @param bool|array $validate   all fields, or array of fields to validate
    * @param bool       $processAll Process all validators, or fail on first
    * @param bool       $failFirst  Perform all checks within a validator
-   * @param null $globalTtlSeconds
+   * @param null       $globalTtlSeconds
    *
    * @return bool|mixed
    */

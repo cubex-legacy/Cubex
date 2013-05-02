@@ -104,14 +104,16 @@ class KvMapper extends DataMapper
     }
   }
 
-  public function setData($attribute, $value, $serialized = false)
+  public function setData(
+    $attribute, $value, $serialized = false, $bypassValidation = false
+  )
   {
     if(!$this->attributeExists($attribute))
     {
       $a = new $this->_attributeType($attribute);
       $this->_addAttribute($a);
     }
-    return parent::setData($attribute, $value, $serialized);
+    return parent::setData($attribute, $value, $serialized, $bypassValidation);
   }
 
   /**
