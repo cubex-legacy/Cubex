@@ -39,12 +39,14 @@ class DatabaseQueue implements IQueueProvider
       $collection = new RecordCollection($mapper);
 
       $collection->runQuery(
-        "UPDATE %T SET %C = %d, %C = %s WHERE %C = %d LIMIT 1",
+        "UPDATE %T SET %C = %d, %C = %s WHERE %C = %s AND %C = %d LIMIT 1",
         $mapper->getTableName(),
         'locked',
         1,
         'locked_by',
         $ownkey,
+        'queue_name',
+        $queue->name(),
         'locked',
         0
       );
