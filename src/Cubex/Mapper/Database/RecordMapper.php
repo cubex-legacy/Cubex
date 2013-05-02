@@ -50,7 +50,7 @@ abstract class RecordMapper extends DataMapper
 
   public function remoteIdKey()
   {
-    $foreignKey = class_shortname($this) . '_id';
+    $foreignKey = class_shortname($this) . 'Id';
     return $this->stringToColumnName($foreignKey);
   }
 
