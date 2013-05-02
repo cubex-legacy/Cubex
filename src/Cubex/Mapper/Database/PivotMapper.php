@@ -133,7 +133,6 @@ class PivotMapper extends RecordMapper
       }
       catch(\Exception $e)
       {
-        echo $e->getMessage();
         $patterns[] = "%C = %s";
       }
     }
