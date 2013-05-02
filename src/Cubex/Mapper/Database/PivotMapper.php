@@ -20,13 +20,9 @@ class PivotMapper extends RecordMapper
   protected $_pivotaKey;
   protected $_pivotbKey;
 
-  public function __construct($ida = null, $idb = null, $columns = ['*'])
+  public function __construct(array $ids = null, $columns = ['*'])
   {
-    parent::__construct(null, $columns);
-    if($ida !== null && $idb !== null)
-    {
-      $this->load($ida, $idb, $columns);
-    }
+    parent::__construct($ids, $columns);
   }
 
   public function id()
@@ -187,12 +183,12 @@ class PivotMapper extends RecordMapper
     {
       $idb = $idb->id();
     }
-    $this->setId(func_get_args());
+    $this->setId([$ida, $idb]);
     return $this;
   }
 
 
-  public function load($ida, $idb, $columns = ['*'])
+  public function loadIds($ida, $idb, $columns = ['*'])
   {
     if($ida instanceof DataMapper)
     {
@@ -259,7 +255,7 @@ class PivotMapper extends RecordMapper
     $pivot->pivotOn($pivota, $pivotb);
     if($load)
     {
-      $pivot->load($pivota, $pivotb);
+      $pivot->load([$pivota, $pivotb]);
     }
     return $pivot;
   }
@@ -273,7 +269,7 @@ class PivotMapper extends RecordMapper
      * @var $pivot \Cubex\Mapper\Database\PivotMapper
      */
     $pivot->pivotOn($pivota, $pivotb);
-    $pivot->load($pivota, $pivotb);
+    $pivot->load([$pivota, $pivotb]);
     $pivot->saveChanges();
     return $pivot;
   }
@@ -290,7 +286,7 @@ class PivotMapper extends RecordMapper
         "You can only call this method on preconfigured mappers", 500
       );
     }
-    $pivot->load($id1, $id2);
+    $pivot->load([$id1, $id2]);
     $pivot->saveChanges();
     return $pivot;
   }
