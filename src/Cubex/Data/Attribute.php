@@ -159,7 +159,7 @@ class Attribute implements IValidatable, IFilterable, \JsonSerializable
 
   public function setData($data)
   {
-    if($data === $this->_data)
+    if($data === $this->rawData())
     {
       return $this;
     }
@@ -331,7 +331,7 @@ class Attribute implements IValidatable, IFilterable, \JsonSerializable
     return $this->_saveable;
   }
 
-  public function setSaveToDatabase($enabled=true)
+  public function setSaveToDatabase($enabled = true)
   {
     $this->_saveable = (bool)$enabled;
     return $this;
