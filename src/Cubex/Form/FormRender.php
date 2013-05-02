@@ -10,10 +10,12 @@ use Cubex\Foundation\IRenderable;
 class FormRender implements IRenderable
 {
   protected $_form;
+  protected $_groupType;
 
-  public function __construct(Form $form)
+  public function __construct(Form $form, $groupType = 'dl')
   {
-    $this->_form = $form;
+    $this->_form      = $form;
+    $this->_groupType = $groupType;
   }
 
   protected function _renderOpening()
@@ -26,6 +28,17 @@ class FormRender implements IRenderable
     return $out;
   }
 
+  public function setGroupType($groupType = 'dl')
+  {
+    $this->_groupType = $groupType;
+    return $this;
+  }
+
+  public function getGroupType()
+  {
+    return $this->_groupType;
+  }
+
   protected function _renderClosing()
   {
     return $this->_form->close();
@@ -34,12 +47,12 @@ class FormRender implements IRenderable
   public function render()
   {
     $out = $this->_renderOpening();
-    $out .= '<dl class="cubexform">';
+    $out .= '<' . $this->_groupType . ' class="cubexform">';
     foreach($this->_form->elements() as $element)
     {
       $out .= (new FormElementRender($element))->render();
     }
-    $out .= '</dl>';
+    $out .= '</' . $this->_groupType . '>';
     $out .= $this->_renderClosing();
     return $out;
   }

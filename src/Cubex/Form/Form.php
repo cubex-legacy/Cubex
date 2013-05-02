@@ -31,6 +31,7 @@ class Form extends DataMapper implements IRenderable
   protected $_validatedHour;
   protected $_autoTimestamp = false;
   protected $_elementRenderTemplate;
+  protected $_renderGroupType = 'dl';
   protected $_schemaType = self::SCHEMA_AS_IS;
   /**
    * @var DataMapper
@@ -783,7 +784,7 @@ class Form extends DataMapper implements IRenderable
 
   public function render()
   {
-    return (new FormRender($this))->render();
+    return (new FormRender($this, $this->_renderGroupType))->render();
   }
 
   public function __toString()
@@ -812,5 +813,16 @@ class Form extends DataMapper implements IRenderable
     }
 
     return $rawAttributes;
+  }
+
+  public function getRenderGroupType()
+  {
+    return $this->_renderGroupType;
+  }
+
+  public function setRenderGroupType($groupType = 'dl')
+  {
+    $this->_renderGroupType = $groupType;
+    return $this;
   }
 }
