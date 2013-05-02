@@ -41,6 +41,16 @@ class Session implements ISessionService
   }
 
   /**
+   * @return $this
+   */
+  public function regenerateId()
+  {
+    session_regenerate_id();
+    
+    return $this;
+  }
+
+  /**
    * @param string $key
    *
    * @return mixed|null
