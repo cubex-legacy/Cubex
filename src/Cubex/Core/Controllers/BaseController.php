@@ -59,6 +59,8 @@ class BaseController
   protected $_actionFiltersBefore = [];
   protected $_actionFiltersAfter = [];
 
+  protected $_preActionResult;
+
 
   /**
    * @param \Cubex\Core\Application\Application f$app
@@ -108,7 +110,7 @@ class BaseController
       if($canProcess !== true)
       {
         if($canProcess instanceof Redirect
-          || $canProcess instanceof IRenderable
+        || $canProcess instanceof IRenderable
         )
         {
           $actionResponse = $canProcess;
@@ -220,7 +222,7 @@ class BaseController
       }
 
       if(($route === null || $this->_routeIsEmpty($route))
-        && $this->request()->is('POST')
+      && $this->request()->is('POST')
       )
       {
         $route = $this->_attemptRoutes(
@@ -311,7 +313,8 @@ class BaseController
    */
   public function runAction($action, $params)
   {
-    $action = trim($action);
+    $action     = trim($action);
+    $callaction = \ucfirst($action);
 
     if($action === null)
     {
@@ -324,29 +327,31 @@ class BaseController
 
     if($this->request()->isAjax())
     {
-      $attempts[] = 'ajax' . \ucfirst($action);
+      $attempts[] = 'ajax' . $callaction;
     }
 
     if($this->request()->is('POST'))
     {
-      $attempts[] = 'post' . \ucfirst($action);
+      $attempts[] = 'post' . $callaction;
     }
 
-    $attempts[] = 'render' . ucfirst($action);
-    $attempts[] = 'action' . ucfirst($action);
+    $attempts[] = 'render' . $callaction;
+    $attempts[] = 'action' . $callaction;
     $attempts[] = $action;
+
+    if(method_exists($this, 'pre' . $callaction))
+    {
+      $this->_preActionResult = call_user_func_array(
+        [$this, 'pre' . $callaction],
+        $params
+      );
+    }
 
     foreach($attempts as $attempt)
     {
       if(method_exists($this, $attempt))
       {
-        return call_user_func_array(
-          [
-          $this,
-          $attempt
-          ],
-          $params
-        );
+        return call_user_func_array([$this, $attempt], $params);
       }
     }
 
