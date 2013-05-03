@@ -300,6 +300,22 @@ class Shell
   }
 
   /**
+   * Hide the cursor
+   */
+  public static function hideCursor()
+  {
+    echo "\033[?25l";
+  }
+
+  /**
+   * Show the cursor
+   */
+  public static function showCursor()
+  {
+    echo "\033[?12l\033[?25h";
+  }
+
+  /**
    * Redraw the screen without clearing it first to avoid flicker
    *
    * @param string $newContent
