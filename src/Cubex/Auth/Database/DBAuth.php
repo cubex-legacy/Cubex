@@ -5,13 +5,11 @@
 
 namespace Cubex\Auth\Database;
 
-use Cubex\Auth\IAuthService;
 use Cubex\Auth\IAuthedUser;
 use Cubex\Auth\BaseAuthService;
 use Cubex\Auth\ILoginCredentials;
 use Cubex\Auth\StdAuthedUser;
 use Cubex\Container\Container;
-use Cubex\Facade\Encryption;
 use Cubex\Facade\Session;
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\ServiceManager\IServiceManagerAware;
@@ -83,9 +81,9 @@ class DBAuth extends BaseAuthService implements IServiceManagerAware
     return $this->_getResult(
       "%C = %s AND %C = %s",
       $this->_fields['username'],
-      $credentials->username(),
+      $credentials->getUsername(),
       $this->_fields['password'],
-      $credentials->password()
+      $credentials->getPassword()
     );
   }
 

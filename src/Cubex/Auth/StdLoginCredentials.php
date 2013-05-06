@@ -36,7 +36,7 @@ class StdLoginCredentials implements ILoginCredentials
   /**
    * @return mixed
    */
-  public function username()
+  public function getUsername()
   {
     return $this->_username;
   }
@@ -44,7 +44,7 @@ class StdLoginCredentials implements ILoginCredentials
   /**
    * @return mixed
    */
-  public function password()
+  public function getPassword()
   {
     return $this->_password;
   }

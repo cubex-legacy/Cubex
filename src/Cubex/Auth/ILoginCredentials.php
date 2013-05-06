@@ -10,10 +10,10 @@ interface ILoginCredentials
   /**
    * @return mixed
    */
-  public function username();
+  public function getUsername();
 
   /**
    * @return mixed
    */
-  public function password();
+  public function getPassword();
 }

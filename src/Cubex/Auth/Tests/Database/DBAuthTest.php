@@ -74,11 +74,11 @@ class DBAuthTest extends TestCase
     $credentialsMock = $this->getMock("\\Cubex\\Auth\\ILoginCredentials");
 
     $credentialsMock->expects($this->exactly(2))
-      ->method("username")
+      ->method("getUsername")
       ->will($this->returnValue("username"));
 
     $credentialsMock->expects($this->exactly(2))
-      ->method("password")
+      ->method("getPassword")
       ->will($this->returnValue("password"));
 
     $this->_mockDbConnection->expects($this->exactly(2))

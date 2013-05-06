@@ -19,14 +19,14 @@ class StdLoginCredentialsTest extends TestCase
       $this->_username, $this->_password
     );
 
-    $this->assertEquals($this->_username, $stdLoginCredentials->username());
-    $this->assertEquals($this->_password, $stdLoginCredentials->password());
+    $this->assertEquals($this->_username, $stdLoginCredentials->getUsername());
+    $this->assertEquals($this->_password, $stdLoginCredentials->getPassword());
 
     $stdLoginCredentials->setUsername("username1");
     $stdLoginCredentials->setPassword("password1");
 
-    $this->assertEquals("username1", $stdLoginCredentials->username());
-    $this->assertEquals("password1", $stdLoginCredentials->password());
+    $this->assertEquals("username1", $stdLoginCredentials->getUsername());
+    $this->assertEquals("password1", $stdLoginCredentials->getPassword());
   }
 
   public function testMake()
@@ -39,7 +39,7 @@ class StdLoginCredentialsTest extends TestCase
       "\\Cubex\\Auth\\StdLoginCredentials", $stdLoginCredentials
     );
 
-    $this->assertEquals($this->_username, $stdLoginCredentials->username());
-    $this->assertEquals($this->_password, $stdLoginCredentials->password());
+    $this->assertEquals($this->_username, $stdLoginCredentials->getUsername());
+    $this->assertEquals($this->_password, $stdLoginCredentials->getPassword());
   }
 }
