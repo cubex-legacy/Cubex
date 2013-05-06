@@ -46,7 +46,7 @@ class Session implements ISessionService
   public function regenerateId()
   {
     session_regenerate_id();
-    
+
     return $this;
   }
 
