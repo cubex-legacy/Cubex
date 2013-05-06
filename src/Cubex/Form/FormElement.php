@@ -341,7 +341,7 @@ class FormElement extends Attribute implements IRenderable
         }
         $this->addAttribute("autocomplete", $autoComplete);
         break;
-      case "bool":
+      case "boolean":
         $this->issetAttribute("autocomplete", $autoComplete ? "on" : "off");
         break;
       case "NULL":
