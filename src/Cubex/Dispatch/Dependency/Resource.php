@@ -222,7 +222,7 @@ class Resource extends Dependency
       $file = "$file.$type";
     }
 
-    if(preg_match("~#(\w+/\w+)#(.*)~", $file, $matches))
+    if(preg_match(static::PACKAGE_REGEX, $file, $matches))
     {
       $event->setPackage($matches[1]);
       $file = $matches[2];

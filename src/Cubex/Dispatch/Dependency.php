@@ -43,7 +43,7 @@ class Dependency extends Dispatcher
 
     if($package)
     {
-      $entityHash .= ";" . $this->getExternalHash();
+      $entityHash = $this->getPackageEntityHash($this->getExternalHash());
     }
 
     $ini = $this->getDispatchIni($entity);

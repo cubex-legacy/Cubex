@@ -304,10 +304,23 @@ class Serve extends Dispatcher implements IDispatchable
    */
   public function dispatchUrlWrappedUrl($data)
   {
+    $package = false;
+
+    if(preg_match(static::PACKAGE_REGEX, $data[1], $matches))
+    {
+      $entityHash = $this->getPackageEntityHash(
+        $this->generateEntityHash($matches[1])
+      );
+      $this->getDispatchPath()->setEntityHash($entityHash);
+      $data[1] = $matches[2];
+      $package = true;
+    }
+
     $uri = $this->dispatchUri(
       $data[1],
       $this->getDispatchPath()->getEntityHash(),
-      $this->getDispatchPath()->getDomainHash()
+      $this->getDispatchPath()->getDomainHash(),
+      $package
     );
 
     return "url('$uri')";

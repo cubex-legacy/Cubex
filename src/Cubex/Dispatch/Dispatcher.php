@@ -58,6 +58,8 @@ class Dispatcher
   const BUILD_OPT_TYPE_DOMAIN    = "domain";
   const BUILD_OPT_TYPE_SUBDOMAIN = "subdomain";
 
+  const PACKAGE_REGEX = "~#(\w+/\w+)#(.*)~";
+
   private static $_dispatchInis = [];
   private static $_entities;
   private static $_externalEntities;
@@ -339,6 +341,16 @@ class Dispatcher
       "main" => "{$filename}.{$fileExtension}",
       "post" => "{$filename}.post.{$fileExtension}"
     );
+  }
+
+  /**
+   * @param string $originalEntityHash
+   *
+   * @return string
+   */
+  public function getPackageEntityHash($originalEntityHash)
+  {
+    return $originalEntityHash . ";" . $this->getExternalHash();
   }
 
   /*****************************************************************************
@@ -625,10 +637,11 @@ class Dispatcher
    * @param string $uri
    * @param string $entityHash
    * @param string $domainHash
+   * @param bool   $package
    *
    * @return string
    */
-  public function dispatchUri($uri, $entityHash, $domainHash)
+  public function dispatchUri($uri, $entityHash, $domainHash, $package = false)
   {
     $uri = trim($uri, "'\" \r\t\n");
 
@@ -639,8 +652,12 @@ class Dispatcher
 
     if(substr($uri, 0, 1) === "/")
     {
-      $uri        = substr($uri, 1);
-      $entityHash = $this->getBaseHash();
+      $uri = substr($uri, 1);
+
+      if(!$package)
+      {
+        $entityHash = $this->getBaseHash();
+      }
     }
 
     $entityMap    = false;

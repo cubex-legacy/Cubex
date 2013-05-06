@@ -32,7 +32,7 @@ class Image extends Dependency
       return $file;
     }
 
-    if(preg_match("~#(\w+/\w+)#(.*)~", $file, $matches))
+    if(preg_match(static::PACKAGE_REGEX, $file, $matches))
     {
       $event->setPackage($matches[1]);
       $file = $matches[2];

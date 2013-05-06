@@ -358,8 +358,9 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
     try
     {
-      $dispatchPath  = new \Cubex\Dispatch\DispatchPath($this->request()->path(
-      ));
+      $dispatchPath  = new \Cubex\Dispatch\DispatchPath(
+        $this->request()->path()
+      );
       $dispatchServe = new \Cubex\Dispatch\Serve(
         $this->getConfig(),
         new \Cubex\FileSystem\FileSystem(),
