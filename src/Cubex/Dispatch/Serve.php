@@ -304,7 +304,8 @@ class Serve extends Dispatcher implements IDispatchable
    */
   public function dispatchUrlWrappedUrl($data)
   {
-    $package = false;
+    $package       = false;
+    $oldEntytyHash = $this->getDispatchPath()->getEntityHash();
 
     if(preg_match(static::PACKAGE_REGEX, $data[1], $matches))
     {
@@ -322,6 +323,8 @@ class Serve extends Dispatcher implements IDispatchable
       $this->getDispatchPath()->getDomainHash(),
       $package
     );
+
+    $this->getDispatchPath()->setEntityHash($oldEntytyHash);
 
     return "url('$uri')";
   }
