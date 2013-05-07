@@ -27,7 +27,7 @@ class TextTable
 
   public function __construct(ITextTableDecorator $decorator = null)
   {
-    if(CUBEX_CLI)
+    if(CUBEX_CLI && (! Shell::isPiped()))
     {
       $this->setMaxTableWidth(Shell::columns());
     }
