@@ -143,6 +143,11 @@ class Shell
    */
   public static function columns($default = 80)
   {
+    if(self::isPiped())
+    {
+      return $default;
+    }
+
     $cacheKey = 'columns';
     $cols = ExpiringEphemeralCache::getCache($cacheKey, __CLASS__, null);
 
