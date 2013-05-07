@@ -239,13 +239,13 @@ class ColumnFamily
 
   public function columnCount($key, array $columnNames = null)
   {
-    $parent = $this->_columnParent();
-    $level  = $this->readConsistencyLevel();
+    $parent      = $this->_columnParent();
+    $level       = $this->readConsistencyLevel();
     $columnNames = $this->prepareDataType(
       $this->columnDataType(),
       $columnNames
     );
-    $slice  = new SlicePredicate(['column_names' => $columnNames]);
+    $slice       = new SlicePredicate(['column_names' => $columnNames]);
     try
     {
       if(is_array($key))
@@ -731,33 +731,50 @@ class ColumnFamily
 
   public function increment($key, $column, $increment = 1)
   {
-    $key            = $this->keyDataType()->pack($key);
-    $level          = $this->writeConsistencyLevel();
-    $parent         = $this->_columnParent();
-    $counter        = new CounterColumn();
-    $counter->value = abs($increment);
-    $counter->name  = $this->prepareDataType($this->columnDataType(), $column);
-    try
-    {
-      $this->_client()->add($key, $parent, $counter, $level);
-    }
-    catch(\Exception $e)
-    {
-      throw $this->formException($e);
-    }
+    return $this->_updateCounter($key, $column, abs($increment));
   }
 
   public function decrement($key, $column, $decrement = 1)
+  {
+    return $this->_updateCounter($key, $column, abs($decrement) * -1);
+  }
+
+  protected function _updateCounter($key, $column, $change)
   {
     $key            = $this->keyDataType()->pack($key);
     $level          = $this->writeConsistencyLevel();
     $parent         = $this->_columnParent();
     $counter        = new CounterColumn();
-    $counter->value = abs($decrement) * -1;
+    $counter->value = $change;
     $counter->name  = $this->prepareDataType($this->columnDataType(), $column);
     try
     {
-      $this->_client()->add($key, $parent, $counter, $level);
+      if(!$this->isBatchOpen())
+      {
+        $this->_client()->add($key, $parent, $counter, $level);
+      }
+      else
+      {
+        $mutations[] = new Mutation(
+          [
+          'column_or_supercolumn' => new ColumnOrSuperColumn(
+            ['counter_column' => $counter]
+          )
+          ]
+        );
+
+        if(isset($this->_batchMutation[$key][$this->name()]))
+        {
+          $this->_batchMutation[$key][$this->name()] = array_merge(
+            (array)$this->_batchMutation[$key][$this->name()],
+            $mutations
+          );
+        }
+        else
+        {
+          $this->_batchMutation[$key][$this->name()] = $mutations;
+        }
+      }
     }
     catch(\Exception $e)
     {
