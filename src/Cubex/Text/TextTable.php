@@ -166,7 +166,7 @@ class TextTable
 
     $maxDataWidth = $this->_calculateMaxDataWidth();
     $totalDataWidth = array_sum($this->_columnWidths);
-    if($totalDataWidth > $maxDataWidth)
+    if(($maxDataWidth !== null) && ($totalDataWidth > $maxDataWidth))
     {
       if($this->_fixedLayout ||
       ($this->_columnWidths[0] > $maxDataWidth)
