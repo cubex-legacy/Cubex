@@ -21,10 +21,13 @@ class DependencyArray
   public function add($item, $dependsOn = array())
   {
     $this->_items[] = $item;
-    foreach($dependsOn as $dependsOnItem)
+    if(is_array($dependsOn))
     {
-      $this->_items[]                   = $dependsOnItem;
-      $this->_depends[$dependsOnItem][] = $item;
+      foreach($dependsOn as $dependsOnItem)
+      {
+        $this->_items[]                   = $dependsOnItem;
+        $this->_depends[$dependsOnItem][] = $item;
+      }
     }
 
     $this->_items                = array_unique($this->_items);
