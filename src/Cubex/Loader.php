@@ -528,8 +528,9 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
     $hash = md5(serialize($_SERVER));
 
-    return substr(md5(implode('.', $host)), 0, 10) .
-      time() . substr($hash, 0, 8);
+    $transactionId = substr(md5(implode('.', $host)), 0, 10);
+    $transactionId .= time() . substr($hash, 0, 8);
+    return $transactionId;
   }
 
   /**
@@ -747,8 +748,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
         $this->handleException(
           new \RuntimeException(
             "Your CLI command '$originalCommand' could not be located." .
-              "\n\nThe following classes (in order) were attempted: \n\n\t" .
-              implode("\n\t", $attempted), 404
+            "\n\nThe following classes (in order) were attempted: \n\n\t" .
+            implode("\n\t", $attempted), 404
           )
         );
       }
