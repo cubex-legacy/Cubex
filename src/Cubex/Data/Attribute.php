@@ -300,7 +300,14 @@ class Attribute implements IValidatable, IFilterable, \JsonSerializable
     switch($this->getSerializer())
     {
       case self::SERIALIZATION_JSON:
-        return json_decode($data);
+        if(is_scalar($data))
+        {
+          return json_decode($data);
+        }
+        else
+        {
+          return json_decode(json_encode($data));
+        }
       case self::SERIALIZATION_PHP:
         return unserialize($data);
     }
