@@ -24,7 +24,7 @@ abstract class ViewModel implements IRenderable, ITranslatable
   {
     try
     {
-      return $this->render();
+      return (string)$this->render();
     }
     catch(\Exception $e)
     {
