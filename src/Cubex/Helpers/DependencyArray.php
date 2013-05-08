@@ -65,12 +65,14 @@ class DependencyArray
   protected function _satisfied($item, $addedSoFar)
   {
     $dependencies = $this->_hasDependency[$item];
-
-    foreach($dependencies as $dependency)
+    if(is_array($dependencies))
     {
-      if(!in_array($dependency, $addedSoFar))
+      foreach($dependencies as $dependency)
       {
-        return false;
+        if(!in_array($dependency, $addedSoFar))
+        {
+          return false;
+        }
       }
     }
 
