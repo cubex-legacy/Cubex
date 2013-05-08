@@ -79,7 +79,7 @@ trait PhtmlParser
       $rendered .= $this->_renderFile($file, $checkExists);
     }
 
-    return $rendered;
+    return (string)$rendered;
   }
 
   public function processRaw($raw)

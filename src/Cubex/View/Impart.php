@@ -32,6 +32,7 @@ class Impart implements IRenderable
 
   /**
    * @param $content
+   *
    * @return $this
    */
   public function setContent($content)
@@ -45,6 +46,6 @@ class Impart implements IRenderable
    */
   public function render()
   {
-    return $this->_content;
+    return (string)$this->_content;
   }
 }

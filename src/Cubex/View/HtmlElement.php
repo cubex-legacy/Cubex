@@ -152,7 +152,7 @@ class HtmlElement implements IRenderable
 
     $return .= $this->_postRender->render();
 
-    return $return;
+    return (string)$return;
   }
 
   /**

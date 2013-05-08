@@ -61,7 +61,7 @@ class RenderGroup implements IRenderable
       }
     }
 
-    return $render;
+    return (string)$render;
   }
 
   public function __toString()
