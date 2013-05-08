@@ -185,6 +185,11 @@ abstract class Application
       }
     }
 
+    if(empty($dispatcherResult))
+    {
+      $dispatcherResult = $this->defaultController();
+    }
+
     if(is_callable($dispatcherResult))
     {
       $dispatcher = $dispatcherResult();
