@@ -22,6 +22,22 @@ class PivotMapper extends RecordMapper
 
   public function __construct(array $ids = null, $columns = ['*'])
   {
+    if($ids !== null)
+    {
+      $loadIds = [];
+      foreach($ids as $id)
+      {
+        if($id instanceof DataMapper)
+        {
+          $loadIds[] = $id->id();
+        }
+        else
+        {
+          $loadIds[] = $id;
+        }
+      }
+      $ids = $loadIds;
+    }
     parent::__construct($ids, $columns);
   }
 
