@@ -43,13 +43,16 @@ class DependencyArray
     while(count($order) < $itmCount && $hasChanged === true)
     {
       $hasChanged = false;
-      foreach($this->_hasDependency as $item => $dependencies)
+      if(is_array($this->_hasDependency))
       {
-        if($this->_satisfied($item, $order))
+        foreach($this->_hasDependency as $item => $dependencies)
         {
-          $order[] = $item;
-          unset($this->_hasDependency[$item]);
-          $hasChanged = true;
+          if($this->_satisfied($item, $order))
+          {
+            $order[] = $item;
+            unset($this->_hasDependency[$item]);
+            $hasChanged = true;
+          }
         }
       }
     }
