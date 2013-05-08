@@ -96,6 +96,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
     define("CUBEX_TRANSACTION", $this->createTransaction());
 
+    \Cubex\Core\Loader\ClassAliasLoader::register();
+
     \Cubex\Container\Container::bind(\Cubex\Container\Container::LOADER, $this);
   }
 
@@ -527,7 +529,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     $hash = md5(serialize($_SERVER));
 
     return substr(md5(implode('.', $host)), 0, 10) .
-    time() . substr($hash, 0, 8);
+      time() . substr($hash, 0, 8);
   }
 
   /**
@@ -745,8 +747,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
         $this->handleException(
           new \RuntimeException(
             "Your CLI command '$originalCommand' could not be located." .
-            "\n\nThe following classes (in order) were attempted: \n\n\t" .
-            implode("\n\t", $attempted), 404
+              "\n\nThe following classes (in order) were attempted: \n\n\t" .
+              implode("\n\t", $attempted), 404
           )
         );
       }
