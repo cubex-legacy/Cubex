@@ -21,13 +21,11 @@ class DependencyArray
   public function add($item, $dependsOn = array())
   {
     $this->_items[] = $item;
-    if(is_array($dependsOn))
+    $dependsOn      = (array)$dependsOn;
+    foreach($dependsOn as $dependsOnItem)
     {
-      foreach($dependsOn as $dependsOnItem)
-      {
-        $this->_items[]                   = $dependsOnItem;
-        $this->_depends[$dependsOnItem][] = $item;
-      }
+      $this->_items[]                   = $dependsOnItem;
+      $this->_depends[$dependsOnItem][] = $item;
     }
 
     $this->_items                = array_unique($this->_items);
@@ -42,17 +40,15 @@ class DependencyArray
     $hasChanged = true;
     while(count($order) < $itmCount && $hasChanged === true)
     {
-      $hasChanged = false;
-      if(is_array($this->_hasDependency))
+      $hasChanged           = false;
+      $this->_hasDependency = (array)$this->_hasDependency;
+      foreach($this->_hasDependency as $item => $dependencies)
       {
-        foreach($this->_hasDependency as $item => $dependencies)
+        if($this->_satisfied($item, $order))
         {
-          if($this->_satisfied($item, $order))
-          {
-            $order[] = $item;
-            unset($this->_hasDependency[$item]);
-            $hasChanged = true;
-          }
+          $order[] = $item;
+          unset($this->_hasDependency[$item]);
+          $hasChanged = true;
         }
       }
     }
@@ -68,14 +64,12 @@ class DependencyArray
   protected function _satisfied($item, $addedSoFar)
   {
     $dependencies = $this->_hasDependency[$item];
-    if(is_array($dependencies))
+    $dependencies = (array)$dependencies;
+    foreach($dependencies as $dependency)
     {
-      foreach($dependencies as $dependency)
+      if(!in_array($dependency, $addedSoFar))
       {
-        if(!in_array($dependency, $addedSoFar))
-        {
-          return false;
-        }
+        return false;
       }
     }
 
