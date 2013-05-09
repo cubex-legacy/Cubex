@@ -18,6 +18,7 @@ class ResourceTemplate implements IRouteTemplate
     $routes[] = new StdRoute('/new', 'new');
     $routes[] = new StdRoute('/:id/edit', 'edit');
     $routes[] = new StdRoute('/:id', 'update', ['PUT', 'POST']);
+    $routes[] = new StdRoute('/:id/delete', 'destroy');
     $routes[] = new StdRoute('/:id', 'destroy', ['DELETE']);
     $routes[] = (
     new StdRoute('/:id', 'show', ['ANY']))
