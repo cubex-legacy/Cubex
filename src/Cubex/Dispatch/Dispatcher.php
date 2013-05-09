@@ -62,7 +62,6 @@ class Dispatcher
 
   private static $_dispatchInis = [];
   private static $_entities;
-  private static $_externalEntities;
   /**
    * @var \Cubex\Foundation\Config\Config
    */
@@ -552,34 +551,6 @@ class Dispatcher
       }
     }
 
-    if(self::$_externalEntities === null)
-    {
-      self::$_externalEntities = $mapper->findExternalEntities();
-    }
-
-    // We don't really know how much of the directory to use so we just explode
-    // it and work backwards hoping for the best
-    foreach(self::$_externalEntities as $entity)
-    {
-      $entityParts    = explode("/", $entity);
-      $attemptedParts = [];
-
-      do
-      {
-        end($entityParts);
-        $attemptedParts[key($entityParts)] = array_pop($entityParts);
-        ksort($attemptedParts);
-
-        $rebuiltEntity = implode("/", $attemptedParts);
-
-        if($this->generateEntityHash($rebuiltEntity, strlen($hash)) === $hash)
-        {
-          return $entity;
-        }
-      }
-      while($entityParts);
-    }
-
     return null;
   }
 
@@ -645,7 +616,7 @@ class Dispatcher
   {
     $uri = trim($uri, "'\" \r\t\n");
 
-    if($this->isExternalUri($uri))
+    if($this->isResolvableUri($uri))
     {
       return $uri;
     }
@@ -693,13 +664,13 @@ class Dispatcher
   }
 
   /**
-   * Determine if a resource is external
+   * Determine if a resource is resolvable
    *
    * @param $uri
    *
    * @return bool
    */
-  public function isExternalUri($uri)
+  public function isResolvableUri($uri)
   {
     foreach(["http://", "https://", "//", "data:"] as $protocol)
     {

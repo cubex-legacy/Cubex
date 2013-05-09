@@ -93,22 +93,24 @@ class Resource extends Dependency
    *
    * @param Resource\TypeEnum $type
    */
-  public function mergeDuplicateExternalUris(TypeEnum $type)
+  public function mergeDuplicateResolvableUris(TypeEnum $type)
   {
     $resourceUris = ipull(self::$_requires[(string)$type], "uri");
-    $externalUris = array_filter($resourceUris, [$this, "isExternalUri"]);
+    $resolvableUris = array_filter($resourceUris, [$this, "isResolvableUri"]);
 
-    $externalUriByProtocol = $this->mapUrisByPriorotisedProtocol($externalUris);
+    $resolvableUriByProtocol = $this->mapUrisByPriorotisedProtocol(
+      $resolvableUris
+    );
 
     $mergedUri = [];
 
     foreach($this->_priorotisedProtocols as $protocol)
     {
-      foreach($externalUriByProtocol[$protocol] as $strippedUri => $originalKey)
+      foreach($resolvableUriByProtocol[$protocol] as $strippedUri => $origKey)
       {
         if(array_key_exists($strippedUri, $mergedUri))
         {
-          unset(self::$_requires[(string)$type][$originalKey]);
+          unset(self::$_requires[(string)$type][$origKey]);
         }
         else
         {
@@ -152,24 +154,27 @@ class Resource extends Dependency
    */
   public function mapUrisByPriorotisedProtocol(array $uris)
   {
-    $externalUriByProtocol = array_fill_keys($this->_priorotisedProtocols, []);
+    $resolvableUriByProtocol = array_fill_keys(
+      $this->_priorotisedProtocols,
+      []
+    );
 
-    foreach($uris as $originalKey => $externalUri)
+    foreach($uris as $originalKey => $resolvableUri)
     {
       foreach($this->_priorotisedProtocols as $protocol)
       {
-        if(strpos($externalUri, $protocol) === 0)
+        if(strpos($resolvableUri, $protocol) === 0)
         {
           $strippedUri                                    = substr(
-            $externalUri,
+            $resolvableUri,
             strlen($protocol)
           );
-          $externalUriByProtocol[$protocol][$strippedUri] = $originalKey;
+          $resolvableUriByProtocol[$protocol][$strippedUri] = $originalKey;
         }
       }
     }
 
-    return $externalUriByProtocol;
+    return $resolvableUriByProtocol;
   }
 
   /**
@@ -177,9 +182,9 @@ class Resource extends Dependency
    */
   public function requireResource(DispatchEvent $event)
   {
-    if($this->isExternalUri($event->getFile()))
+    if($this->isResolvableUri($event->getFile()))
     {
-      $this->requireExternalResource($event);
+      $this->requireResolvableResource($event);
     }
     elseif(array_key_exists(
       $event->getFile(),
@@ -201,10 +206,10 @@ class Resource extends Dependency
   /**
    * @param \Cubex\Dispatch\DispatchEvent $event
    */
-  public function requireExternalResource(DispatchEvent $event)
+  public function requireResolvableResource(DispatchEvent $event)
   {
     $this->_requireResource($event, true);
-    $this->mergeDuplicateExternalUris($event->getType());
+    $this->mergeDuplicateResolvableUris($event->getType());
   }
 
   /**
@@ -247,7 +252,10 @@ class Resource extends Dependency
    *
    * @throws \InvalidArgumentException
    */
-  public function requireThirdpartyResource(DispatchEvent $event, Request $request)
+  public function requireThirdpartyResource(
+    DispatchEvent $event,
+    Request $request
+  )
   {
     $library = $event->getFile();
     $type    = $event->getType();
@@ -287,13 +295,13 @@ class Resource extends Dependency
 
   /**
    * @param \Cubex\Dispatch\DispatchEvent $event
-   * @param bool                  $external
+   * @param bool                          $resolvable
    */
-  protected function _requireResource(DispatchEvent $event, $external = false)
+  protected function _requireResource(DispatchEvent $event, $resolvable = false)
   {
     $resource = $event->getFile();
 
-    if($external)
+    if($resolvable)
     {
       $uri   = $resource;
       $group = "fullpath";

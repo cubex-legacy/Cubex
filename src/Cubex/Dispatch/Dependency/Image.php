@@ -27,7 +27,7 @@ class Image extends Dependency
   {
     $file = $event->getFile();
 
-    if($this->isExternalUri($file))
+    if($this->isResolvableUri($file))
     {
       return $file;
     }
