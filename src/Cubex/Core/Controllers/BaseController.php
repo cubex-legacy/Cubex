@@ -457,8 +457,16 @@ class BaseController
         }
         else if(is_array($routeResult))
         {
-          $subRoutes = StdRoute::fromArray($routeResult);
-          $route     = new StdRoute($routePattern, '');
+          try
+          {
+            assert_instances_of($routeResult, '\Cubex\Routing\IRoute');
+            $subRoutes = $routeResult;
+          }
+          catch(\Exception $e)
+          {
+            $subRoutes = StdRoute::fromArray($routeResult);
+          }
+          $route = new StdRoute($routePattern, '');
           foreach($subRoutes as $sr)
           {
             $route->addSubRoute($sr);
