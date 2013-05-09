@@ -19,6 +19,7 @@ abstract class CliCommand implements ICliTask
    */
   protected $_autoLog = true;
   protected $_echoLevel = LogLevel::ERROR;
+  protected $_defaultLogLevel = LogLevel::EMERGENCY;
   /**
    * @var CliLogger
    */
@@ -71,7 +72,9 @@ abstract class CliCommand implements ICliTask
      */
     if($this->_autoLog)
     {
-      $this->_logger = new CliLogger($this->_echoLevel, LogLevel::EMERGENCY);
+      $this->_logger = new CliLogger(
+        $this->_echoLevel, $this->_defaultLogLevel
+      );
     }
     $this->_loader  = $loader;
     $this->_rawArgs = $rawArgs;

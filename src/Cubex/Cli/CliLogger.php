@@ -96,6 +96,11 @@ class CliLogger
     return $logsDir;
   }
 
+  public function setInstanceName($instanceName)
+  {
+    $this->_logFilePath = $this->_getLogFilePath("", $instanceName);
+  }
+
   protected function _getConfigOption($option, $default = "")
   {
     $conf = Container::config()->get('cli_logger');
