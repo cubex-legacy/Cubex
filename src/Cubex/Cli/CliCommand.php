@@ -97,6 +97,11 @@ abstract class CliCommand implements ICliTask
       $this->_help();
       die();
     }
+
+    if($this->_autoLog && $this->argumentIsSet('log-level'))
+    {
+      $this->_logger->setLogLevel($this->argumentValue('log-level'));
+    }
   }
 
   /**
@@ -163,6 +168,47 @@ abstract class CliCommand implements ICliTask
           'Argument name used for more than one argument: ' . $arg->name
         );
       }
+      $this->_argsByName[$arg->name] = $arg;
+    }
+
+    static::_addLogLevelArgIfRequired();
+  }
+
+  protected function _addLogLevelArgIfRequired()
+  {
+    if(! isset($this->_argsByName['log-level']))
+    {
+      $arg = new CliArgument(
+        'log-level', 'Set the logging level', '',
+        CliArgument::VALUE_REQUIRED, 'level'
+      );
+
+      $arg->addFilter(
+        function ($value)
+        {
+          return strtolower(trim($value));
+        }
+      );
+      $arg->addValidator(
+        function ($value)
+        {
+          switch($value)
+          {
+            case LogLevel::EMERGENCY:
+            case LogLevel::ALERT:
+            case LogLevel::CRITICAL:
+            case LogLevel::ERROR:
+            case LogLevel::WARNING:
+            case LogLevel::NOTICE:
+            case LogLevel::INFO:
+            case LogLevel::DEBUG:
+              return true;
+          }
+          return false;
+        }
+      );
+
+      $this->_options[] = $arg;
       $this->_argsByName[$arg->name] = $arg;
     }
   }
