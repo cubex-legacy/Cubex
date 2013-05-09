@@ -126,11 +126,11 @@ class Serve extends Dispatcher implements IDispatchable
 
         if($debugString === self::getNocacheDebugString())
         {
-          $response->disbleCache();
+          $response->disableCache();
         }
         else if($this->getUseMap() === false)
         {
-          $response->disbleCache();
+          $response->disableCache();
         }
       }
     }

@@ -373,7 +373,7 @@ class Response
    *
    * @return Response
    */
-  public function disbleCache()
+  public function disableCache()
   {
     $this->_cacheable = false;
 
