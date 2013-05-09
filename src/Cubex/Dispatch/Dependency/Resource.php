@@ -182,15 +182,14 @@ class Resource extends Dependency
    */
   public function requireResource(DispatchEvent $event)
   {
-    if($this->isResolvableUri($event->getFile()))
+    $file = $event->getFile();
+    $type = (string)$event->getType();
+
+    if($this->isResolvableUri($file))
     {
       $this->requireResolvableResource($event);
     }
-    elseif(array_key_exists(
-      $event->getFile(),
-      self::$_thirdpartyLibraries[(string)$event->getType()]
-    )
-    )
+    elseif(isset(self::$_thirdpartyLibraries[$type][$file]))
     {
       $this->requireThirdpartyResource(
         $event,
@@ -225,12 +224,6 @@ class Resource extends Dependency
     if(substr($file, -($typeStringLength + 1)) !== ".$type")
     {
       $file = "$file.$type";
-    }
-
-    if(preg_match(static::PACKAGE_REGEX, $file, $matches))
-    {
-      $event->setPackage($matches[1]);
-      $file = $matches[2];
     }
 
     if(substr($file, 0, 1) === "/")
@@ -358,8 +351,8 @@ class Resource extends Dependency
     $dispatchPackagePath = $this->getDispatchPath($event, $request);
 
     $dispatchPackagePath->setResourceHash("pkg")
-    ->setPathToResource($event->getFile() . "." . $event->getType())
-    ->getDispatchPath(true);
+      ->setPathToResource($event->getFile() . "." . $event->getType())
+      ->getDispatchPath(true);
 
     return $dispatchPackagePath;
   }

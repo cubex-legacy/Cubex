@@ -35,6 +35,28 @@ trait RequireTrait
   }
 
   /**
+   * Specify an external CSS file to include with the external key
+   *
+   * @param string $file
+   * @param string $key
+   */
+  public function requireExternalCss($file, $key)
+  {
+    $this->_requireResource($file, TypeEnum::CSS(), null, null, $key);
+  }
+
+  /**
+   * Specify an external JS file to include with the external key
+   *
+   * @param string $file
+   * @param string $key
+   */
+  public function requireExternalJs($file, $key)
+  {
+    $this->_requireResource($file, TypeEnum::JS(), null, null, $key);
+  }
+
+  /**
    * @param string      $library
    * @param null|string $version
    */
@@ -79,9 +101,14 @@ trait RequireTrait
    * @param TypeEnum    $type
    * @param null|string $version
    * @param null|string $namespace
+   * @param null|string $key
    */
   protected function _requireResource(
-    $file, TypeEnum $type, $version = null, $namespace = null
+    $file,
+    TypeEnum $type,
+    $version = null,
+    $namespace = null,
+    $key = null
   )
   {
     if($namespace === null)
@@ -90,10 +117,11 @@ trait RequireTrait
     }
 
     $event = (new DispatchEvent(EventManager::DISPATCH_RESOURCE_REQUIRE))
-    ->setFile($file)
-    ->setType($type)
-    ->setVersion($version)
-    ->setSource($this);
+      ->setFile($file)
+      ->setType($type)
+      ->setVersion($version)
+      ->setExternalKey($key)
+      ->setSource($this);
 
     EventManager::triggerWithEvent(
       EventManager::DISPATCH_RESOURCE_REQUIRE,

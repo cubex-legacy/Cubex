@@ -23,7 +23,7 @@ class Serve extends Dispatcher implements IDispatchable
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
    * @param \Cubex\FileSystem\FileSystem         $fileSystem
-   * @param DispatchPath                                 $dispatchPath
+   * @param DispatchPath                         $dispatchPath
    */
   public function __construct(
     ConfigGroup $configGroup, FileSystem $fileSystem,
@@ -98,7 +98,7 @@ class Serve extends Dispatcher implements IDispatchable
     $debugString    = $this->getDispatchPath()->getDebugString();
     $resourceType   = $this->getResourceExtension($pathToResource);
 
-    if(!array_key_exists($resourceType, $this->getSupportedTypes()))
+    if(!isset($this->getSupportedTypes()[$resourceType]))
     {
       // Either hack attempt or a dev needs a slapped wrist
       $response->fromRenderable(new Error404())->setStatusCode(404);
@@ -145,26 +145,13 @@ class Serve extends Dispatcher implements IDispatchable
   {
     $data            = "";
     $locatedFileKeys = [];
-    $fullEntityPath  = "";
 
     $pathToResource = $this->getDispatchPath()->getPathToResource();
     $filePathParts  = explode("/", $pathToResource);
     $filename       = array_pop($filePathParts);
     $pathToFile     = implode("/", $filePathParts);
     $entityHash     = $this->getDispatchPath()->getEntityHash();
-
-    if($this->getDispatchPath()->getMarker() === $this->getExternalHash())
-    {
-      if(isset($this->getLnretxMap()[$entityHash]))
-      {
-        $package        = $this->getLnretxMap()[$entityHash];
-        $fullEntityPath = $this->getEntityMap()[$package];
-      }
-    }
-    else
-    {
-      $fullEntityPath = $this->getEntityPathByHash($entityHash);
-    }
+    $fullEntityPath = $this->getEntityPathByHash($entityHash);
 
     if(!$this->getFileSystem()->isAbsolute($fullEntityPath))
     {
@@ -190,7 +177,7 @@ class Serve extends Dispatcher implements IDispatchable
         try
         {
           $fileData = $this->getFileSystem()->readFile($file);
-          $data .= $this->dispatchContent($fileData);
+          $data     .= $this->dispatchContent($fileData);
 
           $locatedFileKeys[$fileKey] = true;
         }
@@ -225,7 +212,10 @@ class Serve extends Dispatcher implements IDispatchable
 
     if(!$entityMap)
     {
-      $mapper    = new DispatchMapper($this->getConfig(), $this->getFileSystem());
+      $mapper    = new DispatchMapper(
+        $this->getConfig(),
+        $this->getFileSystem()
+      );
       $entityMap = $this->findAndSaveEntityMap($entity, $mapper);
     }
 
@@ -304,24 +294,12 @@ class Serve extends Dispatcher implements IDispatchable
    */
   public function dispatchUrlWrappedUrl($data)
   {
-    $package       = false;
     $oldEntytyHash = $this->getDispatchPath()->getEntityHash();
-
-    if(preg_match(static::PACKAGE_REGEX, $data[1], $matches))
-    {
-      $entityHash = $this->getPackageEntityHash(
-        $this->generateEntityHash($matches[1])
-      );
-      $this->getDispatchPath()->setEntityHash($entityHash);
-      $data[1] = $matches[2];
-      $package = true;
-    }
 
     $uri = $this->dispatchUri(
       $data[1],
       $this->getDispatchPath()->getEntityHash(),
-      $this->getDispatchPath()->getDomainHash(),
-      $package
+      $this->getDispatchPath()->getDomainHash()
     );
 
     $this->getDispatchPath()->setEntityHash($oldEntytyHash);
@@ -338,8 +316,10 @@ class Serve extends Dispatcher implements IDispatchable
    * @return array
    */
   public function buildResourceLocateDirectoryList(
-    $fullEntityPath, $pathToFile,
-    $filename, $domain
+    $fullEntityPath,
+    $pathToFile,
+    $filename,
+    $domain
   )
   {
     $locateList     = [];
@@ -402,9 +382,9 @@ class Serve extends Dispatcher implements IDispatchable
   private function _setCacheHeaders(Response $response)
   {
     $response->addHeader("X-Powere-By", "Cubex:Dispatch")
-    ->setStatusCode(304)
-    ->cacheFor($this->_cacheTime)
-    ->lastModified(time());
+      ->setStatusCode(304)
+      ->cacheFor($this->_cacheTime)
+      ->lastModified(time());
   }
 
   /**
@@ -415,11 +395,11 @@ class Serve extends Dispatcher implements IDispatchable
   private function _setResponseHeaders(Response $response, $data, $resourceType)
   {
     $response->from($data)
-    ->addHeader("Content-Type", $this->getSupportedTypes()[$resourceType])
-    ->addHeader("X-Powered-By", "Cubex:Dispatch")
-    ->setStatusCode(200)
-    ->cacheFor($this->_cacheTime)
-    ->lastModified(time());
+      ->addHeader("Content-Type", $this->getSupportedTypes()[$resourceType])
+      ->addHeader("X-Powered-By", "Cubex:Dispatch")
+      ->setStatusCode(200)
+      ->cacheFor($this->_cacheTime)
+      ->lastModified(time());
   }
 
   /**

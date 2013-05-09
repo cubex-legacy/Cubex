@@ -20,11 +20,10 @@ class Dependency extends Dispatcher
     $path    = ltrim($event->getFile(), "/");
     $base    = substr($event->getFile(), 0, 1) === "/";
     $domain  = $request->domain() . "." . $request->tld();
-    $package = $event->getPackage();
 
-    if($package)
+    if($event->isExternal())
     {
-      $entity = $package;
+      $entity = $event->getExternalKey();
     }
     else if($base)
     {
@@ -41,13 +40,8 @@ class Dependency extends Dispatcher
     $entityHash        = $this->generateEntityHash($entity);
     $resourceHash      = $this->getNomapHash();
 
-    if($package)
-    {
-      $entityHash = $this->getPackageEntityHash($this->getExternalHash());
-    }
-
     $ini = $this->getDispatchIni($entity);
-    if(array_key_exists($path, $ini))
+    if(isset($ini[$path]))
     {
       $resourceHash = $this->generateResourceHash($ini[$path]);
     }

@@ -29,6 +29,7 @@ class Cli extends DispatchMapper
 
     $entities         = $this->findEntities();
     $this->setEntityMapConfigLines($entities);
+    $this->setExternalMapConfigLines();
     $maps      = $this->mapEntities($entities);
     $savedMaps = $this->saveMaps($maps);
     $this->writeConfig();

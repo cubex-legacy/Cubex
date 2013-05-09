@@ -18,15 +18,14 @@ class Dispatcher
 
   private $_fileSystem;
   private $_domainMap;
+  private $_externalMap;
   private $_entityMap;
-  private $_lnretxMap;
   private $_buildOptions;
   private $_dispatchIniFilename;
   private $_resourceDirectory;
   private $_projectNamespace;
   private $_projectBase;
   private $_baseHash       = "esabot";
-  private $_externalHash   = "lnretx";
   private $_nomapHash      = "pamon";
   private $_supportedTypes = [
     "ico"   => "image/x-icon",
@@ -95,6 +94,7 @@ class Dispatcher
       "Project"
     );
     $this->_domainMap           = $dispatchConfig->getArr("domain_map", []);
+    $this->_externalMap         = $dispatchConfig->getArr("external_map", []);
     $this->_buildOptions        = array_merge(
       [
       self::BUILD_OPT_FORCE_SECURE => false,
@@ -116,7 +116,6 @@ class Dispatcher
     // correct config file directory
     $dispatchIniConfig = $this->getBaseDispatchConfig();
     $this->_entityMap  = $dispatchIniConfig->getArr("entity_map", []);
-    $this->_lnretxMap  = $dispatchIniConfig->getArr("lnretx_map", []);
   }
 
   /**
@@ -130,17 +129,17 @@ class Dispatcher
   /**
    * @return array
    */
-  public function getEntityMap()
+  public function getExternalMap()
   {
-    return $this->_entityMap;
+    return $this->_externalMap;
   }
 
   /**
    * @return array
    */
-  public function getLnretxMap()
+  public function getEntityMap()
   {
-    return $this->_lnretxMap;
+    return $this->_entityMap;
   }
 
   /**
@@ -243,14 +242,6 @@ class Dispatcher
   /**
    * @return string
    */
-  public function getExternalHash()
-  {
-    return $this->_externalHash;
-  }
-
-  /**
-   * @return string
-   */
   public function getNomapHash()
   {
     return $this->_nomapHash;
@@ -275,22 +266,42 @@ class Dispatcher
     {
       return $this->getProjectNamespace() . "/" . $this->getResourceDirectory();
     }
-    else if(array_key_exists($entityHash, $this->getEntityMap()))
+    else if(isset($this->getEntityMap()[$entityHash]))
     {
       return $this->getEntityMap()[$entityHash];
     }
+    else if(isset($this->getEntityMap()["external:$entityHash"]))
+    {
+      $externalKey = $this->getEntityMap()["external:$entityHash"];
+
+      return $this->getExternalMap()[$externalKey];
+    }
     else
     {
-      $mapper = new DispatchMapper($this->getConfig(), $this->getFileSystem());
-      $path   = $this->findEntityFromHash($entityHash, $mapper);
-
-      if($path === null)
+      foreach($this->getExternalMap() as $externalKey => $externalPath)
       {
-        return rawurldecode($entityHash);
-      }
+        $externalEntityHash = $this->generateEntityHash(
+          $externalKey,
+          strlen($entityHash)
+        );
 
-      return $path;
+        if($entityHash === $externalEntityHash)
+        {
+          return $externalPath;
+        }
+      }
     }
+
+    // Last ditch effort
+    $mapper = new DispatchMapper($this->getConfig(), $this->getFileSystem());
+    $path   = $this->findEntityFromHash($entityHash, $mapper);
+
+    if($path === null)
+    {
+      return rawurldecode($entityHash);
+    }
+
+    return $path;
   }
 
   /**
@@ -342,16 +353,6 @@ class Dispatcher
     );
   }
 
-  /**
-   * @param string $originalEntityHash
-   *
-   * @return string
-   */
-  public function getPackageEntityHash($originalEntityHash)
-  {
-    return $originalEntityHash . ";" . $this->getExternalHash();
-  }
-
   /*****************************************************************************
    * The methods below do a little more than the mass of getters above
    */
@@ -384,17 +385,6 @@ class Dispatcher
   public function generateDomainHash($domain, $length = 6)
   {
     return substr(md5($domain), 0, $length);
-  }
-
-  /**
-   * @param string $package
-   * @param int    $length
-   *
-   * @return string
-   */
-  public function generatePackageHash($package, $length = 6)
-  {
-    return substr(md5($package), 0, $length);
   }
 
   /**
@@ -470,12 +460,15 @@ class Dispatcher
   {
     $path        = $directory . DS . $this->getDispatchIniFilename();
     $dispatchIni = [];
-    if(file_exists($path))
+    if($this->getFileSystem()->fileExists($path))
     {
       $dispatchIni = parse_ini_file($path, false);
       if($dispatchIni === null)
       {
-        $dispatchIni = parse_ini_string(file_get_contents($path), false);
+        $dispatchIni = parse_ini_string(
+          $this->getFileSystem()->readFile($path),
+          false
+        );
       }
       if($dispatchIni === false)
       {
@@ -608,11 +601,10 @@ class Dispatcher
    * @param string $uri
    * @param string $entityHash
    * @param string $domainHash
-   * @param bool   $package
    *
    * @return string
    */
-  public function dispatchUri($uri, $entityHash, $domainHash, $package = false)
+  public function dispatchUri($uri, $entityHash, $domainHash)
   {
     $uri = trim($uri, "'\" \r\t\n");
 
@@ -621,11 +613,18 @@ class Dispatcher
       return $uri;
     }
 
+    $external = false;
+    if(preg_match(static::PACKAGE_REGEX, $uri, $matches))
+    {
+      $entityHash = $this->generateEntityHash($matches[1]);
+      $uri        = $matches[2];
+      $external   = true;
+    }
+
     if(substr($uri, 0, 1) === "/")
     {
       $uri = substr($uri, 1);
-
-      if(!$package)
+      if(!$external)
       {
         $entityHash = $this->getBaseHash();
       }
@@ -634,8 +633,7 @@ class Dispatcher
     $entityMap    = false;
     $resourceHash = $this->getNomapHash();
 
-    $mapper = new DispatchMapper($this->getConfig(), $this->getFileSystem());
-    $entity = $this->findEntityFromHash($entityHash, $mapper);
+    $entity = $this->getEntityPathByHash($entityHash);
     if($entity)
     {
       $entityMap = $this->getDispatchIni($entity);
@@ -814,7 +812,7 @@ class Dispatcher
       $domainHash = $this->generateDomainHash($host);
       $domainMap  = $this->getDomainMap();
 
-      if(!array_key_exists($domainHash, $domainMap))
+      if(!isset($domainMap[$domainHash]))
       {
         throw new \Exception(
           "You can't dispatch with a different domain withouth setting your " .

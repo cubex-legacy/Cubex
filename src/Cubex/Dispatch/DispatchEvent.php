@@ -13,7 +13,7 @@ class DispatchEvent extends StdEvent
   protected $_type;
   protected $_namespace;
   protected $_version;
-  protected $_package;
+  protected $_externalKey;
 
   public function __construct($name, array $args = array(), $source = null)
   {
@@ -111,20 +111,28 @@ class DispatchEvent extends StdEvent
   /**
    * @return string|null
    */
-  public function getPackage()
+  public function getExternalKey()
   {
-    return $this->_package;
+    return $this->_externalKey;
   }
 
   /**
-   * @param string $package
+   * @param string|null $externalKey
    *
    * @return $this
    */
-  public function setPackage($package)
+  public function setExternalKey($externalKey)
   {
-    $this->_package = $package;
+    $this->_externalKey = $externalKey;
 
     return $this;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isExternal()
+  {
+    return $this->_externalKey !== null;
   }
 }

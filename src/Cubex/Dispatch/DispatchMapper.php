@@ -40,6 +40,7 @@ class DispatchMapper extends Dispatcher
   {
     $entities = $this->findEntities();
     $this->setEntityMapConfigLines($entities);
+    $this->setExternalMapConfigLines();
     $this->writeConfig();
     $maps = $this->mapEntities($entities);
     $savedMaps = $this->saveMaps($maps);
@@ -402,11 +403,17 @@ class DispatchMapper extends Dispatcher
   {
     foreach($entities as $entity)
     {
-      $entityHash = null;
-      $entityTemp = $entity;
-
-      $entityHash = $this->generateEntityHash($entityTemp);
+      $entityHash = $this->generateEntityHash($entity);
       $this->setConfigLine("entity_map[$entityHash] = $entity");
+    }
+  }
+
+  public function setExternalMapConfigLines()
+  {
+    foreach($this->getExternalMap() as $externalKey => $externalPath)
+    {
+      $entityHash = $this->generateEntityHash($externalKey);
+      $this->setConfigLine("entity_map[external:$entityHash] = $externalKey");
     }
   }
 

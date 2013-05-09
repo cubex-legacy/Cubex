@@ -34,7 +34,7 @@ class Image extends Dependency
 
     if(preg_match(static::PACKAGE_REGEX, $file, $matches))
     {
-      $event->setPackage($matches[1]);
+      $event->setExternalKey($matches[1]);
       $file = $matches[2];
     }
 
