@@ -19,7 +19,6 @@ class DispatchMapper extends Dispatcher
   private $_ignoredFiles = [];
 
   private $_configLines = [];
-  private $_externalProjects = [];
 
   /**
    * @param ConfigGroup                   $configGroup
@@ -31,7 +30,6 @@ class DispatchMapper extends Dispatcher
 
     $this->_ignoredFiles[$this->getDispatchIniFilename()] = true;
     $this->_ignoredFiles[".gitignore"] = true;
-    $this->_setExternalProjects();
   }
 
   /**
@@ -41,8 +39,7 @@ class DispatchMapper extends Dispatcher
   public function run()
   {
     $entities = $this->findEntities();
-    $externalEntities = $this->findExternalEntities();
-    $this->setEntityMapConfigLines(array_merge($entities, $externalEntities));
+    $this->setEntityMapConfigLines($entities);
     $this->writeConfig();
     $maps = $this->mapEntities($entities);
     $savedMaps = $this->saveMaps($maps);
@@ -64,8 +61,6 @@ class DispatchMapper extends Dispatcher
    */
   public function findEntities($entityPath = "")
   {
-    $this->_changeWorkingDir($this->getProjectBase());
-
     $entities = [];
 
     $traversing = $directory = false;
@@ -132,43 +127,9 @@ class DispatchMapper extends Dispatcher
             $entities,
             $this->findEntities($newEntityPath)
           );
-          $this->_changeWorkingDir($this->getProjectBase());
         }
       }
     }
-
-    $this->_changeWorkingDir();
-
-    return $entities;
-  }
-
-  /**
-   * This looks in a composer vendor directory for any bundls that we may want
-   * to map.
-   *
-   * @return array
-   */
-  public function findExternalEntities()
-  {
-    $this->_changeWorkingDir($this->getProjectBase());
-
-    $entities = [];
-
-    $normalizedProjectPath = $this->getFileSystem()->normalizePath(
-      $this->getProjectPath()
-    );
-
-    foreach($this->_getAutoloader()->getPrefixes() as $dirs)
-    {
-      $normalizedPrefixDir = $this->getFileSystem()->normalizePath($dirs[0]);
-
-      if(strpos($normalizedProjectPath, $normalizedPrefixDir) !== 0)
-      {
-        $entities = array_merge($entities, $this->findEntities($dirs[0]));
-      }
-    }
-
-    $this->_changeWorkingDir();
 
     return $entities;
   }
@@ -439,52 +400,14 @@ class DispatchMapper extends Dispatcher
 
   public function setEntityMapConfigLines(array $entities)
   {
-    $this->_changeWorkingDir($this->getProjectBase());
-
     foreach($entities as $entity)
     {
       $entityHash = null;
       $entityTemp = $entity;
-      $fullPath   = $this->getFileSystem()->resolvePath($entity);
 
-      if($fullPath !== false)
-      {
-        foreach($this->_externalProjects as $externalProject)
-        {
-          if(strpos($entity, $externalProject["base"]) !== false)
-          {
-            $entityTemp = stristr($entity, $externalProject["base"]);
-
-            if(strpos($fullPath, $this->getProjectPath()) !== 0)
-            {
-              if(!strpos($entity, $externalProject["package"]) !== false)
-              {
-                continue;
-              }
-
-              $package     = $externalProject["package"];
-              $entityHash  = $package;
-              $packageHash = $this->generatePackageHash($package);
-
-              $this->setConfigLine("lnretx_map[$packageHash] = $package");
-            }
-            else
-            {
-              $entityHash = $this->generateEntityHash($entityTemp);
-            }
-            break;
-          }
-        }
-      }
-
-      if($entityHash === null)
-      {
-        $entityHash = $this->generateEntityHash($entityTemp);
-      }
+      $entityHash = $this->generateEntityHash($entityTemp);
       $this->setConfigLine("entity_map[$entityHash] = $entity");
     }
-
-    $this->_changeWorkingDir();
   }
 
   /**
@@ -515,85 +438,5 @@ class DispatchMapper extends Dispatcher
     }
 
     return $path;
-  }
-
-  /**
-   * When we're working with relative paths that need to be resolved we need to
-   * be in a standard working directory. This is here to abstract that
-   * functionality and easily revert it.
-   *
-   * @param null|string $dir
-   */
-  protected function _changeWorkingDir($dir = null)
-  {
-    static $cwd;
-
-    if($cwd === null)
-    {
-      $cwd = getcwd();
-    }
-
-    if($dir === null)
-    {
-      chdir($cwd);
-    }
-    else
-    {
-      chdir($dir);
-    }
-  }
-
-  /**
-   * We need to get a specific part of an entity path to generate the entity
-   * hash and with external projects this is after the first part of the
-   * namespace.
-   */
-  protected function _setExternalProjects()
-  {
-    foreach($this->_getAutoloader()->getPrefixes() as $namespace => $dirs)
-    {
-      $path    = current($dirs);
-      $package = $this->_extractPackage($namespace, $path);
-      $base    = reset(explode("\\", $namespace));
-
-      if($package)
-      {
-        $this->_externalProjects[$namespace] = [
-          "package" => $package,
-          "path"    => $path,
-          "base"    => $base,
-        ];
-      }
-    }
-  }
-
-  /**
-   * @param string $namespace
-   * @param string $path
-   *
-   * @return bool|string
-   */
-  protected function _extractPackage($namespace, $path)
-  {
-    if(substr_count($namespace, "\\") === 3)
-    {
-      $package = last(explode("\\", $namespace, 2));
-      $cleanPackage = rtrim(str_replace("\\", "/", strtolower($package)), "/");
-
-      if(stripos($path, $cleanPackage) !== false)
-      {
-        return $cleanPackage;
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * @return \Composer\Autoload\ClassLoader
-   */
-  protected function _getAutoloader()
-  {
-    return Container::get(Container::LOADER)->getAutoloader();
   }
 }
