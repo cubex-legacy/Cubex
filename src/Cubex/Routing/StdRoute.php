@@ -265,10 +265,16 @@ class StdRoute implements IRoute, IDataHandler, \JsonSerializable
    */
   public function process()
   {
-    if(preg_match('/^(.*tps?:\/\/|\/|#@)/', $this->_result))
+    if(preg_match('/^(.*tps?:\/\/|\/|#@|@[0-9]{3}\!)/', $this->_result))
     {
-      if(substr($this->_result, 0, 2) == '#@')
+      if(substr($this->_result, 0, 1) == '@')
       {
+        list($code, $to) = sscanf($this->_result, "@%d!%s");
+        Redirect::to($to, $code)->now();
+      }
+      else if(substr($this->_result, 0, 2) == '#@')
+      {
+        //Redirect to anything after #@ specified in the route
         $this->_result = substr($this->_result, 2);
       }
       Redirect::to($this->_result)->now();
