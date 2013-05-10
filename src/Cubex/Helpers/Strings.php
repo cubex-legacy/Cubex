@@ -109,12 +109,7 @@ class Strings
         }
         else
         {
-          $prefix = '';
-          $i     = 0;
-          while($start[$i] == $end[$i] && !is_numeric($start[$i]))
-          {
-            $prefix .= $start[$i++];
-          }
+          $prefix = static::commonPrefix($start, $end);
           $range1 = str_replace($prefix, "", $start);
           $range2 = str_replace($prefix, "", $end);
           if(is_numeric($range1) && is_numeric($range2))
@@ -137,5 +132,16 @@ class Strings
       }
     }
     return $result;
+  }
+
+  public static function commonPrefix($str1, $str2, $stopOnInt = true)
+  {
+    $prefix = '';
+    $i      = 0;
+    while($str1[$i] == $str2[$i] && !($stopOnInt && is_numeric($str1[$i])))
+    {
+      $prefix .= $str1[$i++];
+    }
+    return $prefix;
   }
 }
