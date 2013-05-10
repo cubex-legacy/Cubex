@@ -174,14 +174,14 @@ class DBBuilder
             {
               if(stristr($comm, ' '))
               {
-                list($type, $detail) = explode(' ', substr($comm, 1));
+                list($type, $detail) = explode(' ', substr($comm, 1), 2);
               }
               else
               {
                 $type   = substr($comm, 1);
-                $detail = '';
+                $detail = true;
               }
-              if(!empty($detail) && !empty($type))
+              if(!empty($type))
               {
                 $annotation[$type] = $detail;
               }
