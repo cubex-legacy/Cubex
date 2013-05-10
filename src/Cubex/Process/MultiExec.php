@@ -102,6 +102,9 @@ class MultiExec
     {
       $this->_executeBatch($ids);
     }
+
+    $this->_complete = true;
+
     return $this;
   }
 
@@ -133,8 +136,6 @@ class MultiExec
     {
       pclose($ph);
     }
-
-    $this->_complete = true;
   }
 
   /**
