@@ -172,7 +172,7 @@ class DBBuilder
           {
             if(substr($comm, 0, 8) !== '@comment')
             {
-              if(stristr($comm, ' '))
+              if(strstr($comm, ' '))
               {
                 list($type, $detail) = explode(' ', substr($comm, 1), 2);
               }
