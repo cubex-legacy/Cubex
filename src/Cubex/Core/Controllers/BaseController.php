@@ -22,6 +22,7 @@ use Cubex\Routing\StdRoute;
 use Cubex\Routing\StdRouter;
 use Cubex\ServiceManager\IServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
+use Cubex\View\ViewModel;
 
 class BaseController
   implements IController, IDataHandler, ITranslatable, IServiceManagerAware
@@ -604,5 +605,11 @@ class BaseController
   public function remoteIp()
   {
     return $this->request()->remoteIp();
+  }
+
+  public function createView(ViewModel $viewModel)
+  {
+    $viewModel->setHostController($this);
+    return $viewModel;
   }
 }

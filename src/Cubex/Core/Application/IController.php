@@ -22,7 +22,13 @@ interface IController extends IDispatchable
 
   /**
    * @param $uri
+   *
    * @return mixed
    */
   public function setBaseUri($uri);
+
+  /**
+   * @return string|null
+   */
+  public function baseUri();
 }
