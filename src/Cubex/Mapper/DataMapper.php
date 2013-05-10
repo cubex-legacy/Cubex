@@ -977,6 +977,11 @@ abstract class DataMapper
     }
   }
 
+  public function delete()
+  {
+    return false;
+  }
+
   /**
    * @param bool|array $validate   all fields, or array of fields to validate
    * @param bool       $processAll Process all validators, or fail on first
