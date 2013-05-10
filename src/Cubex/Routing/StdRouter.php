@@ -18,7 +18,7 @@ class StdRouter implements IRouter
    */
   public function __construct(array $routes, $httpVerb = null)
   {
-    $this->_routes = $routes;
+    $this->_routes    = $routes;
     $this->_verbMatch = $httpVerb;
   }
 
@@ -217,32 +217,25 @@ class StdRouter implements IRouter
    */
   public function convertSimpleRoute($route)
   {
+    $idPat = "(_?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)";
     /* Allow Simple Routes */
-    if(stristr($route, ':'))
+    if(strstr($route, ':'))
     {
-      $route = \preg_replace(
-        "/\:(_?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\@alpha/",
-        "(?P<$1>\w+)/",
-        $route
-      );
-      $route = \preg_replace(
-        "/\:(_?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\@all/",
-        "(?P<$1>.*)/",
-        $route
-      );
-      $route = \preg_replace(
-        "/\:(_?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\@num/",
-        "(?P<$1>[1-9]\d*)/",
-        $route
-      );
-      $route = \preg_replace(
-        "/\:(_?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/",
-        "(?P<$1>[^\/]+)/",
-        $route
-      );
-
-      $route = str_replace('//', '/', $route);
+      $route = preg_replace("/\:$idPat\@alpha/", "(?P<$1>\w+)/", $route);
+      $route = preg_replace("/\:$idPat\@all/", "(?P<$1>.*)/", $route);
+      $route = preg_replace("/\:$idPat\@num/", "(?P<$1>\d*)/", $route);
+      $route = preg_replace("/\:$idPat/", "(?P<$1>[^\/]+)/", $route);
     }
+
+    if(strstr($route, '{'))
+    {
+      $route = preg_replace("/{" . "$idPat\@alpha}/", "(?P<$1>\w+)/", $route);
+      $route = preg_replace("/{" . "$idPat\@all}/", "(?P<$1>.*)/", $route);
+      $route = preg_replace("/{" . "$idPat\@num}/", "(?P<$1>\d*)/", $route);
+      $route = preg_replace("/{" . "$idPat}/", "(?P<$1>[^\/]+)/", $route);
+    }
+
+    $route = str_replace('//', '/', $route);
     return $route;
   }
 }
