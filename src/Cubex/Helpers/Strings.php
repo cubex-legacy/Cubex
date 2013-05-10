@@ -96,46 +96,46 @@ class Strings
 
   public static function stringToRange($string)
   {
-    preg_match_all(
-      "/([a-zA-Z]*[0-9]{1,2})-?([a-zA-Z]*[0-9]{0,2}) ?,?;?/",
-      $string,
-      $match
-    );
-    $n = array();
-    foreach($match[1] as $k => $v)
+    $result = [];
+    $ranges = preg_split("(,|\s|;|\|)", $string);
+    foreach($ranges as $range)
     {
-      if(!empty($match[2][$k]))
+      if(strstr($range, '-'))
       {
-        $v2 = $match[2][$k];
-        if(is_numeric($v) && is_numeric($v2))
+        list($start, $end) = explode("-", $range, 2);
+        if(is_numeric($start) && is_numeric($end))
         {
-          $n = array_merge($n, range($v, $v2));
+          $result = array_merge($result, range($start, $end));
         }
         else
         {
-          $start = '';
+          $prefix = '';
           $i     = 0;
-          while($v[$i] == $v2[$i] && !is_numeric($v[$i]))
+          while($start[$i] == $end[$i] && !is_numeric($start[$i]))
           {
-            $start .= $v[$i++];
+            $prefix .= $start[$i++];
           }
-          $range1 = str_replace($start, "", $v);
-          $range2 = str_replace($start, "", $v2);
+          $range1 = str_replace($prefix, "", $start);
+          $range2 = str_replace($prefix, "", $end);
           if(is_numeric($range1) && is_numeric($range2))
           {
-            $range = range($range1, $range2);
-            foreach($range as $r)
+            $prefixRange = range($range1, $range2);
+            foreach($prefixRange as $r)
             {
-              $n[] = $start . $r;
+              $result[] = $prefix . $r;
             }
+          }
+          else
+          {
+            $result[] = $range;
           }
         }
       }
       else
       {
-        $n[] = $v;
+        $result[] = $range;
       }
     }
-    return ($n);
+    return $result;
   }
 }
