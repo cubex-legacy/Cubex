@@ -3,7 +3,7 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\Mapper\Database;
+namespace Cubex\Database\Creations;
 
 use Cubex\Data\Attribute;
 use Cubex\Database\IDatabaseService;
@@ -11,6 +11,7 @@ use Cubex\Database\Schema\Column;
 use Cubex\Database\Schema\DataType;
 use Cubex\Helpers\Strings;
 use Cubex\Mapper\DataMapper;
+use Cubex\Mapper\Database\RecordMapper;
 use Cubex\Sprintf\ParseQuery;
 
 class DBBuilder
@@ -37,9 +38,12 @@ class DBBuilder
   protected $_column;
   protected $_passed;
   protected $_mapperClass;
+  protected $_indexes;
   protected $_addedAutoId = false;
 
-  public function __construct(IDatabaseService $connection, RecordMapper $mapper)
+  public function __construct(
+    IDatabaseService $connection, RecordMapper $mapper
+  )
   {
     $this->_connection  = $connection;
     $this->_mapper      = $mapper;
@@ -75,6 +79,12 @@ class DBBuilder
         }
       }
     }
+  }
+
+  protected function _addIndex($on, $type = 'index')
+  {
+    $type             = strtolower(ltrim($type, '@'));
+    $this->_indexes[] = [$type, $on];
   }
 
   protected function _addColumn()
@@ -162,7 +172,15 @@ class DBBuilder
           {
             if(substr($comm, 0, 8) !== '@comment')
             {
-              list($type, $detail) = explode(' ', substr($comm, 1));
+              if(stristr($comm, ' '))
+              {
+                list($type, $detail) = explode(' ', substr($comm, 1));
+              }
+              else
+              {
+                $type   = substr($comm, 1);
+                $detail = '';
+              }
               if(!empty($detail) && !empty($type))
               {
                 $annotation[$type] = $detail;
@@ -220,6 +238,15 @@ class DBBuilder
       {
         switch(strtolower($k))
         {
+          case 'index':
+            $this->_addIndex($uname, 'index');
+            break;
+          case 'unique':
+            $this->_addIndex($uname, 'unique');
+            break;
+          case 'fulltext':
+            $this->_addIndex($uname, 'fulltext');
+            break;
           case 'default':
             $default = $v;
             break;
@@ -234,7 +261,19 @@ class DBBuilder
             $options = (int)$v;
             break;
           case 'datatype':
-            $dataType = $v;
+            $valid = preg_match(
+              "/([a-zA-Z]+)(\s|\(|\s\(|)([0-9]+)?($|\))/",
+              $v,
+              $match
+            );
+            if($valid)
+            {
+              $dataType = $match[1];
+              if((int)$match[3] > 0)
+              {
+                $options = (int)$match[3];
+              }
+            }
             break;
           case 'characterset':
           case 'charset':
@@ -250,6 +289,9 @@ class DBBuilder
             break;
           case 'allownull':
             $allowNull = (bool)$v;
+            break;
+          case 'notnull':
+            $allowNull = false;
             break;
           case 'unsigned':
             $unsigned = true;
@@ -327,6 +369,7 @@ class DBBuilder
 
   public function createDB()
   {
+    $this->_buildClassIndexes();
     $columns    = $this->_columnSqls();
     $indexes    = $this->_getIndexes();
     $properties = $this->_getTableProperties();
@@ -340,23 +383,32 @@ class DBBuilder
     return $sql;
   }
 
-  protected function _getIndexes()
+  protected function _buildClassIndexes()
   {
-    $indexes  = [];
     $comments = Strings::docCommentLines($this->_reflect->getDocComment());
     foreach($comments as $comment)
     {
       list($type, $desc) = explode(" ", $comment, 2);
       $on = implode("`,`", explode(",", str_replace(' ', '', $desc)));
+      $this->_addIndex($on, $type);
+    }
+  }
+
+  protected function _getIndexes()
+  {
+    $indexes = [];
+    foreach($this->_indexes as $index)
+    {
+      list($type, $on) = $index;
       switch($type)
       {
-        case '@index':
+        case 'index':
           $indexes[] = " INDEX(`$on`) ";
           break;
-        case '@fulltext':
+        case 'fulltext':
           $indexes[] = " FULLTEXT(`$on`) ";
           break;
-        case '@unique':
+        case 'unique':
           $indexes[] = " UNIQUE(`$on`) ";
           break;
       }

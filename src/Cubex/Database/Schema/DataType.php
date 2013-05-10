@@ -51,6 +51,7 @@ class DataType extends Enum
       self::FLOAT,
       self::DOUBLE,
       self::DECIMAL,
+      self::BOOL,
     ];
   }
 }
