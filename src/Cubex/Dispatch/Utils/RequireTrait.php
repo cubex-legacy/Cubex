@@ -35,6 +35,15 @@ trait RequireTrait
   }
 
   /**
+   * @param string $block
+   * @param null   $namespace
+   */
+  public function addJsBlock($block, $namespace = null)
+  {
+    $this->_addResourceBlock($block, TypeEnum::JS(), $namespace);
+  }
+
+  /**
    * Specify an external CSS file to include with the external key
    *
    * @param string $file
@@ -125,6 +134,30 @@ trait RequireTrait
 
     EventManager::triggerWithEvent(
       EventManager::DISPATCH_RESOURCE_REQUIRE,
+      $event,
+      false,
+      $namespace
+    );
+  }
+
+  protected function _addResourceBlock(
+    $block,
+    TypeEnum $type,
+    $namespace = null
+  )
+  {
+    if($namespace === null)
+    {
+      $namespace = $this->_getOrFindNamespace();
+    }
+
+    $event = (new DispatchEvent(EventManager::DISPATCH_BLOCK_ADD))
+      ->setFile($block)
+      ->setType($type)
+      ->setSource($this);
+
+    EventManager::triggerWithEvent(
+      EventManager::DISPATCH_BLOCK_ADD,
       $event,
       false,
       $namespace

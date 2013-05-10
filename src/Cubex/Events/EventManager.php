@@ -39,6 +39,7 @@ class EventManager
   const CUBEX_QUERY = 'cubex.query';
 
   const DISPATCH_RESOURCE_REQUIRE = 'dispatch.resource.require';
+  const DISPATCH_BLOCK_ADD        = 'dispatch.block.add';
   const DISPATCH_PACKAGE_REQUIRE  = 'dispatch.package.require';
   const DISPATCH_URL              = 'dispatch.url';
 

@@ -18,7 +18,14 @@ class Resource extends Dependency
   protected static $_requires = array(
     "css"      => [],
     "js"       => [],
-    "packages" => []
+    "packages" => [],
+  );
+
+  /**
+   * @var array
+   */
+  protected static $_blocks = array(
+    "js"       => [],
   );
 
   /**
@@ -86,6 +93,16 @@ class Resource extends Dependency
     }
 
     return $resourceUris;
+  }
+
+  /**
+   * @param Resource\TypeEnum $type
+   *
+   * @return array
+   */
+  public static function getResourceBlocks(TypeEnum $type)
+  {
+    return self::$_blocks[(string)$type];
   }
 
   /**
@@ -200,6 +217,17 @@ class Resource extends Dependency
     {
       $this->requireInternalResource($event);
     }
+  }
+
+  /**
+   * @param \Cubex\Dispatch\DispatchEvent $event
+   */
+  public function addBlock(DispatchEvent $event)
+  {
+    $block = $event->getFile();
+    $type  = (string)$event->getType();
+
+    self::$_blocks[$type][md5($block)] = $this->minifyData($block, $type);
   }
 
   /**

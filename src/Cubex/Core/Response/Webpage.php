@@ -243,12 +243,23 @@ class Webpage implements
     $jsItems = new Partial(
       '<script type="text/javascript" src' . '="%s"></script>'
     );
-    $jsUris  = Resource::getResourceUris(new TypeEnum(TypeEnum::JS));
+    $jsUris  = Resource::getResourceUris(TypeEnum::JS());
     if($jsUris)
     {
       $jsItems->addElements($jsUris);
     }
-    return $jsItems;
+
+    $jsBlockItems = new Partial(
+      '<script type="text/javascript">%s</script>'
+    );
+    $jsBlocks  = Resource::getResourceBlocks(TypeEnum::JS());
+    if($jsBlocks)
+    {
+      $jsBlockItems->escapeInput(false);
+      $jsBlockItems->addElements($jsBlocks);
+    }
+
+    return (new RenderGroup())->add($jsItems, $jsBlockItems);
   }
 
   /**

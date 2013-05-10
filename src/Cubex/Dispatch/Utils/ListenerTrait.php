@@ -55,6 +55,19 @@ trait ListenerTrait
     );
 
     EventManager::listen(
+      EventManager::DISPATCH_BLOCK_ADD,
+      function (DispatchEvent $event) use ($namespace, $fileSystem)
+      {
+        $event->setNamespace($namespace);
+
+        $url = new Resource(Container::get(Container::CONFIG), $fileSystem);
+
+        return $url->addBlock($event);
+      },
+      $namespace
+    );
+
+    EventManager::listen(
       EventManager::DISPATCH_URL,
       function (DispatchEvent $event) use ($namespace, $fileSystem)
       {
