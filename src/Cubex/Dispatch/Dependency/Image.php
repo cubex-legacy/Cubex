@@ -9,7 +9,7 @@ use Cubex\Core\Http\Request;
 use Cubex\Dispatch\Dependency;
 use Cubex\Dispatch\DispatchEvent;
 
-class Image extends Dependency
+class Image extends Url
 {
   public function getFaviconPath($requestPath, Request $request)
   {
@@ -25,33 +25,6 @@ class Image extends Dependency
 
   public function getUri(DispatchEvent $event)
   {
-    $file = $event->getFile();
-
-    if($this->isResolvableUri($file))
-    {
-      return $file;
-    }
-
-    if(preg_match(static::PACKAGE_REGEX, $file, $matches))
-    {
-      $event->setExternalKey($matches[1]);
-      $file = $matches[2];
-    }
-
-    if(substr($file, 0, 1) === "/")
-    {
-      $file = "/img$file";
-    }
-    else
-    {
-      $file = "img/$file";
-    }
-
-    $event->setFile($file);
-
-    $request      = Container::get(Container::REQUEST);
-    $dispatchPath = $this->getDispatchPath($event, $request);
-
-    return $this->getDispatchUrl($dispatchPath, $request);
+    return parent::getUri($event);
   }
 }

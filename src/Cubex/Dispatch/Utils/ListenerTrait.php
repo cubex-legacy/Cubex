@@ -5,8 +5,8 @@
 namespace Cubex\Dispatch\Utils;
 
 use Cubex\Container\Container;
-use Cubex\Dispatch\Dependency\Image;
 use Cubex\Dispatch\Dependency\Resource;
+use Cubex\Dispatch\Dependency\Url;
 use Cubex\Dispatch\DispatchEvent;
 use Cubex\FileSystem\FileSystem;
 use Cubex\Events\EventManager;
@@ -55,14 +55,14 @@ trait ListenerTrait
     );
 
     EventManager::listen(
-      EventManager::DISPATCH_IMG_URL,
+      EventManager::DISPATCH_URL,
       function (DispatchEvent $event) use ($namespace, $fileSystem)
       {
         $event->setNamespace($namespace);
 
-        $image = new Image(Container::get(Container::CONFIG), $fileSystem);
+        $url = new Url(Container::get(Container::CONFIG), $fileSystem);
 
-        return $image->getUri($event);
+        return $url->getUri($event);
       },
       $namespace
     );

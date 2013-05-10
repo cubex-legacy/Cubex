@@ -18,5 +18,5 @@ class TypeEnum extends Enum
   const __default = self::CSS;
 
   const CSS = 'css';
-  const JS = 'js';
+  const JS  = 'js';
 }

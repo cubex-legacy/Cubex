@@ -40,7 +40,7 @@ class EventManager
 
   const DISPATCH_RESOURCE_REQUIRE = 'dispatch.resource.require';
   const DISPATCH_PACKAGE_REQUIRE  = 'dispatch.package.require';
-  const DISPATCH_IMG_URL          = 'dispatch.img.url';
+  const DISPATCH_URL              = 'dispatch.url';
 
   protected static $_nsListenEvents = array();
   protected static $_listeners = array();

@@ -697,6 +697,9 @@ class Dispatcher
       case "js":
         $uri = "js/$uri";
         break;
+      case "swf":
+        $uri = "swf/$uri";
+        break;
       case "ico":
         break;
       case "ttf":

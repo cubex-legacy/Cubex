@@ -146,9 +146,9 @@ trait RequireTrait
     }
 
     $event = (new DispatchEvent(EventManager::DISPATCH_PACKAGE_REQUIRE))
-    ->setFile($package)
-    ->setType($type)
-    ->setSource($this);
+      ->setFile($package)
+      ->setType($type)
+      ->setSource($this);
 
     EventManager::triggerWithEvent(
       EventManager::DISPATCH_PACKAGE_REQUIRE,
@@ -159,16 +159,27 @@ trait RequireTrait
   }
 
   /**
-   * @param string $file
-   * @param null   $namespace
+   * @param string      $file
+   * @param null|string $namespace
    *
    * @return string
    */
   public function imgUrl($file, $namespace = null)
   {
-    $event = (new DispatchEvent(EventManager::DISPATCH_IMG_URL))
-    ->setFile($file)
-    ->setSource($this);
+    return $this->getDispatchUrl($file, $namespace);
+  }
+
+  /**
+   * @param string      $file
+   * @param null|string $namespace
+   *
+   * @return string
+   */
+  public function getDispatchUrl($file, $namespace = null)
+  {
+    $event = (new DispatchEvent(EventManager::DISPATCH_URL))
+      ->setFile($file)
+      ->setSource($this);
 
     if($namespace === null)
     {
@@ -176,7 +187,7 @@ trait RequireTrait
     }
 
     return EventManager::triggerWithEvent(
-      EventManager::DISPATCH_IMG_URL,
+      EventManager::DISPATCH_URL,
       $event,
       true,
       $namespace
