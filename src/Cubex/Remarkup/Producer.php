@@ -265,7 +265,7 @@ class Producer implements IRenderable
 
   protected function _parseCodeBlock($text)
   {
-    if(!empty($text))
+    if(!empty($text) && $text[0])
     {
       $langCss = '';
       list($language) = sscanf($text[0], "lang=%s");
