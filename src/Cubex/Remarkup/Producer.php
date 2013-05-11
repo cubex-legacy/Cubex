@@ -267,18 +267,26 @@ class Producer implements IRenderable
   {
     if(!empty($text))
     {
-      $code = trim(implode("\n", $text));
-      if(!empty($code))
+      $langCss = '';
+      list($language) = sscanf($text[0], "lang=%s");
+      if($language !== null)
       {
-        $out = highlight_string($code, true);
-        return str_replace("\n", "", $out) . "\n";
+        array_shift($text);
+        $langCss = ' lang-' . $language;
       }
+
+      /**
+       * http://code.google.com/p/google-code-prettify/wiki/GettingStarted
+       */
+      $return = '<pre class="producer-code prettyprint' . $langCss . '">';
+      $return .= trim(implode("", $text)) . '</pre>';
+      return $return;
     }
     return '';
   }
 
   public function __toString()
   {
-    return $this->render();
+    return (string)$this->render();
   }
 }
