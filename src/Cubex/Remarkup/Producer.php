@@ -279,7 +279,7 @@ class Producer implements IRenderable
        * http://code.google.com/p/google-code-prettify/wiki/GettingStarted
        */
       $return = '<pre class="producer-code prettyprint' . $langCss . '">';
-      $return .= trim(implode("", $text)) . '</pre>';
+      $return .= htmlspecialchars(trim(implode("", $text))) . '</pre>';
       return $return;
     }
     return '';
