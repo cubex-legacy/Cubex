@@ -12,6 +12,10 @@ trait Yielder
   protected $_nested = array();
   protected $_renderHooks = array('before' => array(), 'after' => array());
 
+  public function getNest($name)
+  {
+    return isset($this->_nested[$name]) ? $this->_nested[$name] : null;
+  }
 
   /**
    * @param $name
@@ -78,7 +82,9 @@ trait Yielder
       }
 
       $rendered = HtmlElement::create(
-        'div', array('id' => $name), $rendered
+        'div',
+        array('id' => $name),
+        $rendered
       )->render();
     }
 
@@ -86,8 +92,8 @@ trait Yielder
   }
 
   /**
-   * @param                              $when
-   * @param                              $nest
+   * @param                               $when
+   * @param                               $nest
    * @param \Cubex\Foundation\IRenderable $render
    */
   protected function _hookRender($when, $nest, IRenderable $render)
@@ -96,7 +102,7 @@ trait Yielder
   }
 
   /**
-   * @param                              $nest
+   * @param                               $nest
    * @param \Cubex\Foundation\IRenderable $render
    *
    * @return Layout
@@ -108,7 +114,7 @@ trait Yielder
   }
 
   /**
-   * @param                              $nest
+   * @param                               $nest
    * @param \Cubex\Foundation\IRenderable $render
    *
    * @return Layout
