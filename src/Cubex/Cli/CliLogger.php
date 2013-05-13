@@ -89,9 +89,10 @@ class CliLogger
   public static function getDefaultLogPath($instanceName = "")
   {
     $logsDir = realpath(dirname(WEB_ROOT)) . DS . 'logs';
+    $logsDir .= DS . $_REQUEST['__path__'];
     if($instanceName != "")
     {
-      $logsDir .= DS . $instanceName;
+      $logsDir .= '-' . $instanceName;
     }
     return $logsDir;
   }
