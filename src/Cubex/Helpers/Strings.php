@@ -144,4 +144,20 @@ class Strings
     }
     return $prefix;
   }
+
+
+  /**
+   * @param $string string String to split
+   * @param $offset int character position to split on
+   *
+   * @return array [(string)Part1,(string)Part2]
+   */
+  public static function splitAt($string, $offset)
+  {
+    $parts = str_split($string, $offset);
+    $part1 = array_shift($parts);
+    $part2 = implode("", $parts);
+
+    return [$part1, $part2];
+  }
 }
