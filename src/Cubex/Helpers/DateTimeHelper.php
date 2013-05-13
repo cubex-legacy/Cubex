@@ -36,4 +36,48 @@ class DateTimeHelper
 
     return vsprintf($formatString, $params);
   }
+
+  /**
+   * @param mixed  $anything
+   * @param string $pattern
+   *
+   * @return string
+   * @throws \InvalidArgumentException
+   */
+  public static function formattedDateFromAnything(
+    $anything,
+    $pattern = "Y-m-d H:i:s"
+  )
+  {
+    $type = gettype($anything);
+
+    switch($type)
+    {
+      case "object":
+        if($anything instanceof \DateTime)
+        {
+          return $anything->format($pattern);
+        }
+        break;
+      case "integer":
+        return date($pattern, $anything);
+      case "string":
+        if(strlen($anything) === strlen((int)$anything))
+        {
+          return date($pattern, $anything);
+        }
+
+        $anything = strtotime($anything);
+        if($anything !== false)
+        {
+          return date($pattern, $anything);
+        }
+
+        break;
+    }
+
+    throw new \InvalidArgumentException(
+      "Failed Converting param of type '{$type}' to '{$pattern}'"
+    );
+  }
 }
