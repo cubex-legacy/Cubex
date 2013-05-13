@@ -8,6 +8,7 @@ use Cubex\Bundle\BundlerTrait;
 use Cubex\Core\Controllers\BaseController;
 use Cubex\Core\Interfaces\IDirectoryAware;
 use Cubex\Core\Interfaces\INamespaceAware;
+use Cubex\Core\Traits\NamespaceAwareTrait;
 use Cubex\Dispatch\Utils\ListenerTrait;
 use Cubex\Events\IEvent;
 use Cubex\Events\EventManager;
@@ -39,8 +40,7 @@ abstract class Application
   use ListenerTrait;
   use ServiceManagerAwareTrait;
   use BundlerTrait;
-
-  protected $_namespaceCache;
+  use NamespaceAwareTrait;
 
   /**
    * @var \Cubex\Core\Project\Project
@@ -280,22 +280,6 @@ abstract class Application
   public function response()
   {
     return $this->_response;
-  }
-
-  /**
-   * Namespace for the class, it is recommended you return __NAMESPACE__ when
-   * implementing a new application for performance gains
-   *
-   * @return string
-   */
-  public function getNamespace()
-  {
-    if($this->_namespaceCache === null)
-    {
-      $reflector             = new \ReflectionClass(get_called_class());
-      $this->_namespaceCache = $reflector->getNamespaceName();
-    }
-    return $this->_namespaceCache;
   }
 
   /**
