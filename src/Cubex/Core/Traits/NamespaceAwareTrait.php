@@ -19,8 +19,7 @@ trait NamespaceAwareTrait
   {
     if($this->_namespaceCache === null)
     {
-      $reflector             = new \ReflectionClass(get_called_class());
-      $this->_namespaceCache = $reflector->getNamespaceName();
+      $this->_namespaceCache = get_namespace(get_called_class());
     }
     return $this->_namespaceCache;
   }

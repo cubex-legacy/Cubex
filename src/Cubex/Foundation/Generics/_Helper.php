@@ -207,3 +207,20 @@ if(!function_exists("msleep"))
     usleep($milliseconds * 1000);
   }
 }
+
+if(!function_exists("get_namespace"))
+{
+  /**
+   * This will return the namespace of the passed object/class
+   *
+   * @param object|string $source
+   *
+   * @return string
+   */
+  function get_namespace($source)
+  {
+    $sourceObjectRefelction = new \ReflectionClass($source);
+
+    return $sourceObjectRefelction->getNamespaceName();
+  }
+}

@@ -405,9 +405,7 @@ class Dispatcher
    */
   public static function getNamespaceFromSource($source)
   {
-    $sourceObjectRefelction = new \ReflectionClass($source);
-
-    return $sourceObjectRefelction->getNamespaceName();
+    return get_namespace($source);
   }
 
   /**
