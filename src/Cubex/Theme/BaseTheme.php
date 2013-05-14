@@ -34,9 +34,14 @@ abstract class BaseTheme implements ITheme
 
   protected static $initiated;
 
-  public function getTemplate($template = 'default')
+  public function getTemplate($template = 'index')
   {
     return $this->_templateDir . $template . ".phtml";
+  }
+
+  public function getLayout($layout = 'default')
+  {
+    return $this->getTemplate('Layouts' . DS . $layout);
   }
 
   protected function _calculateTemplateDir()

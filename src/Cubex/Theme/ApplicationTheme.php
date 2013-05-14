@@ -44,7 +44,7 @@ class ApplicationTheme implements ITheme, INamespaceAware
     {
       $reflect          = new \ReflectionClass($eClass);
       $filedir          = dirname($reflect->getFileName());
-      $this->_tplDirs[] = $filedir . DS . 'Templates' . DS . 'Layouts' . DS;
+      $this->_tplDirs[] = $filedir . DS . 'Templates' . DS;
       $eClass           = $reflect->getParentClass()->getName();
     }
     while(substr($reflect->getParentClass()->getName(), 0, 5) != 'Cubex');
@@ -54,7 +54,7 @@ class ApplicationTheme implements ITheme, INamespaceAware
     return true;
   }
 
-  public function getTemplate($template = 'default')
+  public function getTemplate($template = 'index')
   {
     $this->_calculate();
     foreach($this->_tplDirs as $dir)
@@ -66,6 +66,11 @@ class ApplicationTheme implements ITheme, INamespaceAware
       }
     }
     return null;
+  }
+
+  public function getLayout($layout = 'default')
+  {
+    return $this->getTemplate('Layouts' . DS . $layout);
   }
 
   public function initiate()

@@ -48,7 +48,7 @@ class Layout implements IRenderable, INamespaceAware
 
   public function getFilePath()
   {
-    return $this->_themeProvider->getTemplate($this->_layoutTemplate);
+    return $this->_themeProvider->getLayout($this->_layoutTemplate);
   }
 
   public function getNamespace()

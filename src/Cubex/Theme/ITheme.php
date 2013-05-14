@@ -7,7 +7,9 @@ namespace Cubex\Theme;
 
 interface ITheme
 {
-  public function getTemplate($template = 'default');
+  public function getTemplate($template = 'index');
+
+  public function getLayout($layout = 'default');
 
   public function initiate();
 }
