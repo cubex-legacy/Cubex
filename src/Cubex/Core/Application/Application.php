@@ -26,6 +26,7 @@ use Cubex\Routing\StdRoute;
 use Cubex\Routing\StdRouter;
 use Cubex\ServiceManager\IServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
+use Cubex\Theme\ApplicationTheme;
 
 /**
  * Web Application
@@ -412,5 +413,10 @@ abstract class Application
   public function projectBase()
   {
     return $this->getConfig()->get("_cubex_")->getStr('project_base');
+  }
+
+  public function getTheme()
+  {
+    return new ApplicationTheme($this);
   }
 }

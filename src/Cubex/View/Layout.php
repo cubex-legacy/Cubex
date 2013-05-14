@@ -11,6 +11,7 @@ use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Foundation\DataHandler\HandlerTrait;
 use Cubex\Foundation\IRenderable;
 use Cubex\I18n\TranslateTraits;
+use Cubex\Theme\ITheme;
 
 class Layout implements IRenderable, INamespaceAware
 {
@@ -21,73 +22,42 @@ class Layout implements IRenderable, INamespaceAware
   use HandlerTrait;
 
   protected $_layoutTemplate = 'Default';
-  protected $_layoutDirectory = '';
   protected $_entity;
   protected $_namespaceCache;
+  protected $_themeProvider;
 
-
-  public function __construct($entity, $layoutDir = null)
+  public function __construct(ITheme $theme, INamespaceAware $callee = null)
   {
-    $this->_entity = $entity;
-    if($layoutDir === null)
+    $this->_themeProvider = $theme;
+    if($callee === null)
     {
-      $this->_layoutDirectory = $this->calculateLayoutDirs($entity);
+      if($theme instanceof INamespaceAware)
+      {
+        $this->_entity = $theme;
+      }
+      else
+      {
+        throw new \Exception("You must specify the callee for your layout");
+      }
     }
     else
     {
-      $this->_layoutDirectory = $layoutDir;
+      $this->_entity = $callee;
     }
   }
 
-  public function calculateLayoutDirs($entity)
+  public function getFilePath()
   {
-    $dirs   = [];
-    $eClass = get_class($entity);
-    do
-    {
-      $reflect = new \ReflectionClass($eClass);
-      $filedir = dirname($reflect->getFileName());
-      $dirs[]  = $filedir . DS . 'Templates' . DS . 'Layouts' . DS;
-      $eClass  = $reflect->getParentClass()->getName();
-    }
-    while(substr($reflect->getParentClass()->getName(), 0, 5) != 'Cubex');
-    return implode(';', $dirs);
+    return $this->_themeProvider->getTemplate($this->_layoutTemplate);
   }
 
   public function getNamespace()
   {
     if($this->_namespaceCache === null)
     {
-      if($this->_entity instanceof INamespaceAware)
-      {
-        $this->_namespaceCache = $this->_entity->getNamespace();
-      }
-      else if($this->_entity !== null)
-      {
-        $class                 = get_class($this->_entity);
-        $reflect               = new \ReflectionClass($class);
-        $this->_namespaceCache = $reflect->getNamespaceName();
-      }
-      else
-      {
-        $this->_namespaceCache = __NAMESPACE__;
-      }
+      $this->_namespaceCache = $this->_entity->getNamespace();
     }
     return $this->_namespaceCache;
-  }
-
-  /**
-   * @return \Cubex\Core\Interfaces\IDirectoryAware
-   */
-  public function entity()
-  {
-    return $this->_entity;
-  }
-
-  public function setLayoutsDirectory($directory)
-  {
-    $this->_layoutDirectory = $directory;
-    return $this;
   }
 
   public function setTemplate($fileName = 'default')
@@ -96,17 +66,18 @@ class Layout implements IRenderable, INamespaceAware
     return $this;
   }
 
-  public function getFilePath()
+  /**
+   * Entity responsible for the layout
+   *
+   * @return INamespaceAware
+   */
+  public function entity()
   {
-    $directories = explode(';', $this->_layoutDirectory);
-    foreach($directories as $dir)
-    {
-      $try = $dir . $this->_layoutTemplate . '.phtml';
-      if(file_exists($try))
-      {
-        return $try;
-      }
-    }
-    return null;
+    return $this->_entity;
+  }
+
+  public function themeProvider()
+  {
+    return $this->_themeProvider;
   }
 }

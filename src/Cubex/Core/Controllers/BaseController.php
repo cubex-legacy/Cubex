@@ -393,7 +393,7 @@ class BaseController
   protected function _attemptRoutes(array $routes)
   {
     $paths = [];
-    $base  = $this->application()->baseUri();
+    $base  = $this->_application->baseUri();
     $path  = $this->request()->path();
     if(starts_with($path, $base))
     {

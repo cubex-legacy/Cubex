@@ -10,6 +10,7 @@ use Cubex\Core\Response\Webpage;
 use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\IRenderable;
+use Cubex\Theme\ApplicationTheme;
 use Cubex\View\Impart;
 use Cubex\View\Layout;
 use Cubex\View\Templates\Exceptions\ExceptionView;
@@ -47,19 +48,19 @@ class WebpageController extends BaseController
 
   public function setTitle($title)
   {
-    $this->webpage()->setTitle($title);
+    $this->_webpage->setTitle($title);
     return $this;
   }
 
   public function addMeta($name, $value)
   {
-    $this->webpage()->addMeta($name, $value);
+    $this->_webpage->addMeta($name, $value);
     return $this;
   }
 
   public function layout()
   {
-    return $this->webpage()->layout();
+    return $this->_webpage->layout();
   }
 
   /**
@@ -69,7 +70,7 @@ class WebpageController extends BaseController
   {
     if($this->_layout === null)
     {
-      $this->setLayoutName($this->application()->layout());
+      $this->setLayoutName($this->_application->layout());
     }
     return $this->_layout;
   }
@@ -86,25 +87,25 @@ class WebpageController extends BaseController
 
   public function nest($name, IRenderable $content)
   {
-    $this->webpage()->layout()->nest($name, $content);
+    $this->_webpage->layout()->nest($name, $content);
     return $this;
   }
 
   public function renderBefore($name, IRenderable $item)
   {
-    $this->webpage()->layout()->renderBefore($name, $item);
+    $this->_webpage->layout()->renderBefore($name, $item);
     return $this;
   }
 
   public function renderAfter($name, IRenderable $item)
   {
-    $this->webpage()->layout()->renderAfter($name, $item);
+    $this->_webpage->layout()->renderAfter($name, $item);
     return $this;
   }
 
   public function isNested($name)
   {
-    return $this->webpage()->layout()->isNested($name);
+    return $this->_webpage->layout()->isNested($name);
   }
 
   /**
@@ -129,10 +130,14 @@ class WebpageController extends BaseController
       );
     }
 
-    $layout = new Layout($this->application());
+    $theme = $this->_application->getTheme();
+    $theme->initiate();
+
+    $layout = new Layout($theme, $this->_application);
     $layout->setTemplate($this->layoutName());
     $this->_webpage->setLayout($layout);
     $this->_webpage->renderableNest($this->_getActionNestName());
+
     return parent::dispatch($request, $response);
   }
 
