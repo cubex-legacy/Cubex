@@ -10,7 +10,7 @@ namespace Cubex\Theme;
  *
  * protected function _selfDirectory()
  * {
- *   return dirname(__FILE__);
+ *   return __DIR__;
  * }
  *
  * public function getNamespace()
