@@ -45,10 +45,17 @@ class Dependency extends Dispatcher
     $entityHash        = $this->generateEntityHash($entity);
     $resourceHash      = $this->getNomapHash();
 
-    $ini = $this->getDispatchIni($entity);
-    if(isset($ini[$path]))
+    $ini    = $this->getDispatchIni($entity);
+    $iniKey = $path;
+
+    if($package)
     {
-      $resourceHash = $this->generateResourceHash($ini[$path]);
+      $iniKey = $this->getResourceExtensionStripped($iniKey);
+    }
+
+    if(isset($ini[$iniKey]))
+    {
+      $resourceHash = $this->generateResourceHash($ini[$iniKey]);
     }
 
     if($package)
