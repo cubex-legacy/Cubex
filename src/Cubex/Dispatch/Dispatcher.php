@@ -27,6 +27,7 @@ class Dispatcher
   private $_projectBase;
   private $_baseHash       = "esabot";
   private $_nomapHash      = "pamon";
+  private $_packageHash    = "pkg";
   private $_supportedTypes = [
     "ico"   => "image/x-icon",
     "css"   => "text/css; charset=utf-8",
@@ -245,6 +246,14 @@ class Dispatcher
   public function getNomapHash()
   {
     return $this->_nomapHash;
+  }
+
+  /**
+   * @return string
+   */
+  public function getPackageHash()
+  {
+    return $this->_packageHash;
   }
 
   /**

@@ -182,7 +182,7 @@ class Resource extends Dependency
       {
         if(strpos($resolvableUri, $protocol) === 0)
         {
-          $strippedUri                                    = substr(
+          $strippedUri                                      = substr(
             $resolvableUri,
             strlen($protocol)
           );

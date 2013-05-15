@@ -61,7 +61,6 @@ trait ListenerTrait
         $event->setNamespace($namespace);
 
         $url = new Resource(Container::get(Container::CONFIG), $fileSystem);
-
         $url->addBlock($event);
       },
       $namespace

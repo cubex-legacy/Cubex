@@ -47,7 +47,7 @@ class Dependency extends Dispatcher
 
     if($package)
     {
-      $resourceHash = "pkg";
+      $resourceHash = $this->getPackageHash();
     }
     else
     {
