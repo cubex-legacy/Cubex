@@ -47,8 +47,15 @@ class Serve extends Dispatcher implements IDispatchable
     }
 
     $resourceHash = $dispatchPath->getResourceHash();
+    $useMap       = true;
+
+    if($resourceHash === $this->getNomapHash())
+    {
+      $useMap = false;
+    }
+
     $this->setDispatchPath($dispatchPath)
-      ->setUseMap($resourceHash !== $this->getNomapHash());
+      ->setUseMap($useMap);
   }
 
   /**
@@ -105,7 +112,7 @@ class Serve extends Dispatcher implements IDispatchable
     }
     else
     {
-      if($resourceHash === "pkg")
+      if($this->getDispatchPath()->getMarker() === $this->getPackageHash())
       {
         $data = $this->getPackageData($domain);
       }
@@ -136,21 +143,14 @@ class Serve extends Dispatcher implements IDispatchable
     }
   }
 
-  /**
-   * @param string $domain
-   *
-   * @return string
-   */
-  public function getData($domain)
+  protected function _getData($domain, $pathToResource, $entityHash)
   {
     $data            = "";
     $locatedFileKeys = [];
 
-    $pathToResource = $this->getDispatchPath()->getPathToResource();
     $filePathParts  = explode("/", $pathToResource);
     $filename       = array_pop($filePathParts);
     $pathToFile     = implode("/", $filePathParts);
-    $entityHash     = $this->getDispatchPath()->getEntityHash();
     $fullEntityPath = $this->getEntityPathByHash($entityHash);
 
     if(!$this->getFileSystem()->isAbsolute($fullEntityPath))
@@ -169,7 +169,7 @@ class Serve extends Dispatcher implements IDispatchable
     {
       foreach($files as $file)
       {
-        if(array_key_exists($fileKey, $locatedFileKeys))
+        if(isset($locatedFileKeys[$fileKey]))
         {
           continue;
         }
@@ -195,48 +195,61 @@ class Serve extends Dispatcher implements IDispatchable
     return $data;
   }
 
+  /**
+   * @param string $domain
+   *
+   * @return string
+   */
+  public function getData($domain)
+  {
+    $pathToResource = $this->getDispatchPath()->getPathToResource();
+    $entityHash     = $this->getDispatchPath()->getEntityHash();
+
+    return $this->_getData($domain, $pathToResource, $entityHash);
+  }
+
   public function getPackageData($domain)
   {
-    $data      = "";
-    $entityMap = false;
+    $data           = "";
+    $packageFile    = $this->getDispatchPath()->getPathToResource();
+    $packageType    = $this->getResourceExtension($packageFile);
+    $packageDir     = substr($packageFile, 0, -(strlen($packageType) + 1));
+    $entityHash     = $this->getDispatchPath()->getEntityHash();
+    $fullPackageDir = $this->getEntityPathByHash($entityHash);
+    $fullPackageDir .= DS . $packageDir;
 
-    $mapper = new DispatchMapper($this->getConfig(), $this->getFileSystem());
-    $entity = $this->findEntityFromHash(
-      $this->getDispatchPath()->getEntityHash(),
-      $mapper
-    );
-    if($entity)
+    if(!$this->getFileSystem()->isAbsolute($fullPackageDir))
     {
-      $entityMap = $this->getDispatchIni($entity);
+      $fullPackageDir = $this->getProjectBase() . DS . $fullPackageDir;
     }
 
-    if(!$entityMap)
+    try
     {
-      $mapper    = new DispatchMapper(
-        $this->getConfig(),
-        $this->getFileSystem()
+      $directoryList = $this->getFileSystem()->listDirectory(
+        $fullPackageDir,
+        false
       );
-      $entityMap = $this->findAndSaveEntityMap($entity, $mapper);
+    }
+    catch(\Exception $e)
+    {
+      $directoryList = [];
     }
 
-    $fileExtension = $this->getResourceExtension(
-      $this->getDispatchPath()->getPathToResource()
-    );
-
-    // Only allow JS and CSS packages
-    $typeEnums = (new TypeEnum())->getConstList();
-    if(in_array($fileExtension, $typeEnums))
+    foreach($directoryList as $directoryListItem)
     {
-      if(!empty($entityMap))
+      $fullPackageDirListItem = $fullPackageDir . DS . $directoryListItem;
+      if(!$this->getFileSystem()->isDir($fullPackageDirListItem))
       {
-        $entityMap = array_keys($entityMap);
-        foreach($entityMap as $resource)
+        $fullPackageDirListItemType = $this->getResourceExtension(
+          $fullPackageDirListItem
+        );
+        if($fullPackageDirListItemType === $packageType)
         {
-          $resourceExtension = $this->getResourceExtension($resource);
-          if($resourceExtension === $fileExtension)
-          {
-            $data .= $this->getData($domain) . "\n";
-          }
+          $data .= $this->_getData(
+            $domain,
+            $packageDir . DS . $directoryListItem,
+            $entityHash
+          );
         }
       }
     }
