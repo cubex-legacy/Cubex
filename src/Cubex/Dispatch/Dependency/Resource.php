@@ -20,6 +20,9 @@ class Resource extends Dependency
     "js"  => [],
   );
 
+  /**
+   * @var array
+   */
   protected static $_packages = array(
     "css" => [],
     "js"  => [],
@@ -84,7 +87,7 @@ class Resource extends Dependency
 
     foreach(self::$_requires[(string)$type] as $resource)
     {
-      if(!array_key_exists($resource["uri"], $sentUris))
+      if(!isset($sentUris[$resource["uri"]]))
       {
         $resourceUris[]             = $resource["uri"];
         $sentUris[$resource["uri"]] = $resource["uri"];
