@@ -5,6 +5,7 @@
 namespace Cubex\Dispatch;
 
 use Cubex\Container\Container;
+use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\FileSystem\FileSystem;
 use Cubex\Foundation\Config\ConfigGroup;
 
@@ -177,10 +178,16 @@ class DispatchMapper extends Dispatcher
    */
   public function mapEntity($entity, $entityPath = "")
   {
-    $map = [];
+    $map       = [];
     $directory = $this->getProjectBase() . DS . $entity;
+
     if($entityPath)
     {
+      if($this->_hasHiddenDirectoryInPath($entityPath))
+      {
+        return [];
+      }
+
       $directory .= DS . $entityPath;
     }
 
@@ -193,6 +200,9 @@ class DispatchMapper extends Dispatcher
       $directoryList = [];
     }
 
+    $cleanedEntityPath = str_replace("\\", "/", $entityPath);
+    $directoryContent  = "";
+
     foreach($directoryList as $directoryListItem)
     {
       $currentEntity = $directory . DS . $directoryListItem;
@@ -202,12 +212,11 @@ class DispatchMapper extends Dispatcher
         $newEntityPath .= $directoryListItem;
         $map = array_merge($map, $this->mapEntity($entity, $newEntityPath));
       }
-      else if(!array_key_exists($directoryListItem, $this->_ignoredFiles))
+      else if(!isset($this->_ignoredFiles[$directoryListItem]))
       {
-        $cleanedEntityPath = $this->_removeHiddenDirectoriesFromPath(
-          $entityPath
-        );
-        $cleanedCurrentEntity = $this->_removeHiddenDirectoriesFromPath(
+        $cleanedCurrentEntity = str_replace(
+          "\\",
+          "/",
           ($entityPath ? $entityPath . DS : "") . $directoryListItem
         );
 
@@ -215,15 +224,21 @@ class DispatchMapper extends Dispatcher
         // array and breaking our ini files
         if($cleanedCurrentEntity)
         {
-          $map[$cleanedCurrentEntity] = md5(
-            $this->_concatAllRelatedFiles(
-              $entity,
-              $cleanedEntityPath,
-              $directoryListItem
-            )
+          $content = $this->_concatAllRelatedFiles(
+            $entity,
+            $cleanedEntityPath,
+            $directoryListItem
           );
+
+          $directoryContent           .= $content;
+          $map[$cleanedCurrentEntity] = md5($content);
         }
       }
+    }
+
+    if($directoryContent)
+    {
+      $map[$cleanedEntityPath] = md5($directoryContent);
     }
 
     return $map;
@@ -418,15 +433,11 @@ class DispatchMapper extends Dispatcher
   }
 
   /**
-   * Sometimes we get entity paths with a hidden directory in it (for branded
-   * resources) but we want it logged at it's normal location to match
-   * dispatch
-   *
    * @param string $path
    *
-   * @return string
+   * @return bool
    */
-  protected function _removeHiddenDirectoriesFromPath($path)
+  protected function _hasHiddenDirectoryInPath($path)
   {
     if($path)
     {
@@ -437,13 +448,11 @@ class DispatchMapper extends Dispatcher
       {
         if($pathPart[0] === ".")
         {
-          unset($pathParts[$pathPartKey]);
+          return true;
         }
       }
-
-      return implode("/", $pathParts);
     }
 
-    return $path;
+    return false;
   }
 }
