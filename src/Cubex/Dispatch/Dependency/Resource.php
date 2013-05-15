@@ -84,15 +84,10 @@ class Resource extends Dependency
 
     foreach(self::$_requires[(string)$type] as $resource)
     {
-      if(!isset(self::$_requires["packages"][$type . "_" . $resource["group"]])
-      || $resource["resource"] === "package"
-      )
+      if(!array_key_exists($resource["uri"], $sentUris))
       {
-        if(!array_key_exists($resource["uri"], $sentUris))
-        {
-          $resourceUris[]             = $resource["uri"];
-          $sentUris[$resource["uri"]] = $resource["uri"];
-        }
+        $resourceUris[]             = $resource["uri"];
+        $sentUris[$resource["uri"]] = $resource["uri"];
       }
     }
 
