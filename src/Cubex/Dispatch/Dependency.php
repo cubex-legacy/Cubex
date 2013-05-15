@@ -10,12 +10,17 @@ use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 class Dependency extends Dispatcher
 {
   /**
-   * @param \Cubex\Dispatch\DispatchEvent    $event
-   * @param \Cubex\Core\Http\Request $request
+   * @param \Cubex\Dispatch\DispatchEvent $event
+   * @param \Cubex\Core\Http\Request      $request
+   * @param bool                          $package
    *
    * @return \Cubex\Dispatch\DispatchPath
    */
-  public function getDispatchPath(DispatchEvent $event, Request $request)
+  public function getDispatchPath(
+    DispatchEvent $event,
+    Request $request,
+    $package = false
+  )
   {
     $path    = ltrim($event->getFile(), "/");
     $base    = substr($event->getFile(), 0, 1) === "/";
@@ -40,10 +45,17 @@ class Dependency extends Dispatcher
     $entityHash        = $this->generateEntityHash($entity);
     $resourceHash      = $this->getNomapHash();
 
-    $ini = $this->getDispatchIni($entity);
-    if(isset($ini[$path]))
+    if($package)
     {
-      $resourceHash = $this->generateResourceHash($ini[$path]);
+      $resourceHash = "pkg";
+    }
+    else
+    {
+      $ini = $this->getDispatchIni($entity);
+      if(isset($ini[$path]))
+      {
+        $resourceHash = $this->generateResourceHash($ini[$path]);
+      }
     }
 
     return DispatchPath::fromParams(

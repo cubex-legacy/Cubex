@@ -244,27 +244,7 @@ class Resource extends Dependency
    */
   public function requireInternalResource(DispatchEvent $event)
   {
-    $file = $event->getFile();
-    $type = $event->getType();
-
-    $typeStringLength = strlen($type);
-
-    if(substr($file, -($typeStringLength + 1)) !== ".$type")
-    {
-      $file = "$file.$type";
-    }
-
-    if(substr($file, 0, 1) === "/")
-    {
-      $file = "/$type$file";
-    }
-    else
-    {
-      $file = "$type/$file";
-    }
-
-    $event->setFile($file);
-    $this->_requireResource($event);
+    $this->_requireResource($this->_prepareEvent($event));
   }
 
   /**
@@ -315,8 +295,8 @@ class Resource extends Dependency
   }
 
   /**
-   * @param \Cubex\Dispatch\DispatchEvent $event
-   * @param bool                          $resolvable
+   * @param DispatchEvent $event
+   * @param bool          $resolvable
    */
   protected function _requireResource(DispatchEvent $event, $resolvable = false)
   {
@@ -343,11 +323,41 @@ class Resource extends Dependency
   }
 
   /**
+   * @param DispatchEvent $event
+   *
+   * @return DispatchEvent
+   */
+  protected function _prepareEvent(DispatchEvent $event)
+  {
+    $file = $event->getFile();
+    $type = $event->getType();
+
+    $typeStringLength = strlen($type);
+
+    if(substr($file, -($typeStringLength + 1)) !== ".$type")
+    {
+      $file = "$file.$type";
+    }
+
+    if(substr($file, 0, 1) === "/")
+    {
+      $file = "/$type$file";
+    }
+    else
+    {
+      $file = "$type/$file";
+    }
+
+    $event->setFile($file);
+    return $event;
+  }
+
+  /**
    * @param \Cubex\Dispatch\DispatchEvent $event
    */
   public function requirePackage(DispatchEvent $event)
   {
-    $this->_requirePackage($event);
+    $this->_requirePackage($this->_prepareEvent($event));
   }
 
   /**
@@ -356,21 +366,20 @@ class Resource extends Dependency
   protected function _requirePackage(DispatchEvent $event)
   {
     $request      = Container::get(Container::REQUEST);
-    $dispatchPath = $this->getDispatchPackagePath($event, $request);
+    $dispatchPath = $this->getDispatchPath($event, $request, true);
+    $group        = $dispatchPath->getEntityHash();
+    $uri          = $this->getDispatchUrl($dispatchPath, $request);
 
     self::$_requires[(string)$event->getType()][] = [
-      "group"    => $dispatchPath->getEntityHash(),
+      "group"    => $group,
       "resource" => "package",
-      "uri"      => $dispatchPath->getDispatchPath()
+      "uri"      => $uri,
     ];
-
-    $key = $event->getType() . "_" . $dispatchPath->getEntityHash();
-    //self::$_requires["packages"][$key] = true;
   }
 
   /**
-   * @param \Cubex\Dispatch\DispatchEvent    $event
-   * @param \Cubex\Core\Http\Request $request
+   * @param DispatchEvent $event
+   * @param Request       $request
    *
    * @return \Cubex\Dispatch\DispatchPath
    */
