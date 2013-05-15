@@ -13,6 +13,8 @@ trait Translation
   protected $_textdomain = 'messages';
   protected $_boundTd = false;
 
+  protected $_filepathCache;
+
   /**
    * @return \Cubex\I18n\Loader\ITanslationLoader
    */
@@ -92,10 +94,13 @@ trait Translation
 
   public function textDomain()
   {
-    $projectBase       = $this->projectBase();
-    $path              = str_replace($projectBase, '', $this->filePath());
-    $path              = ltrim($path, '\\');
-    $this->_textdomain = md5(str_replace('\\', '/', $path));
+    if($this->_textdomain === null)
+    {
+      $projectBase       = $this->projectBase();
+      $path              = str_replace($projectBase, '', $this->filePath());
+      $path              = ltrim($path, '\\');
+      $this->_textdomain = md5(str_replace('\\', '/', $path));
+    }
 
     if(!$this->_boundTd)
     {
@@ -120,7 +125,11 @@ trait Translation
    */
   public function filePath()
   {
-    $reflector = new \ReflectionClass(get_class($this));
-    return \dirname($reflector->getFileName());
+    if($this->_filepathCache === null)
+    {
+      $reflector            = new \ReflectionClass(get_class($this));
+      $this->_filepathCache = dirname($reflector->getFileName());
+    }
+    return $this->_filepathCache;
   }
 }
