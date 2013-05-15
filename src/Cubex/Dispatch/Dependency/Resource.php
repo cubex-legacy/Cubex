@@ -16,16 +16,20 @@ class Resource extends Dependency
    * @var array
    */
   protected static $_requires = array(
-    "css"      => [],
-    "js"       => [],
-    "packages" => [],
+    "css" => [],
+    "js"  => [],
+  );
+
+  protected static $_packages = array(
+    "css" => [],
+    "js"  => [],
   );
 
   /**
    * @var array
    */
   protected static $_blocks = array(
-    "js"       => [],
+    "js" => [],
   );
 
   /**
@@ -244,7 +248,10 @@ class Resource extends Dependency
    */
   public function requireInternalResource(DispatchEvent $event)
   {
-    $this->_requireResource($this->_prepareEvent($event));
+    if(!$this->_resourceLoadedInPackage($event->getFile(), $event->getType()))
+    {
+      $this->_requireResource($this->_prepareEvent($event));
+    }
   }
 
   /**
@@ -357,14 +364,10 @@ class Resource extends Dependency
    */
   public function requirePackage(DispatchEvent $event)
   {
-    $this->_requirePackage($this->_prepareEvent($event));
-  }
+    self::$_packages[(string)$event->getType()][$event->getFile()] = true;
+    $this->_removePackagedResources($event->getType());
 
-  /**
-   * @param \Cubex\Dispatch\DispatchEvent $event
-   */
-  protected function _requirePackage(DispatchEvent $event)
-  {
+    $event        = $this->_prepareEvent($event);
     $request      = Container::get(Container::REQUEST);
     $dispatchPath = $this->getDispatchPath($event, $request, true);
     $group        = $dispatchPath->getEntityHash();
@@ -375,6 +378,20 @@ class Resource extends Dependency
       "resource" => "package",
       "uri"      => $uri,
     ];
+  }
+
+  protected function _removePackagedResources(TypeEnum $type)
+  {
+    $typeAsString = (string)$type;
+    foreach(self::$_requires[$typeAsString] as $requireKey => $require)
+    {
+      // Removes the direcotry type
+      $resource = implode("", explode("$type/", $require["resource"], 2));
+      if($this->_resourceLoadedInPackage($resource, $type))
+      {
+        unset(self::$_requires[$typeAsString][$requireKey]);
+      }
+    }
   }
 
   /**
@@ -392,5 +409,26 @@ class Resource extends Dependency
       ->getDispatchPath(true);
 
     return $dispatchPackagePath;
+  }
+
+  /**
+   * @param          $file
+   * @param TypeEnum $type
+   *
+   * @return bool
+   */
+  protected function _resourceLoadedInPackage($file, TypeEnum $type)
+  {
+    $fileReversed = strrev($file);
+    $fileParts    = explode("/", $fileReversed, 2);
+    $package      = strrev($fileParts[1]);
+    $type         = (string)$type;
+
+    if(isset(self::$_packages[$type][$package]))
+    {
+      return true;
+    }
+
+    return false;
   }
 }

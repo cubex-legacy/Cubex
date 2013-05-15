@@ -100,7 +100,6 @@ class Serve extends Dispatcher implements IDispatchable
    */
   private function _buildResponse(Response $response, $domain)
   {
-    $resourceHash   = $this->getDispatchPath()->getResourceHash();
     $pathToResource = $this->getDispatchPath()->getPathToResource();
     $debugString    = $this->getDispatchPath()->getDebugString();
     $resourceType   = $this->getResourceExtension($pathToResource);
@@ -213,7 +212,7 @@ class Serve extends Dispatcher implements IDispatchable
     $data           = "";
     $packageFile    = $this->getDispatchPath()->getPathToResource();
     $packageType    = $this->getResourceExtension($packageFile);
-    $packageDir     = substr($packageFile, 0, -(strlen($packageType) + 1));
+    $packageDir     = $this->getResourceExtensionStripped($packageFile);
     $entityHash     = $this->getDispatchPath()->getEntityHash();
     $fullPackageDir = $this->getEntityPathByHash($entityHash);
     $fullPackageDir .= DS . $packageDir;

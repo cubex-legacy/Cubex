@@ -342,6 +342,19 @@ class Dispatcher
   }
 
   /**
+   * @param string $resource
+   *
+   * @return string
+   */
+  public function getResourceExtensionStripped($resource)
+  {
+    $resource      = strrev($resource);
+    $resourceParts = explode(".", $resource, 2);
+
+    return strrev($resourceParts[1]);
+  }
+
+  /**
    * This will expand a filename and return an array of filenames that may get
    * included. This is for rendering resources before and after the main file
    *
@@ -351,9 +364,8 @@ class Dispatcher
    */
   public function getRelatedFilenamesOrdered($filename)
   {
-    $fileParts     = explode(".", $filename);
-    $fileExtension = array_pop($fileParts);
-    $filename      = implode(".", $fileParts);
+    $fileExtension = $this->getResourceExtension($filename);
+    $filename      = $this->getResourceExtensionStripped($filename);
 
     return array(
       "pre"  => "{$filename}.pre.{$fileExtension}",
