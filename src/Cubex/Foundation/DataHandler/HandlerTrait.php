@@ -171,11 +171,29 @@ trait HandlerTrait
   {
     if(isset($this->_data[$name]))
     {
+      return (string)$this->_data[$name];
+    }
+    else
+    {
+      return $default;
+    }
+  }
+
+  /**
+   * @param      $name
+   * @param null $default
+   *
+   * @return mixed|null
+   */
+  public function getStrNormalised($name, $default = null)
+  {
+    if(isset($this->_data[$name]))
+    {
       // Normalize newlines.
       return \str_replace(
         array("\r\n", "\r"),
         array("\n", "\n"),
-        (string)$this->_data[$name]
+        $this->_data[$name]
       );
     }
     else
