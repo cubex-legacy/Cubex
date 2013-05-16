@@ -38,7 +38,6 @@ class Response
   const RENDER_TEXT       = 'text';
   const RENDER_UNKNOWN    = 'unknown';
 
-
   /**
    * Create a new response object with a generic render type
    * Rendering of unsupported items will throw exceptions
@@ -133,7 +132,6 @@ class Response
     return $this;
   }
 
-
   /**
    * Set the response to be a json encoded object
    *
@@ -198,7 +196,6 @@ class Response
     $this->_renderType     = self::RENDER_REDIRECT;
     return $this;
   }
-
 
   /**
    * Send a response to the client based on the constructed response object
@@ -353,7 +350,6 @@ class Response
     return $this;
   }
 
-
   /**
    * Set cacheable time in seconds
    *
@@ -446,7 +442,6 @@ class Response
     return isset(self::$statusTexts[$code]) ? self::$statusTexts[$code] : '';
   }
 
-
   /**
    * Convert timestamp to a HTTP Header friendly format
    *
@@ -458,7 +453,6 @@ class Response
   {
     return \gmdate('D, d M Y H:i:s', $timestamp) . ' GMT';
   }
-
 
   /**
    * Status codes translation table.
