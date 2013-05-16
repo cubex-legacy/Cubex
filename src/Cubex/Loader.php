@@ -355,7 +355,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
         $this->request()->path(),
         $this->request()
       );
-      $this->request()->setPath("/" . $faviconPath);
+      $this->request()->setPath($faviconPath);
     }
 
     try
