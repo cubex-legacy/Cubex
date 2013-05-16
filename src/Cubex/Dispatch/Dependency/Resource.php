@@ -274,17 +274,26 @@ class Resource extends Dependency
       );
     }
 
+    $versions = array_fuse(
+      array_keys(self::$_thirdpartyLibraries[(string)$type][$library])
+    );
+
     if($version === null)
     {
-      $uri = current(self::$_thirdpartyLibraries[(string)$type][$library]);
+      $version = current($versions);
     }
-    else
+
+    if(!isset($versions[$version]))
     {
-      if(!array_key_exists(
-        $version,
-        self::$_thirdpartyLibraries[(string)$type][$library]
-      )
-      )
+      $versions = array_filter(
+        $versions,
+        function($var) use ($version)
+        {
+          return starts_with($var, $version);
+        }
+      );
+
+      if(!$versions)
       {
         throw new \InvalidArgumentException(
           "Version '{$version}' of the {$type} '{$library}' library is not " .
@@ -292,8 +301,10 @@ class Resource extends Dependency
         );
       }
 
-      $uri = self::$_thirdpartyLibraries[(string)$type][$library][$version];
+      $version = current($versions);
     }
+
+    $uri = self::$_thirdpartyLibraries[(string)$type][$library][$version];
 
     $event->setFile($request->protocol() . $uri);
     $this->_requireResource($event, true);
