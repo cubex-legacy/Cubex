@@ -127,7 +127,6 @@ class Serve extends Dispatcher implements IDispatchable
       }
       else
       {
-        $response->from($data);
         $this->_setResponseHeaders($response, $data, $resourceType);
 
         if($debugString === self::getNocacheDebugString())
@@ -406,7 +405,7 @@ class Serve extends Dispatcher implements IDispatchable
    */
   private function _setResponseHeaders(Response $response, $data, $resourceType)
   {
-    $response->from($data)
+    $response->fromDispatch($data)
       ->addHeader("Content-Type", $this->getSupportedTypes()[$resourceType])
       ->addHeader("X-Powered-By", "Cubex:Dispatch")
       ->setStatusCode(200)

@@ -37,6 +37,7 @@ class Response
   const RENDER_JSONP      = 'jsonp';
   const RENDER_TEXT       = 'text';
   const RENDER_UNKNOWN    = 'unknown';
+  const RENDER_DISPATCH   = 'dispatch';
 
   /**
    * Create a new response object with a generic render type
@@ -183,6 +184,21 @@ class Response
   }
 
   /**
+   * Set the response to be text from dispatch
+   *
+   * @param string $item
+   *
+   * @return Response
+   */
+  public function fromDispatch($item)
+  {
+    $this->_responseObject = $item;
+    $this->_renderType     = self::RENDER_DISPATCH;
+
+    return $this;
+  }
+
+  /**
    * Set the response to be a redirect response
    *
    * @param \Cubex\Core\Http\Redirect $redirect
@@ -225,11 +241,10 @@ class Response
     switch($this->_renderType)
     {
       case self::RENDER_RENDERABLE:
-
         $this->addHeader("Content-Type", "text/html; charset=UTF-8", false);
         $this->sendHeaders();
 
-        /* Render header before content to allow browser to start loading css */
+        // Render header before content to allow browser to start loading css
         \ob_implicit_flush(true);
         if($this->_responseObject instanceof IRenderable)
         {
@@ -237,7 +252,6 @@ class Response
         }
         break;
       case self::RENDER_JSON:
-
         $this->addHeader("Content-Type", "application/json", false);
         $this->sendHeaders();
 
@@ -253,7 +267,6 @@ class Response
 
         break;
       case self::RENDER_JSONP:
-
         $this->addHeader("Content-Type", "application/json", false);
         $this->sendHeaders();
 
@@ -271,7 +284,7 @@ class Response
 
         break;
       case self::RENDER_TEXT:
-
+      case self::RENDER_DISPATCH:
         $this->addHeader("Content-Type", "text/plain", false);
         $this->sendHeaders();
         echo $this->_responseObject;
