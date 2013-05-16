@@ -138,7 +138,7 @@ class Strings
   {
     if($stopOnInt)
     {
-      $str1 = rtrim($str1, "0123456789");
+      $str1 = strtok($str1, "0123456789");
     }
     $preLen = strlen($str1 ^ $str2) - strlen(ltrim($str1 ^ $str2, chr(0)));
     return substr($str1, 0, $preLen);
