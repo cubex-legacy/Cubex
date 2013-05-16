@@ -136,13 +136,12 @@ class Strings
 
   public static function commonPrefix($str1, $str2, $stopOnInt = true)
   {
-    $prefix = '';
-    $i      = 0;
-    while($str1[$i] == $str2[$i] && !($stopOnInt && is_numeric($str1[$i])))
+    if($stopOnInt)
     {
-      $prefix .= $str1[$i++];
+      $str1 = rtrim($str1, "0123456789");
     }
-    return $prefix;
+    $preLen = strlen($str1 ^ $str2) - strlen(ltrim($str1 ^ $str2, chr(0)));
+    return substr($str1, 0, $preLen);
   }
 
 
