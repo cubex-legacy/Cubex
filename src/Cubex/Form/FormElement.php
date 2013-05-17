@@ -396,4 +396,26 @@ class FormElement extends Attribute implements IRenderable
   {
     return $this->_setScalarAttribute("step", $step);
   }
+
+  /**
+   * Setting no validate will stop browsers trying to validate forms with their
+   * html5 marvels
+   *
+   * @param bool $noValidate
+   *
+   * @return $this
+   */
+  public function setNoValidate($noValidate = false)
+  {
+    if($noValidate)
+    {
+      $this->addAttribute("novalidate");
+    }
+    else
+    {
+      $this->removeAttribute("novalidate");
+    }
+
+    return $this;
+  }
 }
