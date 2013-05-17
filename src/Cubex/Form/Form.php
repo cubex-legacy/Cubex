@@ -287,6 +287,19 @@ class Form extends DataMapper implements IRenderable
   }
 
   /**
+   * Setting no validate will stop browsers trying to validate forms with their
+   * html5 marvels
+   *
+   * @return $this
+   */
+  public function setNoValidate()
+  {
+    $this->addAttribute("novalidate");
+
+    return $this;
+  }
+
+  /**
    * @param $name
    *
    * @return FormElement
