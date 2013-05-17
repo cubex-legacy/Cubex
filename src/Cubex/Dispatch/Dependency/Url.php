@@ -20,10 +20,11 @@ class Url extends Dependency
       return $file;
     }
 
-    if(preg_match(static::PACKAGE_REGEX, $file, $matches))
+    $externalFileData = $this->_getExternalFileDetails($file);
+    if($externalFileData)
     {
-      $event->setExternalKey($matches[1]);
-      $file = $matches[2];
+      $event->setExternalKey($externalFileData["external_key"]);
+      $file = $externalFileData["file"];
     }
 
     $leadingUnderscore = substr($file, 0, 1) === "/" ? "/" : "";

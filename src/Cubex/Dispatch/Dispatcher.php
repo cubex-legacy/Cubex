@@ -615,6 +615,35 @@ class Dispatcher
   }
 
   /**
+   * If this is an external file we return an array;
+   *
+   * array(
+   *   "external_key" => external_key,
+   *   "file" => file,
+   * )
+   *
+   * @param $uri
+   *
+   * @return array|null
+   */
+  protected function _getExternalFileDetails($uri)
+  {
+    if($uri[0] === '{')
+    {
+      $endBracePos = strpos($uri, '}');
+      if($endBracePos)
+      {
+        return [
+          "external_key" => substr($uri, 1, $endBracePos - 1),
+          "file"         => substr($uri, $endBracePos + 1),
+        ];
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * @param string $uri
    * @param string $entityHash
    * @param string $domainHash
@@ -631,17 +660,14 @@ class Dispatcher
     }
 
     $external = false;
-    if($uri[0] === '{')
+    $externalFileData = $this->_getExternalFileDetails($uri);
+    if($externalFileData)
     {
-      $endBracePos = strpos($uri, '}');
-      if($endBracePos)
-      {
-        $entityHash = $this->generateEntityHash(
-          substr($uri, 1, $endBracePos - 1)
-        );
-        $uri        = substr($uri, $endBracePos + 1);
-        $external   = true;
-      }
+      $entityHash = $this->generateEntityHash(
+        $externalFileData["external_key"]
+      );
+      $uri        = $externalFileData["file"];
+      $external   = true;
     }
 
     if(substr($uri, 0, 1) === "/")
