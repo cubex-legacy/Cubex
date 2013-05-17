@@ -58,8 +58,6 @@ class Dispatcher
   const BUILD_OPT_TYPE_DOMAIN    = "domain";
   const BUILD_OPT_TYPE_SUBDOMAIN = "subdomain";
 
-  const PACKAGE_REGEX = "~#(\w+/\w+)#(.*)~";
-
   private static $_dispatchInis = [];
   private static $_entities;
   /**
@@ -625,7 +623,7 @@ class Dispatcher
    */
   public function dispatchUri($uri, $entityHash, $domainHash)
   {
-    $uri = trim($uri, "'\" \r\t\n");
+    $uri = trim($uri, "\r\t\n");
 
     if($this->isResolvableUri($uri))
     {
@@ -633,11 +631,17 @@ class Dispatcher
     }
 
     $external = false;
-    if(preg_match(static::PACKAGE_REGEX, $uri, $matches))
+    if($uri[0] === '{')
     {
-      $entityHash = $this->generateEntityHash($matches[1]);
-      $uri        = $matches[2];
-      $external   = true;
+      $endBracePos = strpos($uri, '}');
+      if($endBracePos)
+      {
+        $entityHash = $this->generateEntityHash(
+          substr($uri, 1, $endBracePos - 1)
+        );
+        $uri        = substr($uri, $endBracePos + 1);
+        $external   = true;
+      }
     }
 
     if(substr($uri, 0, 1) === "/")
