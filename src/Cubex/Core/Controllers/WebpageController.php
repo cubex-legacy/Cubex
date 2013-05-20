@@ -10,7 +10,6 @@ use Cubex\Core\Response\Webpage;
 use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\IRenderable;
-use Cubex\Theme\ApplicationTheme;
 use Cubex\View\Impart;
 use Cubex\View\Layout;
 use Cubex\View\Templates\Exceptions\ExceptionView;

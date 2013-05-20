@@ -12,4 +12,6 @@ interface ITheme
   public function getLayout($layout = 'default');
 
   public function initiate();
+
+  public function getIniFileDirectory();
 }

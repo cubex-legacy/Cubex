@@ -97,5 +97,10 @@ abstract class BaseTheme implements ITheme
     }
   }
 
+  public function getIniFileDirectory()
+  {
+    return dirname(dirname(dirname(__DIR__)));
+  }
+
   abstract protected function _initiate();
 }

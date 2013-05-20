@@ -80,6 +80,14 @@ class ApplicationTheme implements ITheme, INamespaceAware
      */
   }
 
+  public function getIniFileDirectory()
+  {
+    /**
+     * The application theme doesn't have an ini file
+     */
+    return false;
+  }
+
   /**
    * Returns the namespace of the class
    *
