@@ -10,6 +10,7 @@ use Cubex\Core\Http\Request;
 use Cubex\Data\Attribute;
 use Cubex\Data\Validator\Validator;
 use Cubex\Facade\Session;
+use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\IRenderable;
 use Cubex\Helpers\Strings;
 use Cubex\Mapper\DataMapper;
@@ -37,6 +38,8 @@ class Form extends DataMapper implements IRenderable
    * @var DataMapper
    */
   protected $_mapper;
+
+  protected $_renderer;
 
   public function __construct($name, $action = null, $method = 'post')
   {
@@ -451,8 +454,8 @@ class Form extends DataMapper implements IRenderable
     $sElement = new FormElement("__cubex_csrf__", true, null, $csrf);
     $sElement->setType("hidden")->setLabelPosition(Form::LABEL_NONE);
 
-    $tokenF = (new FormElementRender($element))->render();
-    $sessF  = (new FormElementRender($sElement))->render();
+    $tokenF = $element->getRenderer()->render();
+    $sessF  = $sElement->getRenderer()->render();
 
     return $tokenF . $sessF;
   }
@@ -777,6 +780,9 @@ class Form extends DataMapper implements IRenderable
     return $this->_addInputElement(FormElement::WEEK, func_get_args());
   }
 
+  /**
+   * @return \Cubex\Form\FormElement[]
+   */
   public function elements()
   {
     return $this->_attributes;
@@ -794,10 +800,9 @@ class Form extends DataMapper implements IRenderable
     return $this;
   }
 
-
   public function render()
   {
-    return (new FormRender($this, $this->_renderGroupType))->render();
+    return $this->getRenderer()->render();
   }
 
   public function __toString()
@@ -837,5 +842,90 @@ class Form extends DataMapper implements IRenderable
   {
     $this->_renderGroupType = $groupType;
     return $this;
+  }
+
+  /**
+   * @return Config;
+   */
+  public static function getFormConfig()
+  {
+    static $formConfig;
+
+    if($formConfig === null)
+    {
+      $formConfig = Container::config()->get("form", new Config());
+    }
+
+    return $formConfig;
+  }
+
+  /**
+   * @param Form   $form
+   * @param string $groupType
+   *
+   * @return IFormRender
+   */
+  public static function getFormRenderer(Form $form, $groupType = 'dl')
+  {
+    static $formRenderer;
+
+    if($formRenderer === null)
+    {
+      $formRenderer = static::getFormConfig()->getStr(
+        "form_renderer",
+        "\\Cubex\\Form\\FormRender"
+      );
+    }
+
+    return new $formRenderer($form, $groupType);
+  }
+
+  /**
+   * @param FormElement $element
+   * @param string      $template
+   *
+   * @return IFormElementRender
+   */
+  public static function getFormElementRenderer(
+    FormElement $element,
+    $template = null
+  )
+  {
+    static $formElementRenderer;
+
+    if($formElementRenderer === null)
+    {
+      $formElementRenderer = static::getFormConfig()->getStr(
+        "form_element_renderer",
+        "\\Cubex\\Form\\FormElementRender"
+      );
+    }
+
+    return new $formElementRenderer($element, $template);
+  }
+
+  /**
+   * @param IFormRender $renderer
+   *
+   * @return $this
+   */
+  public function setRenderer(IFormRender $renderer)
+  {
+    $this->_renderer = $renderer;
+
+    return $this;
+  }
+
+  /**
+   * @return IFormRender
+   */
+  public function getRenderer()
+  {
+    if($this->_renderer instanceof IFormRender)
+    {
+      return new $this->_renderer($this);
+    }
+
+    return Form::getFormRenderer($this, $this->_renderGroupType);
   }
 }

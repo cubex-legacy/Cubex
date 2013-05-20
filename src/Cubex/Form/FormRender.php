@@ -50,7 +50,7 @@ class FormRender implements IRenderable
     $out .= '<' . $this->_groupType . ' class="cubexform">';
     foreach($this->_form->elements() as $element)
     {
-      $out .= (new FormElementRender($element))->render();
+      $out .= $element->getRenderer()->render();
     }
     $out .= '</' . $this->_groupType . '>';
     $out .= $this->_renderClosing();

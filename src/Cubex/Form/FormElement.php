@@ -49,6 +49,8 @@ class FormElement extends Attribute implements IRenderable
 
   protected $_autoCompleteStringValues = ["on" => "on", "off" => "off"];
 
+  protected $_renderer;
+
   public function type()
   {
     return $this->_type;
@@ -256,8 +258,7 @@ class FormElement extends Attribute implements IRenderable
    */
   public function render()
   {
-    $render = new FormElementRender($this);
-    return $render->render();
+    return $this->getRenderer()->render();
   }
 
   public function __toString()
@@ -395,5 +396,30 @@ class FormElement extends Attribute implements IRenderable
   public function setStep($step)
   {
     return $this->_setScalarAttribute("step", $step);
+  }
+
+  /**
+   * @param IFormElementRender $renderer
+   *
+   * @return $this
+   */
+  public function setRenderer(IFormElementRender $renderer)
+  {
+    $this->_renderer = $renderer;
+
+    return $this;
+  }
+
+  /**
+   * @return IFormElementRender
+   */
+  public function getRenderer()
+  {
+    if($this->_renderer instanceof IFormElementRender)
+    {
+      return new $this->_renderer($this);
+    }
+
+    return Form::getFormElementRenderer($this);
   }
 }
