@@ -64,6 +64,10 @@ class Dispatcher
    * @var \Cubex\Foundation\Config\Config
    */
   private static $_dispatchIni;
+  /**
+   * @var array
+   */
+  private static $_themeIni;
 
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
@@ -283,6 +287,16 @@ class Dispatcher
 
       return $this->getExternalMap()[$externalKey];
     }
+    else if(substr_count($entityHash, ",") > 0)
+    {
+      $pathToThemeIni = str_replace(",", "/", $entityHash);
+      $pathToThemeIni = $this->getFileSystem()->resolvePath(
+        $this->getProjectBase() . DS . $pathToThemeIni
+      );echo '<pre>';var_dump($this->getProjectBase() );echo '</pre>';die;
+      $themeIni = $this->getThemeConfig($pathToThemeIni);
+
+      return $pathToThemeIni . DS . idx($themeIni, "res_dir");
+    }
     else
     {
       foreach($this->getExternalMap() as $externalKey => $externalPath)
@@ -466,6 +480,24 @@ class Dispatcher
   public static function setBaseDispatchConfig(array $config)
   {
     self::$_dispatchIni = new Config($config);
+  }
+
+  /**
+   * @param $configDirectory
+   *
+   * @return array
+   */
+  public function getThemeConfig($configDirectory)
+  {
+    if(self::$_themeIni === null)
+    {
+      self::$_themeIni = parse_ini_file(
+        $configDirectory . DS . "theme.ini",
+        true
+      );
+    }
+
+    return self::$_themeIni;
   }
 
   /**

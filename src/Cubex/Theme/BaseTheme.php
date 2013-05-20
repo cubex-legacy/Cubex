@@ -99,7 +99,9 @@ abstract class BaseTheme implements ITheme
 
   public function getIniFileDirectory()
   {
-    return dirname(dirname(dirname(__DIR__)));
+    $class = new \ReflectionClass(get_called_class());
+    
+    return dirname(dirname(dirname(dirname($class->getFileName()))));
   }
 
   abstract protected function _initiate();

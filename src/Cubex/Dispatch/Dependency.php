@@ -6,6 +6,7 @@ namespace Cubex\Dispatch;
 
 use Cubex\Core\Http\Request;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
+use Cubex\Theme\ITheme;
 
 class Dependency extends Dispatcher
 {
@@ -45,7 +46,28 @@ class Dependency extends Dispatcher
     $entityHash        = $this->generateEntityHash($entity);
     $resourceHash      = $this->getNomapHash();
 
-    $ini    = $this->getDispatchIni($entity);
+    if($event->getSource() instanceof ITheme)
+    {
+      $relativePath = $this->getFileSystem()->getRelativePath(
+        $this->getProjectBase(),
+        $event->getSource()->getIniFileDirectory(),
+        false
+      );
+      $entityHash = str_replace("/", ",", $relativePath);
+
+      $themeIni = $this->getThemeConfig($relativePath);
+      if(idx($themeIni, "res_dir", false))
+      {
+        $ini = $this->getDispatchIni(
+          $relativePath . DS . $themeIni["res_dir"]
+        );
+      }
+    }
+    else
+    {
+      $ini = $this->getDispatchIni($entity);
+    }
+
     $iniKey = $path;
 
     if($package)
