@@ -12,6 +12,7 @@ use Cubex\Events\EventManager;
 use Cubex\Foundation\IRenderable;
 use Cubex\View\Impart;
 use Cubex\View\Layout;
+use Cubex\View\TemplatedView;
 use Cubex\View\Templates\Exceptions\ExceptionView;
 
 class WebpageController extends BaseController
@@ -210,5 +211,35 @@ class WebpageController extends BaseController
   public function isEsiSubAction()
   {
     return (bool)$this->_renderingEsiAction;
+  }
+
+  /**
+   * @param $action
+   * @param $params
+   *
+   * @return mixed
+   * @throws \BadMethodCallException
+   * @throws \Exception
+   */
+  public function runAction($action, $params)
+  {
+    try
+    {
+      return parent::runAction($action, $params);
+    }
+    catch(\BadMethodCallException $e)
+    {
+      $path   = substr($this->request()->path(), strlen($this->baseUri()) + 1);
+      $return = new TemplatedView($path, $this->application());
+      if($return === '')
+      {
+        throw $e;
+      }
+      return $return;
+    }
+    catch(\Exception $e)
+    {
+      throw $e;
+    }
   }
 }
