@@ -292,7 +292,7 @@ class Dispatcher
       $pathToThemeIni = str_replace(",", "/", $entityHash);
       $pathToThemeIni = $this->getFileSystem()->resolvePath(
         $this->getProjectBase() . DS . $pathToThemeIni
-      );echo '<pre>';var_dump($this->getProjectBase() );echo '</pre>';die;
+      );
       $themeIni = $this->getThemeConfig($pathToThemeIni);
 
       return $pathToThemeIni . DS . idx($themeIni, "res_dir");
