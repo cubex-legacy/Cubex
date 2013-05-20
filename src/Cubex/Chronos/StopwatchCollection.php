@@ -20,11 +20,16 @@ class StopwatchCollection
    * @var int
    */
   private $_precision;
+  /**
+   * @var bool
+   */
+  private $_displayAllInReport;
 
   public function __construct()
   {
-    $this->_stopwatches = [];
-    $this->_precision   = 3;
+    $this->_stopwatches        = [];
+    $this->_precision          = 3;
+    $this->_displayAllInReport = true;
   }
 
   /**
@@ -55,6 +60,17 @@ class StopwatchCollection
     return $sw;
   }
 
+  /**
+   * Set whether to show all of the stopwatches in the report or just
+   * the ones that have been triggered once or more.
+   *
+   * @param bool $displayAll
+   */
+  public function setDisplayAllInReport($displayAll = true)
+  {
+    $this->_displayAllInReport = $displayAll;
+  }
+
   public function scriptRunTime()
   {
     return microtime(true) - PHP_START;
@@ -77,19 +93,25 @@ class StopwatchCollection
     {
       foreach($this->_stopwatches as $sw)
       {
-        $swTotal = $sw->totalTime();
-        $percent = ($swTotal * 100) / $totalTime;
+        if($this->_displayAllInReport || ($sw->eventCount() > 0))
+        {
+          $swTotal = $sw->totalTime();
+          $percent = ($swTotal * 100) / $totalTime;
 
-        $report[] = [
-          $sw->getName(),
-          NumberFormat::format($sw->eventCount(), \NumberFormatter::TYPE_INT32),
-          Numbers::formatMicroTime(max($sw->minTime(), 0), $this->_precision),
-          Numbers::formatMicroTime($sw->maxTime(), $this->_precision),
-          Numbers::formatMicroTime($sw->averageTime(), $this->_precision),
-          Numbers::formatMicroTime($sw->lastTime(), $this->_precision),
-          Numbers::formatMicroTime($swTotal, $this->_precision),
-          sprintf("%.1f%%", $percent)
-        ];
+          $report[] = [
+            $sw->getName(),
+            NumberFormat::format(
+              $sw->eventCount(),
+              \NumberFormatter::TYPE_INT32
+            ),
+            Numbers::formatMicroTime(max($sw->minTime(), 0), $this->_precision),
+            Numbers::formatMicroTime($sw->maxTime(), $this->_precision),
+            Numbers::formatMicroTime($sw->averageTime(), $this->_precision),
+            Numbers::formatMicroTime($sw->lastTime(), $this->_precision),
+            Numbers::formatMicroTime($swTotal, $this->_precision),
+            sprintf("%.1f%%", $percent)
+          ];
+        }
       }
     }
 
