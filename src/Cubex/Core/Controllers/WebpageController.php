@@ -230,7 +230,7 @@ class WebpageController extends BaseController
     catch(\BadMethodCallException $e)
     {
       $path   = substr($this->request()->path(), strlen($this->baseUri()) + 1);
-      $return = new TemplatedView($path, $this->application());
+      $return = (new TemplatedView($path, $this->application()))->render();
       if($return === '')
       {
         throw $e;
