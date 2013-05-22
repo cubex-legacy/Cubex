@@ -8,6 +8,7 @@ use Cubex\Data\Attribute;
 use Cubex\Data\CallbackAttribute;
 use Cubex\Data\CompositeAttribute;
 use Cubex\Data\CompoundAttribute;
+use Cubex\Data\Mapper\IDataMapper;
 use Cubex\Data\Multribute;
 use Cubex\Data\PolymorphicAttribute;
 use Cubex\Exception\CubexException;
@@ -15,7 +16,7 @@ use Cubex\Helpers\Inflection;
 use Cubex\Helpers\Strings;
 
 abstract class DataMapper
-  implements \JsonSerializable, \IteratorAggregate, \Serializable
+  implements \JsonSerializable, \IteratorAggregate, \Serializable, IDataMapper
 {
   const CONFIG_IDS    = 'id-mechanism';
   const CONFIG_SCHEMA = 'schema-type';
@@ -1023,9 +1024,9 @@ abstract class DataMapper
         if($attr->isModified() && $attr->saveToDatabase())
         {
           if(
-            !$this->_autoTimestamp
-            || ($attr->name() != $this->createdAttribute()
-            && $attr->name() != $this->updatedAttribute())
+          !$this->_autoTimestamp
+          || ($attr->name() != $this->createdAttribute()
+          && $attr->name() != $this->updatedAttribute())
           )
           {
             $this->_changes[$attr->name()] = [
@@ -1239,5 +1240,10 @@ abstract class DataMapper
   {
     $this->__construct();
     $this->hydrate(json_decode($data));
+  }
+
+  public function load($id = null)
+  {
+    return $this;
   }
 }
