@@ -10,7 +10,6 @@ namespace Cubex\ServiceManager;
 use Cubex\Cache\ICacheService;
 use Cubex\Database\IDatabaseService;
 use Cubex\Session\ISessionService;
-use Psr\Log\InvalidArgumentException;
 
 class ServiceManager
 {
@@ -265,15 +264,17 @@ class ServiceManager
   }
 
   /**
-   * @param string       $class
-   * @param string|null  $name
-   * @param array        $constructParams
+   * @param string      $class
+   * @param string|null $name
+   * @param array       $constructParams
    *
    * @return object
    * @throws \RuntimeException
    */
-  protected function _buildClass($class, $name = null,
-                                 array $constructParams = [])
+  protected function _buildClass(
+    $class, $name = null,
+    array $constructParams = []
+  )
   {
     $reflection = new \ReflectionClass($class);
 
@@ -306,8 +307,10 @@ class ServiceManager
    * @return array
    * @throws \RuntimeException
    */
-  protected function _getConstructorArgs(array $params, $name = null,
-                                         array $constructParams = [])
+  protected function _getConstructorArgs(
+    array $params, $name = null,
+    array $constructParams = []
+  )
   {
     $args = [];
     foreach($params as $ii => $param)
@@ -348,8 +351,10 @@ class ServiceManager
    * @return $this
    * @throws \InvalidArgumentException
    */
-  public function reBind($name, ServiceConfig $config, $shared = true
-                          /*[, mixed $constructParam, ...]*/)
+  public function reBind(
+    $name, ServiceConfig $config, $shared = true
+    /*[, mixed $constructParam, ...]*/
+  )
   {
     $constructParams = func_get_args();
     array_shift($constructParams);
