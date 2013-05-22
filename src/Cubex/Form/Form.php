@@ -7,7 +7,7 @@ namespace Cubex\Form;
 
 use Cubex\Container\Container;
 use Cubex\Core\Http\Request;
-use Cubex\Data\Attribute;
+use Cubex\Data\Attribute\Attribute;
 use Cubex\Data\Validator\Validator;
 use Cubex\Facade\Session;
 use Cubex\Foundation\Config\Config;
@@ -472,7 +472,7 @@ class Form extends DataMapper implements IRenderable
   }
 
   /***
-   * @param FormElement|\Cubex\Data\Attribute $attribute
+   * @param FormElement|\Cubex\Data\Attribute\Attribute $attribute
    *
    * @return $this
    * @throws \Exception

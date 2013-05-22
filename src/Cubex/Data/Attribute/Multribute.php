@@ -3,9 +3,9 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\Data;
+namespace Cubex\Data\Attribute;
 
-use Cubex\Mapper\DataMapper;
+use Cubex\Data\Mapper\IDataMapper;
 
 abstract class Multribute extends Attribute
 {
@@ -27,7 +27,7 @@ abstract class Multribute extends Attribute
     $this->_hidden   = $hidden;
   }
 
-  public function setParent(DataMapper $mapper)
+  public function setParent(IDataMapper $mapper)
   {
     $this->_parent = $mapper;
     return $this;

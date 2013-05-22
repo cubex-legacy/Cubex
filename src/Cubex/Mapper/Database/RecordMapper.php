@@ -6,9 +6,9 @@
 namespace Cubex\Mapper\Database;
 
 use Cubex\Container\Container;
-use Cubex\Data\Attribute;
-use Cubex\Data\CallbackAttribute;
-use Cubex\Data\CompositeAttribute;
+use Cubex\Data\Attribute\Attribute;
+use Cubex\Data\Attribute\CallbackAttribute;
+use Cubex\Data\Attribute\CompositeAttribute;
 use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Database\ConnectionMode;
 use Cubex\Database\Creations\DBBuilder;

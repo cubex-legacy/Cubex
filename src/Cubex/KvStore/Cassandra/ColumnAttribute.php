@@ -5,7 +5,7 @@
 
 namespace Cubex\KvStore\Cassandra;
 
-use Cubex\Data\Attribute;
+use Cubex\Data\Attribute\Attribute;
 
 class ColumnAttribute extends Attribute
 {

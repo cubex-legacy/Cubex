@@ -5,7 +5,7 @@
 
 namespace Cubex\Form;
 
-use Cubex\Data\Attribute;
+use Cubex\Data\Attribute\Attribute;
 use Cubex\Foundation\IRenderable;
 use Cubex\Helpers\Strings;
 

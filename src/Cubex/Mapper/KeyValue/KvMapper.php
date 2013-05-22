@@ -6,7 +6,7 @@
 namespace Cubex\Mapper\KeyValue;
 
 use Cubex\Container\Container;
-use Cubex\Data\Attribute;
+use Cubex\Data\Attribute\Attribute;
 use Cubex\Mapper\DataMapper;
 
 class KvMapper extends DataMapper

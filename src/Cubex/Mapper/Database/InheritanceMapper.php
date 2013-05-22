@@ -5,7 +5,7 @@
 
 namespace Cubex\Mapper\Database;
 
-use Cubex\Data\Attribute;
+use Cubex\Data\Attribute\Attribute;
 use Cubex\Sprintf\ParseQuery;
 
 abstract class InheritanceMapper extends RecordMapper

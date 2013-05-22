@@ -5,7 +5,7 @@
 
 namespace Cubex\Database\Creations;
 
-use Cubex\Data\Attribute;
+use Cubex\Data\Attribute\Attribute;
 use Cubex\Database\IDatabaseService;
 use Cubex\Database\Schema\Column;
 use Cubex\Database\Schema\DataType;

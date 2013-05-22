@@ -5,8 +5,8 @@
 
 namespace Cubex\Mapper\Cassandra;
 
-use Cubex\Data\Attribute;
-use Cubex\Data\CallbackAttribute;
+use Cubex\Data\Attribute\Attribute;
+use Cubex\Data\Attribute\CallbackAttribute;
 use Cubex\Facade\Cassandra;
 use Cubex\KvStore\Cassandra\ColumnAttribute;
 use Cubex\KvStore\Cassandra\DataType\CassandraType;

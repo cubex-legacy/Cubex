@@ -5,7 +5,7 @@
 
 namespace Cubex\Queue\Provider\Database;
 
-use Cubex\Data\Attribute;
+use Cubex\Data\Attribute\Attribute;
 use Cubex\Mapper\Database\RecordMapper;
 
 class QueueMapper extends RecordMapper

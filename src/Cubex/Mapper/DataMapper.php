@@ -4,13 +4,13 @@
  */
 namespace Cubex\Mapper;
 
-use Cubex\Data\Attribute;
-use Cubex\Data\CallbackAttribute;
-use Cubex\Data\CompositeAttribute;
-use Cubex\Data\CompoundAttribute;
+use Cubex\Data\Attribute\Attribute;
+use Cubex\Data\Attribute\CallbackAttribute;
+use Cubex\Data\Attribute\CompositeAttribute;
+use Cubex\Data\Attribute\CompoundAttribute;
 use Cubex\Data\Mapper\IDataMapper;
-use Cubex\Data\Multribute;
-use Cubex\Data\PolymorphicAttribute;
+use Cubex\Data\Attribute\Multribute;
+use Cubex\Data\Attribute\PolymorphicAttribute;
 use Cubex\Exception\CubexException;
 use Cubex\Helpers\Inflection;
 use Cubex\Helpers\Strings;
@@ -48,7 +48,7 @@ abstract class DataMapper
 
   protected $_id;
   /**
-   * @var \Cubex\Data\Attribute[]
+   * @var \Cubex\Data\Attribute\Attribute[]
    */
   protected $_attributes;
   protected $_invalidAttributes;
@@ -60,7 +60,7 @@ abstract class DataMapper
   protected $_schemaType = self::SCHEMA_UNDERSCORE;
   protected $_validationType = self::VALIDATION_ONREQUEST;
 
-  protected $_attributeType = '\Cubex\Data\Attribute';
+  protected $_attributeType = '\Cubex\Data\Attribute\Attribute';
 
   /**
    * Automatically add all public properties as attributes
@@ -227,7 +227,7 @@ abstract class DataMapper
   }
 
   /**
-   * @return \Cubex\Data\Attribute[]
+   * @return \Cubex\Data\Attribute\Attribute[]
    */
   public function getRawAttributes()
   {
@@ -525,7 +525,7 @@ abstract class DataMapper
   /**
    * @param $name
    *
-   * @return \Cubex\Data\Attribute
+   * @return \Cubex\Data\Attribute\Attribute
    */
   public function getAttribute($name)
   {
@@ -535,7 +535,7 @@ abstract class DataMapper
   /**
    * @param $name
    *
-   * @return \Cubex\Data\Multribute
+   * @return \Cubex\Data\Attribute\Multribute
    * @throws \Exception
    */
   public function getCompAttribute($name)
@@ -552,7 +552,7 @@ abstract class DataMapper
   }
 
   /**
-   * @param \Cubex\Data\Attribute $attribute
+   * @param \Cubex\Data\Attribute\Attribute $attribute
    *
    * @return $this
    */

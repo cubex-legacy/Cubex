@@ -5,7 +5,7 @@
 
 namespace Cubex\Mapper\Database;
 
-use Cubex\Data\Attribute;
+use Cubex\Data\Attribute\Attribute;
 use Cubex\Data\Validator\Validator;
 use Cubex\Helpers\Inflection;
 use Cubex\Mapper\DataMapper;

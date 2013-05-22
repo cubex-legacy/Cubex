@@ -3,7 +3,7 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\Data;
+namespace Cubex\Data\Attribute;
 
 class CompoundAttribute extends Multribute
 {
