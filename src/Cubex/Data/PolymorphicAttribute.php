@@ -5,8 +5,7 @@
 
 namespace Cubex\Data;
 
-use Cubex\Mapper\DataMapper;
-use Cubex\Mapper\Database\RecordMapper;
+use Cubex\Data\Mapper\IDataMapper;
 
 class PolymorphicAttribute extends Attribute
 {
@@ -49,7 +48,7 @@ class PolymorphicAttribute extends Attribute
     {
       $class  = $this->getTypeAttribute()->data();
       $object = new $class();
-      if($object instanceof RecordMapper)
+      if($object instanceof IDataMapper)
       {
         return $object->load($this->getIdAttribute()->data());
       }
@@ -57,7 +56,7 @@ class PolymorphicAttribute extends Attribute
     }
   }
 
-  public function setData(DataMapper $data)
+  public function setData(IDataMapper $data)
   {
     $this->_stored = $data;
     $this->getIdAttribute()->setData($data->id());
