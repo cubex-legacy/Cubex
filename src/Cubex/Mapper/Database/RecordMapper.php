@@ -267,7 +267,7 @@ abstract class RecordMapper extends DataMapper
    * @return static
    * @throws \Exception
    */
-  public function load($id, $columns = ['*'])
+  public function load($id = null, $columns = ['*'])
   {
     $this->_loadPending = true;
     $this->_loadDetails = ['id' => $id, 'columns' => $columns];
@@ -563,9 +563,9 @@ abstract class RecordMapper extends DataMapper
           }
 
           if(
-            $this->_autoTimestamp
-            && $attr->name() != $this->createdAttribute()
-            && $attr->name() != $this->updatedAttribute()
+          $this->_autoTimestamp
+          && $attr->name() != $this->createdAttribute()
+          && $attr->name() != $this->updatedAttribute()
           )
           {
             $this->_changes[$attr->name()] = [

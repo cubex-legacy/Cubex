@@ -43,7 +43,7 @@ class KvMapper extends DataMapper
    * @return static
    * @throws \Exception
    */
-  public function load($id, array $columns = null)
+  public function load($id = null, array $columns = null)
   {
     $this->setId($id);
     $row = $this->connection()->getRow($this->getTableName(), $id, $columns);
