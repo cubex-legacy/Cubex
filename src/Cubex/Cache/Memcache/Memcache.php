@@ -34,6 +34,7 @@ class Memcache implements ICacheService
   {
     $this->_config     = $config;
     $this->_connection = new \Memcache();
+    $this->connect();
   }
 
   public function connect($mode = 'w')
