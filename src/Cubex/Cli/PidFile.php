@@ -6,7 +6,6 @@
 namespace Cubex\Cli;
 
 use Cubex\Container\Container;
-use Cubex\Exception\CubexException;
 
 class PidFile
 {

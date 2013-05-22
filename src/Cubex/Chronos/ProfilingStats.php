@@ -91,10 +91,13 @@ class ProfilingStats
       {
         case 'g':
           $this->_memoryLimit *= 1024;
+          break;
         case 'm':
           $this->_memoryLimit *= 1024;
+          break;
         case 'k':
           $this->_memoryLimit *= 1024;
+          break;
       }
     }
 

@@ -35,7 +35,7 @@ else
 
 /**
  * @method Enum __toString()
- * @method Enum getConstList()
+ * @method Enum[] getConstList()
  */
 abstract class Enum extends EnumWrapper
 {

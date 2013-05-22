@@ -9,13 +9,10 @@ use Cubex\Container\Container;
 use Cubex\Cookie\EncryptedCookie;
 use Cubex\Cookie\StandardCookie;
 use Cubex\Encryption\Service\TestEncryption;
-use Cubex\ServiceManager\ServiceConfig;
 use Cubex\Tests\TestCase;
 
 class CookieTest extends TestCase
 {
-  private $_oldEncryptionConfig;
-
   public function setUp()
   {
     // We setup a mock encryption object so we can test encrypted cookies

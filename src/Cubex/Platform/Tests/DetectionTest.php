@@ -4,7 +4,6 @@
  */
 namespace Cubex\Platform\Tests;
 
-use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Platform\Detection;
 use Cubex\Tests\TestCase;
 

@@ -64,7 +64,6 @@ class Analyse
     $tokens    = token_get_all($content);
     $startLine = $building = 0;
     $msgId     = $type = $msgIdPlural = '';
-    $quotetype = "'";
     $started   = false;
 
     foreach($tokens as $token)

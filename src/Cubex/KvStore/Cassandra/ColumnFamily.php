@@ -780,6 +780,7 @@ class ColumnFamily
     {
       throw $this->formException($e);
     }
+    return true;
   }
 
   public function removeCounter($key, $column)
