@@ -5,7 +5,7 @@
 
 namespace Cubex\Core\Http;
 
-use Cubex\Foundation\DataHandler\HandlerTrait;
+use Cubex\Data\Handler\HandlerTrait;
 
 class Request implements \IteratorAggregate
 {

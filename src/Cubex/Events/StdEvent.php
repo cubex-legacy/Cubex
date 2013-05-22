@@ -4,7 +4,7 @@
  */
 namespace Cubex\Events;
 
-use Cubex\Foundation\DataHandler\HandlerTrait;
+use Cubex\Data\Handler\HandlerTrait;
 
 class StdEvent implements IEvent, \JsonSerializable
 {

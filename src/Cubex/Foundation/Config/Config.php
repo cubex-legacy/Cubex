@@ -5,8 +5,8 @@
 
 namespace Cubex\Foundation\Config;
 
-use Cubex\Foundation\DataHandler\IDataHandler;
-use Cubex\Foundation\DataHandler\HandlerTrait;
+use Cubex\Data\Handler\IDataHandler;
+use Cubex\Data\Handler\HandlerTrait;
 
 class Config implements \IteratorAggregate, IDataHandler, \ArrayAccess
 {

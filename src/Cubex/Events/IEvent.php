@@ -4,7 +4,7 @@
  */
 namespace Cubex\Events;
 
-use Cubex\Foundation\DataHandler\IDataHandler;
+use Cubex\Data\Handler\IDataHandler;
 
 interface IEvent extends IDataHandler
 {

@@ -9,8 +9,8 @@ use Cubex\Core\Application\IController;
 use Cubex\Core\Http\Redirect;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
-use Cubex\Foundation\DataHandler\IDataHandler;
-use Cubex\Foundation\DataHandler\HandlerTrait;
+use Cubex\Data\Handler\IDataHandler;
+use Cubex\Data\Handler\HandlerTrait;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 

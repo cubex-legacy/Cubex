@@ -3,7 +3,7 @@
  * @author Brooke Bryan
  */
 
-namespace Cubex\Foundation\DataHandler;
+namespace Cubex\Data\Handler;
 
 /**
  * Data Handler Interface

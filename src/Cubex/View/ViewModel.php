@@ -8,7 +8,7 @@ use Cubex\Container\Container;
 use Cubex\Core\Application\IController;
 use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Events\EventManager;
-use Cubex\Foundation\DataHandler\HandlerTrait;
+use Cubex\Data\Handler\HandlerTrait;
 use Cubex\Foundation\IRenderable;
 use Cubex\I18n\ITranslatable;
 use Cubex\I18n\TranslateTraits;

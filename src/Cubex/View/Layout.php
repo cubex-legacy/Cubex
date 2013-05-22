@@ -5,10 +5,9 @@
 
 namespace Cubex\View;
 
-use Cubex\Core\Interfaces\IDirectoryAware;
 use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\Dispatch\Utils\RequireTrait;
-use Cubex\Foundation\DataHandler\HandlerTrait;
+use Cubex\Data\Handler\HandlerTrait;
 use Cubex\Foundation\IRenderable;
 use Cubex\I18n\TranslateTraits;
 use Cubex\Theme\ITheme;

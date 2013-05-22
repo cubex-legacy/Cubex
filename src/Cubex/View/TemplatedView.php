@@ -8,8 +8,8 @@ use Cubex\Core\Application\IController;
 use Cubex\Core\Interfaces\IDirectoryAware;
 use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\Dispatch\Utils\RequireTrait;
-use Cubex\Foundation\DataHandler\HandlerTrait;
-use Cubex\Foundation\DataHandler\IDataHandler;
+use Cubex\Data\Handler\HandlerTrait;
+use Cubex\Data\Handler\IDataHandler;
 use Cubex\Foundation\IRenderable;
 use Cubex\I18n\TranslateTraits;
 

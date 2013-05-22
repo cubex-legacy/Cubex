@@ -5,8 +5,8 @@
 namespace Cubex\Routing;
 
 use Cubex\Facade\Redirect;
-use Cubex\Foundation\DataHandler\IDataHandler;
-use Cubex\Foundation\DataHandler\HandlerTrait;
+use Cubex\Data\Handler\IDataHandler;
+use Cubex\Data\Handler\HandlerTrait;
 
 class StdRoute implements IRoute, IDataHandler, \JsonSerializable
 {

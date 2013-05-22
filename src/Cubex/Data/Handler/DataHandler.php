@@ -3,7 +3,7 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\Foundation\DataHandler;
+namespace Cubex\Data\Handler;
 
 class DataHandler implements IDataHandler
 {
