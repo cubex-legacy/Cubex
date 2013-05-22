@@ -34,14 +34,22 @@ class Memcache implements ICacheService
   {
     $this->_config     = $config;
     $this->_connection = new \Memcache();
-    $this->_connection->addserver($config->getStr("hostname", "localhost"));
   }
 
   public function connect($mode = 'w')
   {
-    return $this->_connection->connect(
-      $this->_config->getStr("hostname", 'localhost')
-    );
+    $success = true;
+    foreach($this->_getServerList() as $server)
+    {
+      $success = $this->_connection->addserver($server) && $success;
+    }
+
+    return $success;
+  }
+
+  protected function _getServerList()
+  {
+    return $this->_config->getArr("hostname", ["localhost"]);
   }
 
   protected function _conn()
@@ -126,9 +134,16 @@ class Memcache implements ICacheService
       {
         return false;
       }
-      $return = $this->_conn()->getServerStatus(
-        $this->_config->getStr("hostname", 'localhost')
-      );
+
+      $return = false;
+      foreach($this->_getServerList() as $server)
+      {
+        if($this->_conn()->getServerStatus($server))
+        {
+          $return = true;
+          break;
+        }
+      }
     }
     catch(\Exception $e)
     {
