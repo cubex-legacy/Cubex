@@ -192,7 +192,7 @@ trait HandlerTrait
       // Normalize newlines.
       return \str_replace(
         array("\r\n", "\r"),
-        array("\n", "\n"),
+        "\n",
         $this->_data[$name]
       );
     }
