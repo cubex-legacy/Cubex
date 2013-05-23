@@ -62,6 +62,8 @@ abstract class DataMapper
 
   protected $_attributeType = '\Cubex\Data\Attribute\Attribute';
 
+  protected static $reflectedAttributes;
+
   /**
    * Automatically add all public properties as attributes
    * and unset them for automatic handling of data
@@ -156,15 +158,21 @@ abstract class DataMapper
       }
     }
 
-    //TODO -o brooke: Store the result in a static cache
-    $class = new \ReflectionClass(get_class($this));
-    foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
+    if(static::$reflectedAttributes === null)
     {
-      $propName = $p->getName();
+      static::$reflectedAttributes = [];
+      $class = new \ReflectionClass(get_class($this));
+      foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
+      {
+        static::$reflectedAttributes[$p->getName()] = $p->getValue($this);
+      }
+    }
+
+    foreach(static::$reflectedAttributes as $propName => $default)
+    {
       $property = $this->stringToColumnName($propName);
       if(!$this->attributeExists($property))
       {
-        $default = $p->getValue($this);
         $attr    = new $type($property, false, null, $default);
         /**
          * @var $attr Attribute
