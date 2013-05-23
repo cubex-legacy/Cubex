@@ -156,6 +156,7 @@ abstract class DataMapper
       }
     }
 
+    //TODO -o brooke: Store the result in a static cache
     $class = new \ReflectionClass(get_class($this));
     foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
     {

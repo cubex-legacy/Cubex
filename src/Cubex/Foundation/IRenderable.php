@@ -2,6 +2,7 @@
 /**
  * @author Brooke Bryan
  */
+//TODO: Relocate into Views namespace
 namespace Cubex\Foundation;
 
 /**

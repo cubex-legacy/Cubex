@@ -188,6 +188,7 @@ class Attribute implements IValidatable, IFilterable, \JsonSerializable
 
   public function data()
   {
+    //TODO: Cache filtered value on attribute -clear on set
     return $this->filter($this->rawData());
   }
 
