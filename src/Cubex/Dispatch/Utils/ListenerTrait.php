@@ -5,6 +5,7 @@
 namespace Cubex\Dispatch\Utils;
 
 use Cubex\Container\Container;
+use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\Dispatch\Dependency\Resource;
 use Cubex\Dispatch\Dependency\Url;
 use Cubex\Dispatch\DispatchEvent;
@@ -17,7 +18,7 @@ trait ListenerTrait
   {
     if($namespace === null)
     {
-      if(method_exists($this, "getNamespace"))
+      if($this instanceof INamespaceAware)
       {
         $namespace = $this->getNamespace();
       }
