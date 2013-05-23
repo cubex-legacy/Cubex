@@ -140,10 +140,10 @@ class Strings
     {
       $str1 = strtok($str1, "0123456789");
     }
-    $preLen = strlen(rtrim($str1 ^ $str2, "\x01..\xFF"));
-
+    $preLen = strlen($str1 ^ $str2) - strlen(ltrim($str1 ^ $str2, chr(0)));
     return substr($str1, 0, $preLen);
   }
+
 
   /**
    * @param $string string String to split
