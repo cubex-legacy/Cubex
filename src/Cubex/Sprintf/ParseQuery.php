@@ -93,6 +93,40 @@ class ParseQuery implements IFormatter
     }
   }
 
+  /**
+   * The purpose of this method is to do all the hard work of escaping and
+   * preparing data for you. After the first requried argument you can either
+   * pass an array starting with the query, followed by it's params, or pass
+   * the query as the second argument and the following params as argument 3, 4,
+   * 5, n...
+   *
+   * Example 1:
+   *
+   * ParseQuery::parse(
+   *   IDatabaseService,
+   *   [
+   *     "SELECT * FROM %T WHERE %C = %d",
+   *     "mytablename",
+   *     "myidkey",
+   *     123
+   *   ]
+   * );
+   *
+   * Example 2:
+   *
+   * ParseQuery::parse(
+   *   IDatabaseService,
+   *   "SELECT * FROM %T WHERE %C = %d",
+   *   "mytablename",
+   *   "myidkey",
+   *   123
+   * );
+   *
+   * @param IDatabaseService $connection
+   * @param array            $args
+   *
+   * @return mixed
+   */
   public static function parse(IDatabaseService $connection, $args = [])
   {
     if(func_num_args() > 2)
