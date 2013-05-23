@@ -13,16 +13,18 @@ use Cubex\Events\EventManager;
 
 trait ListenerTrait
 {
-  /**
-   * @return string
-   */
-  abstract public function getNamespace();
-
   protected function _listen($namespace = null)
   {
     if($namespace === null)
     {
-      $namespace = $this->getNamespace();
+      if(method_exists($this, "getNamespace"))
+      {
+        $namespace = $this->getNamespace();
+      }
+      else
+      {
+        $namespace = get_namespace($this);
+      }
     }
     $fileSystem = new FileSystem();
 
