@@ -14,6 +14,14 @@ class Inflection
   protected $_completed = false;
   protected $_final;
 
+  protected static $_vowelsDictionary = [
+    'a' => 'a',
+    'e' => 'e',
+    'i' => 'i',
+    'o' => 'o',
+    'u' => 'u',
+  ];
+
   protected function _complete($word = null)
   {
     $this->_completed = true;
@@ -21,12 +29,13 @@ class Inflection
     {
       $this->_final = $word;
     }
+
     return true;
   }
 
   public static function isVowel($letter)
   {
-    return in_array(strtolower($letter), ['a', 'e', 'i', 'o', 'u']);
+    return isset(self::$_vowelsDictionary[strtolower($letter)]);
   }
 
   public static function singularise($word)
@@ -46,6 +55,7 @@ class Inflection
       'endsWithEs',
       'endsWithFs',
     ];
+
     foreach($rules as $rule)
     {
       if($instance->$rule())
@@ -81,6 +91,7 @@ class Inflection
       'endsWithF',
       'endsWithSXZCHSH',
     ];
+
     foreach($rules as $rule)
     {
       if($instance->$rule())
@@ -95,29 +106,30 @@ class Inflection
   public function nonConversions()
   {
     $nonConversions = [
-      'news',
-      'data',
-      'bison',
-      'buffalo',
-      'deer',
-      'fish',
-      'moose',
-      'pike',
-      'sheep',
-      'salmon',
-      'trout',
-      'swine',
-      'plankton',
-      'money',
-      'information',
-      'series',
-      'equipment',
+      'news'        => 'news',
+      'data'        => 'data',
+      'bison'       => 'bison',
+      'buffalo'     => 'buffalo',
+      'deer'        => 'deer',
+      'fish'        => 'fish',
+      'moose'       => 'moose',
+      'pike'        => 'pike',
+      'sheep'       => 'sheep',
+      'salmon'      => 'salmon',
+      'trout'       => 'trout',
+      'swine'       => 'swine',
+      'plankton'    => 'plankton',
+      'money'       => 'money',
+      'information' => 'information',
+      'series'      => 'series',
+      'equipment'   => 'equipment',
     ];
 
-    if(in_array($this->_lowerWord, $nonConversions))
+    if(isset($nonConversions[$this->_lowerWord]))
     {
       return $this->_complete();
     }
+
     return false;
   }
 
@@ -155,6 +167,7 @@ class Inflection
         }
       }
     }
+
     return false;
   }
 
@@ -162,19 +175,17 @@ class Inflection
   {
     if(ends_with($this->_lowerWord, 'o'))
     {
-      if(in_array(
-        $this->_lowerWord,
-        [
-        'piano',
-        'zero',
-        'photo',
-        'pro',
-        'radio',
-        'disco',
-        'logo',
-        ]
-      )
-      )
+      $endsWith0 = [
+        'piano' => 'piano',
+        'zero'  => 'zero',
+        'photo' => 'photo',
+        'pro'   => 'pro',
+        'radio' => 'radio',
+        'disco' => 'disco',
+        'logo'  => 'logo',
+      ];
+
+      if(isset($endsWith0[$this->_lowerWord]))
       {
         return $this->_complete($this->_word . 's');
       }
@@ -184,6 +195,7 @@ class Inflection
         return $this->_complete($this->_word . 'es');
       }
     }
+
     return false;
   }
 
@@ -191,7 +203,9 @@ class Inflection
   {
     if(ends_with($this->_lowerWord, 'y'))
     {
-      if(in_array($this->_lowerWord, ['day', 'monkey']))
+      $endsWithY = ['day' => 'day', 'monkey' => 'monkey',];
+
+      if(isset($endsWithY[$this->_lowerWord]))
       {
         return $this->_complete($this->_word . 's');
       }
@@ -201,6 +215,7 @@ class Inflection
         return $this->_complete(substr($this->_word, 0, -1) . 'ies');
       }
     }
+
     return false;
   }
 
@@ -210,24 +225,32 @@ class Inflection
     {
       return $this->_complete(substr($this->_word, 0, -2) . 'ves');
     }
+
     return false;
   }
 
   protected function _fWords()
   {
-    return ['chef', 'cliff', 'ref', 'roof'];
+    return [
+      'chef'  => 'chef',
+      'cliff' => 'cliff',
+      'ref'   => 'ref',
+      'roof'  => 'roof'
+    ];
   }
 
   public function endsWithF()
   {
     if(ends_with($this->_lowerWord, 'f'))
     {
-      if(in_array($this->_lowerWord, $this->_fWords()))
+      if(isset($this->_fWords()[$this->_lowerWord]))
       {
         return $this->_complete($this->_word . 's');
       }
+
       return $this->_complete(substr($this->_word, 0, -1) . 'ves');
     }
+
     return false;
   }
 
@@ -243,6 +266,7 @@ class Inflection
     {
       return $this->_complete($this->_word . 'es');
     }
+
     return false;
   }
 
@@ -256,7 +280,9 @@ class Inflection
       || ends_with($this->_lowerWord, 'shes')
     )
     {
-      if(in_array($this->_lowerWord, ['houses']))
+      $endsWithXZCHSH = ['houses' => 'houses'];
+
+      if(isset($endsWithXZCHSH[$this->_lowerWord]))
       {
         return $this->_complete(substr($this->_word, 0, -1));
       }
@@ -265,6 +291,7 @@ class Inflection
         return $this->_complete(substr($this->_word, 0, -2));
       }
     }
+
     return false;
   }
 
@@ -278,6 +305,7 @@ class Inflection
     {
       return $this->_complete(substr($this->_word, 0, -3) . 'y');
     }
+
     return false;
   }
 
@@ -291,12 +319,15 @@ class Inflection
     {
       return $this->_complete(substr($this->_word, 0, -3) . 'f');
     }
+
     return false;
   }
 
   public function endsWithEs()
   {
-    if(in_array($this->_lowerWord, ['shoes']))
+    $endsWithEs = ['shoes' => 'shoes'];
+
+    if(isset($endsWithEs[$this->_lowerWord]))
     {
       return $this->_complete(substr($this->_word, 0, -1));
     }
@@ -308,15 +339,17 @@ class Inflection
     {
       return $this->_complete(substr($this->_word, 0, -1));
     }
+
     return false;
   }
 
   public function endsWithFs()
   {
-    if(in_array(substr($this->_lowerWord, 0, -1), $this->_fWords()))
+    if(isset($this->_fWords()[substr($this->_lowerWord, 0, -1)]))
     {
       return $this->_complete(substr($this->_word, 0, -1));
     }
+
     return false;
   }
 }
