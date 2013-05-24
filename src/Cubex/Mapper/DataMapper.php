@@ -158,22 +158,25 @@ abstract class DataMapper
       }
     }
 
-    if(static::$reflectedAttributes === null)
+    $calledClass = get_class($this);
+    if(!isset(static::$reflectedAttributes[$calledClass]))
     {
-      static::$reflectedAttributes = [];
-      $class = new \ReflectionClass(get_class($this));
+      static::$reflectedAttributes[$calledClass] = [];
+
+      $class = new \ReflectionClass($calledClass);
       foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
       {
-        static::$reflectedAttributes[$p->getName()] = $p->getValue($this);
+        static::$reflectedAttributes[$calledClass][$p->getName(
+        )] = $p->getValue($this);
       }
     }
 
-    foreach(static::$reflectedAttributes as $propName => $default)
+    foreach(static::$reflectedAttributes[$calledClass] as $propName => $default)
     {
       $property = $this->stringToColumnName($propName);
       if(!$this->attributeExists($property))
       {
-        $attr    = new $type($property, false, null, $default);
+        $attr = new $type($property, false, null, $default);
         /**
          * @var $attr Attribute
          */
