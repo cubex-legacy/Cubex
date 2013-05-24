@@ -43,11 +43,11 @@ class Validator
 
   public static function length($string, $min = 1, $max = null)
   {
-    if($min && $min > 0 && strlen($string) <= $min)
+    if($min && $min > 0 && strlen($string) < $min)
     {
       throw new \Exception("Minimum Length of $min Required");
     }
-    if($max && $max > 0 && strlen($string) >= $max)
+    if($max && $max > 0 && strlen($string) > $max)
     {
       throw new \Exception("Maximum Length of $max Required");
     }
