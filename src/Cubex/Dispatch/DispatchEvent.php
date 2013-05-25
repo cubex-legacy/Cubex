@@ -65,7 +65,7 @@ class DispatchEvent extends StdEvent
    */
   public function getSource()
   {
-    return $this->source();
+    return $this->_source;
   }
 
   /**

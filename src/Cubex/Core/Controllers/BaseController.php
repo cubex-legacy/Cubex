@@ -7,6 +7,8 @@ namespace Cubex\Core\Controllers;
 use Cubex\Core\Application\Application;
 use Cubex\Core\Application\IController;
 use Cubex\Core\Http\Redirect;
+use Cubex\Core\Interfaces\INamespaceAware;
+use Cubex\Core\Traits\NamespaceAwareTrait;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Data\Handler\IDataHandler;
@@ -25,12 +27,14 @@ use Cubex\ServiceManager\ServiceManagerAwareTrait;
 use Cubex\View\ViewModel;
 
 class BaseController
-  implements IController, IDataHandler, ITranslatable, IServiceManagerAware
+  implements IController, IDataHandler, ITranslatable,
+             IServiceManagerAware, INamespaceAware
 {
   use HandlerTrait;
   use ConfigTrait;
   use TranslateTraits;
   use ServiceManagerAwareTrait;
+  use NamespaceAwareTrait;
 
   /**
    * @var \Cubex\Core\Http\Request

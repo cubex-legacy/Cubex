@@ -114,7 +114,7 @@ class Resource extends Dependency
    */
   public function mergeDuplicateResolvableUris(TypeEnum $type)
   {
-    $resourceUris = ipull(self::$_requires[(string)$type], "uri");
+    $resourceUris   = ipull(self::$_requires[(string)$type], "uri");
     $resolvableUris = array_filter($resourceUris, [$this, "isResolvableUri"]);
 
     $resolvableUriByProtocol = $this->mapUrisByPriorotisedProtocol(
@@ -204,16 +204,16 @@ class Resource extends Dependency
     $file = $event->getFile();
     $type = (string)$event->getType();
 
-    if($this->isResolvableUri($file))
-    {
-      $this->requireResolvableResource($event);
-    }
-    elseif(isset(self::$_thirdpartyLibraries[$type][$file]))
+    if(isset(self::$_thirdpartyLibraries[$type][$file]))
     {
       $this->requireThirdpartyResource(
         $event,
         Container::get(Container::REQUEST)
       );
+    }
+    else if($this->isResolvableUri($file))
+    {
+      $this->requireResolvableResource($event);
     }
     else
     {
@@ -253,8 +253,8 @@ class Resource extends Dependency
   }
 
   /**
-   * @param \Cubex\Dispatch\DispatchEvent    $event
-   * @param \Cubex\Core\Http\Request $request
+   * @param \Cubex\Dispatch\DispatchEvent $event
+   * @param \Cubex\Core\Http\Request      $request
    *
    * @throws \InvalidArgumentException
    */
@@ -287,7 +287,7 @@ class Resource extends Dependency
     {
       $versions = array_filter(
         $versions,
-        function($var) use ($version)
+        function ($var) use ($version)
         {
           return starts_with($var, $version);
         }
@@ -414,8 +414,8 @@ class Resource extends Dependency
     $dispatchPackagePath = $this->getDispatchPath($event, $request);
 
     $dispatchPackagePath->setResourceHash("pkg")
-      ->setPathToResource($event->getFile() . "." . $event->getType())
-      ->getDispatchPath(true);
+    ->setPathToResource($event->getFile() . "." . $event->getType())
+    ->getDispatchPath(true);
 
     return $dispatchPackagePath;
   }

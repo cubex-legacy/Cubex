@@ -16,19 +16,19 @@ class Dispatcher
 {
   use ConfigTrait;
 
-  private $_fileSystem;
-  private $_domainMap;
-  private $_externalMap;
-  private $_entityMap;
-  private $_buildOptions;
-  private $_dispatchIniFilename;
-  private $_resourceDirectory;
-  private $_projectNamespace;
-  private $_projectBase;
-  private $_baseHash       = "esabot";
-  private $_nomapHash      = "pamon";
-  private $_packageHash    = "pkg";
-  private $_supportedTypes = [
+  protected $_fileSystem;
+  protected $_domainMap;
+  protected $_externalMap;
+  protected $_entityMap;
+  protected $_buildOptions;
+  protected $_dispatchIniFilename;
+  protected $_resourceDirectory;
+  protected $_projectNamespace;
+  protected $_projectBase;
+  protected $_baseHash = "esabot";
+  protected $_nomapHash = "pamon";
+  protected $_packageHash = "pkg";
+  protected $_supportedTypes = [
     "ico"   => "image/x-icon",
     "css"   => "text/css; charset=utf-8",
     "js"    => "text/javascript; charset=utf-8",
@@ -58,16 +58,16 @@ class Dispatcher
   const BUILD_OPT_TYPE_DOMAIN    = "domain";
   const BUILD_OPT_TYPE_SUBDOMAIN = "subdomain";
 
-  private static $_dispatchInis = [];
-  private static $_entities;
+  protected static $_dispatchInis = [];
+  protected static $_entities;
   /**
    * @var \Cubex\Foundation\Config\Config
    */
-  private static $_dispatchIni;
+  protected static $_dispatchIni;
   /**
    * @var array
    */
-  private static $_themeIni;
+  protected static $_themeIni;
 
   /**
    * @param \Cubex\Foundation\Config\ConfigGroup $configGroup
@@ -75,13 +75,7 @@ class Dispatcher
    */
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
-    if(!defined("DS"))
-    {
-      define("DS", DIRECTORY_SEPARATOR);
-    }
-
     $this->configure($configGroup);
-
     $dispatchConfig = $this->config("dispatch");
     $projectConfig  = $this->config("project");
     $cubexConfig    = $this->config("_cubex_");
@@ -110,11 +104,9 @@ class Dispatcher
       "resource_directory",
       "res"
     );
-
     $this->_projectBase = $this->getFileSystem()->resolvePath(
       $cubexConfig->getStr("project_base", '../src')
     );
-
     // We do these bits at the end as we need the project base path to get the
     // correct config file directory
     $dispatchIniConfig = $this->getBaseDispatchConfig();
@@ -293,7 +285,7 @@ class Dispatcher
       $pathToThemeIni = $this->getFileSystem()->resolvePath(
         $this->getProjectBase() . DS . $pathToThemeIni
       );
-      $themeIni = $this->getThemeConfig($pathToThemeIni);
+      $themeIni       = $this->getThemeConfig($pathToThemeIni);
 
       return $pathToThemeIni . DS . idx($themeIni, "res_dir");
     }
@@ -573,7 +565,7 @@ class Dispatcher
    * When you call it we only really want the hash, the path and depth are for
    * the method to call it's self recursively.
    *
-   * @param string $hash
+   * @param string         $hash
    * @param DispatchMapper $mapper
    *
    * @return null|string
@@ -691,7 +683,7 @@ class Dispatcher
       return $uri;
     }
 
-    $external = false;
+    $external         = false;
     $externalFileData = $this->_getExternalFileDetails($uri);
     if($externalFileData)
     {
@@ -841,7 +833,7 @@ class Dispatcher
   }
 
   /**
-   * @param DispatchPath                     $path
+   * @param DispatchPath             $path
    * @param \Cubex\Core\Http\Request $request
    *
    * @return string

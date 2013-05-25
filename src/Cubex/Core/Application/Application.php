@@ -124,7 +124,7 @@ abstract class Application
   {
     $this->_request  = $request;
     $this->_response = $response;
-    $this->_listen();
+    $this->_listen($this->getNamespace(), $this->getConfig());
     $this->addDefaultBundles();
     $this->initialiseBundles();
     $this->dispatching();
