@@ -90,10 +90,10 @@ class ProfilingStats
       switch(strtolower(substr($limit, -1)))
       {
         case 'g':
-          $this->_memoryLimit *= 1024;
+          $this->_memoryLimit *= 1073741824;
           break;
         case 'm':
-          $this->_memoryLimit *= 1024;
+          $this->_memoryLimit *= 1048576;
           break;
         case 'k':
           $this->_memoryLimit *= 1024;
