@@ -8,6 +8,7 @@ use Cubex\Data\Attribute\Attribute;
 use Cubex\Data\Attribute\CallbackAttribute;
 use Cubex\Data\Attribute\CompositeAttribute;
 use Cubex\Data\Attribute\CompoundAttribute;
+use Cubex\Data\DataHelper;
 use Cubex\Data\Mapper\IDataMapper;
 use Cubex\Data\Attribute\Multribute;
 use Cubex\Data\Attribute\PolymorphicAttribute;
@@ -166,23 +167,67 @@ abstract class DataMapper
       $class = new \ReflectionClass($calledClass);
       foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
       {
-        static::$reflectedAttributes[$calledClass][$p->getName(
-        )] = $p->getValue($this);
+        $value = ['default' => $p->getValue($this)];
+
+        $docBlock = Strings::docCommentLines($p->getDocComment());
+        foreach($docBlock as $docLine)
+        {
+          if(starts_with($docLine, '@', false))
+          {
+            list($docType, $docValue) = explode(" ", substr($docLine, 1), 2);
+            switch(strtolower($docType))
+            {
+              case 'filter':
+                $value['filters'][] = DataHelper::readCallableDocBlock(
+                  'Filter',
+                  $docValue
+                );
+                break;
+              case 'validate':
+              case 'validator':
+                $value['validators'][] = DataHelper::readCallableDocBlock(
+                  'Validator',
+                  $docValue
+                );
+                break;
+            }
+          }
+        }
+
+        static::$reflectedAttributes[$calledClass][$p->getName()] = $value;
       }
     }
 
-    foreach(static::$reflectedAttributes[$calledClass] as $propName => $default)
+    //TODO: Prebuild attribute, and cloning from cache, may speed up this
+    foreach(static::$reflectedAttributes[$calledClass] as $propName => $prop)
     {
       $property = $this->stringToColumnName($propName);
       if(!$this->attributeExists($property))
       {
-        $attr = new $type($property, false, null, $default);
+        $attr = new $type($property, false, null, $prop['default']);
         /**
          * @var $attr Attribute
          */
+
+        if(isset($prop['filters']))
+        {
+          foreach($prop['filters'] as $filter)
+          {
+            $attr->addFilter($filter['callable'], $filter['options']);
+          }
+        }
+
+        if(isset($prop['validators']))
+        {
+          foreach($prop['validators'] as $validator)
+          {
+            $attr->addValidator($validator['callable'], $validator['options']);
+          }
+        }
+
         $attr->setSourcePropertyName($propName);
         $this->_addReflectedAttribute($attr);
-        $this->_attribute($property)->setDefault($default);
+        $this->_attribute($property)->setDefault($prop['default']);
       }
       unset($this->$propName);
     }

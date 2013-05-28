@@ -5,6 +5,7 @@
 
 namespace Cubex\Cli;
 
+use Cubex\Data\DataHelper;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Helpers\Strings;
 use Cubex\Loader;
@@ -716,11 +717,14 @@ abstract class CliCommand implements ICliTask
               $valueDescription = $value;
               break;
             case 'filter':
-              $filters[] = $this->_readCallableDocBlock('Filter', $value);
+              $filters[] = DataHelper::readCallableDocBlock('Filter', $value);
               break;
             case 'validate':
             case 'validator':
-              $validators[] = $this->_readCallableDocBlock('Validator', $value);
+              $validators[] = DataHelper::readCallableDocBlock(
+                'Validator',
+                $value
+              );
               break;
           }
         }
@@ -754,29 +758,6 @@ abstract class CliCommand implements ICliTask
 
       unset($this->$propName);
     }
-  }
-
-  /**
-   * Provide full class, or method name on filter trait
-   * Or an array for callable
-   */
-  protected function _readCallableDocBlock($type, $data)
-  {
-    $callable = null;
-
-    $args = explode(' ', $data);
-
-    if(isset($args[0]))
-    {
-      $callable = $args[0];
-      if(!strstr($callable, '\\') && !strstr($callable, '::'))
-      {
-        $callable = '\Cubex\Data\\' . $type . '\\' . $type . '::' . $callable;
-      }
-      array_shift($args);
-    }
-
-    return ['callable' => $callable, 'options' => (array)$args];
   }
 
   public function __get($name)
