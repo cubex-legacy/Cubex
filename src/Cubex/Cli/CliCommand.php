@@ -179,7 +179,7 @@ abstract class CliCommand implements ICliTask
 
   protected function _addLogLevelArgIfRequired()
   {
-    if(! isset($this->_argsByName['log-level']))
+    if(!isset($this->_argsByName['log-level']))
     {
       $arg = new CliArgument(
         'log-level', 'Set the logging level', '',
@@ -211,7 +211,7 @@ abstract class CliCommand implements ICliTask
         }
       );
 
-      $this->_options[] = $arg;
+      $this->_options[]              = $arg;
       $this->_argsByName[$arg->name] = $arg;
     }
   }
@@ -680,6 +680,8 @@ abstract class CliCommand implements ICliTask
         $usedShorts[$shortCode] = true;
       }
 
+      $filters = $validators = [];
+
       $required         = false;
       $valueOption      = CliArgument::VALUE_NONE;
       $valueDescription = $defaultValue;
@@ -698,8 +700,8 @@ abstract class CliCommand implements ICliTask
         }
         else
         {
-          $parts = explode(" ", substr($docLine, 1), 2);
-          switch(strtolower($parts[0]))
+          list($type, $value) = explode(" ", substr($docLine, 1), 2);
+          switch(strtolower($type))
           {
             case 'required':
               $required = true;
@@ -711,7 +713,14 @@ abstract class CliCommand implements ICliTask
               $valueOption = CliArgument::VALUE_OPTIONAL;
               break;
             case 'example':
-              $valueDescription = $parts[1];
+              $valueDescription = $value;
+              break;
+            case 'filter':
+              $filters[] = $this->_readCallableDocBlock('Filter', $value);
+              break;
+            case 'validate':
+            case 'validator':
+              $validators[] = $this->_readCallableDocBlock('Validator', $value);
               break;
           }
         }
@@ -726,8 +735,48 @@ abstract class CliCommand implements ICliTask
         $propName, implode(' ', $description), $shortCode,
         $valueOption, $valueDescription, $required, $defaultValue
       );
+
+      foreach($filters as $filter)
+      {
+        $this->_args[$propName]->addFilter(
+          $filter['callable'],
+          $filter['options']
+        );
+      }
+
+      foreach($validators as $validator)
+      {
+        $this->_args[$propName]->addValidator(
+          $validator['callable'],
+          $validator['options']
+        );
+      }
+
       unset($this->$propName);
     }
+  }
+
+  /**
+   * Provide full class, or method name on filter trait
+   * Or an array for callable
+   */
+  protected function _readCallableDocBlock($type, $data)
+  {
+    $callable = null;
+
+    $args = explode(' ', $data);
+
+    if(isset($args[0]))
+    {
+      $callable = $args[0];
+      if(!strstr($callable, '\\') && !strstr($callable, '::'))
+      {
+        $callable = '\Cubex\Data\\' . $type . '\\' . $type . '::' . $callable;
+      }
+      array_shift($args);
+    }
+
+    return ['callable' => $callable, 'options' => (array)$args];
   }
 
   public function __get($name)
