@@ -7,6 +7,7 @@ namespace Cubex\Database\MySQL;
 
 use Cubex\Database\IDatabaseService;
 use Cubex\Events\EventManager;
+use Cubex\Log\Log;
 use Cubex\ServiceManager\ServiceConfig;
 
 class MySQL implements IDatabaseService
@@ -141,6 +142,7 @@ class MySQL implements IDatabaseService
     {
       $this->_errorno  = $this->_connection->errno;
       $this->_errormsg = $this->_connection->error;
+      Log::error('(' . $this->_errorno . ') ' . $this->_errormsg);
     }
 
     EventManager::trigger(
