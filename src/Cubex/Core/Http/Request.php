@@ -579,7 +579,7 @@ class Request implements \IteratorAggregate
    *
    * @return string mixed
    */
-  public function urlSprintf($format = "%p%h:%po%pa")
+  public function urlSprintf($format = "%p%h")
   {
     $formater = [
       "%r" => $this->port(),
