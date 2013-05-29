@@ -31,6 +31,8 @@ class Response
 
   protected $_rendered = false;
 
+  protected $_fileLocation;
+
   const RENDER_REDIRECT   = 'redirect';
   const RENDER_RENDERABLE = 'renderable';
   const RENDER_JSON       = 'json';
@@ -38,6 +40,7 @@ class Response
   const RENDER_TEXT       = 'text';
   const RENDER_UNKNOWN    = 'unknown';
   const RENDER_DISPATCH   = 'dispatch';
+  const RENDER_DOWNLOAD   = 'download';
 
   /**
    * Create a new response object with a generic render type
@@ -95,9 +98,9 @@ class Response
   /**
    * Set a header to be sent to the client on respond
    *
-   * @param string       $header
-   * @param string       $data
-   * @param bool         $replace
+   * @param string $header
+   * @param string $data
+   * @param bool   $replace
    *
    * @return Response
    */
@@ -213,6 +216,30 @@ class Response
     return $this;
   }
 
+  public function createDownload($fileLocation, $filename = null)
+  {
+    if(!file_exists($fileLocation))
+    {
+      throw new \Exception(
+        "The file you are attempting to download does not exist", 404
+      );
+    }
+    $this->_renderType   = self::RENDER_DOWNLOAD;
+    $this->_fileLocation = $fileLocation;
+
+    if($filename === null)
+    {
+      $filename = end(explode(DS, $fileLocation));
+    }
+
+    $this->addHeader(
+      'Content-Disposition',
+      ('attachment; filename="' . $filename . '"')
+    );
+
+    return $this;
+  }
+
   /**
    * Send a response to the client based on the constructed response object
    * Only the most recent response initiator/call will be used
@@ -240,6 +267,19 @@ class Response
 
     switch($this->_renderType)
     {
+      case self::RENDER_DOWNLOAD:
+        //TODO: Possibly look into Symfony file download response
+        $this->addHeader('Content-Transfer-Encoding', 'binary');
+        $this->addHeader('Content-Length', filesize($this->_fileLocation));
+        $this->addHeader('Content-Type', 'application/octet-stream');
+        $this->sendHeaders();
+
+        $out  = fopen('php://output', 'wb');
+        $file = fopen($this->_fileLocation, 'rb');
+        stream_copy_to_stream($file, $out);
+        fclose($out);
+        fclose($file);
+        break;
       case self::RENDER_RENDERABLE:
         $this->addHeader("Content-Type", "text/html; charset=UTF-8", false);
         $this->sendHeaders();
@@ -260,7 +300,9 @@ class Response
         // Prevent content sniffing attacks by encoding "<" and ">", so browsers
         // won't try to execute the document as HTML
         $response = \str_replace(
-          array('<', '>'), array('\u003c', '\u003e'), $response
+          array('<', '>'),
+          array('\u003c', '\u003e'),
+          $response
         );
 
         echo $response;
@@ -277,7 +319,9 @@ class Response
         // Prevent content sniffing attacks by encoding "<" and ">", so browsers
         // won't try to execute the document as HTML
         $response = \str_replace(
-          array('<', '>'), array('\u003c', '\u003e'), $response
+          array('<', '>'),
+          array('\u003c', '\u003e'),
+          $response
         );
 
         echo $response;
@@ -334,14 +378,16 @@ class Response
       if($this->_lastModified)
       {
         $this->addHeader(
-          'Last-Modified', $this->generateHeaderDate($this->_lastModified)
+          'Last-Modified',
+          $this->generateHeaderDate($this->_lastModified)
         );
       }
 
       if($this->_cacheable)
       {
         $this->addHeader(
-          "Expires", $this->generateHeaderDate(time() + $this->_cacheable)
+          "Expires",
+          $this->generateHeaderDate(time() + $this->_cacheable)
         );
       }
       else
@@ -350,7 +396,8 @@ class Response
         $this->addHeader("Expires", "Fri, 21 Dec 2012 11:11:11 GMT");
         $this->addHeader("Pragma", "no-cache");
         $this->addHeader(
-          "Cache-Control", "private, no-cache, no-store, must-revalidate"
+          "Cache-Control",
+          "private, no-cache, no-store, must-revalidate"
         );
       }
 
