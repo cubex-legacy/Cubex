@@ -5,6 +5,8 @@
 
 namespace Cubex\Mapper;
 
+use Cubex\Data\Refine\Refiner;
+
 /**
  * @var Collection DataMapper[]
  */
@@ -355,5 +357,14 @@ class Collection
   {
     $this->_preCheckMappers();
     return isset($this->_mappers[$offset]) ? $this->_mappers[$offset] : null;
+  }
+
+  /**
+   * Create a new collection based on a refinement of this collection
+   */
+  public function refine(array $rules)
+  {
+    $refiner = new Refiner($this->_mappers, $rules);
+    return new static($this->_mapperType, $refiner->refine());
   }
 }
