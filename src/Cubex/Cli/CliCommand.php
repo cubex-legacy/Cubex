@@ -701,7 +701,15 @@ abstract class CliCommand implements ICliTask
         }
         else
         {
-          list($type, $value) = explode(" ", substr($docLine, 1), 2);
+          if(strstr($docLine, " "))
+          {
+            list($type, $value) = explode(" ", substr($docLine, 1), 2);
+          }
+          else
+          {
+            $type  = substr($docLine, 1);
+            $value = true;
+          }
           switch(strtolower($type))
           {
             case 'required':
