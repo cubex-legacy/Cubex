@@ -116,7 +116,7 @@ class Request implements \IteratorAggregate
    */
   public function setHost($host)
   {
-    $this->_host          = $host;
+    $this->_host = $host;
     // If we update the host we want to reset all ts corresponding values.
     $this->_processedHost = false;
     $this->_subdomain     = null;
@@ -177,16 +177,13 @@ class Request implements \IteratorAggregate
           $this->_domain = $part;
         }
       }
+      else if(empty($this->_subdomain))
+      {
+        $this->_subdomain = $part;
+      }
       else
       {
-        if(empty($this->_subdomain))
-        {
-          $this->_subdomain = $part;
-        }
-        else
-        {
-          $this->_subdomain = $part . '.' . $this->_subdomain;
-        }
+        $this->_subdomain = $part . '.' . $this->_subdomain;
       }
     }
 
