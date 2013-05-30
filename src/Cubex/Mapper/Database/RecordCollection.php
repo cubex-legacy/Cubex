@@ -532,13 +532,4 @@ class RecordCollection extends Collection
     $this->loadWhereAppend("%C LIKE %<", $column, $value);
     return $this;
   }
-
-  /**
-   * Create a new collection based on a refinement of this collection
-   */
-  public function refine(array $rules)
-  {
-    $this->get();
-    return parent::refine($rules);
-  }
 }
