@@ -892,7 +892,12 @@ abstract class RecordMapper extends DataMapper
    */
   public static function collection()
   {
-    return new RecordCollection(new static);
+    $collection = new RecordCollection(new static);
+    if(func_num_args() > 0)
+    {
+      call_user_func_array([$collection, 'loadWhere'], func_get_args());
+    }
+    return $collection;
   }
 
   protected function _handleError(IDatabaseService $connection)
