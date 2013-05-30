@@ -366,7 +366,7 @@ class Collection
   {
     $refiner    = new Refiner($this->_mappers, $rules);
     $collection = new static($this->_mapperType, $refiner->refine());
-    $collection->setLoaded();
+    $collection->setLoaded(true);
     return $collection;
   }
 }
