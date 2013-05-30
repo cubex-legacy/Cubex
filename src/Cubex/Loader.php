@@ -351,11 +351,21 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
       $dispatchImage = new \Cubex\Dispatch\Dependency\Image(
         $this->getConfig(), new \Cubex\FileSystem\FileSystem()
       );
+
       $faviconPath   = $dispatchImage->getFaviconPath(
-        $this->request()->path(),
+        ltrim($this->request()->path(), "/"),
         $this->request()
       );
-      $this->request()->setPath($faviconPath);
+
+      if(isset($faviconPath["host"]))
+      {
+        $this->request()->setHost($faviconPath["host"]);
+      }
+
+      if(isset($faviconPath["path"]))
+      {
+        $this->request()->setPath($faviconPath["path"]);
+      }
     }
 
     try

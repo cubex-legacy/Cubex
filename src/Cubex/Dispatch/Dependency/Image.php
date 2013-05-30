@@ -8,19 +8,20 @@ use Cubex\Container\Container;
 use Cubex\Core\Http\Request;
 use Cubex\Dispatch\Dependency;
 use Cubex\Dispatch\DispatchEvent;
+use Cubex\Dispatch\DispatchPath;
 
 class Image extends Url
 {
   public function getFaviconPath($requestPath, Request $request)
   {
-    $path = DS . $this->getResourceDirectory() . DS;
-    $path .= $this->generateDomainHash(
-      $request->domain() . "." . $request->tld()
+    $dispatchPath = DispatchPath::fromParams(
+      $this->generateDomainHash($request->domain() . "." . $request->tld()),
+      $this->getBaseHash(),
+      $this->getNomapHash(),
+      $requestPath
     );
-    $path .= DS . $this->getBaseHash() . DS . $this->getNomapHash();
-    $path .= $requestPath;
 
-    return $this->getFileSystem()->normalizePath($path);
+    return parse_url($this->getDispatchUrl($dispatchPath, $request));
   }
 
   public function getUri(DispatchEvent $event)

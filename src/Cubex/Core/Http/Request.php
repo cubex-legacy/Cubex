@@ -116,7 +116,13 @@ class Request implements \IteratorAggregate
    */
   public function setHost($host)
   {
-    $this->_host = $host;
+    $this->_host          = $host;
+    // If we update the host we want to reset all ts corresponding values.
+    $this->_processedHost = false;
+    $this->_subdomain     = null;
+    $this->_domain        = null;
+    $this->_tld           = null;
+    $this->_port          = null;
 
     return $this;
   }
