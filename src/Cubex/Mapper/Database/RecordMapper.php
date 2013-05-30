@@ -846,14 +846,9 @@ abstract class RecordMapper extends DataMapper
    */
   public static function loadWhere()
   {
-    $collection = new RecordCollection(new static);
-    return call_user_func_array(
-      [
-      $collection,
-      'loadOneWhere'
-      ],
-      func_get_args()
-    );
+    $args = func_get_args();
+    array_unshift($args, ['*']);
+    return call_user_func_array(["static", "loadWhereWith"], $args);
   }
 
   /**
@@ -862,10 +857,29 @@ abstract class RecordMapper extends DataMapper
    */
   public static function loadWhereOrNew()
   {
-    $resp = call_user_func_array(
-      [get_called_class(), "loadWhere"],
-      func_get_args()
+    $args = func_get_args();
+    array_unshift($args, ['*']);
+    return call_user_func_array(["static", "loadWhereOrNewWith"], $args);
+  }
+
+  public static function loadWhereWith(array $columns, $where/**,$where*/)
+  {
+    $args = func_get_args();
+    array_shift($args);
+    $collection = new RecordCollection(new static);
+    $collection->setColumns($columns);
+    return call_user_func_array(
+      [
+      $collection,
+      'loadOneWhere'
+      ],
+      $args
     );
+  }
+
+  public static function loadWhereOrNewWith(array $columns, $where/**,$where*/)
+  {
+    $resp = call_user_func_array(["static", "loadWhereWith"], func_get_args());
     if($resp === null)
     {
       $resp = new static;
