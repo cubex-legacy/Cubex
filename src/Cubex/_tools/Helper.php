@@ -219,8 +219,9 @@ if(!function_exists("get_namespace"))
    */
   function get_namespace($source)
   {
-    $sourceObjectRefelction = new \ReflectionClass($source);
-
-    return $sourceObjectRefelction->getNamespaceName();
+    $source = is_object($source) ? get_class($source) : $source;
+    $source = explode('\\', $source);
+    array_pop($source);
+    return implode('\\', $source);
   }
 }
