@@ -364,7 +364,9 @@ class Collection
    */
   public function refine(array $rules)
   {
-    $refiner = new Refiner($this->_mappers, $rules);
-    return new static($this->_mapperType, $refiner->refine());
+    $refiner    = new Refiner($this->_mappers, $rules);
+    $collection = new static($this->_mapperType, $refiner->refine());
+    $collection->setLoaded();
+    return $collection;
   }
 }
