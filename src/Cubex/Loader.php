@@ -179,7 +179,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
   public function setLocale($locale = null)
   {
-    if(!$this->config("locale")->getBool('enabled', true))
+    if(!$this->config("locale")->getBool('enabled', false))
     {
       return $this;
     }
@@ -352,7 +352,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
         $this->getConfig(), new \Cubex\FileSystem\FileSystem()
       );
 
-      $faviconPath   = $dispatchImage->getFaviconPath(
+      $faviconPath = $dispatchImage->getFaviconPath(
         ltrim($this->request()->path(), "/"),
         $this->request()
       );
