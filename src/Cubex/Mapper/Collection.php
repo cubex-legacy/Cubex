@@ -362,9 +362,9 @@ class Collection
   /**
    * Create a new collection based on a refinement of this collection
    */
-  public function refine(array $rules)
+  public function refine(array $rules, $matchAll = true)
   {
-    $refiner    = new Refiner($this->_mappers, $rules);
+    $refiner    = new Refiner($this->_mappers, $rules, $matchAll);
     $collection = new static($this->_mapperType, $refiner->refine());
     $collection->setLoaded(true);
     return $collection;

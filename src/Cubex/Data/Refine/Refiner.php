@@ -10,13 +10,23 @@ class Refiner
   /**
    * @var IRefinement[]
    */
-  protected $_refinements = [];
-  protected $_raw = [];
+  protected $_refinements;
+  protected $_raw;
+  protected $_matchAll;
 
-  public function __construct(array $raw, array $refinements = [])
+  public function __construct(
+    array $raw, array $refinements = [], $matchAll = true
+  )
   {
-    $this->_raw = $raw;
+    $this->_raw      = $raw;
+    $this->_matchAll = $matchAll;
     $this->addRefinements($refinements);
+  }
+
+  public function setMatchAll($matchAll = true)
+  {
+    $this->_matchAll = $matchAll;
+    return $this;
   }
 
   public function addRefinement(IRefinement $refinement)
@@ -39,14 +49,25 @@ class Refiner
 
   public function refine()
   {
-    foreach($this->_refinements as $refine)
+    foreach($this->_raw as $itemId => $entry)
     {
-      foreach($this->_raw as $itemId => $entry)
+      $passed = false;
+      foreach($this->_refinements as $refine)
       {
-        if(!$refine->verify($entry))
+        if($refine->verify($entry))
         {
-          unset($this->_raw[$itemId]);
+          $passed = true;
         }
+        else if($this->_matchAll)
+        {
+          $passed = false;
+          break;
+        }
+      }
+
+      if(!$passed)
+      {
+        unset($this->_raw[$itemId]);
       }
     }
 
