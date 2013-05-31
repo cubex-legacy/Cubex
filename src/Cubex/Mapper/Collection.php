@@ -46,6 +46,11 @@ class Collection
     return array_keys($this->_mappers);
   }
 
+  public function hasMappers()
+  {
+    return $this->count() > 0;
+  }
+
   public function first($default = null)
   {
     if($this->count() > 0)
