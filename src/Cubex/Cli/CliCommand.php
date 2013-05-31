@@ -676,18 +676,8 @@ abstract class CliCommand implements ICliTask
     {
       $propName     = $p->getName();
       $defaultValue = $p->getValue($this);
-
-      $shortCode = strtolower(substr($propName, 0, 1));
-      if(isset($usedShorts[$shortCode]))
-      {
-        $shortCode = '';
-      }
-      else
-      {
-        $usedShorts[$shortCode] = true;
-      }
-
-      $filters = $validators = [];
+      $filters      = $validators = [];
+      $shortCode    = null;
 
       $required         = false;
       $valueOption      = CliArgument::VALUE_NONE;
@@ -718,10 +708,17 @@ abstract class CliCommand implements ICliTask
           }
           switch(strtolower($type))
           {
+            case 'short':
+            case 'shortcode':
+            case 'shortname':
+            case 'alias':
+              $shortCode = $value;
+              break;
             case 'required':
               $required = true;
               break;
             case 'valuerequired':
+            case 'inputvalue':
               $valueOption = CliArgument::VALUE_REQUIRED;
               break;
             case 'optional':
@@ -742,6 +739,20 @@ abstract class CliCommand implements ICliTask
               break;
           }
         }
+      }
+
+      if($shortCode === null)
+      {
+        $shortCode = strtolower(substr($propName, 0, 1));
+      }
+
+      if(isset($usedShorts[$shortCode]))
+      {
+        $shortCode = '';
+      }
+      else
+      {
+        $usedShorts[$shortCode] = true;
       }
 
       if(empty($description))
