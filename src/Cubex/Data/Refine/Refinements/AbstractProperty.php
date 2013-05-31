@@ -12,12 +12,16 @@ abstract class AbstractProperty implements IRefinement
   protected $_property;
   protected $_match;
   protected $_strict;
+  protected $_passUnset;
 
-  public function __construct($property, $match, $strict = true)
+  public function __construct(
+    $property, $match, $strict = true, $passOnUnset = false
+  )
   {
-    $this->_property = $property;
-    $this->_match    = $match;
-    $this->_strict   = $strict;
+    $this->_property  = $property;
+    $this->_match     = $match;
+    $this->_strict    = $strict;
+    $this->_passUnset = $passOnUnset;
   }
 
   public function verify($data)
@@ -28,6 +32,10 @@ abstract class AbstractProperty implements IRefinement
       {
         return true;
       }
+    }
+    else if($this->_passUnset)
+    {
+      return true;
     }
     return false;
   }
