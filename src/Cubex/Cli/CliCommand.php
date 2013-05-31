@@ -175,7 +175,13 @@ abstract class CliCommand implements ICliTask
       $this->_argsByName[$arg->name] = $arg;
     }
 
+    $this->_configure();
+
     static::_addLogLevelArgIfRequired();
+  }
+
+  protected function _configure()
+  {
   }
 
   protected function _addLogLevelArgIfRequired()
