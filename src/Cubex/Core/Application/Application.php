@@ -208,6 +208,7 @@ abstract class Application
       }
       if($dispatcher instanceof IController)
       {
+        $dispatcher->setBaseUri($this->baseUri());
         $matchRoute = $router->getMatchedRoute();
         if($matchRoute !== null)
         {
