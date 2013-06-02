@@ -150,7 +150,21 @@ abstract class CliCommand implements ICliTask
           $seenArrayArg = true;
         }
       }
-      else
+
+      if(isset($this->_argsByName[$arg->name]))
+      {
+        throw new \Exception(
+          'Argument name used for more than one argument: ' . $arg->name
+        );
+      }
+      $this->_argsByName[$arg->name] = $arg;
+    }
+
+    $this->_configure();
+
+    foreach($args as $arg)
+    {
+      if($arg instanceof CliArgument)
       {
         $this->_options[] = $arg;
         if($arg->hasShortName())
@@ -165,17 +179,7 @@ abstract class CliCommand implements ICliTask
           $this->_argsByShortName[$arg->shortName] = $arg;
         }
       }
-
-      if(isset($this->_argsByName[$arg->name]))
-      {
-        throw new \Exception(
-          'Argument name used for more than one argument: ' . $arg->name
-        );
-      }
-      $this->_argsByName[$arg->name] = $arg;
     }
-
-    $this->_configure();
 
     static::_addLogLevelArgIfRequired();
   }
