@@ -183,7 +183,7 @@ class Form extends DataMapper implements IRenderable
               }
 
               $this->addSelectElement($a->name(), $options, $a->data());
-              $this->get($a->name())->setLabel(Strings::humanize($display));
+              $this->get($a->name())->setLabel(Strings::titleize($display));
               continue;
             }
           }
