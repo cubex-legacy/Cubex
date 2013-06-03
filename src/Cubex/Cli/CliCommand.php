@@ -70,6 +70,8 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
    */
   public function __construct($loader, $rawArgs)
   {
+    (new DocBlockParser($this))->parse();
+
     /**
      * If you wish to log to a file, or use CLI logger in a more detailed way,
      * Set _autoLog to false and initiate the CliLogger within your class
@@ -80,6 +82,7 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
         $this->_echoLevel, $this->_defaultLogLevel
       );
     }
+
     $this->_loader  = $loader;
     $this->_rawArgs = $rawArgs;
 
@@ -246,7 +249,6 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
    */
   protected function _help()
   {
-    (new DocBlockParser($this))->parse();
     if($this->_comment !== null)
     {
       echo $this->_comment . "\n";
