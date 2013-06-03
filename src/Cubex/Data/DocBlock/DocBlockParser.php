@@ -31,7 +31,7 @@ class DocBlockParser
     {
       if(starts_with($docLine, '@'))
       {
-        if(starts_with($docLine, '@comment'))
+        if(!starts_with($docLine, '@comment'))
         {
           if(strstr($docLine, ' '))
           {
