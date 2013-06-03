@@ -5,7 +5,10 @@
 
 namespace Cubex\Cli;
 
-class CliArgument extends CliArgumentBase
+use Cubex\Data\DataHelper;
+use Cubex\Data\DocBlock\IDocBlockAware;
+
+class CliArgument extends CliArgumentBase implements IDocBlockAware
 {
   const VALUE_NONE     = 0;
   const VALUE_OPTIONAL = 1;
@@ -18,23 +21,23 @@ class CliArgument extends CliArgumentBase
   public $conflictingArgs;
 
   /**
-   * @param string     $longName         The long argument name.
-   *                                     Must only contain numbers,
-   *                                     letters and hyphens.
-   * @param string     $description      The description to show in the help
-   * @param string     $shortName        The short argument name.
-   *                                     Must be a single letter.
-   * @param int        $valueOption      Specify whether this argument
-   *                                     needs a value
-   * @param string     $valueDescription The name of the value to
-   *                                     show in the help
-   * @param bool       $required         True if this option is required
-   * @param mixed      $defaultValue     The default value to use if this
-   *                                     argument is not specified.
-   * @param callable[] $validators       Validators to use on argument's value
-   * @param string[]   $conflictingArgs  A list of arguments that cannot be
-   *                                     specified on the same command line as
-   *                                     this argument
+   * @param string     $longName          The long argument name.
+   *                                      Must only contain numbers,
+   *                                      letters and hyphens.
+   * @param string     $description       The description to show in the help
+   * @param string     $shortName         The short argument name.
+   *                                      Must be a single letter.
+   * @param int        $valueOption       Specify whether this argument
+   *                                      needs a value
+   * @param string     $valueDescription  The name of the value to
+   *                                      show in the help
+   * @param bool       $required          True if this option is required
+   * @param mixed      $defaultValue      The default value to use if this
+   *                                      argument is not specified.
+   * @param callable[] $validators        Validators to use on argument's value
+   * @param string[]   $conflictingArgs   A list of arguments that cannot be
+   *                                      specified on the same command line as
+   *                                      this argument
    *
    * @throws \Exception
    */
@@ -118,5 +121,45 @@ class CliArgument extends CliArgumentBase
     {
       parent::setData($data);
     }
+  }
+
+  public function setDocBlockItem($type, $value)
+  {
+    switch(strtolower($type))
+    {
+      case 'short':
+      case 'shortcode':
+      case 'shortname':
+      case 'alias':
+        $this->shortName = $value;
+        break;
+      case 'required':
+        $this->required = $value;
+        break;
+      case 'valuerequired':
+      case 'inputvalue':
+        $this->valueOption = CliArgument::VALUE_REQUIRED;
+        break;
+      case 'optional':
+        $this->valueOption = CliArgument::VALUE_OPTIONAL;
+        break;
+      case 'example':
+        $this->valueDescription = $value;
+        break;
+      case 'filter':
+        $filter = DataHelper::readCallableDocBlock('Filter', $value);
+        $this->addFilter($filter['callable'], $filter['options']);
+        break;
+      case 'validate':
+      case 'validator':
+        $validator = DataHelper::readCallableDocBlock('Validator', $value);
+        $this->addValidator($validator['callable'], $validator['options']);
+        break;
+    }
+  }
+
+  public function setDocBlockComment($comment)
+  {
+    $this->description = $comment;
   }
 }

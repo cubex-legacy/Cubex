@@ -5,13 +5,14 @@
 
 namespace Cubex\Cli;
 
-use Cubex\Data\DataHelper;
+use Cubex\Data\DocBlock\DocBlockParser;
+use Cubex\Data\DocBlock\IDocBlockAware;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Helpers\Strings;
 use Cubex\Loader;
 use Psr\Log\LogLevel;
 
-abstract class CliCommand implements ICliTask
+abstract class CliCommand implements ICliTask, IDocBlockAware
 {
   use ConfigTrait;
 
@@ -60,6 +61,8 @@ abstract class CliCommand implements ICliTask
   protected $_args = [];
 
   protected $_publicMethods;
+
+  protected $_comment;
 
   /**
    * @param Loader   $loader
@@ -243,17 +246,10 @@ abstract class CliCommand implements ICliTask
    */
   protected function _help()
   {
-    $reflected    = new \ReflectionClass(get_called_class());
-    $commentLines = Strings::docCommentLines($reflected->getDocComment());
-    if(!empty($commentLines))
+    (new DocBlockParser($this))->parse();
+    if($this->_comment !== null)
     {
-      foreach($commentLines as $helpLine)
-      {
-        if(substr($helpLine, 0, 1) !== '@')
-        {
-          echo $helpLine . "\n";
-        }
-      }
+      echo $this->_comment . "\n";
     }
 
     $usage = "Usage: " . $_REQUEST['__path__'];
@@ -678,114 +674,40 @@ abstract class CliCommand implements ICliTask
 
     foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
     {
-      $propName     = $p->getName();
-      $defaultValue = $p->getValue($this);
-      $filters      = $validators = [];
-      $shortCode    = null;
+      $name             = $p->getName();
+      $valueDescription = $defaultValue = $p->getValue($this);
+      $shortCode        = strtolower(substr($name, 0, 1));
 
-      $required         = false;
-      $valueOption      = CliArgument::VALUE_NONE;
-      $valueDescription = $defaultValue;
+      $required    = false;
+      $valueOption = CliArgument::VALUE_NONE;
+
       if(empty($valueDescription))
       {
         $valueDescription = 'value';
       }
 
-      $description = [];
-      $docBlock    = Strings::docCommentLines($p->getDocComment());
-      foreach($docBlock as $docLine)
-      {
-        if(substr($docLine, 0, 1) !== '@')
-        {
-          $description[] = $docLine;
-        }
-        else
-        {
-          if(strstr($docLine, " "))
-          {
-            list($type, $value) = explode(" ", substr($docLine, 1), 2);
-          }
-          else
-          {
-            $type  = substr($docLine, 1);
-            $value = true;
-          }
-          switch(strtolower($type))
-          {
-            case 'short':
-            case 'shortcode':
-            case 'shortname':
-            case 'alias':
-              $shortCode = $value;
-              break;
-            case 'required':
-              $required = true;
-              break;
-            case 'valuerequired':
-            case 'inputvalue':
-              $valueOption = CliArgument::VALUE_REQUIRED;
-              break;
-            case 'optional':
-              $valueOption = CliArgument::VALUE_OPTIONAL;
-              break;
-            case 'example':
-              $valueDescription = $value;
-              break;
-            case 'filter':
-              $filters[] = DataHelper::readCallableDocBlock('Filter', $value);
-              break;
-            case 'validate':
-            case 'validator':
-              $validators[] = DataHelper::readCallableDocBlock(
-                'Validator',
-                $value
-              );
-              break;
-          }
-        }
-      }
-
-      if($shortCode === null)
-      {
-        $shortCode = strtolower(substr($propName, 0, 1));
-      }
-
       if(isset($usedShorts[$shortCode]))
       {
-        $shortCode = '';
-      }
-      else
-      {
-        $usedShorts[$shortCode] = true;
+        $shortCode = null;
       }
 
-      if(empty($description))
-      {
-        $description[] = $propName;
-      }
-
-      $this->_args[$propName] = new CliArgument(
-        $propName, implode(' ', $description), $shortCode,
+      $this->_args[$name] = new CliArgument(
+        $name, $name, $shortCode,
         $valueOption, $valueDescription, $required, $defaultValue
       );
 
-      foreach($filters as $filter)
+      (new DocBlockParser($this->_args[$name], $p->getDocComment()))->parse();
+
+      if($this->_args[$name]->hasShortName())
       {
-        $this->_args[$propName]->addFilter(
-          $filter['callable'],
-          $filter['options']
-        );
+        $shortCode = $this->_args[$name]->shortName;
+        if(!isset($usedShorts[$shortCode]))
+        {
+          $usedShorts[$shortCode] = true;
+        }
       }
 
-      foreach($validators as $validator)
-      {
-        $this->_args[$propName]->addValidator(
-          $validator['callable'],
-          $validator['options']
-        );
-      }
-
-      unset($this->$propName);
+      unset($this->$name);
     }
   }
 
@@ -797,6 +719,8 @@ abstract class CliCommand implements ICliTask
   public function nonCallableMethods()
   {
     return [
+      'setDocBlockItem',
+      'setDocBlockComment',
       'nonCallableMethods',
       'methodCallArgs',
       'execute',
@@ -811,5 +735,14 @@ abstract class CliCommand implements ICliTask
       'getConfig',
       'config'
     ];
+  }
+
+  public function setDocBlockItem($item, $value)
+  {
+  }
+
+  public function setDocBlockComment($comment)
+  {
+    $this->_comment = $comment;
   }
 }
