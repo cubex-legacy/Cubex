@@ -261,7 +261,7 @@ class MySQL implements IDatabaseService
     {
       while($row = $result->fetch_object())
       {
-        if($keyField == null)
+        if($keyField === null)
         {
           $keyField = array_keys(get_object_vars($row));
           if(count($keyField) == 2)

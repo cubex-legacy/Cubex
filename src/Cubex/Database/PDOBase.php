@@ -212,7 +212,7 @@ abstract class PDOBase implements IDatabaseService
       {
         while($row = $result->fetchObject())
         {
-          if($keyField == null)
+          if($keyField === null)
           {
             $keyField = array_keys(get_object_vars($row));
             if(count($keyField) == 2)

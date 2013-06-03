@@ -142,7 +142,7 @@ abstract class DataMapper
 
   protected function _buildAttributes($type = null)
   {
-    if($type == null)
+    if($type === null)
     {
       $type = $this->_attributeType;
     }

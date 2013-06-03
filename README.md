@@ -1,4 +1,6 @@
-Cubex
+Cubex Framework
 =====
 
-Cubex Framework
+Required PHP Extensions:
+  (PECL) intl (requires php-devel / icu libicu-devel)
+  mysqli
