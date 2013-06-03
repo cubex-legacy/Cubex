@@ -174,7 +174,15 @@ abstract class DataMapper
         {
           if(starts_with($docLine, '@', false))
           {
-            list($docType, $docValue) = explode(" ", substr($docLine, 1), 2);
+            if(strstr($docLine, ' '))
+            {
+              list($docType, $docValue) = explode(" ", substr($docLine, 1), 2);
+            }
+            else
+            {
+              $docType  = $docLine;
+              $docValue = true;
+            }
             switch(strtolower($docType))
             {
               case 'filter':
