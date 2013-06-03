@@ -161,7 +161,13 @@ class Form extends DataMapper implements IRenderable
             $options = (new OptionBuilder($rel))->getOptions();
             if(!empty($options))
             {
-              //TODO: Check if attribute required, if not, add in a "SELECT" for null
+              if(!$a->required())
+              {
+                if(!isset($options[0]))
+                {
+                  $options = [0 => '- SELECT - '] + $options;
+                }
+              }
               $this->addSelectElement($a->name(), $options, $a->data());
               $this->get($a->name())->setLabel(ucwords($methodname));
               continue;
