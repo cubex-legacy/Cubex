@@ -46,12 +46,12 @@ class DocBlockParser
         }
         else
         {
-          $comment[] = substr($docLine, 8);
+          $comment[] = trim(substr($docLine, 9));
         }
       }
       else if(!empty($docLine))
       {
-        $comment[] = $docLine;
+        $comment[] = trim($docLine);
       }
     }
 
