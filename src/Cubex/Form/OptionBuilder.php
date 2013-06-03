@@ -7,6 +7,7 @@ namespace Cubex\Form;
 
 use Cubex\Mapper\Database\RecordCollection;
 use Cubex\Mapper\Database\RecordMapper;
+use Cubex\Type\Enum;
 
 class OptionBuilder
 {
@@ -24,11 +25,17 @@ class OptionBuilder
       return null;
     }
 
+    if($this->_source instanceof Enum)
+    {
+      return $this->_source->getConstList();
+    }
+
     if($this->_source instanceof RecordCollection)
     {
       return $this->fromCollection($this->_source);
     }
-    else if($this->_source instanceof RecordMapper)
+
+    if($this->_source instanceof RecordMapper)
     {
       return $this->fromRecordMapper($this->_source);
     }
