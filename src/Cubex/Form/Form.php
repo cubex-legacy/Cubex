@@ -149,11 +149,12 @@ class Form extends DataMapper implements IRenderable
         if($relations)
         {
           $methodname = null;
+          $display    = $a->name();
 
           if(ends_with($a->name(), 'id', false))
           {
             $methodname = substr($a->name(), 0, -2);
-            $methodname = trim($methodname, '_');
+            $display    = $methodname = trim($methodname, '_');
             $methodname = Strings::variableToCamelCase($methodname);
             if(method_exists($mapper, $methodname . 's'))
             {
@@ -180,8 +181,9 @@ class Form extends DataMapper implements IRenderable
                   $options = [0 => '- SELECT - '] + $options;
                 }
               }
+
               $this->addSelectElement($a->name(), $options, $a->data());
-              $this->get($a->name())->setLabel(ucwords($methodname));
+              $this->get($a->name())->setLabel(Strings::humanize($display));
               continue;
             }
           }
