@@ -54,7 +54,12 @@ class DocBlockParser
         $comment[] = $docLine;
       }
     }
-    $this->_object->setDocBlockComment(implode("\n", $comment));
+
+    if(!empty($comment))
+    {
+      $this->_object->setDocBlockComment(implode("\n", $comment));
+    }
+
     return true;
   }
 }
