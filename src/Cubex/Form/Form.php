@@ -146,16 +146,28 @@ class Form extends DataMapper implements IRenderable
       else
       {
 
-        if($relations && strtolower(substr($a->name(), -2)) == 'id')
+        if($relations)
         {
-          $methodname = substr($a->name(), 0, -2);
-          $methodname = trim($methodname, '_');
-          if(method_exists($mapper, $methodname . 's'))
+          $methodname = null;
+
+          if(ends_with($a->name(), 'id', false))
           {
-            $methodname = $methodname . 's';
+            $methodname = substr($a->name(), 0, -2);
+            $methodname = trim($methodname, '_');
+            $methodname = Strings::variableToCamelCase($methodname);
+            if(method_exists($mapper, $methodname . 's'))
+            {
+              $methodname = $methodname . 's';
+            }
           }
 
-          if(method_exists($mapper, $methodname))
+          if(ends_with($a->name(), 'type', false))
+          {
+            $methodname = $a->name() . 's';
+            $methodname = Strings::variableToCamelCase($methodname);
+          }
+
+          if($methodname !== null && method_exists($mapper, $methodname))
           {
             $rel     = $mapper->$methodname();
             $options = (new OptionBuilder($rel))->getOptions();
