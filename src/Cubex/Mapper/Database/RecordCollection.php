@@ -273,7 +273,7 @@ class RecordCollection extends Collection
 
     if($rows)
     {
-      if($this->_columns === ['*'] && $allowLimit && $this->_groupBy == null)
+      if($this->_columns === ['*'] && $allowLimit && $this->_groupBy === null)
       {
         $queries   = EphemeralCache::getCache("sqlqueries", $this, []);
         $queries[] = $query;
