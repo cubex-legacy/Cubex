@@ -173,13 +173,23 @@ class HtmlElement implements IRenderable
     return \htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
   }
 
-  public function renderBefore(IRenderable $item)
+  /**
+   * @param IRenderable|string $item
+   *
+   * @return $this
+   */
+  public function renderBefore($item)
   {
     $this->_preRender->add($item);
     return $this;
   }
 
-  public function renderAfter(IRenderable $item)
+  /**
+   * @param IRenderable|string $item
+   *
+   * @return $this
+   */
+  public function renderAfter($item)
   {
     $this->_postRender->add($item);
     return $this;
