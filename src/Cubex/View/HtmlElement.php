@@ -23,6 +23,25 @@ class HtmlElement implements IRenderable
   protected $_preRender;
   protected $_postRender;
 
+  protected $_selfClosingTags = [
+    'area'    => 'area',
+    'base'    => 'base',
+    'br'      => 'br',
+    'col'     => 'col',
+    'command' => 'command',
+    'embed'   => 'embed',
+    'hr'      => 'hr',
+    'img'     => 'img',
+    'input'   => 'input',
+    'keygen'  => 'keygen',
+    'link'    => 'link',
+    'meta'    => 'meta',
+    'param'   => 'param',
+    'source'  => 'source',
+    'track'   => 'track',
+    'wbr'     => 'wbr',
+  ];
+
   /**
    * @param string $tag
    * @param array  $attributes
@@ -136,7 +155,14 @@ class HtmlElement implements IRenderable
 
     if(!empty($this->_tag))
     {
-      $return .= '<' . $this->_tag . $this->renderAttributes() . '>';
+      $return .= '<' . $this->_tag . $this->renderAttributes();
+
+      if(empty($this->_content) && isset($this->_selfClosingTags[$this->_tag]))
+      {
+        $return .= ' /';
+      }
+
+      $return .= '>';
     }
 
     $return .= $this->_content;
@@ -148,7 +174,15 @@ class HtmlElement implements IRenderable
         $return .= $nest->render();
       }
     }
-    $return .= empty($this->_tag) ? '' : '</' . $this->_tag . '>';
+
+    if(!empty($this->_tag))
+    {
+      if(!isset($this->_selfClosingTags[$this->_tag])
+        || !empty($this->_content))
+      {
+        $return .= '</' . $this->_tag . '>';
+      }
+    }
 
     $return .= $this->_postRender->render();
 
