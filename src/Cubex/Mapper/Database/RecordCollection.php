@@ -291,7 +291,7 @@ class RecordCollection extends Collection
 
     if($rows)
     {
-      if($this->_columns === ['*'] && $allowLimit && $this->_groupBy == null)
+      if($this->_columns === ['*'] && $allowLimit && $this->_groupBy === null)
       {
         $queries   = EphemeralCache::getCache("sqlqueries", $this, []);
         $queries[] = $query;
@@ -553,7 +553,7 @@ class RecordCollection extends Collection
 
   public function count()
   {
-    if(empty($this->_mappers))
+    if(!$this->_loaded)
     {
       list(, $rows) = $this->_doQuery(['COUNT(*) AS `c`'], false, true, true);
       if(!empty($rows) && isset($rows[0]->c))
