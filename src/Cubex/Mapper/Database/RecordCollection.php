@@ -191,14 +191,16 @@ class RecordCollection extends Collection
     );
   }
 
-  public function get()
+  protected function _doQuery(
+    $columns, $useOrder = false, $useLimit = false, $cache = false
+  )
   {
     $query      = 'SELECT %LC FROM %T';
     $tableQuery = $query = ParseQuery::parse(
       $this->connection(),
       [
       $query,
-      $this->_columns,
+      $columns,
       $this->_mapperType->getTableName(),
       ]
     );
@@ -214,19 +216,19 @@ class RecordCollection extends Collection
       $query .= " GROUP BY $this->_groupBy";
     }
 
-    if($this->_orderBy !== null)
+    if($useOrder && $this->_orderBy !== null)
     {
       $query .= " ORDER BY $this->_orderBy";
     }
 
-    if($this->_limit !== null)
+    if($useLimit && $this->_limit !== null)
     {
       $query .= " LIMIT $this->_offset,$this->_limit";
     }
 
     $rows = [];
 
-    if($this->_columns == ['*']
+    if($columns == ['*']
     && $this->_limit === null
     && $this->_groupBy === null
     )
@@ -255,11 +257,27 @@ class RecordCollection extends Collection
         }
       }
     }
+    else if($cache)
+    {
+      $rows = EphemeralCache::getCache(md5($query), $this);
+    }
 
     if(empty($rows))
     {
       $rows = $this->connection()->getRows($query);
     }
+
+    if($cache)
+    {
+      EphemeralCache::storeCache(md5($query), $rows, $this);
+    }
+
+    return [$query, $rows];
+  }
+
+  public function get()
+  {
+    list($query, $rows) = $this->_doQuery($this->_columns, true, true);
 
     $allowLimit = $this->_limit === null;
     if($this->_offset == 0)
@@ -273,7 +291,7 @@ class RecordCollection extends Collection
 
     if($rows)
     {
-      if($this->_columns === ['*'] && $allowLimit && $this->_groupBy === null)
+      if($this->_columns === ['*'] && $allowLimit && $this->_groupBy == null)
       {
         $queries   = EphemeralCache::getCache("sqlqueries", $this, []);
         $queries[] = $query;
@@ -531,5 +549,18 @@ class RecordCollection extends Collection
   {
     $this->loadWhereAppend("%C LIKE %<", $column, $value);
     return $this;
+  }
+
+  public function count()
+  {
+    if(empty($this->_mappers))
+    {
+      list(, $rows) = $this->_doQuery(['COUNT(*) AS `c`'], false, true, true);
+      if(!empty($rows) && isset($rows[0]->c))
+      {
+        return (int)$rows[0]->c;
+      }
+    }
+    return parent::count();
   }
 }
