@@ -112,12 +112,15 @@ class Form extends DataMapper implements IRenderable
   }
 
   /**
-   * @param \Cubex\Mapper\DataMapper $mapper
-   * @param bool                     $relations Build Belongs To Dropdowns
+   * @param DataMapper $mapper
+   * @param bool       $relations  Build Belongs To Dropdowns
+   * @param array      $attributes List of attributes to build
    *
    * @return $this
    */
-  public function buildFromMapper(DataMapper $mapper, $relations = false)
+  public function buildFromMapper(
+    DataMapper $mapper, $relations = false, array $attributes = null
+  )
   {
     if($mapper instanceof RecordMapper)
     {
@@ -127,69 +130,72 @@ class Form extends DataMapper implements IRenderable
     $attr = $mapper->getRawAttributes();
     foreach($attr as $a)
     {
-      if($mapper->maintainsTimestamps())
+      if($attributes === null || in_array($a->name(), $attributes))
       {
-        $autoKeys = [
-          $mapper->updatedAttribute(),
-          $mapper->createdAttribute()
-        ];
-        if(in_array($a->name(), $autoKeys))
+        if($mapper->maintainsTimestamps())
         {
-          continue;
+          $autoKeys = [
+            $mapper->updatedAttribute(),
+            $mapper->createdAttribute()
+          ];
+          if(in_array($a->name(), $autoKeys))
+          {
+            continue;
+          }
         }
-      }
 
-      if($mapper->getIdKey() == $a->name())
-      {
-        $this->addHiddenElement($a->name(), $a->data());
-      }
-      else
-      {
-
-        if($relations)
+        if($mapper->getIdKey() == $a->name())
         {
-          $methodname = null;
-          $display    = $a->name();
+          $this->addHiddenElement($a->name(), $a->data());
+        }
+        else
+        {
 
-          if(ends_with($a->name(), 'id', false))
+          if($relations)
           {
-            $methodname = substr($a->name(), 0, -2);
-            $display    = $methodname = trim($methodname, '_');
-            $methodname = Strings::variableToCamelCase($methodname);
-            if(method_exists($mapper, $methodname . 's'))
+            $methodname = null;
+            $display    = $a->name();
+
+            if(ends_with($a->name(), 'id', false))
             {
-              $methodname = $methodname . 's';
-            }
-          }
-
-          if(ends_with($a->name(), 'type', false))
-          {
-            $methodname = $a->name() . 's';
-            $methodname = Strings::variableToCamelCase($methodname);
-          }
-
-          if($methodname !== null && method_exists($mapper, $methodname))
-          {
-            $rel     = $mapper->$methodname();
-            $options = (new OptionBuilder($rel))->getOptions();
-            if(!empty($options))
-            {
-              if(!$a->required())
+              $methodname = substr($a->name(), 0, -2);
+              $display    = $methodname = trim($methodname, '_');
+              $methodname = Strings::variableToCamelCase($methodname);
+              if(method_exists($mapper, $methodname . 's'))
               {
-                if(!isset($options[0]))
-                {
-                  $options = [0 => '- SELECT - '] + $options;
-                }
+                $methodname = $methodname . 's';
               }
+            }
 
-              $this->addSelectElement($a->name(), $options, $a->data());
-              $this->get($a->name())->setLabel(Strings::titleize($display));
-              continue;
+            if(ends_with($a->name(), 'type', false))
+            {
+              $methodname = $a->name() . 's';
+              $methodname = Strings::variableToCamelCase($methodname);
+            }
+
+            if($methodname !== null && method_exists($mapper, $methodname))
+            {
+              $rel     = $mapper->$methodname();
+              $options = (new OptionBuilder($rel))->getOptions();
+              if(!empty($options))
+              {
+                if(!$a->required())
+                {
+                  if(!isset($options[0]))
+                  {
+                    $options = [0 => '- SELECT - '] + $options;
+                  }
+                }
+
+                $this->addSelectElement($a->name(), $options, $a->data());
+                $this->get($a->name())->setLabel(Strings::titleize($display));
+                continue;
+              }
             }
           }
-        }
 
-        $this->_addElementFromAttribute($a);
+          $this->_addElementFromAttribute($a);
+        }
       }
     }
 
