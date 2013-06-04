@@ -32,11 +32,20 @@ class MySQLPDO extends PDOBase
    */
   public function escapeColumnName($column)
   {
+    if($column === null || $column === '')
+    {
+      return '``';
+    }
+
     if($column == '*')
     {
       return '*';
     }
 
+    if(strstr($column, '(') && strstr($column, ')'))
+    {
+      return $column;
+    }
     $column = $this->escapeString($column);
 
     return "`$column`";

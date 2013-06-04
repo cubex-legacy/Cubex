@@ -95,6 +95,11 @@ class MySQL implements IDatabaseService
       return '*';
     }
 
+    if(strstr($column, '(') && strstr($column, ')'))
+    {
+      return $column;
+    }
+
     $column = str_replace('`', '', $this->escapeString($column));
 
     if(empty($column))
