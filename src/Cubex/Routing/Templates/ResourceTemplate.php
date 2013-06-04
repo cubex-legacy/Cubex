@@ -20,13 +20,13 @@ class ResourceTemplate implements IRouteTemplate
     $routes[] = new StdRoute('/:id', 'update', ['PUT', 'POST']);
     $routes[] = new StdRoute('/:id/delete', 'destroy');
     $routes[] = new StdRoute('/:id', 'destroy', ['DELETE']);
-    $routes[] = (
-    new StdRoute('/:id', 'show', ['ANY']))
-    ->excludeVerb('POST')
-    ->excludeVerb('DELETE')
-    ->excludeVerb('PUT');
+    $routes[] = (new StdRoute('/:id', 'show', ['ANY']))
+                ->excludeVerb('POST')
+                ->excludeVerb('DELETE')
+                ->excludeVerb('PUT');
     $routes[] = new StdRoute('/', 'create', ['POST']);
     $routes[] = new StdRoute('/', 'index');
+    $routes[] = new StdRoute('/page/:pnumber', 'index');
     return $routes;
   }
 }
