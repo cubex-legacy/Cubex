@@ -239,13 +239,13 @@ class DBBuilder
         switch(strtolower($k))
         {
           case 'index':
-            $this->_addIndex($uname, 'index');
+            $this->_addIndex($name, 'index');
             break;
           case 'unique':
-            $this->_addIndex($uname, 'unique');
+            $this->_addIndex($name, 'unique');
             break;
           case 'fulltext':
-            $this->_addIndex($uname, 'fulltext');
+            $this->_addIndex($name, 'fulltext');
             break;
           case 'default':
             $default = $v;
