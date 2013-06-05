@@ -7,7 +7,7 @@ namespace Cubex\Form;
 
 use Cubex\Foundation\IRenderable;
 
-class FormElementRender implements IRenderable
+class FormElementRender implements IFormElementRender
 {
 
   /**

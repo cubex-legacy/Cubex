@@ -7,7 +7,7 @@ namespace Cubex\Form;
 
 use Cubex\Foundation\IRenderable;
 
-class FormRender implements IRenderable
+class FormRender implements IFormRender
 {
   protected $_form;
   protected $_groupType;
