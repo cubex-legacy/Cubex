@@ -35,7 +35,6 @@ class Request implements \IteratorAggregate
     'edu'
   );
 
-
   /**
    * @param null $path Defaults to $_SERVER['HTTP_HOST']
    * @param null $host Defaults to $_SERVER['REQUEST_URI']
@@ -377,11 +376,11 @@ class Request implements \IteratorAggregate
         return true;
       }
     }
-    if($this->postVariables(self::TYPE_AJAX, false))
+    if($this->postVariables(self::TYPE_AJAX) !== null)
     {
       return true;
     }
-    else if($this->getVariables(self::TYPE_AJAX, false))
+    else if($this->getVariables(self::TYPE_AJAX) !== null)
     {
       return true;
     }
@@ -393,11 +392,11 @@ class Request implements \IteratorAggregate
    */
   public function isForm()
   {
-    if($this->postVariables(self::TYPE_FORM, false))
+    if($this->postVariables(self::TYPE_FORM) !== null)
     {
       return true;
     }
-    else if($this->getVariables(self::TYPE_FORM, false))
+    else if($this->getVariables(self::TYPE_FORM) !== null)
     {
       return true;
     }
@@ -411,7 +410,6 @@ class Request implements \IteratorAggregate
   {
     return !isset($_REQUEST[self::NO_JAVASCRIPT]);
   }
-
 
   /**
    * REQUEST Variables (Excluding __ prefixed used by Cubex)
