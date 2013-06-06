@@ -65,7 +65,7 @@ class PidFile
       }
       else
       {
-        $path = '/var/run/' . $filename;
+        $path = '/var/run/cubex/' . $filename;
       }
     }
     return $path;
@@ -95,6 +95,17 @@ class PidFile
         }
       }
       unlink($this->_pidFilePath);
+    }
+    else
+    {
+      $pidDir = dirname($this->_pidFilePath);
+      if(! file_exists($pidDir))
+      {
+        if(! mkdir($pidDir, 0755, true))
+        {
+          throw new \Exception('Error creating PID file directory ' . $pidDir);
+        }
+      }
     }
 
     file_put_contents($this->_pidFilePath, getmypid());
