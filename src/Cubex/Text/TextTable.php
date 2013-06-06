@@ -27,7 +27,7 @@ class TextTable
 
   public function __construct(ITextTableDecorator $decorator = null)
   {
-    if(CUBEX_CLI && (! Shell::isPiped()))
+    if(CUBEX_CLI && (!Shell::isPiped()))
     {
       $this->setMaxTableWidth(Shell::columns());
     }
@@ -129,21 +129,24 @@ class TextTable
         $out .= $this->_decorator->renderColumnHeaders($this->_headers);
       }
 
-      foreach($this->_rows as $row)
+      if(!empty($this->_rows))
       {
-        if($row === self::SPACER)
+        foreach($this->_rows as $row)
         {
-          $out .= $this->_decorator->renderSpacerRow();
-        }
-        else if(is_string($row) && (strpos($row, self::SUBHEADING) === 0))
-        {
-          $out .= $this->_decorator->renderSubHeading(
-            substr($row, strlen(self::SUBHEADING))
-          );
-        }
-        else
-        {
-          $out .= $this->_decorator->renderDataRow($row);
+          if($row === self::SPACER)
+          {
+            $out .= $this->_decorator->renderSpacerRow();
+          }
+          else if(is_string($row) && (strpos($row, self::SUBHEADING) === 0))
+          {
+            $out .= $this->_decorator->renderSubHeading(
+              substr($row, strlen(self::SUBHEADING))
+            );
+          }
+          else
+          {
+            $out .= $this->_decorator->renderDataRow($row);
+          }
         }
       }
 
@@ -164,7 +167,7 @@ class TextTable
 
     $width = $this->_columnWidths[$column - 1];
 
-    $maxDataWidth = $this->_calculateMaxDataWidth();
+    $maxDataWidth   = $this->_calculateMaxDataWidth();
     $totalDataWidth = array_sum($this->_columnWidths);
     if(($maxDataWidth !== null) && ($totalDataWidth > $maxDataWidth))
     {
@@ -176,9 +179,9 @@ class TextTable
       }
       else
       {
-        $widthDiff = $totalDataWidth - $maxDataWidth;
+        $widthDiff   = $totalDataWidth - $maxDataWidth;
         $paddingSize = $this->_columnCount * 2 *
-          $this->_decorator->cellPadding();
+        $this->_decorator->cellPadding();
 
         $includePadding = false;
 
@@ -252,7 +255,7 @@ class TextTable
     if($this->_maxTableWidth !== null)
     {
       return $this->_maxTableWidth - (
-        ($this->_columnCount * ((2 * $this->_decorator->cellPadding()) + 1)) + 1
+      ($this->_columnCount * ((2 * $this->_decorator->cellPadding()) + 1)) + 1
       );
     }
     else
