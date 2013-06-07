@@ -66,9 +66,10 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
   /**
    * Initiate Cubex
    *
-   * @param null $autoLoader Composer AutoLoader
+   * @param null   $autoLoader Composer AutoLoader
+   * @param string $webRoot    Override the project root path
    */
-  public function __construct($autoLoader = null)
+  public function __construct($autoLoader = null, $webRoot = "")
   {
     $this->_autoloader = $autoLoader;
 
@@ -76,9 +77,14 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
     isset($_SERVER['DOCUMENT_ROOT']) or $_SERVER['DOCUMENT_ROOT'] = false;
 
+    if(!$webRoot)
+    {
+      $webRoot = $_SERVER['DOCUMENT_ROOT'];
+    }
+
     define("CUBEX_CLI", php_sapi_name() === 'cli');
     define("CUBEX_WEB", !CUBEX_CLI);
-    define("WEB_ROOT", $_SERVER['DOCUMENT_ROOT']);
+    define("WEB_ROOT", $webRoot);
 
     $this->setResponse($this->buildResponse());
     set_exception_handler(array($this, 'handleException'));
