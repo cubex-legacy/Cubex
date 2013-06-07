@@ -280,6 +280,12 @@ class Attribute implements IValidatable, IFilterable, \JsonSerializable
     return $this->_serializer;
   }
 
+  public function hasSerializer()
+  {
+    return $this->_serializer !== null
+    && $this->_serializer != self::SERIALIZATION_NONE;
+  }
+
   public function serialize($data = null)
   {
     if($data === null)

@@ -55,6 +55,7 @@ abstract class DataMapper
   protected $_invalidAttributes;
   protected $_exists = false;
   protected $_autoTimestamp = true;
+  protected $_filterOnSave = true;
   protected $_changes;
 
   protected $_idType = self::ID_MANUAL;
@@ -575,7 +576,6 @@ abstract class DataMapper
     return true;
   }
 
-
   /**
    * @param $name
    *
@@ -823,7 +823,6 @@ abstract class DataMapper
       return $result;
     }
   }
-
 
   protected function _unmodifyAttributes()
   {

@@ -139,7 +139,6 @@ abstract class RecordMapper extends DataMapper
     }
   }
 
-
   public function setExists($bool = true)
   {
     if($bool)
@@ -372,7 +371,6 @@ abstract class RecordMapper extends DataMapper
     return $sm->db($this->_dbServiceName, $mode);
   }
 
-
   public function id()
   {
     $this->_load();
@@ -456,7 +454,6 @@ abstract class RecordMapper extends DataMapper
   {
     return implode("|", func_get_args());
   }
-
 
   public function getDateFormat($attribute = null)
   {
@@ -579,9 +576,13 @@ abstract class RecordMapper extends DataMapper
           {
             $val = $val->format($this->getDateFormat($attr->name()));
           }
-          else
+          else if($attr->hasSerializer())
           {
             $val = $attr->serialize();
+          }
+          else if($this->_filterOnSave)
+          {
+            $val = $attr->data();
           }
 
           if($cache !== null)
@@ -920,7 +921,6 @@ abstract class RecordMapper extends DataMapper
         throw new \Exception($connection->errorMsg(), $connection->errorNo());
     }
   }
-
 
   public function __clone()
   {
