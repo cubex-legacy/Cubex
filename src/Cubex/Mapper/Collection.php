@@ -114,6 +114,17 @@ class Collection
     return $result;
   }
 
+  public function getFieldValues($keyField)
+  {
+    $this->_preCheckMappers();
+    $result = [];
+    foreach($this->_mappers as $mapper)
+    {
+      $result[] = $mapper->$keyField;
+    }
+    return $result;
+  }
+
   public function getKeyedArray($keyField, array $fields)
   {
     $this->_preCheckMappers();
@@ -260,7 +271,6 @@ class Collection
     }
   }
 
-
   public function getIterator()
   {
     $this->_preCheckMappers();
@@ -373,5 +383,26 @@ class Collection
     $collection = new static($this->_mapperType, $refiner->refine());
     $collection->setLoaded(true);
     return $collection;
+  }
+
+  public function min($key = 'id')
+  {
+    return min($this->getFieldValues($key));
+  }
+
+  public function max($key = 'id')
+  {
+    return max($this->getFieldValues($key));
+  }
+
+  public function avg($key = 'id')
+  {
+    $values = $this->getFieldValues($key);
+    return array_sum($values) / count($values);
+  }
+
+  public function sum($key = 'id')
+  {
+    return array_sum($this->getFieldValues($key));
   }
 }
