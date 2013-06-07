@@ -166,8 +166,7 @@ class Form extends DataMapper implements IRenderable
                 $methodname = $methodname . 's';
               }
             }
-
-            if(ends_with($a->name(), 'type', false))
+            else
             {
               $methodname = $a->name() . 's';
               $methodname = Strings::variableToCamelCase($methodname);
