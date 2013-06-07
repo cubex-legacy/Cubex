@@ -551,16 +551,66 @@ class RecordCollection extends Collection
     return $this;
   }
 
-  public function count()
+  protected function _aggregateNotLoaded($column)
   {
     if(!$this->_loaded)
     {
-      list(, $rows) = $this->_doQuery(['COUNT(*) AS `c`'], false, true, true);
+      list(, $rows) = $this->_doQuery([$column . ' AS `c`'], false, true, true);
       if(!empty($rows) && isset($rows[0]->c))
       {
-        return (int)$rows[0]->c;
+        return $rows[0]->c;
       }
     }
-    return parent::count();
+    return null;
+  }
+
+  public function count()
+  {
+    $count = $this->_aggregateNotLoaded('COUNT(*)');
+    if($count === null)
+    {
+      return parent::count();
+    }
+    return (int)$count;
+  }
+
+  public function min($key = 'id')
+  {
+    $result = $this->_aggregateNotLoaded('MIN(`' . $key . '`)');
+    if($result === null)
+    {
+      return parent::min($key);
+    }
+    return $result;
+  }
+
+  public function max($key = 'id')
+  {
+    $result = $this->_aggregateNotLoaded('MAX(`' . $key . '`)');
+    if($result === null)
+    {
+      return parent::max($key);
+    }
+    return $result;
+  }
+
+  public function avg($key = 'id')
+  {
+    $result = $this->_aggregateNotLoaded('AVG(`' . $key . '`)');
+    if($result === null)
+    {
+      return parent::avg($key);
+    }
+    return $result;
+  }
+
+  public function sum($key = 'id')
+  {
+    $result = $this->_aggregateNotLoaded('SUM(`' . $key . '`)');
+    if($result === null)
+    {
+      return parent::sum($key);
+    }
+    return $result;
   }
 }
