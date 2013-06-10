@@ -171,6 +171,6 @@ class Memcached implements ICacheService
    */
   public function checkForMiss($data)
   {
-    return !($data === false);
+    return $data === false;
   }
 }
