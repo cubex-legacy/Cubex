@@ -3,11 +3,11 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\KvStore\Cassandra;
+namespace Cubex\Cassandra;
 
 use Cubex\Data\Attribute\Attribute;
-use Cubex\KvStore\Cassandra\DataType\BytesType;
-use Cubex\KvStore\Cassandra\DataType\CassandraType;
+use Cubex\Cassandra\DataType\BytesType;
+use Cubex\Cassandra\DataType\CassandraType;
 use Thrift\Exception\TApplicationException;
 use cassandra\AuthenticationException;
 use cassandra\AuthorizationException;

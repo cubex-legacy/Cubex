@@ -10,7 +10,7 @@ class Cassandra extends BaseFacade
   /**
    * @param string $name
    *
-   * @return \Cubex\KvStore\Cassandra\CassandraService
+   * @return \Cubex\Cassandra\CassandraService
    */
   public static function getAccessor($name = 'cassandra')
   {

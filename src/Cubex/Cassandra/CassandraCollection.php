@@ -5,7 +5,7 @@
 
 namespace Cubex\Mapper\Cassandra;
 
-use Cubex\KvStore\Cassandra\ColumnAttribute;
+use Cubex\Cassandra\ColumnAttribute;
 use Cubex\Mapper\KeyValue\KvCollection;
 
 class CassandraCollection extends KvCollection
@@ -41,7 +41,7 @@ class CassandraCollection extends KvCollection
   }
 
   /**
-   * @return \Cubex\KvStore\Cassandra\CassandraService
+   * @return \Cubex\Cassandra\CassandraService
    */
   public function connection()
   {
@@ -79,7 +79,7 @@ class CassandraCollection extends KvCollection
   }
 
   /**
-   * @return \Cubex\KvStore\Cassandra\ColumnFamily
+   * @return \Cubex\Cassandra\ColumnFamily
    */
   public function cf()
   {

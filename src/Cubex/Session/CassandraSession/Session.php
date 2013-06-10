@@ -20,7 +20,7 @@ class Session implements ISessionService
   protected $_config;
 
   /**
-   * @var \Cubex\KvStore\Cassandra\CassandraService
+   * @var \Cubex\Cassandra\CassandraService
    */
   protected $_serviceProvider;
 

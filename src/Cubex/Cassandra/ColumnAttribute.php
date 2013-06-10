@@ -3,7 +3,7 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\KvStore\Cassandra;
+namespace Cubex\Cassandra;
 
 use Cubex\Data\Attribute\Attribute;
 

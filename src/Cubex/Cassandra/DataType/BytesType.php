@@ -3,7 +3,7 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\KvStore\Cassandra\DataType;
+namespace Cubex\Cassandra\DataType;
 
 class BytesType extends CassandraType
 {

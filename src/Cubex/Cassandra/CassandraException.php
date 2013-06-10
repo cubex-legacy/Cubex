@@ -3,7 +3,7 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\KvStore\Cassandra;
+namespace Cubex\Cassandra;
 
 class CassandraException extends \Exception
 {

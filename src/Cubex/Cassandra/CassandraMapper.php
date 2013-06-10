@@ -3,20 +3,20 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\Mapper\Cassandra;
+namespace Cubex\Cassandra;
 
 use Cubex\Data\Attribute\Attribute;
 use Cubex\Data\Attribute\CallbackAttribute;
 use Cubex\Facade\Cassandra;
-use Cubex\KvStore\Cassandra\ColumnAttribute;
-use Cubex\KvStore\Cassandra\DataType\CassandraType;
+use Cubex\Cassandra\ColumnAttribute;
+use Cubex\Cassandra\DataType\CassandraType;
 use Cubex\Mapper\KeyValue\KvMapper;
 
 class CassandraMapper extends KvMapper
 {
   protected $_cassandraConnection = 'cassandra';
   protected $_autoTimestamp = false;
-  protected $_attributeType = '\Cubex\KvStore\Cassandra\ColumnAttribute';
+  protected $_attributeType = '\Cubex\Cassandra\ColumnAttribute';
 
   public function connection()
   {
@@ -24,7 +24,7 @@ class CassandraMapper extends KvMapper
   }
 
   /**
-   * @return \Cubex\KvStore\Cassandra\ColumnFamily
+   * @return \Cubex\Cassandra\ColumnFamily
    */
   public static function cf()
   {
@@ -36,7 +36,7 @@ class CassandraMapper extends KvMapper
   }
 
   /**
-   * @return \Cubex\KvStore\Cassandra\ColumnFamily
+   * @return \Cubex\Cassandra\ColumnFamily
    */
   public function getCf()
   {
@@ -70,7 +70,7 @@ class CassandraMapper extends KvMapper
   /**
    * @param $name
    *
-   * @return \Cubex\KvStore\Cassandra\ColumnAttribute
+   * @return \Cubex\Cassandra\ColumnAttribute
    */
   public function getAttribute($name)
   {
@@ -86,7 +86,7 @@ class CassandraMapper extends KvMapper
   }
 
   /**
-   * @return \Cubex\KvStore\Cassandra\CassandraService
+   * @return \Cubex\Cassandra\CassandraService
    */
   public static function conn()
   {
