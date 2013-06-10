@@ -66,6 +66,8 @@ abstract class DataMapper
 
   protected static $reflectedAttributes;
 
+  protected $_cacheProvider;
+
   /**
    * Automatically add all public properties as attributes
    * and unset them for automatic handling of data
@@ -1247,8 +1249,7 @@ abstract class DataMapper
    */
   public static function tableName($plural = true)
   {
-    $current = new static;
-    return $current->getTableName($plural);
+    return (new static)->getTableName($plural);
   }
 
   /**
@@ -1303,11 +1304,19 @@ abstract class DataMapper
   public function unserialize($data)
   {
     $this->__construct();
-    $this->hydrate(json_decode($data));
+    $this->hydrate((array)json_decode($data));
   }
 
   public function load($id = null)
   {
     return $this;
+  }
+
+  /**
+   * @return \Cubex\Cache\ICacheService
+   */
+  public function getCacheProvider()
+  {
+    return $this->_cacheProvider;
   }
 }

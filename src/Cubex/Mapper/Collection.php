@@ -6,6 +6,7 @@
 namespace Cubex\Mapper;
 
 use Cubex\Data\Refine\Refiner;
+use Cubex\View\Partial;
 
 /**
  * @var Collection DataMapper[]
@@ -25,6 +26,9 @@ class Collection
    */
   protected $_mapperType;
   protected $_loaded;
+
+  protected $_cacheProvider;
+  protected $_loadedCacheKey;
 
   public function __construct(DataMapper $map, array $mappers = null)
   {
@@ -332,16 +336,17 @@ class Collection
   public function unserialize($serialized)
   {
     $un                = unserialize($serialized);
+    $this->_mappers    = $this->_dictionary = [];
+    $this->_position   = 0;
+    $this->_loaded     = false;
     $this->_mapperType = $un['mapper'];
-    $this->hydrate(json_decode($un['mappers']));
+    $this->hydrate((array)json_decode($un['mappers']));
   }
-
 
   public function __toString()
   {
     return json_encode($this);
   }
-
 
   public function offsetSet($offset, $value)
   {
@@ -404,5 +409,96 @@ class Collection
   public function sum($key = 'id')
   {
     return array_sum($this->getFieldValues($key));
+  }
+
+  protected function _makeUniqueKey()
+  {
+    return 'unavailable';
+  }
+
+  protected function _makeCacheKey($key = null)
+  {
+    if($key === null)
+    {
+      $key = $this->_makeUniqueKey();
+    }
+    return "COLLECTION:" . get_class($this->_mapperType) . ":" . $key;
+  }
+
+  public function getCacheProvider($accessMode = 'r')
+  {
+    if($this->_cacheProvider === null)
+    {
+      $this->_cacheProvider = $this->_mapperType->getCacheProvider();
+    }
+
+    if($this->_cacheProvider === null)
+    {
+      throw new \Exception(
+        "No cache provider configured on " . get_class($this->_mapperType)
+      );
+    }
+    else
+    {
+      $this->_cacheProvider->connect($accessMode);
+    }
+
+    return $this->_cacheProvider;
+  }
+
+  /**
+   * Load collection from cache
+   *
+   * @param null $cacheKey
+   *
+   * @return bool Cache load success
+   */
+  public function loadFromCache($cacheKey = null)
+  {
+    $cacher      = $this->getCacheProvider('r');
+    $cacheKey    = $this->_makeCacheKey($cacheKey);
+    $cacheResult = $cacher->get($cacheKey);
+    if(!$cacher->checkForMiss($cacheResult))
+    {
+      $this->unserialize($cacheResult);
+      return true;
+    }
+    return false;
+  }
+
+  public function isCached($cacheKey = null)
+  {
+    $cacheKey = $this->_makeCacheKey($cacheKey);
+    return $this->getCacheProvider('r')->exists($cacheKey);
+  }
+
+  public function deleteCache($cacheKey = null)
+  {
+    if($cacheKey === null)
+    {
+      $cacheKey = $this->_loadedCacheKey;
+      if($cacheKey === null)
+      {
+        $cacheKey = $this->_makeCacheKey();
+      }
+    }
+    else
+    {
+      $cacheKey = $this->_makeCacheKey($cacheKey);
+    }
+
+    $this->getCacheProvider('w')->delete($cacheKey);
+
+    return true;
+  }
+
+  public function setCache($seconds = 3600, $cacheKey = null)
+  {
+    $cacheKey = $this->_makeCacheKey($cacheKey);
+    return $this->getCacheProvider('w')->set(
+      $cacheKey,
+      $this->serialize(),
+      $seconds
+    );
   }
 }
