@@ -10,9 +10,9 @@ class Cache extends BaseFacade
   /**
    * @return \Cubex\Cache\ICacheService
    */
-  public static function getAccessor()
+  public static function getAccessor($connection = 'cache')
   {
-    return static::getServiceManager()->cache();
+    return static::getServiceManager()->cache($connection);
   }
 
   public static function has($key)
