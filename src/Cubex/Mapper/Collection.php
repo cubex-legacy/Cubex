@@ -422,7 +422,7 @@ class Collection
     {
       $key = $this->_makeUniqueKey();
     }
-    return "COLLECTION:" . get_class($this->_mapperType) . ":" . $key;
+    return "COL:" . get_class($this->_mapperType) . ":" . $key;
   }
 
   public function getCacheProvider($accessMode = 'r')

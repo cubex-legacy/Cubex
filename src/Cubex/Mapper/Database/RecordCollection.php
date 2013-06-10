@@ -613,4 +613,10 @@ class RecordCollection extends Collection
     }
     return $result;
   }
+
+  protected function _makeUniqueKey()
+  {
+    return substr(md5($this->_query), 0, 6) . ':' .
+    substr(str_replace(['`', ' '], '', $this->_query), 0, 10);
+  }
 }
