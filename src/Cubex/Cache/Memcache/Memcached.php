@@ -45,10 +45,10 @@ class Memcached implements ICacheService
 
   protected function _getServerList()
   {
-    if(! $this->_serverList)
+    if(!$this->_serverList)
     {
       $this->_serverList = [];
-      $defPort = $this->_config->getInt("port", self::DEFAULT_PORT);
+      $defPort           = $this->_config->getInt("port", self::DEFAULT_PORT);
       foreach($this->_config->getArr("hostname", ["localhost"]) as $server)
       {
         if(strpos($server, ':'))
@@ -148,5 +148,29 @@ class Memcached implements ICacheService
   public function isConnected()
   {
     return true;
+  }
+
+  /**
+   * Check to see if the key is cached
+   *
+   * @param $key
+   *
+   * @return bool
+   */
+  public function exists($key)
+  {
+    return !$this->checkForMiss($this->get($key));
+  }
+
+  /**
+   * Check the result of get or multi to see if the data is a cache miss
+   *
+   * @param $data mixed result from get
+   *
+   * @return bool true on cache miss
+   */
+  public function checkForMiss($data)
+  {
+    return !($data === false);
   }
 }

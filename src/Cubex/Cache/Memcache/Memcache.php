@@ -153,4 +153,28 @@ class Memcache implements ICacheService
 
     return (bool)$return;
   }
+
+  /**
+   * Check to see if the key is cached
+   *
+   * @param $key
+   *
+   * @return bool
+   */
+  public function exists($key)
+  {
+    return !$this->checkForMiss($this->get($key));
+  }
+
+  /**
+   * Check the result of get or multi to see if the data is a cache miss
+   *
+   * @param $data mixed result from get
+   *
+   * @return bool true on cache miss
+   */
+  public function checkForMiss($data)
+  {
+    return !($data === false);
+  }
 }
