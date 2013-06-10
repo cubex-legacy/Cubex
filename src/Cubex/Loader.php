@@ -66,10 +66,14 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
   /**
    * Initiate Cubex
    *
-   * @param null   $autoLoader Composer AutoLoader
-   * @param string $webRoot    Override the project root path
+   * @param null   $autoLoader  Composer AutoLoader
+   * @param string $webRoot     Override the project root path
+   * @param bool   $handleErrors If true then enable top-level exception
+   *                             handler and error handler
    */
-  public function __construct($autoLoader = null, $webRoot = "")
+  public function __construct(
+    $autoLoader = null, $webRoot = "", $handleErrors = true
+  )
   {
     $this->_autoloader = $autoLoader;
 
@@ -87,8 +91,11 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     define("WEB_ROOT", $webRoot);
 
     $this->setResponse($this->buildResponse());
-    set_exception_handler(array($this, 'handleException'));
-    set_error_handler(array($this, 'handleError'));
+    if($handleErrors)
+    {
+      set_exception_handler(array($this, 'handleException'));
+      set_error_handler(array($this, 'handleError'));
+    }
 
     try
     {
