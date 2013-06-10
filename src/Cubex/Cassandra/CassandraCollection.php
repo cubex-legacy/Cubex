@@ -3,7 +3,7 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\Mapper\Cassandra;
+namespace Cubex\Cassandra;
 
 use Cubex\Cassandra\ColumnAttribute;
 use Cubex\Mapper\KeyValue\KvCollection;
