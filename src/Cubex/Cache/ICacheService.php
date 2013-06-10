@@ -54,7 +54,6 @@ interface ICacheService extends IService
    */
   public function set($key, $data, $expire = 0);
 
-
   /**
    * Delete key from the cache
    *
