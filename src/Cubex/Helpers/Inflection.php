@@ -257,11 +257,11 @@ class Inflection
   public function endsWithSXZCHSH()
   {
     if(
-      ends_with($this->_lowerWord, 's')
-      || ends_with($this->_lowerWord, 'x')
-      || ends_with($this->_lowerWord, 'z')
-      || ends_with($this->_lowerWord, 'ch')
-      || ends_with($this->_lowerWord, 'sh')
+    ends_with($this->_lowerWord, 's')
+    || ends_with($this->_lowerWord, 'x')
+    || ends_with($this->_lowerWord, 'z')
+    || ends_with($this->_lowerWord, 'ch')
+    || ends_with($this->_lowerWord, 'sh')
     )
     {
       return $this->_complete($this->_word . 'es');
@@ -273,11 +273,11 @@ class Inflection
   public function endsWithXZCHSH()
   {
     if(
-      ends_with($this->_lowerWord, 'ses')
-      || ends_with($this->_lowerWord, 'xes')
-      || ends_with($this->_lowerWord, 'zes')
-      || ends_with($this->_lowerWord, 'ches')
-      || ends_with($this->_lowerWord, 'shes')
+    ends_with($this->_lowerWord, 'ses')
+    || ends_with($this->_lowerWord, 'xes')
+    || ends_with($this->_lowerWord, 'zes')
+    || ends_with($this->_lowerWord, 'ches')
+    || ends_with($this->_lowerWord, 'shes')
     )
     {
       $endsWithXZCHSH = ['houses' => 'houses'];
@@ -351,5 +351,18 @@ class Inflection
     }
 
     return false;
+  }
+
+  public static function basicPlural($int, $singular, $plural = null)
+  {
+    if($int == 1)
+    {
+      return $singular;
+    }
+    if($plural === null)
+    {
+      $plural = $singular . 's';
+    }
+    return $plural;
   }
 }

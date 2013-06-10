@@ -20,7 +20,7 @@ class DateTimeHelper
     $secs -= $mins * 60;
 
     $formatString = "";
-    $params = [];
+    $params       = [];
     if($alwaysShowHours || ($hours > 0))
     {
       $formatString .= "%d:";
@@ -79,5 +79,71 @@ class DateTimeHelper
     throw new \InvalidArgumentException(
       "Failed Converting param of type '{$type}' to '{$pattern}'"
     );
+  }
+
+  public static function formatDateDiff($start, $end = null, $shortUnits = true)
+  {
+    if(!($start instanceof \DateTime))
+    {
+      $start = new \DateTime($start);
+    }
+
+    if($end === null)
+    {
+      $end = new \DateTime();
+    }
+
+    if(!($end instanceof \DateTime))
+    {
+      $end = new \DateTime($start);
+    }
+
+    return static::formatDateInterval($end->diff($start), $shortUnits);
+  }
+
+  public static function formatTimespan($timespan, $shortUnits = true)
+  {
+    $d1 = new \DateTime();
+    $d2 = new \DateTime();
+    $d2->add(new \DateInterval('PT' . $timespan . 'S'));
+    return static::formatDateInterval($d2->diff($d1), $shortUnits);
+  }
+
+  public static function formatDateInterval(
+    \DateInterval $interval, $shortUnits = true
+  )
+  {
+    $format = array();
+    $units  = [
+      "y" => ["yr", "year"],
+      "m" => ["mo", "month"],
+      "d" => ["day", "day"],
+      "h" => ["hr", "hour"],
+      "i" => ["min", "minute"],
+      "s" => ["sec", "second"],
+    ];
+
+    foreach($units as $unit => $options)
+    {
+      if($interval->$unit !== 0)
+      {
+        $format[] = "%$unit " .
+        Inflection::basicPlural(
+          $interval->$unit,
+          $shortUnits ? $options[0] : $options[1]
+        );
+      }
+    }
+
+    if(count($format) > 1)
+    {
+      $format = array_shift($format) . ", " . array_shift($format);
+    }
+    else
+    {
+      $format = array_pop($format);
+    }
+
+    return $interval->format($format);
   }
 }
