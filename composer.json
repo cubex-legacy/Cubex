@@ -27,6 +27,7 @@
     "mobiledetect/mobiledetectlib": "Supported platform detection library",
     "phpseclib/phpseclib":          "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc."
   },
+  "bin":               ["bin/kill-cubex-script.sh"],
   "autoload":          {
     "files": [
       "src/Cubex/_tools/Helper.php",
