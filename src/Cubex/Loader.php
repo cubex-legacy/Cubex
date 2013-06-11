@@ -66,8 +66,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
   /**
    * Initiate Cubex
    *
-   * @param null   $autoLoader  Composer AutoLoader
-   * @param string $webRoot     Override the project root path
+   * @param null   $autoLoader   Composer AutoLoader
+   * @param string $webRoot      Override the project root path
    * @param bool   $handleErrors If true then enable top-level exception
    *                             handler and error handler
    */
@@ -99,7 +99,15 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
     try
     {
-      $this->setupEnv();
+      $opts = getopt("", ["cubex-env::"]);
+      if(isset($opts['cubex-env']))
+      {
+        $this->setupEnv($opts['cubex-env']);
+      }
+      else
+      {
+        $this->setupEnv();
+      }
     }
     catch(\Exception $e)
     {
@@ -218,13 +226,18 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
    *
    * @throws \Exception
    */
-  public function setupEnv()
+  public function setupEnv($env = null)
   {
-    $env = \getenv('CUBEX_ENV'); // Apache Config
+    if($env === null)
+    {
+      $env = \getenv('CUBEX_ENV'); // Apache Config
+    }
+
     if(!$env && isset($_ENV['CUBEX_ENV']))
     {
       $env = $_ENV['CUBEX_ENV'];
     }
+
     if(!$env)
     {
       if(CUBEX_CLI)
@@ -671,10 +684,17 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
         throw new \RuntimeException('No command was specified');
       }
 
-      $command = $_REQUEST['__path__'] = $args[1];
-
       // remove the "cubex" command from the arguments
       array_shift($args);
+
+      //Strip out environment force
+
+      if(isset($args[0]) && starts_with($args[0], '--cubex-env='))
+      {
+        array_shift($args);
+      }
+
+      $command = $_REQUEST['__path__'] = $args[0];
 
       $_SERVER['CUBEX_CLI'] = true;
 
