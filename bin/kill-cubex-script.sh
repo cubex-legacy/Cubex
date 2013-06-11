@@ -8,7 +8,7 @@ fi
 
 CLASSNAME="$1"
 
-PID=`ps ax | grep "cubex $CLASSNAME" | grep -v grep | awk '{print $1}' | xargs echo`
+PID=`ps ax | grep "bin/cubex" | grep "$CLASSNAME" | grep -v grep | awk '{print $1}' | xargs echo`
 
 if [ "$PID" = "" ]
 then
