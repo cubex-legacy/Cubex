@@ -27,7 +27,9 @@ class OptionBuilder
 
     if($this->_source instanceof Enum)
     {
-      return $this->_source->getConstList();
+      $options = array_flip($this->_source->getConstList());
+      $options = array_map('\Cubex\Helpers\Strings::titleize', $options);
+      return $options;
     }
 
     if($this->_source instanceof RecordCollection)
