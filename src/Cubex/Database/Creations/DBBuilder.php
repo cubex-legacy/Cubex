@@ -160,8 +160,8 @@ class DBBuilder
     try
     {
       $comment = $this->_reflect->getProperty(
-        $attr->sourceProperty()
-      )->getDocComment();
+                   $attr->sourceProperty()
+                 )->getDocComment();
       if(!empty($comment))
       {
         $comments = Strings::docCommentLines($comment);
@@ -397,20 +397,23 @@ class DBBuilder
   protected function _getIndexes()
   {
     $indexes = [];
-    foreach($this->_indexes as $index)
+    if($this->_indexes)
     {
-      list($type, $on) = $index;
-      switch($type)
+      foreach($this->_indexes as $index)
       {
-        case 'index':
-          $indexes[] = " INDEX(`$on`) ";
-          break;
-        case 'fulltext':
-          $indexes[] = " FULLTEXT(`$on`) ";
-          break;
-        case 'unique':
-          $indexes[] = " UNIQUE(`$on`) ";
-          break;
+        list($type, $on) = $index;
+        switch($type)
+        {
+          case 'index':
+            $indexes[] = " INDEX(`$on`) ";
+            break;
+          case 'fulltext':
+            $indexes[] = " FULLTEXT(`$on`) ";
+            break;
+          case 'unique':
+            $indexes[] = " UNIQUE(`$on`) ";
+            break;
+        }
       }
     }
     return $indexes;
