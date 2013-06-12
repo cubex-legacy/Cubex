@@ -5,6 +5,7 @@
 
 namespace Cubex\Mapper\Database;
 
+use Cubex\Container\Container;
 use Cubex\Database\ConnectionMode;
 use Cubex\Sprintf\ParseQuery;
 
@@ -65,10 +66,26 @@ class Aggregate
   protected function _getResult($query)
   {
     $tableQ = $this->_parse(
-      " FROM %T WHERE ", $this->_resource->getTableName()
+      " FROM %T WHERE ",
+      $this->_resource->getTableName()
     );
     $q      = $query . $tableQ . $this->_where;
-    return $this->_connection()->getField($q);
+    try
+    {
+      $result = $this->_connection()->getField($q);
+    }
+    catch(\Exception $e)
+    {
+      if($this->_connection()->errorNo() == 1146)
+      {
+        if(Container::config()->get("devtools")->getBool("creations", false))
+        {
+          $this->_resource->createTable();
+        }
+      }
+      $result = false;
+    }
+    return $result;
   }
 
   /* Code Hinting Support */

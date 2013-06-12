@@ -148,6 +148,7 @@ class MySQL implements IDatabaseService
       $this->_errorno  = $this->_connection->errno;
       $this->_errormsg = $this->_connection->error;
       Log::error('(' . $this->_errorno . ') ' . $this->_errormsg);
+      throw new \Exception($this->_errormsg, $this->_errorno);
     }
 
     EventManager::trigger(
