@@ -231,7 +231,10 @@ abstract class RecordMapper extends DataMapper
     {
       if($connection->errorNo() == 1146)
       {
-        $this->createTable();
+        if(Container::config()->get("devtools")->getBool("creations", false))
+        {
+          $this->createTable();
+        }
       }
       $this->setData($this->getIdKey(), $id);
     }

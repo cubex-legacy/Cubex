@@ -5,6 +5,7 @@
 
 namespace Cubex\Mapper\Database;
 
+use Cubex\Container\Container;
 use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Data\Validator\Validator;
 use Cubex\Database\ConnectionMode;
@@ -269,7 +270,10 @@ class RecordCollection extends Collection
       {
         if($this->connection()->errorNo() === 1146)
         {
-          $this->_mapperType->createTable();
+          if(Container::config()->get("devtools")->getBool("creations", false))
+          {
+            $this->_mapperType->createTable();
+          }
         }
       }
     }
