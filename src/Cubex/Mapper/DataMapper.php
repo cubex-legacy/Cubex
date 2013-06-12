@@ -1386,6 +1386,7 @@ abstract class DataMapper
     if(!$cacher->checkForMiss($cacheResult))
     {
       $this->unserialize($cacheResult);
+      $this->setExists(true);
       $this->_loadedCacheKey = $cacheKey;
       return true;
     }
@@ -1426,7 +1427,6 @@ abstract class DataMapper
       return false;
     }
     $cacheKey = $this->_makeCacheKey($cacheKey);
-    \Log::debug("Caching $cacheKey");
     return $this->getCacheProvider('w')->set(
       $cacheKey,
       $this->serialize(),
