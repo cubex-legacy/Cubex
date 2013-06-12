@@ -43,18 +43,29 @@ class Dictionary implements IConfigurable
 
   public function match($task)
   {
-    if(isset($this->_map[$task]))
+    if($task !== 'prefixes' && isset($this->_map[$task]))
     {
       return $this->_map[$task];
     }
-    else
+    else if(stristr($task, '.'))
     {
-      if(stristr($task, '.'))
-      {
-        $task = str_replace('.', '\\', $task);
-      }
-      return $task;
+      $task = str_replace('.', '\\', $task);
     }
+    return $task;
+  }
+
+  public function getPrefixes($namespace)
+  {
+    $prefix = $this->_configuration
+              ->get("cli_dictionary")
+              ->getArr("prefixes", []);
+
+    array_unshift($prefix, '', $namespace . '.', $namespace . '.Cli.');
+    $prefix[] = 'Bundl.';
+    $prefix[] = 'Qubes.';
+    $prefix[] = 'Cubex.';
+
+    return $prefix;
   }
 
   public function defaultTasks()

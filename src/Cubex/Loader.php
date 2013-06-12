@@ -709,13 +709,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
       }
 
       $attempted = [];
-      $attempts  = [
-        '',
-        $this->_namespace . '.',
-        $this->_namespace . '.Cli.',
-        'Bundl.',
-        'Cubex.'
-      ];
+      $attempts  = $dictionary->getPrefixes($this->_namespace);
+
       foreach($attempts as $try)
       {
         $command      = $try . $originalCommand;
