@@ -971,4 +971,22 @@ abstract class RecordMapper extends DataMapper
     }
     return $final;
   }
+
+  public function tableExists()
+  {
+    $table = $this->connection()->getRow(
+      "SHOW TABLES LIKE '" . $this->getTableName() . "'"
+    );
+    return $table !== null;
+  }
+
+  public function createTable()
+  {
+    if(!$this->tableExists())
+    {
+      $build = new DBBuilder($this->connection(), $this, true);
+      return $build->success();
+    }
+    return true;
+  }
 }

@@ -55,7 +55,7 @@ class DBBuilder
     //Table does not exist or requested
     if($forceCreate)
     {
-      $this->_tableName = $mapper->tableName();
+      $this->_tableName = $mapper->getTableName();
       $this->_database  = null;
       $this->createColumns();
       $this->_passed = $this->_connection->query($this->createDB());
