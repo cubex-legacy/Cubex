@@ -42,7 +42,7 @@ class DBBuilder
   protected $_addedAutoId = false;
 
   public function __construct(
-    IDatabaseService $connection, RecordMapper $mapper
+    IDatabaseService $connection, RecordMapper $mapper, $forceCreate = false
   )
   {
     $this->_connection  = $connection;
@@ -52,7 +52,15 @@ class DBBuilder
     $this->_reflect     = new \ReflectionObject($this->_mapper);
 
     $matches = array();
-    if($connection->errorNo() == 1146) //Table does not exist
+    //Table does not exist or requested
+    if($forceCreate)
+    {
+      $this->_tableName = $mapper->tableName();
+      $this->_database  = null;
+      $this->createColumns();
+      $this->_passed = $this->_connection->query($this->createDB());
+    }
+    else if($connection->errorNo() == 1146)
     {
       preg_match_all("/\w+/", $connection->errorMsg(), $matches);
       if($matches)
@@ -159,9 +167,9 @@ class DBBuilder
     $annotation   = [];
     try
     {
-      $comment = $this->_reflect->getProperty(
-                   $attr->sourceProperty()
-                 )->getDocComment();
+      $comment = $this->_reflect
+                 ->getProperty($attr->sourceProperty())
+                 ->getDocComment();
       if(!empty($comment))
       {
         $comments = Strings::docCommentLines($comment);
@@ -376,7 +384,11 @@ class DBBuilder
     $content    = array_merge((array)$columns, (array)$indexes);
 
     $sql = "CREATE TABLE ";
-    $sql .= "`" . $this->_database . "`.`" . $this->_tableName . "`";
+    if($this->_database !== null)
+    {
+      $sql .= `" . $this->_database . "`;
+    }
+    $sql .= "`" . $this->_tableName . "`";
     $sql .= "(" . implode(",", $content) . ") ";
     $sql .= implode(" ", $properties);
 
