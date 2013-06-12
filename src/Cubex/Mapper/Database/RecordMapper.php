@@ -39,6 +39,9 @@ abstract class RecordMapper extends DataMapper
 
   protected $_handledError;
 
+  protected $_autoCacheOnLoad = false;
+  protected $_attemptLoadFromCache = false;
+
   public function __construct($id = null, $columns = ['*'])
   {
     parent::__construct();
@@ -180,6 +183,13 @@ abstract class RecordMapper extends DataMapper
       $this->_fromRow($row);
       return $this;
     }
+    else if($this->_attemptLoadFromCache)
+    {
+      if($this->loadFromCache($id))
+      {
+        return $this;
+      }
+    }
 
     $connection = $this->connection(
       new ConnectionMode(ConnectionMode::READ)
@@ -248,6 +258,11 @@ abstract class RecordMapper extends DataMapper
           EphemeralCache::storeCache($id, $row, $this);
         }
         $this->_fromRow($row);
+
+        if($this->_autoCacheOnLoad)
+        {
+          $this->setCache($this->_autoCacheSeconds);
+        }
       }
       else
       {
@@ -276,6 +291,8 @@ abstract class RecordMapper extends DataMapper
   public function load($id = null, $columns = ['*'])
   {
     $this->_loadPending = true;
+    //Ensure all SELECT queries match column order for optimised caching
+    sort($columns);
     $this->_loadDetails = ['id' => $id, 'columns' => $columns];
     return $this;
   }
@@ -493,6 +510,7 @@ abstract class RecordMapper extends DataMapper
     $validate = false, $processAll = false, $failFirst = false
   )
   {
+    $this->_cacheOnSave();
     $this->_saveValidation(
       $validate,
       $processAll,
@@ -995,5 +1013,26 @@ abstract class RecordMapper extends DataMapper
       return $build->success();
     }
     return true;
+  }
+
+  protected function _makeCacheKey($key = null)
+  {
+    if($key === null)
+    {
+      $key = $this->id();
+    }
+
+    $unique = '';
+    if(isset($this->_loadDetails['id']))
+    {
+      $unique .= $this->_loadDetails['id'];
+    }
+    if(isset($this->_loadDetails['columns']))
+    {
+      $unique .= implode(',', $this->_loadDetails['columns']);
+    }
+
+    return "RMP:" . get_class($this) . ":" .
+    substr(md5($unique), 0, 6) . ':' . $key;
   }
 }

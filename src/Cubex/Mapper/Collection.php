@@ -416,6 +416,11 @@ class Collection
     return 'unavailable';
   }
 
+  public function getCacheKey()
+  {
+    return $this->_makeCacheKey();
+  }
+
   protected function _makeCacheKey($key = null)
   {
     if($key === null)
@@ -461,6 +466,7 @@ class Collection
     if(!$cacher->checkForMiss($cacheResult))
     {
       $this->unserialize($cacheResult);
+      $this->_loadedCacheKey = $cacheKey;
       return true;
     }
     return false;
@@ -500,5 +506,25 @@ class Collection
       $this->serialize(),
       $seconds
     );
+  }
+
+  public function setCacheSeconds($seconds, $cacheKey = null)
+  {
+    return $this->setCache($seconds, $cacheKey);
+  }
+
+  public function setCacheMinutes($minutes, $cacheKey = null)
+  {
+    return $this->setCache($minutes * 60, $cacheKey);
+  }
+
+  public function setCacheHours($hours, $cacheKey = null)
+  {
+    return $this->setCache($hours * 3600, $cacheKey);
+  }
+
+  public function setCacheDays($days, $cacheKey = null)
+  {
+    return $this->setCache($days * 86400, $cacheKey);
   }
 }
