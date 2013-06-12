@@ -33,6 +33,7 @@ class DatabaseQueue implements IQueueProvider
     $maxAttempts = $this->config()->getInt("max_attempts", 3);
     $ownkey      = FileSystem::readRandomCharacters(30);
     $waits       = 0;
+    $this->_queueMapper(true, true);
 
     while(true)
     {
@@ -90,9 +91,9 @@ class DatabaseQueue implements IQueueProvider
     $consumer->shutdown();
   }
 
-  protected function _queueMapper()
+  protected function _queueMapper($createNew = false, $createTable = false)
   {
-    if($this->_map === null)
+    if($this->_map === null || $createNew)
     {
       $this->_map = new QueueMapper();
       $this->_map->setTableName(
@@ -102,7 +103,10 @@ class DatabaseQueue implements IQueueProvider
         $this->config()->getStr("db_service", "db")
       );
 
-      $this->_map->createTable();
+      if($createTable)
+      {
+        $this->_map->createTable();
+      }
     }
 
     return $this->_map;
