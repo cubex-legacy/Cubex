@@ -265,6 +265,13 @@ class RecordCollection extends Collection
     if(empty($rows))
     {
       $rows = $this->connection()->getRows($query);
+      if(!$rows)
+      {
+        if($this->connection()->errorNo() === 1146)
+        {
+          $this->_mapperType->createTable();
+        }
+      }
     }
 
     if($cache)
