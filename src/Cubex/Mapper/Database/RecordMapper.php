@@ -694,7 +694,14 @@ abstract class RecordMapper extends DataMapper
       $query = str_replace('#UPDATES#', implode(', ', $updates), $query);
     }
 
-    $result = $connection->query($query);
+    try
+    {
+      $result = $connection->query($query);
+    }
+    catch(\Exception $e)
+    {
+      $result = false;
+    }
 
     if($this->_handledError !== true && !$result)
     {
