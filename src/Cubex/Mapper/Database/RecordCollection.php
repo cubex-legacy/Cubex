@@ -265,7 +265,14 @@ class RecordCollection extends Collection
 
     if(empty($rows))
     {
-      $rows = $this->connection()->getRows($query);
+      try
+      {
+        $rows = $this->connection()->getRows($query);
+      }
+      catch(\Exception $e)
+      {
+        $rows = false;
+      }
       if(!$rows)
       {
         if($this->connection()->errorNo() === 1146)
