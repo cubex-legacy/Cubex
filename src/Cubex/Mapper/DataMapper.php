@@ -1059,7 +1059,8 @@ abstract class DataMapper
   {
     if($this->hasCacheProvider())
     {
-      if($this->_autoCacheOnSave)
+      //Only cache if the mapper has been loaded
+      if($this->_autoCacheOnSave && $this->exists())
       {
         $this->setCache($this->_autoCacheSeconds);
       }

@@ -183,7 +183,7 @@ abstract class RecordMapper extends DataMapper
       $this->_fromRow($row);
       return $this;
     }
-    else if($this->_attemptLoadFromCache)
+    else if($this->_attemptLoadFromCache && $this->hasCacheProvider())
     {
       if($this->loadFromCache($id))
       {
