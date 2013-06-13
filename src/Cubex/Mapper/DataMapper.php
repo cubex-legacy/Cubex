@@ -55,6 +55,7 @@ abstract class DataMapper
   protected $_invalidAttributes;
   protected $_exists = false;
   protected $_autoTimestamp = true;
+  protected $_deleteTimestamp = false;
   protected $_filterOnSave = true;
   protected $_changes;
 
@@ -165,6 +166,14 @@ abstract class DataMapper
       if(!$this->attributeExists($this->updatedAttribute()))
       {
         $this->_addAttribute(new $type($this->updatedAttribute()));
+      }
+    }
+
+    if($this->_deleteTimestamp)
+    {
+      if(!$this->attributeExists($this->deletedAttribute()))
+      {
+        $this->_addAttribute(new $type($this->deletedAttribute()));
       }
     }
 
@@ -988,6 +997,16 @@ abstract class DataMapper
     return 'created_at';
   }
 
+  public function deletedAttribute()
+  {
+    return 'deleted_at';
+  }
+
+  public function supportsSoftDeletes()
+  {
+    return $this->_deleteTimestamp;
+  }
+
   protected function _updateTimestamps()
   {
     if(!$this->_autoTimestamp)
@@ -1002,6 +1021,44 @@ abstract class DataMapper
     }
 
     return true;
+  }
+
+  public function softDelete($instantSave = true)
+  {
+    if($this->_deleteTimestamp)
+    {
+      $this->setData($this->deletedAttribute(), $this->currentDateTime());
+      if($instantSave)
+      {
+        $this->saveChanges();
+      }
+      return $this;
+    }
+    else
+    {
+      throw new \Exception(
+        "Soft deletes are not supported on '" . get_class($this) . "'"
+      );
+    }
+  }
+
+  public function restore($instantSave = true)
+  {
+    if($this->_deleteTimestamp)
+    {
+      $this->setData($this->deletedAttribute(), null);
+      if($instantSave)
+      {
+        $this->saveChanges();
+      }
+      return $this;
+    }
+    else
+    {
+      throw new \Exception(
+        "Soft deletes & restore are not supported on '" . get_class($this) . "'"
+      );
+    }
   }
 
   public function currentDateTime()

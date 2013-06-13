@@ -1042,4 +1042,13 @@ abstract class RecordMapper extends DataMapper
     return "RMP:" . get_class($this) . ":" .
     substr(md5($unique), 0, 6) . ':' . $key;
   }
+
+  public function softDeleteWhere()
+  {
+    if($this->supportsSoftDeletes())
+    {
+      return "`" . $this->deletedAttribute() . "` IS NULL";
+    }
+    return "1=1";
+  }
 }

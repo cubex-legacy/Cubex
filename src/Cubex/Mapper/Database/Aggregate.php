@@ -12,11 +12,12 @@ use Cubex\Sprintf\ParseQuery;
 class Aggregate
 {
   protected $_resource;
-  protected $_where = '1=1';
+  protected $_where;
 
   public function __construct(RecordMapper $resource)
   {
     $this->_resource = $resource;
+    $this->_where    = $resource->softDeleteWhere();
   }
 
   public function where($pattern /*, $arg, $arg */)

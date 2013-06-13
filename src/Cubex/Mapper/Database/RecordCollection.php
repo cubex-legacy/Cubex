@@ -79,7 +79,7 @@ class RecordCollection extends Collection
 
   public function loadAll()
   {
-    static::loadWhere("1=1");
+    static::loadWhere($this->_mapperType->softDeleteWhere());
     return $this;
   }
 
@@ -159,6 +159,11 @@ class RecordCollection extends Collection
 
     $this->clear();
     $this->_query = ParseQuery::parse($this->connection(), $args);
+    if(!empty($this->_query))
+    {
+      $this->_query = $this->_mapperType->softDeleteWhere() .
+      ' AND ' . $this->_query;
+    }
 
     return $this;
   }
