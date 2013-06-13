@@ -20,7 +20,7 @@ class TextPrefetch
     $this->_textContainer = $container;
     if($language === null)
     {
-      $language = LOCALE2;
+      $language = defined('LOCALE2') ? LOCALE2 : 'en';
     }
     $this->_language = $language;
     if($type !== null && $ids !== null)
