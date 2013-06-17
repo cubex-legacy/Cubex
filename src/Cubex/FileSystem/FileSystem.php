@@ -26,32 +26,31 @@ class FileSystem
       return static::_pseudoBytes($bytes);
     }
 
-    $urandom = @fopen('/dev/urandom', 'rb');
-    if(!$urandom)
+    $randomBytesFile = '/dev/urandom';
+    if(file_exists($randomBytesFile))
     {
-      try
+      $urandom = fopen($randomBytesFile, 'rb');
+      if(!$urandom)
       {
+        fclose($urandom);
         return static::_pseudoBytes($bytes);
       }
-      catch(\Exception $e)
+
+      $data = fread($urandom, $bytes);
+      if(strlen($data) != $bytes)
       {
         throw new FilesystemException(
-          '/dev/urandom',
-          'Failed to open /dev/urandom for reading!'
+          $randomBytesFile,
+          'Failed to read random bytes!'
         );
       }
-    }
 
-    $data = @fread($urandom, $bytes);
-    if(strlen($data) != $bytes)
+      fclose($urandom);
+    }
+    else
     {
-      throw new FilesystemException(
-        '/dev/urandom',
-        'Failed to read random bytes!'
-      );
+      return static::_pseudoBytes($bytes);
     }
-
-    @fclose($urandom);
 
     return $data;
   }
@@ -64,8 +63,11 @@ class FileSystem
     }
     else
     {
-      throw new FilesystemException(
-        '', "openssl_random_pseudo_bytes is unavailable"
+      $chrs = "0123456789abcdefghijklmnopqrstuvwxyz!$%^&*()-=+<?>,./:;'@#~[]{}";
+      return substr(
+        str_shuffle(str_repeat($chrs, ceil($bytes / 63))),
+        0,
+        $bytes
       );
     }
   }
