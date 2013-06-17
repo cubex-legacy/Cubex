@@ -54,8 +54,7 @@ class Serve extends Dispatcher implements IDispatchable
       $useMap = false;
     }
 
-    $this->setDispatchPath($dispatchPath)
-      ->setUseMap($useMap);
+    $this->setDispatchPath($dispatchPath)->setUseMap($useMap);
   }
 
   /**
@@ -72,14 +71,14 @@ class Serve extends Dispatcher implements IDispatchable
     $resourceHash = $this->getDispatchPath()->getResourceHash();
 
     if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
-      && $debugString !== self::getNocacheDebugString()
-      && $resourceHash !== $this->getNomapHash()
+    && $debugString !== self::getNocacheDebugString()
+    && $resourceHash !== $this->getNomapHash()
     )
     {
       $this->_setCacheHeaders($response);
     }
     else if(
-      preg_match("@(//|\.\.)@", $this->getDispatchPath()->getPathToResource())
+    preg_match("@(//|\.\.)@", $this->getDispatchPath()->getPathToResource())
     )
     {
       // Stop possible hacks for disk paths, e.g. /js/../../../etc/passwd
@@ -175,7 +174,7 @@ class Serve extends Dispatcher implements IDispatchable
         try
         {
           $fileData = $this->getFileSystem()->readFile($file);
-          $data     .= $this->dispatchContent($fileData);
+          $data .= $this->dispatchContent($fileData);
 
           $locatedFileKeys[$fileKey] = true;
         }
@@ -245,7 +244,7 @@ class Serve extends Dispatcher implements IDispatchable
         {
           $data .= $this->_getData(
             $domain,
-            $packageDir . DS . $directoryListItem,
+            ($packageDir . DS . $directoryListItem),
             $entityHash
           );
         }
@@ -256,7 +255,7 @@ class Serve extends Dispatcher implements IDispatchable
   }
 
   /**
-   * @param string                 $entity
+   * @param string                         $entity
    * @param \Cubex\Dispatch\DispatchMapper $mapper
    *
    * @return array
@@ -392,10 +391,10 @@ class Serve extends Dispatcher implements IDispatchable
    */
   private function _setCacheHeaders(Response $response)
   {
-    $response->addHeader("X-Powere-By", "Cubex:Dispatch")
-      ->setStatusCode(304)
-      ->cacheFor($this->_cacheTime)
-      ->lastModified(time());
+    $response->addHeader("X-Powered-By", "Cubex:Dispatch")
+    ->setStatusCode(304)
+    ->cacheFor($this->_cacheTime)
+    ->lastModified(time());
   }
 
   /**
@@ -406,11 +405,11 @@ class Serve extends Dispatcher implements IDispatchable
   private function _setResponseHeaders(Response $response, $data, $resourceType)
   {
     $response->fromDispatch($data)
-      ->addHeader("Content-Type", $this->getSupportedTypes()[$resourceType])
-      ->addHeader("X-Powered-By", "Cubex:Dispatch")
-      ->setStatusCode(200)
-      ->cacheFor($this->_cacheTime)
-      ->lastModified(time());
+    ->addHeader("Content-Type", $this->getSupportedTypes()[$resourceType])
+    ->addHeader("X-Powered-By", "Cubex:Dispatch")
+    ->setStatusCode(200)
+    ->cacheFor($this->_cacheTime)
+    ->lastModified(time());
   }
 
   /**
