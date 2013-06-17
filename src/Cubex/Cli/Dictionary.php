@@ -5,6 +5,7 @@
 
 namespace Cubex\Cli;
 
+use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Foundation\Config\IConfigurable;
@@ -57,7 +58,7 @@ class Dictionary implements IConfigurable
   public function getPrefixes($namespace)
   {
     $prefix = $this->_configuration
-              ->get("cli_dictionary")
+              ->get("cli_dictionary", new Config())
               ->getArr("prefixes", []);
 
     array_unshift($prefix, '', $namespace . '.', $namespace . '.Cli.');
