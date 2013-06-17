@@ -57,10 +57,7 @@ class Dictionary implements IConfigurable
 
   public function getPrefixes($namespace)
   {
-    $prefix = $this->_configuration
-              ->get("cli_dictionary", new Config())
-              ->getArr("prefixes", []);
-
+    $prefix = $this->config("cli_dictionary")->getArr("prefixes", []);
     array_unshift($prefix, '', $namespace . '.', $namespace . '.Cli.');
     $prefix[] = 'Bundl.';
     $prefix[] = 'Qubes.';
