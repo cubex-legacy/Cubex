@@ -5,22 +5,25 @@
 
 namespace Cubex\Cassandra;
 
+use Cubex\Container\Container;
 use Cubex\Data\Attribute\Attribute;
 use Cubex\Data\Attribute\CallbackAttribute;
-use Cubex\Facade\Cassandra;
 use Cubex\Cassandra\ColumnAttribute;
 use Cubex\Cassandra\DataType\CassandraType;
-use Cubex\Mapper\KeyValue\KvMapper;
+use Cubex\Mapper\DataMapper;
 
-class CassandraMapper extends KvMapper
+class CassandraMapper extends DataMapper
 {
   protected $_cassandraConnection = 'cassandra';
   protected $_autoTimestamp = false;
   protected $_attributeType = '\Cubex\Cassandra\ColumnAttribute';
 
+  /**
+   * @return \Cubex\Cassandra\CassandraService
+   */
   public function connection()
   {
-    return Cassandra::getAccessor($this->_cassandraConnection);
+    return Container::servicemanager()->get($this->_cassandraConnection);
   }
 
   /**
@@ -50,10 +53,14 @@ class CassandraMapper extends KvMapper
   {
     if(!$this->attributeExists($attribute))
     {
-      $a = new ColumnAttribute($attribute);
-      $a->setExpiry($ttl);
+      $a = new $this->_attributeType($attribute);
+      if($a instanceof ColumnAttribute)
+      {
+        $a->setExpiry($ttl);
+      }
       $this->_addAttribute($a);
     }
+
     return parent::setData($attribute, $value, $serialized, $bypassValidation);
   }
 
@@ -179,9 +186,9 @@ class CassandraMapper extends KvMapper
         if($attr->isModified() && $attr->saveToDatabase())
         {
           if(
-            !$this->_autoTimestamp
-            || ($attr->name() != $this->createdAttribute()
-            && $attr->name() != $this->updatedAttribute())
+          !$this->_autoTimestamp
+          || ($attr->name() != $this->createdAttribute()
+          && $attr->name() != $this->updatedAttribute())
           )
           {
             $columns[$attr->name()]        = $attr;
@@ -200,5 +207,50 @@ class CassandraMapper extends KvMapper
       $columns,
       $globalTtlSeconds
     );
+  }
+
+  public function __construct($id = null, array $columns = null)
+  {
+    parent::__construct();
+    if($id !== null)
+    {
+      $this->load($id, $columns);
+    }
+  }
+
+  /**
+   * @param       $id
+   * @param array $columns
+   *
+   * @return static
+   * @throws \Exception
+   */
+  public function load($id = null, array $columns = null)
+  {
+    $this->setId($id);
+    $row = $this->connection()->getRow($this->getTableName(), $id, $columns);
+    if($row)
+    {
+      $this->hydrate($row, false, true);
+      $this->setExists(true);
+      $this->_unmodifyAttributes();
+    }
+    return $this;
+  }
+
+  public function delete(array $columns = null)
+  {
+    if($columns === null)
+    {
+      $this->connection()->deleteData($this->getTableName(), $this->id());
+    }
+    else
+    {
+      $this->connection()->deleteData(
+        $this->getTableName(),
+        $this->id(),
+        $columns
+      );
+    }
   }
 }

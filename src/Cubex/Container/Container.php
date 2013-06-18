@@ -85,7 +85,6 @@ class Container
     return static::get(self::RESPONSE);
   }
 
-
   /**
    * @return \Cubex\Auth\IAuthedUser|null
    */
