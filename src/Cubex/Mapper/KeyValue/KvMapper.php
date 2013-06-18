@@ -12,7 +12,7 @@ use Cubex\Mapper\DataMapper;
 class KvMapper extends DataMapper
 {
   /**
-   * @return \Cubex\KvStore\IKvService
+   * @return \Cubex\Data\Service\IDataService
    */
   public function connection()
   {
@@ -20,7 +20,7 @@ class KvMapper extends DataMapper
   }
 
   /**
-   * @return \Cubex\KvStore\IKvService
+   * @return \Cubex\Data\Service\IDataService
    */
   public static function conn()
   {
@@ -55,7 +55,6 @@ class KvMapper extends DataMapper
     }
     return $this;
   }
-
 
   /**
    * @param bool|array $validate   all fields, or array of fields to validate

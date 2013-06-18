@@ -5,12 +5,12 @@
 
 namespace Cubex\Cassandra;
 
-use Cubex\KvStore\IKvService;
+use Cubex\Data\Service\IDataService;
 use Cubex\ServiceManager\ServiceConfigTrait;
 use cassandra\AuthenticationRequest;
 use cassandra\InvalidRequestException;
 
-class CassandraService implements IKvService
+class CassandraService implements IDataService
 {
   use ServiceConfigTrait;
 

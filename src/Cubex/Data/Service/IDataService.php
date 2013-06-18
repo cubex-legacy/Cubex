@@ -3,11 +3,11 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\KvStore;
+namespace Cubex\Data\Service;
 
 use Cubex\ServiceManager\IService;
 
-interface IKvService extends IService
+interface IDataService extends IService
 {
   public function connect();
 
