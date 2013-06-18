@@ -27,7 +27,10 @@ class DBAuth extends BaseAuthService implements IServiceManagerAware
 
   protected function _connection()
   {
-    return $this->getServiceManager()->db($this->_connectionName);
+    return $this->getServiceManager()->getWithType(
+      $this->_connectionName,
+      '\Cubex\Database\IDatabaseService'
+    );
   }
 
   /**

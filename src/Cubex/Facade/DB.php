@@ -16,7 +16,10 @@ class DB extends BaseFacade
    */
   public static function getAccessor($name = 'db')
   {
-    return static::getServiceManager()->db($name);
+    return static::getServiceManager()->getWithType(
+      $name,
+      '\Cubex\Database\IDatabaseService'
+    );
   }
 
   protected static function _query($method, $query /*,$args*/)

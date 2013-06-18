@@ -391,8 +391,16 @@ abstract class RecordMapper extends DataMapper
       $mode = new ConnectionMode(ConnectionMode::READ);
     }
 
-    $sm = Container::servicemanager();
-    return $sm->db($this->_dbServiceName, $mode);
+    $connection = Container::servicemanager()->getWithType(
+      $this->_dbServiceName,
+      '\Cubex\Database\IDatabaseService'
+    );
+
+    if($mode !== null && $connection instanceof IDatabaseService)
+    {
+      $connection->connect($mode);
+    }
+    return $connection;
   }
 
   public function id()

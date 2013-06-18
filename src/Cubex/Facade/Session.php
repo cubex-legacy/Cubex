@@ -12,13 +12,18 @@ class Session extends BaseFacade
   const FLASH_KEY = "__FLASH__";
 
   /**
+   * @param string $serviceName
+   *
    * @return \Cubex\Session\ISessionService
    */
-  public static function getAccessor()
+  public static function getAccessor($serviceName = 'session')
   {
     $sessionManager = static::getServiceManager();
 
-    return $sessionManager->session();
+    return $sessionManager->getWithType(
+      $serviceName,
+      '\Cubex\Session\ISessionService'
+    );
   }
 
   /**
@@ -98,7 +103,7 @@ class Session extends BaseFacade
 
   /**
    * @param string $key
-   * @param mixed $value
+   * @param mixed  $value
    *
    * @return \Cubex\Session\ISessionService
    */

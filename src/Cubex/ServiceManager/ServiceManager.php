@@ -7,9 +7,6 @@ namespace Cubex\ServiceManager;
 /**
  * Container for services
  */
-use Cubex\Cache\ICacheService;
-use Cubex\Database\IDatabaseService;
-use Cubex\Session\ISessionService;
 
 class ServiceManager
 {
@@ -376,49 +373,19 @@ class ServiceManager
     }
   }
 
-  /**
-   * @param string $connection
-   *
-   * @return \Cubex\Cache\ICacheService
-   * @throws \Exception
-   */
-  public function cache($connection = 'cache')
+  public function getWithType($serviceName, $instanceOf)
   {
-    $cache = $this->get($connection);
-    if($cache instanceof ICacheService)
+    $service = $this->get($serviceName);
+    if($service instanceof $instanceOf)
     {
-      return $cache;
+      return $service;
     }
-    throw new \Exception("No cache service available");
-  }
-
-  /**
-   * @param string $connection
-   *
-   * @return \Cubex\Database\IDatabaseService
-   * @throws \Exception
-   */
-  public function db($connection = 'db')
-  {
-    $database = $this->get($connection);
-    if($database instanceof IDatabaseService)
+    else
     {
-      return $database;
+      throw new \Exception(
+        "The service $serviceName is not a valid instance of " .
+        get_class($instanceOf)
+      );
     }
-    throw new \Exception("No database service available");
-  }
-
-  /**
-   * @return \Cubex\Session\ISessionService
-   * @throws \Exception
-   */
-  public function session()
-  {
-    $session = $this->get("session");
-    if($session instanceof ISessionService)
-    {
-      return $session;
-    }
-    throw new \Exception("No session service available");
   }
 }

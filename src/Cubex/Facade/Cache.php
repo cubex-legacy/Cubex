@@ -8,11 +8,16 @@ namespace Cubex\Facade;
 class Cache extends BaseFacade
 {
   /**
+   * @param string $connection
+   *
    * @return \Cubex\Cache\ICacheService
    */
   public static function getAccessor($connection = 'cache')
   {
-    return static::getServiceManager()->cache($connection);
+    return static::getServiceManager()->getWithType(
+      $connection,
+      '\Cubex\Cache\ICacheService'
+    );
   }
 
   public static function has($key)
