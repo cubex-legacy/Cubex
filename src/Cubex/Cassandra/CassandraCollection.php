@@ -6,14 +6,16 @@
 namespace Cubex\Cassandra;
 
 use Cubex\Cassandra\ColumnAttribute;
-use Cubex\Mapper\KeyValue\KvCollection;
+use Cubex\Mapper\Collection;
 
-class CassandraCollection extends KvCollection
+class CassandraCollection extends Collection
 {
   /**
    * @var CassandraMapper
    */
   protected $_mapperType;
+  protected $_columns;
+  protected $_limit = 100;
 
   public function __construct(CassandraMapper $map, array $mappers = null)
   {
@@ -91,5 +93,59 @@ class CassandraCollection extends KvCollection
   )
   {
     return $this->cf()->makeSlice($start, $finish, $reverse, $limit);
+  }
+
+  public function setColumns(array $columns = null)
+  {
+    $this->_columns = $columns;
+    return $this;
+  }
+
+  public function setLimit($limit = 100)
+  {
+    $this->_limit = (int)$limit;
+    return $this;
+  }
+
+  public function getLimit()
+  {
+    return $this->_limit;
+  }
+
+  public function loadIds($ids)
+  {
+    if(func_num_args() > 1)
+    {
+      $ids = func_get_args();
+    }
+    else if(!is_array($ids))
+    {
+      $ids = [$ids];
+    }
+
+    $results = $this->connection()->getRows(
+      $this->_mapperType->getTableName(),
+      $ids,
+      $this->_columns
+    );
+
+    $this->clear();
+    if($results !== null && is_array($results))
+    {
+      foreach($results as $key => $result)
+      {
+        if(empty($result))
+        {
+          continue;
+        }
+        $map = clone $this->_mapperType;
+        $map->hydrate($result, true, true);
+        $map->setId($key);
+        $map->setExists(true);
+        $this->addMapper($map);
+      }
+    }
+
+    return $this;
   }
 }
