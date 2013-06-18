@@ -9,7 +9,7 @@ use Cubex\Auth\IAuthedUser;
 use Cubex\Auth\BaseAuthService;
 use Cubex\Auth\ILoginCredentials;
 use Cubex\Auth\StdAuthedUser;
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Facade\Session;
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\ServiceManager\IServiceManagerAware;

@@ -8,7 +8,7 @@ namespace Cubex\Auth\Tests\Database;
 use Cubex\Auth\Database\DBAuth;
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\Tests\TestCase;
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 
 class DBAuthTest extends TestCase
 {

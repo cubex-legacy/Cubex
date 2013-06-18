@@ -1,4 +1,4 @@
 Cubex Foundation
 ==
 
-IRenderable interface and Config classes
+IRenderable interface, Container and Config classes

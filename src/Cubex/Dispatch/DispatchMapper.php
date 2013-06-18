@@ -4,7 +4,7 @@
  */
 namespace Cubex\Dispatch;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\FileSystem\FileSystem;
 use Cubex\Foundation\Config\ConfigGroup;

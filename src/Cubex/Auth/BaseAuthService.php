@@ -5,7 +5,7 @@
 
 namespace Cubex\Auth;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Cookie\Cookies;
 use Cubex\Cookie\EncryptedCookie;
 

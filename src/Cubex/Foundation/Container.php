@@ -2,7 +2,7 @@
 /**
  * @author  brooke.bryan
  */
-namespace Cubex\Container;
+namespace Cubex\Foundation;
 
 use Cubex\Foundation\Config\ConfigGroup;
 

@@ -5,7 +5,7 @@
 
 namespace Cubex\Mapper\Database;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Data\Validator\Validator;
 use Cubex\Database\ConnectionMode;

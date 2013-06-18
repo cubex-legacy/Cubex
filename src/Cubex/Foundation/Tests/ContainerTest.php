@@ -4,7 +4,7 @@
  */
 namespace Cubex\Container\Tests;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Tests\TestCase;
 
 class ContainerTest extends TestCase

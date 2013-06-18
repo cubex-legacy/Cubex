@@ -5,7 +5,7 @@
 
 namespace Cubex\Facade;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 
 class FeatureSwitch extends BaseFacade
 {

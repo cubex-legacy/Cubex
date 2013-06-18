@@ -5,7 +5,7 @@
 
 namespace Cubex\I18n\Tests;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Cookie\Cookies;
 use Cubex\Cookie\StandardCookie;
 use Cubex\I18n\Service\Locale\PersistentCookie;

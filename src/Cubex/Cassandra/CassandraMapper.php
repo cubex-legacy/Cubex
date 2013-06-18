@@ -5,7 +5,7 @@
 
 namespace Cubex\Cassandra;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Data\Attribute\Attribute;
 use Cubex\Data\Attribute\CallbackAttribute;
 use Cubex\Cassandra\ColumnAttribute;

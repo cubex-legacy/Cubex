@@ -4,7 +4,7 @@
  */
 namespace Cubex\Dispatch\Dependency;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Core\Http\Request;
 use Cubex\Dispatch\Dependency;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;

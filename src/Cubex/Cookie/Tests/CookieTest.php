@@ -5,7 +5,7 @@
 
 namespace Cubex\Cookie\Tests;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Cookie\EncryptedCookie;
 use Cubex\Cookie\StandardCookie;
 use Cubex\Encryption\Service\TestEncryption;

@@ -16,8 +16,8 @@ class Redirect implements IDispatchableAccess, IDispatchInjection
     if($this->_request === null)
     {
       $this->setRequest(
-        \Cubex\Container\Container::get(
-          \Cubex\Container\Container::REQUEST
+        \Cubex\Foundation\Container::get(
+          \Cubex\Foundation\Container::REQUEST
         )
       );
     }

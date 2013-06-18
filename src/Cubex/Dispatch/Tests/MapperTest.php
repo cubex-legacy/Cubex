@@ -7,7 +7,7 @@ namespace Cubex\Dispatch\Tests;
 use Cubex\FileSystem\FileSystem;
 use Cubex\Dispatch\DispatchMapper;
 use Cubex\Tests\TestCase;
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 
 class MapperTest extends TestCase
 {

@@ -5,7 +5,7 @@
 
 namespace Cubex\Mapper\Database;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Database\ConnectionMode;
 use Cubex\Sprintf\ParseQuery;
 

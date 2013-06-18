@@ -4,7 +4,7 @@
  */
 namespace Cubex\I18n;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 
 class Locale
 {

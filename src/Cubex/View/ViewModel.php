@@ -4,7 +4,7 @@
  */
 namespace Cubex\View;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Core\Application\IController;
 use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Events\EventManager;

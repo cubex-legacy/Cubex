@@ -7,7 +7,7 @@ namespace Cubex\Facade;
 
 use Cubex\Auth\IAuthedUser;
 use Cubex\Auth\ILoginCredentials;
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Cookie\Cookies;
 use Cubex\Cookie\EncryptedCookie;
 

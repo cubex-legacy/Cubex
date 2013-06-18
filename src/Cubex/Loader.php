@@ -119,7 +119,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
     \Cubex\Core\Loader\ClassAliasLoader::register();
 
-    \Cubex\Container\Container::bind(\Cubex\Container\Container::LOADER, $this);
+    Foundation\Container::bind(Foundation\Container::LOADER, $this);
   }
 
   public function setServiceManagerClass($serviceManager)
@@ -191,8 +191,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
       }
     }
 
-    \Cubex\Container\Container::bind(
-      \Cubex\Container\Container::SERVICE_MANAGER,
+    Foundation\Container::bind(
+      Foundation\Container::SERVICE_MANAGER,
       $sm
     );
     $this->setServiceManager($sm);
@@ -325,8 +325,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     $configuration->addConfig('_cubex_', $cubexConfig);
 
     $this->_configuration = $configuration;
-    \Cubex\Container\Container::bind(
-      \Cubex\Container\Container::CONFIG,
+    Foundation\Container::bind(
+      Foundation\Container::CONFIG,
       $this->_configuration
     );
 
@@ -476,8 +476,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
   public function setRequest(Request $request)
   {
     $this->_request = $request;
-    \Cubex\Container\Container::bind(
-      \Cubex\Container\Container::REQUEST,
+    Foundation\Container::bind(
+      Foundation\Container::REQUEST,
       $this->_request
     );
     EventManager::trigger(EventManager::CUBEX_REQUEST_BIND);
@@ -531,8 +531,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
   public function setResponse(Response $response)
   {
     $this->_response = $response;
-    \Cubex\Container\Container::bind(
-      \Cubex\Container\Container::RESPONSE,
+    Foundation\Container::bind(
+      Foundation\Container::RESPONSE,
       $this->_response
     );
 

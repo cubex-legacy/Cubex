@@ -5,7 +5,7 @@
 
 namespace Cubex\Email;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Foundation\Config\Config;
 use Cubex\ServiceManager\ServiceConfig;
 

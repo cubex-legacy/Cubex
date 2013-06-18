@@ -5,7 +5,7 @@
 
 namespace Cubex\Form;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Core\Http\Request;
 use Cubex\Data\Attribute\Attribute;
 use Cubex\Data\Validator\Validator;

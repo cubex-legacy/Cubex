@@ -5,7 +5,7 @@
 
 namespace Cubex\Facade;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\ServiceManager\ServiceManager;
 
 abstract class BaseFacade

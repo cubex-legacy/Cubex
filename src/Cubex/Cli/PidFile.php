@@ -5,7 +5,7 @@
 
 namespace Cubex\Cli;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 
 class PidFile
 {

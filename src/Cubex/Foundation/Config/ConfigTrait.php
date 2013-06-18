@@ -4,7 +4,7 @@
  */
 namespace Cubex\Foundation\Config;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 
 trait ConfigTrait
 {

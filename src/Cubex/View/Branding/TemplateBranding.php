@@ -5,7 +5,7 @@
 
 namespace Cubex\View\Branding;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Core\Http\Request;
 use Cubex\Foundation\Config\ConfigGroup;
 

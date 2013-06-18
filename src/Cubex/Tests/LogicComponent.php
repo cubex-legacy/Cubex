@@ -45,10 +45,10 @@ final class LogicComponent extends \Cubex\Components\LogicComponent
         static::$_tempBind[$parentComponentString] = [];
       }
 
-      $oldComponent = static::$_interfaces[$parentComponentString][$interface];
+      $oldComponent                                          = static::$_interfaces[$parentComponentString][$interface];
       static::$_tempBind[$parentComponentString][$interface] = $oldComponent;
       static::$_interfaces[$parentComponentString][$interface]
-        = $componentString;
+                                                             = $componentString;
 
       self::_getTestServiceManager()->tempBind($componentString, $component);
 
@@ -64,7 +64,7 @@ final class LogicComponent extends \Cubex\Components\LogicComponent
     {
       foreach($interfaces as $interface => $component)
       {
-        $oldComponent = static::$_interfaces[$parentComponent][$interface];
+        $oldComponent                                      = static::$_interfaces[$parentComponent][$interface];
         static::$_interfaces[$parentComponent][$interface] = $component;
         unset(static::$_tempBind[$parentComponent][$interface]);
 

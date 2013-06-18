@@ -193,7 +193,7 @@ if(!function_exists("url"))
    */
   function url($format = "%p%h")
   {
-    return \Cubex\Container\Container::request()->urlSprintf($format);
+    return \Cubex\Foundation\Container::request()->urlSprintf($format);
   }
 }
 

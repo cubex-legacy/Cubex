@@ -4,7 +4,7 @@
  */
 namespace Cubex\Dispatch\Utils;
 
-use Cubex\Container\Container;
+use Cubex\Foundation\Container;
 use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\Dispatch\Dependency\Resource;
 use Cubex\Dispatch\Dependency\Url;
