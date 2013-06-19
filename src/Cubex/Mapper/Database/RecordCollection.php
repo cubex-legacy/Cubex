@@ -5,6 +5,7 @@
 
 namespace Cubex\Mapper\Database;
 
+use Cubex\Data\Filter\Filter;
 use Cubex\Foundation\Container;
 use Cubex\Data\Ephemeral\EphemeralCache;
 use Cubex\Data\Validator\Validator;
@@ -71,9 +72,9 @@ class RecordCollection extends Collection
     return $this;
   }
 
-  public function setColumns(array $columns = ['*'])
+  public function setColumns($columns = ['*'])
   {
-    $this->_columns = $columns;
+    $this->_columns = Filter::arr($columns);
     return $this;
   }
 
@@ -522,6 +523,21 @@ class RecordCollection extends Collection
   {
     $type = substr(ParseQuery::valueType($value), 1);
     $this->loadWhereAppend("%C %=" . $type, $column, $value);
+    return $this;
+  }
+
+  /**
+   * Not Equal Search
+   *
+   * @param $column
+   * @param $value
+   *
+   * @return $this
+   */
+  public function whereNeq($column, $value)
+  {
+    $type = substr(ParseQuery::valueType($value), 1);
+    $this->loadWhereAppend("%C != %" . $type, $column, $value);
     return $this;
   }
 
