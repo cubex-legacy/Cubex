@@ -574,6 +574,45 @@ class RecordCollection extends Collection
     return $this;
   }
 
+  /**
+   * @param $column
+   * @param $value1
+   * @param $value2
+   *
+   * @return $this
+   */
+  public function whereBetween($column, $value1, $value2)
+  {
+    $this->loadWhereAppend("%C BETWEEN %s AND %s", $column, $value1, $value2);
+    return $this;
+  }
+
+  /**
+   * @param $column
+   * @param $value
+   * @param $type
+   *
+   * @return $this
+   */
+  public function whereGreaterThan($column, $value, $type = 's')
+  {
+    $this->loadWhereAppend("%C > %" . $type, $column, $value);
+    return $this;
+  }
+
+  /**
+   * @param $column
+   * @param $value
+   * @param $type
+   *
+   * @return $this
+   */
+  public function whereLessThan($column, $value, $type = 's')
+  {
+    $this->loadWhereAppend("%C < %" . $type, $column, $value);
+    return $this;
+  }
+
   protected function _aggregateNotLoaded($column)
   {
     if(!$this->_loaded)
