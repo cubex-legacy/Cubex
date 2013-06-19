@@ -129,6 +129,30 @@ class Collection
     return $result;
   }
 
+  /**
+   * Get first instance of a field, or a default value
+   *
+   * @param      $keyField
+   * @param null $default
+   *
+   * @return mixed|null
+   */
+  public function getField($keyField, $default = null)
+  {
+    $this->_preCheckMappers();
+    if($this->_mappers)
+    {
+      foreach($this->_mappers as $mapper)
+      {
+        if(isset($mapper->$keyField))
+        {
+          return $mapper->$keyField;
+        }
+      }
+    }
+    return $default;
+  }
+
   public function getKeyedArray($keyField, array $fields)
   {
     $this->_preCheckMappers();
