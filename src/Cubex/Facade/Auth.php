@@ -16,9 +16,9 @@ class Auth extends BaseFacade
   /**
    * @return \Cubex\Auth\IAuthService|null
    */
-  public static function getAccessor()
+  public static function getAccessor($serviceName = "auth")
   {
-    return static::getServiceManager()->get("auth");
+    return static::getServiceManager()->get($serviceName);
   }
 
   protected static function _storeLogin(IAuthedUser $user)

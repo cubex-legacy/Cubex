@@ -9,9 +9,9 @@ class Email extends BaseFacade
   /**
    * @return \Cubex\Email\IEmailService
    */
-  public static function getAccessor()
+  public static function getAccessor($serviceName = "email")
   {
-    return static::getServiceManager()->get("email");
+    return static::getServiceManager()->get($serviceName);
   }
 
   /**

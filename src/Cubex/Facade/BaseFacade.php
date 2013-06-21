@@ -27,7 +27,7 @@ abstract class BaseFacade
     }
   }
 
-  public static function getAccessor()
+  public static function getAccessor($serviceName)
   {
     throw new \RuntimeException(
       "getAccess has not been implemented on " . get_called_class()

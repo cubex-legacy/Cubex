@@ -9,11 +9,11 @@ class PlatformDetection extends BaseFacade
   /**
    * @return \Cubex\Platform\Detection\IDetectionService
    */
-  public static function getAccessor()
+  public static function getAccessor($serviceName = "platform.detection")
   {
     $serviceManager = static::getServiceManager();
 
-    return $serviceManager->get("platform.detection");
+    return $serviceManager->get($serviceName);
   }
 
   /**

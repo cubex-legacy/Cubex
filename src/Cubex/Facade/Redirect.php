@@ -7,7 +7,7 @@ namespace Cubex\Facade;
 
 class Redirect extends BaseFacade
 {
-  public static function getAccessor()
+  public static function getAccessor($serviceName = null)
   {
     return new \Cubex\Core\Http\Redirect();
   }

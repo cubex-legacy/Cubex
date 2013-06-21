@@ -10,9 +10,9 @@ class Encryption extends BaseFacade
   /**
    * @return \Cubex\Encryption\IEncryptionService
    */
-  public static function getAccessor()
+  public static function getAccessor($serviceName = "encryption")
   {
-    return static::getServiceManager()->get("encryption");
+    return static::getServiceManager()->get($serviceName);
   }
 
   /**
