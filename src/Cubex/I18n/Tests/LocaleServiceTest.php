@@ -9,9 +9,9 @@ use Cubex\Foundation\Container;
 use Cubex\Cookie\Cookies;
 use Cubex\Cookie\StandardCookie;
 use Cubex\I18n\Service\Locale\PersistentCookie;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class LocaleServiceTest extends TestCase
+class LocaleServiceTest extends CubexTestCase
 {
   /**
    * @var \PHPUnit_Framework_MockObject_MockObject

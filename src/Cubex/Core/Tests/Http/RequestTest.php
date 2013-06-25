@@ -5,9 +5,9 @@
 namespace Cubex\Core\Tests\Http;
 
 use Cubex\Core\Http\Request;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class RequestTest extends TestCase
+class RequestTest extends CubexTestCase
 {
   /**
    * @dataProvider requestUrlSprintfProvider

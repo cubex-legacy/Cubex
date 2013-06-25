@@ -6,9 +6,9 @@
 namespace Cubex\Auth\Tests;
 
 use Cubex\Auth\StdLoginCredentials;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class StdLoginCredentialsTest extends TestCase
+class StdLoginCredentialsTest extends CubexTestCase
 {
   private $_username = "username";
   private $_password = "password";

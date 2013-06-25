@@ -5,9 +5,9 @@
 
 namespace Cubex\Bundle\Tests;
 
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class BundlerTraitTest extends TestCase
+class BundlerTraitTest extends CubexTestCase
 {
   public function testIsInitiallyEmpty()
   {

@@ -7,9 +7,9 @@ namespace Cubex\Dispatch\Tests;
 use Cubex\Dispatch\Dispatcher;
 use Cubex\FileSystem\FileSystem;
 use Cubex\Foundation\Config\ConfigGroup;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class DispatcherTest extends TestCase
+class DispatcherTest extends CubexTestCase
 {
   /**
    * @var \Cubex\Foundation\Config\ConfigGroup

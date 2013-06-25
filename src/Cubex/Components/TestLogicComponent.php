@@ -3,7 +3,9 @@
  * @author gareth.evans
  */
 
-namespace Cubex\Tests;
+namespace Cubex\Components;
+
+use Cubex\ServiceManager\TestServiceManager;
 
 /**
  * Class LogicComponent
@@ -11,26 +13,26 @@ namespace Cubex\Tests;
  * This is used to temporarily bind different objects (usually mocks) against
  * an interface.
  *
- * @package Cubex\Tests
+ * @package Cubex\Components
  */
-final class LogicComponent extends \Cubex\Components\LogicComponent
+final class TestLogicComponent extends LogicComponent
 {
   protected static $_tempBind = [];
 
   public static function bindServiceManager()
   {
-    static::$_internalServiceManager = new ServiceManager();
+    static::$_internalServiceManager = new TestServiceManager();
   }
 
   /**
-   * @param \Cubex\Components\LogicComponent $parentComponent
-   * @param string                           $interface
-   * @param object                           $component
+   * @param LogicComponent $parentComponent
+   * @param string         $interface
+   * @param object         $component
    *
    * @return bool
    */
   public static function tempBind(
-    \Cubex\Components\LogicComponent $parentComponent,
+    LogicComponent $parentComponent,
     $interface,
     $component
   )
@@ -45,7 +47,8 @@ final class LogicComponent extends \Cubex\Components\LogicComponent
         static::$_tempBind[$parentComponentString] = [];
       }
 
-      $oldComponent                                          = static::$_interfaces[$parentComponentString][$interface];
+      $oldComponent
+        = static::$_interfaces[$parentComponentString][$interface];
       static::$_tempBind[$parentComponentString][$interface] = $oldComponent;
       static::$_interfaces[$parentComponentString][$interface]
                                                              = $componentString;
@@ -64,7 +67,8 @@ final class LogicComponent extends \Cubex\Components\LogicComponent
     {
       foreach($interfaces as $interface => $component)
       {
-        $oldComponent                                      = static::$_interfaces[$parentComponent][$interface];
+        $oldComponent
+          = static::$_interfaces[$parentComponent][$interface];
         static::$_interfaces[$parentComponent][$interface] = $component;
         unset(static::$_tempBind[$parentComponent][$interface]);
 
@@ -79,7 +83,7 @@ final class LogicComponent extends \Cubex\Components\LogicComponent
   }
 
   /**
-   * @return \Cubex\Tests\ServiceManager
+   * @return \Cubex\ServiceManager\TestServiceManager
    */
   protected static function _getTestServiceManager()
   {

@@ -7,9 +7,9 @@ namespace Cubex\Cache\Tests;
 
 use Cubex\Cache\Memcache\Memcache;
 use Cubex\ServiceManager\ServiceConfig;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class MemcacheTest extends TestCase
+class MemcacheTest extends CubexTestCase
 {
   /**
    * @var \Cubex\Cache\Memcache\Memcache

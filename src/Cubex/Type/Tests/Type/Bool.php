@@ -6,10 +6,17 @@ namespace Cubex\Type\Tests\Type;
 
 use Cubex\Type\Enum;
 
+/**
+ * Class Bool
+ * @package Cubex\Type\Tests\Type
+ *
+ * @method static BOOL_TRUE
+ * @method static BOOL_FALSE
+ */
 class Bool extends Enum
 {
-  const __default = self::TRUE;
+  const __default = self::BOOL_TRUE;
 
-  const TRUE = "1";
-  const FALSE = "0";
+  const BOOL_TRUE = "1";
+  const BOOL_FALSE = "0";
 }

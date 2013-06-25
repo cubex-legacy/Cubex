@@ -7,10 +7,10 @@ namespace Cubex\Auth\Tests\Database;
 
 use Cubex\Auth\Database\DBAuth;
 use Cubex\ServiceManager\ServiceConfig;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 use Cubex\Foundation\Container;
 
-class DBAuthTest extends TestCase
+class DBAuthTest extends CubexTestCase
 {
   /**
    * @var \PHPUnit_Framework_MockObject_MockObject
@@ -18,7 +18,7 @@ class DBAuthTest extends TestCase
   private $_mockDbConnection;
 
   /**
-   * @var \Cubex\Tests\ServiceManager
+   * @var \Cubex\ServiceManager\TestServiceManager
    */
   private $_serviceManager;
 

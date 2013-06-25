@@ -5,9 +5,9 @@
 
 namespace Cubex\Bundle\Tests;
 
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class BundleTest extends TestCase
+class BundleTest extends CubexTestCase
 {
   /**
    * @var \Cubex\Bundle\Bundle

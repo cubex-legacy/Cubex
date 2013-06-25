@@ -4,10 +4,10 @@
  */
 namespace Cubex\Log\Tests;
 
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 use Psr\Log\LogLevel;
 
-class LoggerTest extends TestCase
+class LoggerTest extends CubexTestCase
 {
   public function testCorrectLevelPassed()
   {

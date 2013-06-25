@@ -6,9 +6,9 @@
 namespace Cubex\Cli\Tests;
 
 use Cubex\Cli\Shell;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class ShellTest extends TestCase
+class ShellTest extends CubexTestCase
 {
   private $_server;
 

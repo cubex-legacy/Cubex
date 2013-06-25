@@ -7,9 +7,9 @@ namespace Cubex\Cli\Tests;
 
 use Cubex\Cli\Dictionary;
 use Cubex\Foundation\Config\ConfigGroup;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class DictionaryTest extends TestCase
+class DictionaryTest extends CubexTestCase
 {
   private $_tasksArr = [
     "task1" => "class1",

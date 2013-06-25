@@ -3,9 +3,9 @@
  * @author gareth.evans
  */
 
-namespace Cubex\Tests;
+namespace Cubex\ServiceManager;
 
-class ServiceManager extends \Cubex\ServiceManager\ServiceManager
+class TestServiceManager extends ServiceManager
 {
   protected $_current = [];
 

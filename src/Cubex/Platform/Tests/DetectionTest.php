@@ -5,9 +5,9 @@
 namespace Cubex\Platform\Tests;
 
 use Cubex\Platform\Detection;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class DetectionTest extends TestCase
+class DetectionTest extends CubexTestCase
 {
   /**
    * @var \PHPUnit_Framework_MockObject_MockObject

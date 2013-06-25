@@ -4,12 +4,12 @@
  */
 namespace Cubex\Type\Tests;
 
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 use Cubex\Type\Tests\Type\Bool;
 use Cubex\Type\Tests\Type\EnumNoConstants;
 use Cubex\Type\Tests\Type\EnumNoDefault;
 
-class EnumTest extends TestCase
+class EnumTest extends CubexTestCase
 {
   public function testSomething()
   {
@@ -22,8 +22,8 @@ class EnumTest extends TestCase
 
   public function testSetAndToString()
   {
-    $enum = new Bool(Bool::TRUE);
-    $this->assertEquals($enum, Bool::TRUE);
+    $enum = new Bool(Bool::BOOL_TRUE);
+    $this->assertEquals($enum, Bool::BOOL_TRUE);
   }
 
   public function testExcptionThrownWhenNoDefaultSet()
@@ -55,8 +55,8 @@ class EnumTest extends TestCase
     $enum = new Bool();
 
     $constants = [
-      "TRUE"  => "1",
-      "FALSE" => "0"
+      "BOOL_TRUE"  => "1",
+      "BOOL_FALSE" => "0"
     ];
     $this->assertEquals($constants, $enum->getConstList());
 
@@ -66,15 +66,15 @@ class EnumTest extends TestCase
 
   public function testCallStatic()
   {
-    $enum = Bool::FALSE();
-    $this->assertEquals($enum, Bool::FALSE);
+    $enum = Bool::BOOL_FALSE();
+    $this->assertEquals($enum, Bool::BOOL_FALSE);
   }
 
   public function testConstantExists()
   {
     $enum = new Bool();
 
-    $this->assertTrue($enum->constantExists("true"));
+    $this->assertTrue($enum->constantExists("bool_true"));
     $this->assertFalse($enum->constantExists("random"));
   }
 }

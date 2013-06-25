@@ -2,9 +2,9 @@
 /**
  * @author: gareth.evans
  */
-namespace Cubex\Tests;
+namespace Cubex\Foundation\Tests;
 
-class Test extends TestCase
+class Test extends CubexTestCase
 {
   public function testTests()
   {

@@ -9,9 +9,9 @@ use Cubex\Foundation\Container;
 use Cubex\Cookie\EncryptedCookie;
 use Cubex\Cookie\StandardCookie;
 use Cubex\Encryption\Service\TestEncryption;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class CookieTest extends TestCase
+class CookieTest extends CubexTestCase
 {
   public function setUp()
   {
@@ -19,7 +19,7 @@ class CookieTest extends TestCase
     $sm = Container::get(Container::SERVICE_MANAGER);
 
     /**
-     * @var \Cubex\Tests\ServiceManager $sm
+     * @var \Cubex\ServiceManager\TestServiceManager $sm
      */
     $sm->tempBind("encryption", new TestEncryption());
   }
@@ -29,7 +29,7 @@ class CookieTest extends TestCase
     $sm = Container::get(Container::SERVICE_MANAGER);
 
     /**
-     * @var \Cubex\Tests\ServiceManager $sm
+     * @var \Cubex\ServiceManager\TestServiceManager $sm
      */
     $sm->clearTemp("encryption");
   }
@@ -56,7 +56,6 @@ class CookieTest extends TestCase
     $this->assertEquals(".example.com", $standardCookie->getDomain());
     $this->assertTrue($standardCookie->isSecure());
     $this->assertTrue($standardCookie->isHttponly());
-
 
     $encryptedCookie = new EncryptedCookie(
       "cookieTest",

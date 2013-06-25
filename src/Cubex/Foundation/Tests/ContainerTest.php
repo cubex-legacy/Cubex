@@ -5,9 +5,9 @@
 namespace Cubex\Foundation\Tests;
 
 use Cubex\Foundation\Container;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class ContainerTest extends TestCase
+class ContainerTest extends CubexTestCase
 {
   public function testGet()
   {

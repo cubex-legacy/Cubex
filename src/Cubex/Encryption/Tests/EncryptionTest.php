@@ -5,9 +5,9 @@
 namespace Cubex\Encryption\Tests;
 
 use Cubex\Encryption\Service\TestEncryption;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 
-class EncryptionTest extends TestCase
+class EncryptionTest extends CubexTestCase
 {
   private $_value;
   private $_valueReversed;

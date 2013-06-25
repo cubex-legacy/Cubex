@@ -6,10 +6,10 @@ namespace Cubex\Dispatch\Tests;
 
 use Cubex\FileSystem\FileSystem;
 use Cubex\Dispatch\DispatchMapper;
-use Cubex\Tests\TestCase;
+use Cubex\Foundation\Tests\CubexTestCase;
 use Cubex\Foundation\Container;
 
-class MapperTest extends TestCase
+class MapperTest extends CubexTestCase
 {
   /**
    * @var \Cubex\Foundation\Config\ConfigGroup
