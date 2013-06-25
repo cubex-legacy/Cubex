@@ -17,7 +17,7 @@ class ContainerTest extends CubexTestCase
     Container::bind("containertest.get", $this);
 
     $this->assertInstanceOf(
-      "\\Cubex\\Container\\Tests\\ContainerTest",
+      "\\Cubex\\Foundation\\Tests\\ContainerTest",
       Container::get("containertest.get")
     );
   }
@@ -27,7 +27,7 @@ class ContainerTest extends CubexTestCase
     Container::bind("containertest.bind", $this);
 
     $this->assertInstanceOf(
-      "\\Cubex\\Container\\Tests\\ContainerTest",
+      "\\Cubex\\Foundation\\Tests\\ContainerTest",
       Container::get("containertest.bind")
     );
   }
@@ -37,14 +37,14 @@ class ContainerTest extends CubexTestCase
     Container::bindif("containertest.bindif", $this);
 
     $this->assertInstanceOf(
-      "\\Cubex\\Container\\Tests\\ContainerTest",
+      "\\Cubex\\Foundation\\Tests\\ContainerTest",
       Container::get("containertest.bindif")
     );
 
     Container::bindIf("containertest.bindif", new \stdClass());
 
     $this->assertInstanceOf(
-      "\\Cubex\\Container\\Tests\\ContainerTest",
+      "\\Cubex\\Foundation\\Tests\\ContainerTest",
       Container::get("containertest.bindif")
     );
   }
@@ -56,7 +56,7 @@ class ContainerTest extends CubexTestCase
     Container::bind("containertest.bound", $this);
 
     $this->assertInstanceOf(
-      "\\Cubex\\Container\\Tests\\ContainerTest",
+      "\\Cubex\\Foundation\\Tests\\ContainerTest",
       Container::get("containertest.bound")
     );
   }
