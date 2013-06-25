@@ -203,7 +203,15 @@ class Webpage implements
     $head .= implode('', $this->_headerElements);
     $head .= $this->metaHTML();
 
-    return $head;
+    $cssBlockItems = new Partial('<style type="text/css">%s</style>');
+    $cssBlocks     = Resource::getResourceBlocks(TypeEnum::CSS());
+    if($cssBlocks)
+    {
+      $cssBlockItems->escapeInput(false);
+      $cssBlockItems->addElements($cssBlocks);
+    }
+
+    return (new RenderGroup())->add($head, $cssBlockItems);
   }
 
   /**

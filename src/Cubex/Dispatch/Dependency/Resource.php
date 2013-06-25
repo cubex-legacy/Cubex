@@ -32,7 +32,8 @@ class Resource extends Dependency
    * @var array
    */
   protected static $_blocks = array(
-    "js" => [],
+    "css" => [],
+    "js"  => [],
   );
 
   /**

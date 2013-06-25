@@ -44,6 +44,15 @@ trait RequireTrait
   }
 
   /**
+   * @param string $block
+   * @param null   $namespace
+   */
+  public function addCssBlock($block, $namespace = null)
+  {
+    $this->_addResourceBlock($block, TypeEnum::CSS(), $namespace);
+  }
+
+  /**
    * Specify an external CSS file to include with the external key
    *
    * @param string $file
