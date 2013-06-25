@@ -2,7 +2,7 @@
 /**
  * @author: gareth.evans
  */
-namespace Cubex\Container\Tests;
+namespace Cubex\Foundation\Tests;
 
 use Cubex\Foundation\Container;
 use Cubex\Tests\TestCase;
