@@ -23,9 +23,9 @@ class Dependency extends Dispatcher
     $package = false
   )
   {
-    $path    = ltrim($event->getFile(), "/");
-    $base    = substr($event->getFile(), 0, 1) === "/";
-    $domain  = $request->domain() . "." . $request->tld();
+    $path   = ltrim($event->getFile(), "/");
+    $base   = substr($event->getFile(), 0, 1) === "/";
+    $domain = $request->domain() . "." . $request->tld();
 
     if($event->isExternal())
     {
@@ -42,9 +42,10 @@ class Dependency extends Dispatcher
       $entity = $this->getFileSystem()->normalizePath($entity);
     }
 
-    $domainHash        = $this->generateDomainHash($domain);
-    $entityHash        = $this->generateEntityHash($entity);
-    $resourceHash      = $this->getNomapHash();
+    $domainHash   = $this->generateDomainHash($domain);
+    $entityHash   = $this->generateEntityHash($entity);
+    $resourceHash = $this->getNomapHash();
+    $ini = null;
 
     if($event->getSource() instanceof ITheme)
     {
@@ -53,7 +54,6 @@ class Dependency extends Dispatcher
         $event->getSource()->getIniFileDirectory(),
         false
       );
-      $entityHash = str_replace("/", ",", $relativePath);
 
       $themeIni = $this->getThemeConfig($relativePath);
       if(idx($themeIni, "res_dir", false))
@@ -62,8 +62,15 @@ class Dependency extends Dispatcher
           $relativePath . DS . $themeIni["res_dir"]
         );
       }
+
+      if($ini !== null)
+      {
+        $entityHash   = str_replace("/", ",", $relativePath);
+      }
+
     }
-    else
+
+    if($ini === null)
     {
       $ini = $this->getDispatchIni($entity);
     }
