@@ -14,6 +14,8 @@ use Cubex\Cookie\EncryptedCookie;
 class Auth extends BaseFacade
 {
   /**
+   * @param string $serviceName
+   *
    * @return \Cubex\Auth\IAuthService|null
    */
   public static function getAccessor($serviceName = "auth")
@@ -77,6 +79,16 @@ class Auth extends BaseFacade
       $user = static::_retrieveFromCookie();
     }
     return $user;
+  }
+
+  public static function hasLoginCookie()
+  {
+    return static::getAccessor()->hasLoginCookie();
+  }
+
+  public static function getRawUsername()
+  {
+    return static::getAccessor()->getRawUsername();
   }
 
   public static function logout($rememberUsername = false)

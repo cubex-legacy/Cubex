@@ -60,6 +60,22 @@ interface IAuthService extends IService
   public function retrieveLogin();
 
   /**
+   * This lets us now if the request has a login cookie. We don't know if it's
+   * authed but it's enough info to guess if they're logged in for some basic
+   * UI changes like displaying username.
+   *
+   * @return bool
+   */
+  public function hasLoginCookie();
+
+  /**
+   * Returned the username as set in the cookie
+   *
+   * @return null|string
+   */
+  public function getRawUsername();
+
+  /**
    * @return void|null|bool
    */
   public function logout();
