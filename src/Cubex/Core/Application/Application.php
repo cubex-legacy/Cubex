@@ -155,7 +155,9 @@ abstract class Application
 
     if(is_scalar($dispatcherResult))
     {
-      if(class_exists($dispatcherResult))
+      if(starts_with($dispatcherResult, '\\')
+      && class_exists($dispatcherResult)
+      )
       {
         $dispatcher = new $dispatcherResult;
       }
