@@ -431,12 +431,15 @@ class Resource extends Dependency
   {
     $fileReversed = strrev($file);
     $fileParts    = explode("/", $fileReversed, 2);
-    $package      = strrev($fileParts[1]);
-    $type         = (string)$type;
-
-    if(isset(self::$_packages[$type][$package]))
+    if(isset($fileParts[1]))
     {
-      return true;
+      $package = strrev($fileParts[1]);
+      $type    = (string)$type;
+
+      if(isset(self::$_packages[$type][$package]))
+      {
+        return true;
+      }
     }
 
     return false;
