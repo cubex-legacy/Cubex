@@ -21,4 +21,27 @@ interface IAuthedUser
    * @return array
    */
   public function getDetails();
+
+  /**
+   * @param string $key
+   *
+   * @return bool
+   */
+  public function hasDetail($key);
+
+  /**
+   * @param string $key
+   * @param mixed  $value
+   *
+   * @return $this
+   */
+  public function addDetail($key, $value);
+
+  /**
+   * @param string $key
+   * @param null   $default
+   *
+   * @return mixed
+   */
+  public function getDetail($key, $default = null);
 }
