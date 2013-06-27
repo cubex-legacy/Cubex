@@ -302,6 +302,7 @@ class RecordCollection extends Collection
   public function get()
   {
     list($query, $rows) = $this->_doQuery($this->_columns, true, true);
+    $this->clear();
 
     $allowLimit = $this->_limit === null;
     if($this->_offset == 0)
