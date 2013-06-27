@@ -5,7 +5,7 @@
 
 namespace Cubex\Auth\Tests\Database;
 
-use Cubex\Auth\Database\DBAuth;
+use Cubex\Auth\Services\DBAuth;
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\Foundation\Tests\CubexTestCase;
 use Cubex\Foundation\Container;
