@@ -3,7 +3,7 @@
  * @author  brooke.bryan
  */
 
-namespace Cubex\Auth\Database;
+namespace Cubex\Auth\Services;
 
 use Cubex\Auth\IAuthedUser;
 use Cubex\Auth\BaseAuthService;
