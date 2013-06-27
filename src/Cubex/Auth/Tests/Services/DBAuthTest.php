@@ -3,7 +3,7 @@
  * @author gareth.evans
  */
 
-namespace Cubex\Auth\Tests\Database;
+namespace Cubex\Auth\Tests\Services;
 
 use Cubex\Auth\Services\DBAuth;
 use Cubex\ServiceManager\ServiceConfig;
