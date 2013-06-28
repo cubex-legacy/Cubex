@@ -574,17 +574,7 @@ class ColumnFamily
     {
       if($this->isBatchOpen())
       {
-        if(isset($this->_batchMutation[$key][$this->name()]))
-        {
-          $this->_batchMutation[$key][$this->name()] = array_merge(
-            (array)$this->_batchMutation[$key][$this->name()],
-            $mutations
-          );
-        }
-        else
-        {
-          $this->_batchMutation[$key][$this->name()] = $mutations;
-        }
+        $this->_addToBatch($key, $mutations);
       }
       else
       {
@@ -701,17 +691,7 @@ class ColumnFamily
         {
           foreach($keys as $key)
           {
-            if(isset($this->_batchMutation[$key][$this->name()]))
-            {
-              $this->_batchMutation[$key][$this->name()] = array_merge(
-                (array)$this->_batchMutation[$key][$this->name()],
-                $mutations
-              );
-            }
-            else
-            {
-              $this->_batchMutation[$key][$this->name()] = $mutations;
-            }
+            $this->_addToBatch($key, $mutations);
           }
         }
       }
@@ -755,25 +735,16 @@ class ColumnFamily
       }
       else
       {
-        $mutations[] = new Mutation(
-          [
-          'column_or_supercolumn' => new ColumnOrSuperColumn(
-            ['counter_column' => $counter]
+        $this->_addToBatch(
+          $key,
+          new Mutation(
+            [
+            'column_or_supercolumn' => new ColumnOrSuperColumn(
+              ['counter_column' => $counter]
+            )
+            ]
           )
-          ]
         );
-
-        if(isset($this->_batchMutation[$key][$this->name()]))
-        {
-          $this->_batchMutation[$key][$this->name()] = array_merge(
-            (array)$this->_batchMutation[$key][$this->name()],
-            $mutations
-          );
-        }
-        else
-        {
-          $this->_batchMutation[$key][$this->name()] = $mutations;
-        }
       }
     }
     catch(\Exception $e)
@@ -967,7 +938,7 @@ class ColumnFamily
 
   public function isBatchOpen()
   {
-    return (bool)$this->_processingBatch;
+    return $this->_processingBatch || $this->connection()->isBatchOpen();
   }
 
   public function cancelBatch()
@@ -977,7 +948,7 @@ class ColumnFamily
     return $this;
   }
 
-  public function flushBatch()
+  public function flushBatch($atomic = false)
   {
     if($this->_batchMutation === null || empty($this->_batchMutation))
     {
@@ -987,7 +958,14 @@ class ColumnFamily
     $level = $this->writeConsistencyLevel();
     try
     {
-      $this->_client()->batch_mutate($this->_batchMutation, $level);
+      if($atomic)
+      {
+        $this->_client()->atomic_batch_mutate($this->_batchMutation, $level);
+      }
+      else
+      {
+        $this->_client()->batch_mutate($this->_batchMutation, $level);
+      }
     }
     catch(\Exception $e)
     {
@@ -1002,6 +980,43 @@ class ColumnFamily
     $this->flushBatch();
     $this->_processingBatch = false;
     return $this;
+  }
+
+  protected function _addToBatch($key, $mutations)
+  {
+    if($this->connection()->isBatchOpen())
+    {
+      $this->connection()->addToBatch($this->name(), $key, $mutations);
+    }
+    else
+    {
+      $cfName = $this->name();
+      if(! is_array($mutations))
+      {
+        $mutations = [$mutations];
+      }
+      if($this->_batchMutation === null)
+      {
+        $this->_batchMutation = [];
+      }
+
+      if(! isset($this->_batchMutation[$key]))
+      {
+        $this->_batchMutation[$key] = [];
+      }
+
+      if(isset($this->_batchMutation[$key][$cfName]))
+      {
+        $this->_batchMutation[$key][$cfName] = array_merge(
+          (array)$this->_batchMutation[$key][$cfName],
+          $mutations
+        );
+      }
+      else
+      {
+        $this->_batchMutation[$key][$cfName] = $mutations;
+      }
+    }
   }
 
   public function timestamp()

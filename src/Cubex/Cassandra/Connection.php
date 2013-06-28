@@ -5,6 +5,8 @@
 
 namespace Cubex\Cassandra;
 
+use cassandra\ConsistencyLevel;
+use cassandra\Mutation;
 use Thrift\Exception\TException;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Transport\TFramedTransport;
@@ -34,6 +36,9 @@ class Connection
   protected $_transport;
 
   protected $_connected;
+
+  protected $_processingBatch = false;
+  protected $_batchMutation = null;
 
   public function __construct(array $hosts = ['localhost'], $port = 9160)
   {
@@ -224,5 +229,100 @@ class Connection
   public function describeKeyspace($keyspace)
   {
     return $this->_describe("keyspace", null, [$keyspace]);
+  }
+
+  public function openBatch()
+  {
+    $this->_processingBatch = true;
+    return $this;
+  }
+
+  public function isBatchOpen()
+  {
+    return (bool)$this->_processingBatch;
+  }
+
+  public function cancelBatch()
+  {
+    $this->_batchMutation = null;
+    $this->closeBatch();
+    return $this;
+  }
+
+  public function flushBatch(
+    $atomic = true, $writeConsistencyLevel = ConsistencyLevel::QUORUM
+  )
+  {
+    if($this->_batchMutation === null || empty($this->_batchMutation))
+    {
+      return $this;
+    }
+
+    try
+    {
+      if($atomic)
+      {
+        $this->client()->atomic_batch_mutate(
+          $this->_batchMutation,
+          $writeConsistencyLevel
+        );
+      }
+      else
+      {
+        $this->client()->batch_mutate(
+          $this->_batchMutation,
+          $writeConsistencyLevel
+        );
+      }
+    }
+    catch(\Exception $e)
+    {
+      throw new CassandraException($e->getMessage(), $e->getCode(), $e);
+    }
+    $this->_batchMutation = null;
+    return $this;
+  }
+
+  public function closeBatch(
+    $atomic = true, $writeConsistencyLevel = ConsistencyLevel::QUORUM
+  )
+  {
+    $this->flushBatch($atomic, $writeConsistencyLevel);
+    $this->_processingBatch = false;
+    return $this;
+  }
+
+  /**
+   * @param string              $cfName
+   * @param string              $key
+   * @param Mutation|Mutation[] $mutations
+   */
+  public function addToBatch($cfName, $key, $mutations)
+  {
+    if(! is_array($mutations))
+    {
+      $mutations = [$mutations];
+    }
+    if($this->_batchMutation === null)
+    {
+      $this->_batchMutation = [];
+    }
+
+    if(! isset($this->_batchMutation[$key]))
+    {
+      $this->_batchMutation[$key] = [];
+    }
+
+    if(isset($this->_batchMutation[$key][$cfName]))
+    {
+      $this->_batchMutation[$key][$cfName] = array_merge(
+        (array)$this->_batchMutation[$key][$cfName],
+        $mutations
+      );
+    }
+    else
+    {
+      $this->_batchMutation[$key][$cfName] = $mutations;
+    }
   }
 }
