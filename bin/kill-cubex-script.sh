@@ -16,7 +16,7 @@ then
 else
   for P in $PID
   do
-          echo "Killing $CLASSNAME PID $P"
+          echo "Killing Cubex Class $CLASSNAME PID $P"
           kill $P
         done
 fi
