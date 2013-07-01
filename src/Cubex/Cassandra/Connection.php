@@ -33,6 +33,9 @@ class Connection
   protected $_client;
   protected $_socket;
   protected $_protocol;
+  /**
+   * @var TFramedTransport
+   */
   protected $_transport;
 
   protected $_connected;
@@ -148,6 +151,9 @@ class Connection
   public function disconnect()
   {
     $this->_client = null;
+    $this->_transport->close();
+    $this->_transport = null;
+    $this->_protocol = null;
     $this->_connected = false;
   }
 
