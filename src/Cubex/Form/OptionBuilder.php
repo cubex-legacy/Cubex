@@ -7,6 +7,7 @@ namespace Cubex\Form;
 
 use Cubex\Mapper\Database\RecordCollection;
 use Cubex\Mapper\Database\RecordMapper;
+use Cubex\Mapper\DataMapper;
 use Cubex\Type\Enum;
 
 class OptionBuilder
@@ -60,17 +61,25 @@ class OptionBuilder
 
   public function fromCollection(RecordCollection $c)
   {
-    $c->setLimit(0, 51);
-    if($c->count() > 50)
+    $c->setLimit(0, 101);
+    if($c->count() > 100)
     {
       //TODO: Has Many Results, should switch to ajax textbox
     }
     $options     = [];
     $attrName    = null;
-    $attrOptions = ['name', 'description', 'display'];
+    $attrOptions = [
+      'name',
+      'description',
+      'display',
+      'display_name',
+      'display_value',
+      'option_name',
+      'id'
+    ];
     foreach($c as $option)
     {
-      if($option instanceof RecordMapper)
+      if($option instanceof DataMapper)
       {
         if($attrName === null)
         {
@@ -79,8 +88,8 @@ class OptionBuilder
             if($option->hasAttribute($opt))
             {
               $attrName = $opt;
+              break;
             }
-            break;
           }
         }
 
