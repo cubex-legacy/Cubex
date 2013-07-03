@@ -157,6 +157,28 @@ if(!function_exists("starts_with"))
   }
 }
 
+if(!function_exists("starts_with_any"))
+{
+  /**
+   * @param       $haystack
+   * @param array $needles
+   * @param bool  $case
+   *
+   * @return bool
+   */
+  function starts_with_any($haystack, array $needles, $case = true)
+  {
+    foreach($needles as $needle)
+    {
+      if(starts_with($haystack, $needle, $case))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
 if(!function_exists("ends_with"))
 {
   /**
@@ -169,6 +191,28 @@ if(!function_exists("ends_with"))
   function ends_with($haystack, $needle, $case = true)
   {
     return starts_with(strrev($haystack), strrev($needle), $case);
+  }
+}
+
+if(!function_exists("ends_with_any"))
+{
+  /**
+   * @param       $haystack
+   * @param array $needles
+   * @param bool  $case
+   *
+   * @return bool
+   */
+  function ends_with_any($haystack, array $needles, $case = true)
+  {
+    foreach($needles as $needle)
+    {
+      if(ends_with($haystack, $needle, $case))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
