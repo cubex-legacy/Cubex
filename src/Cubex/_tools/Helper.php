@@ -269,3 +269,35 @@ if(!function_exists("get_namespace"))
     return implode('\\', $source);
   }
 }
+
+if(! function_exists('build_path'))
+{
+  /**
+   * Concatenate any number of path sections and correctly
+   * handle directory separators
+   *
+   * @return string
+   */
+  function build_path(/* string... */)
+  {
+    $args = func_get_args();
+
+    $fullPath = "";
+    foreach($args as $section)
+    {
+      if(!empty($section))
+      {
+        if($fullPath == "")
+        {
+          $fullPath = $section;
+        }
+        else
+        {
+          $fullPath = rtrim($fullPath, '/\\') . DS . ltrim($section, '/\\');
+        }
+      }
+    }
+
+    return $fullPath;
+  }
+}
