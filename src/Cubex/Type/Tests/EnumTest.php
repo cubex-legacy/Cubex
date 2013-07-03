@@ -77,4 +77,43 @@ class EnumTest extends CubexTestCase
     $this->assertTrue($enum->constantExists("bool_true"));
     $this->assertFalse($enum->constantExists("random"));
   }
+
+  public function testIs()
+  {
+    $enum = new Bool(BOOL::BOOL_TRUE);
+
+    $this->assertTrue($enum->is(BOOL::BOOL_TRUE));
+    $this->assertFalse($enum->is(BOOL::BOOL_FALSE));
+  }
+
+  /**
+   * @dataProvider compareCouples
+   */
+  public function testMatch($shouldMatch, $val1, $val2, $strict)
+  {
+    if($shouldMatch)
+    {
+      $this->assertTrue(Bool::match($val1, $val2, $strict));
+    }
+    else
+    {
+      $this->assertFalse(Bool::match($val1, $val2, $strict));
+    }
+  }
+
+  public function compareCouples()
+  {
+    return [
+      [true, 1, 1, true],
+      [true, new Bool(), new Bool(), true],
+      [true, new Bool(), 1, true],
+      [true, new Bool(), Bool::BOOL_TRUE, true],
+      [false, 1, 2, true],
+      [false, new Bool(), new Bool(BOOL::BOOL_FALSE), true],
+      [false, new Bool(), 0, true],
+      [false, new Bool(), Bool::BOOL_FALSE, true],
+      [true, "foo", "foo", false],
+      [false, "foo", "foo", true],
+    ];
+  }
 }
