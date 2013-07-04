@@ -6,13 +6,19 @@
 namespace Cubex\Components;
 
 use Cubex\Core\Interfaces\INamespaceAware;
+use Cubex\Data\Batching\Batching;
+use Cubex\Data\Batching\IBatchable;
 use Cubex\ServiceManager\ServiceManager;
 
 /**
  * A Logic component should contain Interface typehints
+ *
+ * @property BatchOperation[] $_batchOperations
  */
-abstract class LogicComponent implements IComponent, INamespaceAware
+abstract class LogicComponent implements IComponent, INamespaceAware, IBatchable
 {
+  use Batching;
+
   public function __construct()
   {
     if(!isset(static::$_interfaces[get_called_class()]))
@@ -35,6 +41,30 @@ abstract class LogicComponent implements IComponent, INamespaceAware
 
     $reflector = new \ReflectionClass(get_called_class());
     return $reflector->getName();
+  }
+
+  /**
+   * @param BatchOperation $operation
+   *
+   * @return $this
+   */
+  protected function _addToBatch(BatchOperation $operation)
+  {
+    $this->_batchOperations[] = $operation;
+
+    return $this;
+  }
+
+  public function flushBatch()
+  {
+    foreach($this->_batchOperations as $operation)
+    {
+      call_user_func_array($operation->getCallable(), $operation->getArgs());
+    }
+
+    $this->_batchOperations = [];
+
+    return $this;
   }
 
   protected function _docLines()
