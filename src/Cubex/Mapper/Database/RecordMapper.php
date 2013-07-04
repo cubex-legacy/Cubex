@@ -236,7 +236,15 @@ abstract class RecordMapper extends DataMapper
 
     $query = ParseQuery::parse($connection, $args);
 
-    $rows = $connection->getRows($query);
+    try
+    {
+      $rows = $connection->getRows($query);
+    }
+    catch(\Exception $e)
+    {
+      $rows = false;
+    }
+
     if(!$rows)
     {
       if($connection->errorNo() == 1146)
