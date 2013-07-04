@@ -49,6 +49,17 @@ class DateTimeHelper
     $pattern = "Y-m-d H:i:s"
   )
   {
+    return self::dateTimeFromAnything($anything)->format($pattern);
+  }
+
+  /**
+   * @param mixed $anything
+   *
+   * @return \DateTime
+   * @throws \InvalidArgumentException
+   */
+  public static function dateTimeFromAnything($anything)
+  {
     $type = gettype($anything);
 
     switch($type)
@@ -56,28 +67,28 @@ class DateTimeHelper
       case "object":
         if($anything instanceof \DateTime)
         {
-          return $anything->format($pattern);
+          return $anything;
         }
         break;
       case "integer":
-        return date($pattern, $anything);
+        return (new \DateTime())->setTimestamp($anything);
       case "string":
-        if(strlen($anything) === strlen((int)$anything))
+        if(ctype_digit($anything))
         {
-          return date($pattern, $anything);
+          return (new \DateTime())->setTimestamp((int)$anything);
         }
 
         $anything = strtotime($anything);
         if($anything !== false)
         {
-          return date($pattern, $anything);
+          return (new \DateTime())->setTimestamp($anything);
         }
 
         break;
     }
 
     throw new \InvalidArgumentException(
-      "Failed Converting param of type '{$type}' to '{$pattern}'"
+      "Failed Converting param of type '{$type}' to DateTime object"
     );
   }
 
