@@ -595,16 +595,22 @@ class RecordCollection extends Collection
    * @param $column
    * @param $value1
    * @param $value2
+   * @param $type
    *
    * @return $this
    */
-  public function whereBetween($column, $value1, $value2 = null)
+  public function whereBetween($column, $value1, $value2 = null, $type = "s")
   {
     if($value2 === null && is_array($value1))
     {
       list($value1, $value2) = array_values($value1);
     }
-    $this->loadWhereAppend("%C BETWEEN %s AND %s", $column, $value1, $value2);
+    $this->loadWhereAppend(
+      "%C BETWEEN %{$type} AND %{$type}",
+      $column,
+      $value1,
+      $value2
+    );
     return $this;
   }
 
