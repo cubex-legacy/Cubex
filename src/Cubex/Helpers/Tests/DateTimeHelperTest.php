@@ -63,7 +63,6 @@ class DateTimeHelperTest extends CubexTestCase
         (new \DateTime())->setTimestamp(strtotime("13-05-12")),
         (new \DateTime())->setTimestamp(strtotime("13-05-12"))
       ],
-      ["+4 days", (new \DateTime())->setTimestamp(strtotime("+4 days"))],
     ];
   }
 
@@ -82,7 +81,6 @@ class DateTimeHelperTest extends CubexTestCase
         'D M j G:i:s T Y',
         "Sun May 12 0:00:00 BST 2013"
       ],
-      ["+4 days", 'Y-m-d H:i:s', date('Y-m-d H:i:s', strtotime("+4 days"))],
     ];
   }
 }
