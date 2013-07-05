@@ -10,17 +10,12 @@ use Cubex\Detection\IDetection;
 interface IPlatformDetection extends IDetection
 {
   /**
-   * @return bool
+   * @return string
    */
-  public function isMobile();
+  public function getPlatform();
 
   /**
-   * @return bool
+   * @return string
    */
-  public function isTablet();
-
-  /**
-   * @return bool
-   */
-  public function isDesktop();
+  public function getVersion();
 }

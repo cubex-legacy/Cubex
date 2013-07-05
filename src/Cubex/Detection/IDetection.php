@@ -10,11 +10,6 @@ use Cubex\ServiceManager\IService;
 interface IDetection extends IService
 {
   /**
-   * @return bool
-   */
-  public function canSetUserAgent();
-
-  /**
    * @param string $userAgent
    *
    * @return mixed

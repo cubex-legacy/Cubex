@@ -30,10 +30,10 @@ class Detection extends BaseFacade
   /**
    * @param string $serviceName
    *
-   * @return \Cubex\Detection\OperatingSystem\IOperatingSystemDetection
+   * @return \Cubex\Detection\Platform\IPlatformDetection
    */
-  public static function getOperatingSystemAccessor(
-    $serviceName = 'detection\operatingsystem'
+  public static function getPlatformAccessor(
+    $serviceName = 'detection\platform'
   )
   {
     return static::getAccessor($serviceName);
@@ -42,10 +42,10 @@ class Detection extends BaseFacade
   /**
    * @param string $serviceName
    *
-   * @return \Cubex\Detection\Platform\IPlatformDetection
+   * @return \Cubex\Detection\Device\IDeviceDetection
    */
-  public static function getPlatformAccessor(
-    $serviceName = 'detection\platform'
+  public static function getDeviceAccessor(
+    $serviceName = 'detection\device'
   )
   {
     return static::getAccessor($serviceName);
@@ -71,16 +71,16 @@ class Detection extends BaseFacade
     return static::getBrowserAccessor()->getVersion();
   }
 
-  /****************************
-   * Operating System Detection
-   ****************************/
+  /********************
+   * Platform Detection
+   ********************/
 
   /**
    * @return string
    */
   public static function getOperatingSystem()
   {
-    return static::getOperatingSystemAccessor()->getOpertatingSystem();
+    return static::getPlatformAccessor()->getPlatform();
   }
 
   /**
@@ -88,19 +88,19 @@ class Detection extends BaseFacade
    */
   public static function getOperatingSystemVersion()
   {
-    return static::getOperatingSystemAccessor()->getVersion();
+    return static::getPlatformAccessor()->getVersion();
   }
 
-  /********************
-   * Platform Detection
-   ********************/
+  /******************
+   * Device Detection
+   ******************/
 
   /**
    * @return bool
    */
   public static function isMobile()
   {
-    return static::getPlatformAccessor()->isMobile();
+    return static::getDeviceAccessor()->isMobile();
   }
 
   /**
@@ -108,7 +108,7 @@ class Detection extends BaseFacade
    */
   public static function isTablet()
   {
-    return static::getPlatformAccessor()->isTablet();
+    return static::getDeviceAccessor()->isTablet();
   }
 
   /**
@@ -116,6 +116,6 @@ class Detection extends BaseFacade
    */
   public static function isDesktop()
   {
-    return static::getPlatformAccessor()->isDesktop();
+    return static::getDeviceAccessor()->isDesktop();
   }
 }

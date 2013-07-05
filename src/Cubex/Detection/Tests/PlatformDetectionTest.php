@@ -16,7 +16,7 @@ class PlatformDetectionTest extends CubexTestCase
   public function setUp()
   {
     $this->_detectionMock = $this->getMock(
-      "\\Cubex\\Detection\\Platform\\IPlatformDetection"
+      "\\Cubex\\Detection\\Device\\IDeviceDetection"
     );
   }
 
@@ -34,7 +34,7 @@ class PlatformDetectionTest extends CubexTestCase
       ->will($this->returnValue(true));
 
     /**
-     * @var \Cubex\Platform\Detection\IDetectionService $detectionMock
+     * @var \Cubex\Detection\Device\IDeviceDetection $detectionMock
      */
 
     $this->assertFalse($detectionMock->isMobile());
