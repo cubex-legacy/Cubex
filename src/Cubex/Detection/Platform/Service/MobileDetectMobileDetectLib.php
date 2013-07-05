@@ -2,25 +2,21 @@
 /**
  * @author: gareth.evans
  */
-namespace Cubex\Platform\Detection\Service;
+namespace Cubex\Detection\Platform\Service;
 
-use Cubex\Platform\Detection\IDetectionService;
+use Cubex\Detection\Platform\IPlatformDetection;
 use Cubex\ServiceManager\ServiceConfig;
 
-class MobileDetectMobileDetectLib implements IDetectionService
+class MobileDetectMobileDetectLib implements IPlatformDetection
 {
   /**
    * @var \Mobile_Detect
    */
   protected $_detection;
 
-  public function __construct()
-  {
-    $this->_detection = new \Mobile_Detect();
-  }
-
   public function configure(ServiceConfig $config)
   {
+    $this->_detection = new \Mobile_Detect();
   }
 
   public function isMobile()
@@ -43,7 +39,7 @@ class MobileDetectMobileDetectLib implements IDetectionService
     return true;
   }
 
-  public function setUserAgent(array $userAgent)
+  public function setUserAgent($userAgent)
   {
     $this->_detection->setUserAgent($userAgent);
 

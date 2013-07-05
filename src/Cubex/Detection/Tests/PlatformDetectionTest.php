@@ -2,12 +2,11 @@
 /**
  * @author: gareth.evans
  */
-namespace Cubex\Platform\Tests;
+namespace Cubex\Detection\Tests;
 
-use Cubex\Platform\Detection;
 use Cubex\Foundation\Tests\CubexTestCase;
 
-class DetectionTest extends CubexTestCase
+class PlatformDetectionTest extends CubexTestCase
 {
   /**
    * @var \PHPUnit_Framework_MockObject_MockObject
@@ -17,7 +16,7 @@ class DetectionTest extends CubexTestCase
   public function setUp()
   {
     $this->_detectionMock = $this->getMock(
-      "\\Cubex\\Platform\\Detection\\IDetectionService"
+      "\\Cubex\\Detection\\Platform\\IPlatformDetection"
     );
   }
 
