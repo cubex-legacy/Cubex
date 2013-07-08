@@ -78,7 +78,7 @@ class Detection extends BaseFacade
   /**
    * @return string
    */
-  public static function getOperatingSystem()
+  public static function getPlatform()
   {
     return static::getPlatformAccessor()->getPlatform();
   }
@@ -86,7 +86,7 @@ class Detection extends BaseFacade
   /**
    * @return string
    */
-  public static function getOperatingSystemVersion()
+  public static function getPlatformVersion()
   {
     return static::getPlatformAccessor()->getVersion();
   }
