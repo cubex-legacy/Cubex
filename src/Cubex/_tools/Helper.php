@@ -280,10 +280,38 @@ if(! function_exists('build_path'))
    */
   function build_path(/* string... */)
   {
-    $args = func_get_args();
+    return build_path_custom(DS, func_get_args());
+  }
+}
 
+if(! function_exists('build_path_win'))
+{
+  function build_path_win(/* string... */)
+  {
+    return build_path_custom('\\', func_get_args());
+  }
+}
+
+if(! function_exists('build_path_unix'))
+{
+  function build_path_unix(/* string... */)
+  {
+    return build_path_custom('/', func_get_args());
+  }
+}
+
+if(! function_exists('build_path_custom'))
+{
+  /**
+   * @param string   $directorySeparator
+   * @param string[] $pathComponents
+   *
+   * @return string
+   */
+  function build_path_custom($directorySeparator, array $pathComponents)
+  {
     $fullPath = "";
-    foreach($args as $section)
+    foreach($pathComponents as $section)
     {
       if(!empty($section))
       {
@@ -293,7 +321,8 @@ if(! function_exists('build_path'))
         }
         else
         {
-          $fullPath = rtrim($fullPath, '/\\') . DS . ltrim($section, '/\\');
+          $fullPath = rtrim($fullPath, '/\\' . $directorySeparator) .
+            $directorySeparator . ltrim($section, '/\\' . $directorySeparator);
         }
       }
     }
@@ -301,3 +330,4 @@ if(! function_exists('build_path'))
     return $fullPath;
   }
 }
+
