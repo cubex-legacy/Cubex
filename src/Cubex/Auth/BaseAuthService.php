@@ -82,6 +82,7 @@ abstract class BaseAuthService implements IAuthService
     }
     catch(\Exception $e)
     {
+      // TODO: log exception. This could be a setup error
       $user = null;
     }
 
