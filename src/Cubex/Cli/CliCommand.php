@@ -592,6 +592,19 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
   }
 
   /**
+   * Check is an argument has been configured
+   *
+   * @param $name
+   *
+   * @return bool
+   */
+  public function argumentIsConfigured($name)
+  {
+    return (isset($this->_argsByName[$name])
+    || isset($this->_argsByShortName[$name]));
+  }
+
+  /**
    * Check if a command-line argument was provided
    *
    * @param string $longArgName The long name of the argument
@@ -715,13 +728,13 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
 
   public function __get($name)
   {
-    if($this->argumentIsSet($name))
+    if($this->argumentIsConfigured($name))
     {
       return $this->argumentValue($name);
     }
     else
     {
-      throw new \Exception("The arg '$name' has not been set.");
+      throw new \Exception("The arg '$name' has not been configured.");
     }
   }
 
