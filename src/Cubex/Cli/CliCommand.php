@@ -715,7 +715,14 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
 
   public function __get($name)
   {
-    return $this->argumentValue($name);
+    if($this->argumentIsSet($name))
+    {
+      return $this->argumentValue($name);
+    }
+    else
+    {
+      throw new \Exception("The arg '$name' has not been set.");
+    }
   }
 
   public function nonCallableMethods()
