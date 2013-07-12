@@ -5,6 +5,8 @@
 
 namespace Cubex\Data\Validator;
 
+use Cubex\Type\Enum;
+
 class Validator
 {
   const VALIDATE_EMAIL      = '\Cubex\Data\Validator\Validator::email';
@@ -23,6 +25,8 @@ class Validator
   const VALIDATE_BASE64     = '\Cubex\Data\Validator\Validator::base64';
   const VALIDATE_URL        = '\Cubex\Data\Validator\Validator::url';
   const VALIDATE_DOMAIN     = '\Cubex\Data\Validator\Validator::domain';
+  const VALIDATE_ENUM       = '\Cubex\Data\Validator\Validator::enum';
+  const VALIDATE_CONST      = '\Cubex\Data\Validator\Validator::constant';
 
   /**
    * @param $email
@@ -39,7 +43,6 @@ class Validator
 
     return true;
   }
-
 
   public static function length($string, $min = 1, $max = null)
   {
@@ -250,6 +253,25 @@ class Validator
       throw new \Exception('Invalid Domain');
     }
 
+    return true;
+  }
+
+  public static function enum($input, Enum $type)
+  {
+    if(!$type->constantExists($input))
+    {
+      throw new \Exception("Invalid " . get_class($type));
+    }
+    return true;
+  }
+
+  public static function constant($input, $type)
+  {
+    $reflect = new \ReflectionObject($type);
+    if(!$reflect->getConstant(strtoupper($input)))
+    {
+      throw new \Exception("Invalid " . get_class($type) . ' constant');
+    }
     return true;
   }
 }
