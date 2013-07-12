@@ -7,6 +7,8 @@ namespace Cubex\Cli;
 
 use Cubex\Data\DocBlock\DocBlockParser;
 use Cubex\Data\DocBlock\IDocBlockAware;
+use Cubex\Data\Filter\Filter;
+use Cubex\Data\Validator\Validator;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Helpers\Strings;
 use Cubex\Loader;
@@ -112,6 +114,11 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
     {
       $this->_logger->setLogLevel($this->argumentValue('log-level'));
     }
+
+    if($this->argumentIsSet('echo-level'))
+    {
+      $this->_echoLevel = $this->argumentValue('echo-level');
+    }
   }
 
   /**
@@ -187,6 +194,7 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
       }
     }
 
+    static::_addEchoLevelArgIfRequired();
     static::_addLogLevelArgIfRequired();
   }
 
@@ -203,31 +211,26 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
         CliArgument::VALUE_REQUIRED, 'level'
       );
 
-      $arg->addFilter(
-        function ($value)
-        {
-          return strtolower(trim($value));
-        }
-      );
-      $arg->addValidator(
-        function ($value)
-        {
-          switch($value)
-          {
-            case LogLevel::EMERGENCY:
-            case LogLevel::ALERT:
-            case LogLevel::CRITICAL:
-            case LogLevel::ERROR:
-            case LogLevel::WARNING:
-            case LogLevel::NOTICE:
-            case LogLevel::INFO:
-            case LogLevel::DEBUG:
-              return true;
-          }
-          return false;
-        }
+      $arg->addFilter(Filter::FILTER_LOWER);
+      $arg->addFilter(Filter::FILTER_TRIM);
+      $arg->addValidator(Validator::VALIDATE_CONST, [new LogLevel]);
+      $this->_options[]              = $arg;
+      $this->_argsByName[$arg->name] = $arg;
+    }
+  }
+
+  protected function _addEchoLevelArgIfRequired()
+  {
+    if(!isset($this->_argsByName['echo-level']))
+    {
+      $arg = new CliArgument(
+        'echo-level', 'Set the output logging level', '',
+        CliArgument::VALUE_REQUIRED, 'level'
       );
 
+      $arg->addFilter(Filter::FILTER_LOWER);
+      $arg->addFilter(Filter::FILTER_TRIM);
+      $arg->addValidator(Validator::VALIDATE_CONST, [new LogLevel]);
       $this->_options[]              = $arg;
       $this->_argsByName[$arg->name] = $arg;
     }
