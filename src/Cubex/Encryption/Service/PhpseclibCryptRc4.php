@@ -1,7 +1,7 @@
 <?php
 /**
- * Requires https://packagist.org/packages/onigoetz/phpseclib
- * require: "onigoetz/phpseclib": "dev-master"
+ * Requires https://packagist.org/packages/phpseclib/phpseclib
+ * require: "phpseclib/phpseclib": "dev-master"
  *
  * @author  gareth.evans
  */
