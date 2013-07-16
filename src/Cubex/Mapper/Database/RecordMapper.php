@@ -799,94 +799,50 @@ abstract class RecordMapper extends DataMapper
     return $schema;
   }
 
+  public static function aggregate(
+    $method = 'count', $key = "id", $where = null, $skipFirstWhere = false
+  )
+  {
+    if($where !== null && $skipFirstWhere)
+    {
+      array_shift($where);
+      if(empty($where))
+      {
+        $where = null;
+      }
+    }
+
+    $aggregate = new Aggregate(new static);
+    if($where !== null)
+    {
+      call_user_func_array([$aggregate, "where"], $where);
+    }
+    return $aggregate->$method($key);
+  }
+
   public static function min($key = 'id')
   {
-    $a = new Aggregate(new static);
-    if(func_num_args() > 1)
-    {
-      $args = func_get_args();
-      array_shift($args);
-      call_user_func_array(
-        [
-        $a,
-        'where'
-        ],
-        $args
-      );
-    }
-    return $a->min($key);
+    return static::aggregate(__FUNCTION__, $key, func_get_args(), true);
   }
 
   public static function max($key = 'id')
   {
-    $a = new Aggregate(new static);
-    if(func_num_args() > 1)
-    {
-      $args = func_get_args();
-      array_shift($args);
-      call_user_func_array(
-        [
-        $a,
-        'where'
-        ],
-        $args
-      );
-    }
-    return $a->max($key);
+    return static::aggregate(__FUNCTION__, $key, func_get_args(), true);
   }
 
   public static function avg($key = 'id')
   {
-    $a = new Aggregate(new static);
-    if(func_num_args() > 1)
-    {
-      $args = func_get_args();
-      array_shift($args);
-      call_user_func_array(
-        [
-        $a,
-        'where'
-        ],
-        $args
-      );
-    }
-    return $a->avg($key);
+    return static::aggregate(__FUNCTION__, $key, func_get_args(), true);
   }
 
   public static function sum($key = 'id')
   {
-    $a = new Aggregate(new static);
-    if(func_num_args() > 1)
-    {
-      $args = func_get_args();
-      array_shift($args);
-      call_user_func_array(
-        [
-        $a,
-        'where'
-        ],
-        $args
-      );
-    }
-    return $a->sum($key);
+    return static::aggregate(__FUNCTION__, $key, func_get_args(), true);
   }
 
   public static function count($key = 'id')
   {
-    $a = new Aggregate(new static);
-    if(func_num_args() > 1)
-    {
-      $args = func_get_args();
-      array_shift($args);
-      call_user_func_array(
-        [
-        $a,
-        'where'
-        ],
-        $args
-      );
-    }
-    return $a->count($key);
+    return static::aggregate(__FUNCTION__, $key, func_get_args(), true);
   }
 
   /**
