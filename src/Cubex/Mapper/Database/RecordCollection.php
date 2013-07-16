@@ -328,7 +328,7 @@ class RecordCollection extends Collection
       {
         $map = clone $this->_mapperType;
         $map->disableLoading();
-        $map->hydrate((array)$row, true);
+        $map->hydrate((array)$row, true, 'dynamic');
         $map->setExists(true);
         $this->addMapper($map);
 

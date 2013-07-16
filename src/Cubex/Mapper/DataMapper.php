@@ -938,7 +938,12 @@ abstract class DataMapper
         $exists = $this->attributeExists($k);
         if(!$exists && $createAttributes)
         {
-          $this->_addAttribute(new Attribute($k));
+          $newattr = new Attribute($k);
+          if($createAttributes === 'dynamic')
+          {
+            $newattr->setSaveToDatabase(false);
+          }
+          $this->_addAttribute($newattr);
           $exists = true;
         }
 
