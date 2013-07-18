@@ -24,8 +24,9 @@ class TemplatedView implements IRenderable, INamespaceAware, IDataHandler
   protected $_directory = '';
   protected $_entity;
   protected $_namespaceCache;
+  protected $_extension;
 
-  public function __construct($template, $entity)
+  public function __construct($template, $entity, $extension = 'phtml')
   {
     if($entity instanceof IController)
     {
@@ -40,6 +41,7 @@ class TemplatedView implements IRenderable, INamespaceAware, IDataHandler
       );
     }
 
+    $this->_extension = $extension;
     $this->_entity    = $entity;
     $this->_directory = $entity->containingDirectory();
     $this->_directory .= '/Templates/';
@@ -82,6 +84,12 @@ class TemplatedView implements IRenderable, INamespaceAware, IDataHandler
     return $this;
   }
 
+  public function setExtension($extension = 'phtml')
+  {
+    $this->_extension = $extension;
+    return $this;
+  }
+
   public function setTemplate($fileName = 'default')
   {
     $this->_template = $fileName;
@@ -90,12 +98,12 @@ class TemplatedView implements IRenderable, INamespaceAware, IDataHandler
 
   public function getFilePath()
   {
-    return $this->_directory . '/' . $this->_template . '.phtml';
+    return $this->_directory . '/' . $this->_template . '.' . $this->_extension;
   }
 
   public function getRenderFiles()
   {
     $brander = new Branding\TemplateBranding($this->_directory);
-    return $brander->buildFileList($this->_template, 'phtml');
+    return $brander->buildFileList($this->_template, $this->_extension);
   }
 }
