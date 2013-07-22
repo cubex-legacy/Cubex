@@ -115,9 +115,10 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
       $this->_logger->setLogLevel($this->argumentValue('log-level'));
     }
 
-    if($this->argumentIsSet('echo-level'))
+    if($this->_autoLog && $this->argumentIsSet('echo-level'))
     {
       $this->_echoLevel = $this->argumentValue('echo-level');
+      $this->_logger->setEchoLevel($this->_echoLevel);
     }
   }
 
