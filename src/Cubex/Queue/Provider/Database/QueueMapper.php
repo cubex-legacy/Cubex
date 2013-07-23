@@ -25,6 +25,11 @@ class QueueMapper extends RecordMapper
    */
   public $attempts = 0;
 
+  /**
+   * @datatype DateTime
+   */
+  public $availableFrom;
+
   protected function _configure()
   {
     $this->_attribute("data")->setSerializer(Attribute::SERIALIZATION_JSON);

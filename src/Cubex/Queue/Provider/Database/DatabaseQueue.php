@@ -6,6 +6,7 @@
 namespace Cubex\Queue\Provider\Database;
 
 use Cubex\FileSystem\FileSystem;
+use Cubex\Helpers\DateTimeHelper;
 use Cubex\Helpers\Strings;
 use Cubex\Mapper\Database\RecordCollection;
 use Cubex\Queue\IQueue;
@@ -20,11 +21,14 @@ class DatabaseQueue implements IQueueProvider
 
   protected $_map;
 
-  public function push(IQueue $queue, $data = null)
+  public function push(IQueue $queue, $data = null, $delay = 0)
   {
-    $mapper            = $this->_queueMapper(true);
-    $mapper->queueName = $queue->name();
-    $mapper->data      = $data;
+    $mapper                = $this->_queueMapper(true);
+    $mapper->queueName     = $queue->name();
+    $mapper->data          = $data;
+    $mapper->availableFrom = DateTimeHelper::dateTimeFromAnything(
+      time() + $delay
+    );
     $mapper->saveChanges();
   }
 
@@ -42,7 +46,7 @@ class DatabaseQueue implements IQueueProvider
 
       $collection->runQuery(
         "UPDATE %T SET %C = %d, %C = %s " .
-        "WHERE %C = %s AND %C = %d LIMIT 1",
+        "WHERE %C = %s AND %C = %d AND %C <= NOW() LIMIT 1",
         $mapper->getTableName(),
         'locked',
         1,
@@ -51,6 +55,7 @@ class DatabaseQueue implements IQueueProvider
         'queue_name',
         $queue->name(),
         'locked',
+        'availableFrom',
         0
       );
 

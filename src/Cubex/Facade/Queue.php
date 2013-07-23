@@ -31,9 +31,9 @@ class Queue extends BaseFacade
     return static::getServiceManager()->get($queue);
   }
 
-  public static function push(\Cubex\Queue\IQueue $queue, $message)
+  public static function push(\Cubex\Queue\IQueue $queue, $message, $delay = 0)
   {
-    return static::getAccessor()->push($queue, $message);
+    return static::getAccessor()->push($queue, $message, $delay);
   }
 
   public static function consume(

@@ -14,7 +14,7 @@ class BlackholeQueue implements IQueueProvider
 {
   use ServiceConfigTrait;
 
-  public function push(IQueue $queue, $data = null)
+  public function push(IQueue $queue, $data = null, $delay = 0)
   {
     return true;
   }

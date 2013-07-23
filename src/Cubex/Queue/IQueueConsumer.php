@@ -24,5 +24,9 @@ interface IQueueConsumer
    */
   public function waitTime($waits = 0);
 
+  /**
+   * This method will be called once all the items in the queue have been
+   * consumed, and the consumer is about to shut down
+   */
   public function shutdown();
 }
