@@ -20,8 +20,8 @@ class Relationship
     if($foreignKey === null)
     {
       $foreignKey = strtolower(class_shortname($source)) . '_id';
-      $foreignKey = $source->stringToColumnName($foreignKey);
     }
+    $foreignKey = $source->stringToColumnName($foreignKey);
 
     $source->setRecentRelationKey($foreignKey);
 
@@ -64,8 +64,8 @@ class Relationship
     if($foreignKey === null)
     {
       $foreignKey = strtolower(class_shortname($source)) . '_id';
-      $foreignKey = $source->stringToColumnName($foreignKey);
     }
+    $foreignKey = $source->stringToColumnName($foreignKey);
 
     $entity->setRecentRelationKey($foreignKey);
     $entity->setFromRelationshipType(RecordMapper::RELATIONSHIP_HASMANY);
@@ -91,8 +91,8 @@ class Relationship
     if($foreignKey === null)
     {
       $foreignKey = strtolower(class_shortname($entity)) . '_id';
-      $foreignKey = $source->stringToColumnName($foreignKey);
     }
+    $foreignKey = $source->stringToColumnName($foreignKey);
 
     $entity->setFromRelationshipType(RecordMapper::RELATIONSHIP_BELONGSTO);
 
@@ -108,8 +108,8 @@ class Relationship
         if($localKey === null)
         {
           $localKey = strtolower(class_shortname($source)) . '_id';
-          $localKey = $source->stringToColumnName($localKey);
         }
+        $localKey = $source->stringToColumnName($localKey);
 
         $entity->setRecentRelationKey($foreignKey);
 
