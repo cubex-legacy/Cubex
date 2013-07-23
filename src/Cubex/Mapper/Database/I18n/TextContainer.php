@@ -18,6 +18,9 @@ abstract class TextContainer extends RecordMapper
    * @length   2
    */
   public $language;
+  /**
+   * @length 255
+   */
   public $text;
   /**
    * @var \Cubex\Mapper\DataMapper
