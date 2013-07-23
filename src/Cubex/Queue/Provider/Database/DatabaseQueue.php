@@ -55,8 +55,8 @@ class DatabaseQueue implements IQueueProvider
         'queue_name',
         $queue->name(),
         'locked',
-        'availableFrom',
-        0
+        0,
+        'available_from'
       );
 
       $mapper = $collection->loadOneWhere(
