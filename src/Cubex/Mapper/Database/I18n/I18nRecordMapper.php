@@ -104,7 +104,7 @@ abstract class I18nRecordMapper extends RecordMapper
     foreach($names as $name)
     {
       $attr = new CallbackAttribute($name);
-      $attr->setCallback([$this, "saveProperty"]);
+      $attr->setCallback("saveProperty");
       $attr->setStoreOriginal(false);
       $this->_addAttribute($attr);
     }
