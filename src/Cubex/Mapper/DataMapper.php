@@ -185,7 +185,7 @@ abstract class DataMapper
       $class = new \ReflectionClass($calledClass);
       foreach($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $p)
       {
-        $value = ['description' => [], 'default' => $p->getValue($this)];
+        $value = ['description' => null, 'default' => $p->getValue($this)];
 
         $docBlock = Strings::docCommentLines($p->getDocComment());
         foreach($docBlock as $docLine)
@@ -206,7 +206,7 @@ abstract class DataMapper
               case 'description':
                 if($docValue !== true)
                 {
-                  $value['description'][] = trim($docValue);
+                  $value['description'] = trim($docValue);
                 }
                 break;
               case 'filter':
@@ -223,10 +223,6 @@ abstract class DataMapper
                 );
                 break;
             }
-          }
-          else
-          {
-            $value['description'][] = trim($docLine);
           }
         }
 
@@ -261,9 +257,9 @@ abstract class DataMapper
           }
         }
 
-        if(!empty($prop['description']))
+        if($prop['description'] !== null)
         {
-          $attr->setDescription(implode("\n", $prop['description']));
+          $attr->setDescription($prop['description']);
         }
         $attr->setSourcePropertyName($propName);
         $this->_addReflectedAttribute($attr);
