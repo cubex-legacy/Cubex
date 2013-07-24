@@ -53,6 +53,28 @@ class DatabaseQueue implements IQueueProvider
     $consumer->shutdown();
   }
 
+  protected function _lockRecords(IQueue $queue, $limit = 1)
+  {
+    $mapper     = $this->_queueMapper(true);
+    $collection = new RecordCollection($mapper);
+
+    $collection->runQuery(
+      "UPDATE %T SET %C = %d, %C = %s " .
+      "WHERE %C = %s AND %C = %d AND %C <= NOW() LIMIT " . $limit,
+      $mapper->getTableName(),
+      'locked',
+      1,
+      'locked_by',
+      $this->_ownKey,
+      'queue_name',
+      $queue->name(),
+      'locked',
+      0,
+      'available_from'
+    );
+    return $collection;
+  }
+
   protected function _consumeBatch(IQueue $queue, IBatchQueueConsumer $consumer)
   {
     $batchSize = (int)$consumer->getBatchSize();
@@ -66,24 +88,7 @@ class DatabaseQueue implements IQueueProvider
 
     while(true)
     {
-      $mapper     = $this->_queueMapper(true);
-      $collection = new RecordCollection($mapper);
-
-      $collection->runQuery(
-        "UPDATE %T SET %C = %d, %C = %s " .
-        "WHERE %C = %s AND %C = %d AND %C <= NOW() LIMIT " . $batchSize,
-        $mapper->getTableName(),
-        'locked',
-        1,
-        'locked_by',
-        $this->_ownKey,
-        'queue_name',
-        $queue->name(),
-        'locked',
-        0,
-        'available_from'
-      );
-
+      $collection   = $this->_lockRecords($queue, $batchSize);
       $batchMappers = $collection->loadWhere(
         ['locked' => 1, 'locked_by' => $this->_ownKey]
       )->get();
@@ -142,25 +147,8 @@ class DatabaseQueue implements IQueueProvider
 
     while(true)
     {
-      $mapper     = $this->_queueMapper(true);
-      $collection = new RecordCollection($mapper);
-
-      $collection->runQuery(
-        "UPDATE %T SET %C = %d, %C = %s " .
-        "WHERE %C = %s AND %C = %d AND %C <= NOW() LIMIT 1",
-        $mapper->getTableName(),
-        'locked',
-        1,
-        'locked_by',
-        $this->_ownKey,
-        'queue_name',
-        $queue->name(),
-        'locked',
-        0,
-        'available_from'
-      );
-
-      $mapper = $collection->loadOneWhere(
+      $collection = $this->_lockRecords($queue, 1);
+      $mapper     = $collection->loadOneWhere(
         ['locked' => 1, 'locked_by' => $this->_ownKey]
       );
 
