@@ -5,6 +5,7 @@
 
 namespace Cubex\Queue\Provider\Blackhole;
 
+use Cubex\Queue\IBatchQueueConsumer;
 use Cubex\Queue\IQueue;
 use Cubex\Queue\IQueueConsumer;
 use Cubex\Queue\IQueueProvider;
@@ -22,5 +23,9 @@ class BlackholeQueue implements IQueueProvider
   public function consume(IQueue $queue, IQueueConsumer $consumer)
   {
     $consumer->process($queue, ['processor' => 'blackhole']);
+    if($consumer instanceof IBatchQueueConsumer)
+    {
+      $consumer->runBatch();
+    }
   }
 }
