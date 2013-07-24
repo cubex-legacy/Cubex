@@ -10,7 +10,7 @@ class CallbackAttribute extends Attribute
   protected $_callback;
   protected $_storeOriginal = true;
 
-  public function setCallback(callable $callback)
+  public function setCallback($callback)
   {
     $this->_callback = $callback;
     return $this;
@@ -32,12 +32,19 @@ class CallbackAttribute extends Attribute
     return $this->storeOriginal();
   }
 
-  public function saveAttribute()
+  public function saveAttribute($source = null)
   {
     $cb = $this->_callback;
     if(is_callable($cb))
     {
       return $cb($this);
+    }
+    else if(is_scalar($cb))
+    {
+      if(method_exists($source, $cb))
+      {
+        $source->$cb($this);
+      }
     }
     return false;
   }

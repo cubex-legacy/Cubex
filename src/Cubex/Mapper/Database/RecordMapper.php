@@ -747,7 +747,7 @@ abstract class RecordMapper extends DataMapper
         /**
          * @var $attr CallbackAttribute
          */
-        $attr->saveAttribute();
+        $attr->saveAttribute($this);
       }
     }
 
