@@ -34,6 +34,7 @@ class Attribute implements IValidatable, IFilterable, \JsonSerializable
   protected $_hidden = false;
   protected $_requireUnserialize = false;
   protected $_saveable = true;
+  protected $_description;
 
   public function __construct(
     $name,
@@ -49,6 +50,17 @@ class Attribute implements IValidatable, IFilterable, \JsonSerializable
     $this->setOptions($options);
     $this->setSerializer($serializer);
     $this->_modified = false;
+  }
+
+  public function setDescription($description)
+  {
+    $this->_description = $description;
+    return $this;
+  }
+
+  public function getDescription()
+  {
+    return $this->_description;
   }
 
   public function setSourcePropertyName($name)
