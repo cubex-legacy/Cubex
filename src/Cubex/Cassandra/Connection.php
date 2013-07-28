@@ -141,11 +141,7 @@ class Connection
 
   public function isConnected()
   {
-    if($this->_connected === null)
-    {
-      $this->client();
-    }
-    return $this->_connected;
+    return (bool)$this->_connected;
   }
 
   public function disconnect()
@@ -153,7 +149,7 @@ class Connection
     $this->_client = null;
     $this->_transport->close();
     $this->_transport = null;
-    $this->_protocol = null;
+    $this->_protocol  = null;
     $this->_connected = false;
   }
 
@@ -305,7 +301,7 @@ class Connection
    */
   public function addToBatch($cfName, $key, $mutations)
   {
-    if(! is_array($mutations))
+    if(!is_array($mutations))
     {
       $mutations = [$mutations];
     }
@@ -314,7 +310,7 @@ class Connection
       $this->_batchMutation = [];
     }
 
-    if(! isset($this->_batchMutation[$key]))
+    if(!isset($this->_batchMutation[$key]))
     {
       $this->_batchMutation[$key] = [];
     }
