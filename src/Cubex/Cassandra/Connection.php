@@ -93,6 +93,11 @@ class Connection
     return $this;
   }
 
+  public function getHosts()
+  {
+    return $this->_hosts;
+  }
+
   public function addHost($host, $port = null)
   {
     $this->_hosts[] = $host;
