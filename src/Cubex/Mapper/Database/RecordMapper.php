@@ -984,14 +984,27 @@ abstract class RecordMapper extends DataMapper
     return $table !== null;
   }
 
-  public function createTable()
+  public function createTable($dropIfExists = false)
   {
-    if(!$this->tableExists())
+    $exists = $this->tableExists();
+    if(!$exists || $dropIfExists)
     {
+      if($dropIfExists && $exists)
+      {
+        $this->dropTable();
+      }
       $build = new DBBuilder($this->connection(), $this, true);
       return $build->success();
     }
     return true;
+  }
+
+  public function dropTable()
+  {
+    return $this->connection(ConnectionMode::WRITE)->query(
+      "DROP TABLE %T",
+      $this->getTableName()
+    );
   }
 
   protected function _makeCacheKey($key = null)
