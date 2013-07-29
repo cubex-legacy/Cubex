@@ -1022,7 +1022,7 @@ abstract class DataMapper
     return $this->_deleteTimestamp;
   }
 
-  protected function _updateTimestamps()
+  protected function _updateTimestamps($forceCreatedUpdate = false)
   {
     if(!$this->_autoTimestamp)
     {
@@ -1030,7 +1030,7 @@ abstract class DataMapper
     }
 
     $this->setData($this->updatedAttribute(), $this->currentDateTime());
-    if(!$this->exists())
+    if(!$this->exists() || $forceCreatedUpdate)
     {
       $this->setData($this->createdAttribute(), $this->currentDateTime());
     }
@@ -1141,6 +1141,37 @@ abstract class DataMapper
         $this->deleteCache();
       }
     }
+  }
+
+  /**
+   * @param bool|array $validate   all fields, or array of fields to validate
+   * @param bool       $processAll Process all validators, or fail on first
+   * @param bool       $failFirst  Perform all checks within a validator
+   *
+   * @return bool
+   */
+  public function saveAsNew(
+    $validate = false, $processAll = false, $failFirst = false
+  )
+  {
+    $this->setExists(false);
+
+    $config = $this->getConfiguration();
+    if(isset($config[static::CONFIG_IDS])
+    && $config[static::CONFIG_IDS] !== static::ID_COMPOSITE
+    )
+    {
+      $this->setId(null);
+    }
+
+    foreach($this->getRawAttributes() as $attr)
+    {
+      $attr->setModified();
+    }
+
+    $this->_updateTimestamps(true);
+
+    return $this->saveChanges($validate, $processAll, $failFirst);
   }
 
   /**
