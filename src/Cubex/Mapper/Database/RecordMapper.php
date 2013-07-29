@@ -1002,7 +1002,7 @@ abstract class RecordMapper extends DataMapper
   public function dropTable()
   {
     return $this->connection(ConnectionMode::WRITE)->query(
-      "DROP TABLE %T",
+      "DROP TABLE IF EXISTS %T",
       $this->getTableName()
     );
   }
