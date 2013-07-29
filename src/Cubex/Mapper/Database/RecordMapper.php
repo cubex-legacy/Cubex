@@ -191,9 +191,7 @@ abstract class RecordMapper extends DataMapper
       }
     }
 
-    $connection = $this->connection(
-      new ConnectionMode(ConnectionMode::READ)
-    );
+    $connection = $this->connection(ConnectionMode::READ());
 
     $idAttr = $this->getAttribute($this->getIdKey());
     if($idAttr instanceof CompositeAttribute)
@@ -325,9 +323,7 @@ abstract class RecordMapper extends DataMapper
     $this->deleteEphemeralCache();
     if($this->exists())
     {
-      $connection = $this->connection(
-        new ConnectionMode(ConnectionMode::WRITE)
-      );
+      $connection = $this->connection(ConnectionMode::WRITE());
 
       $pattern = $this->idPattern();
       $pattern = 'DELETE FROM %T WHERE ' . $pattern;
@@ -396,7 +392,7 @@ abstract class RecordMapper extends DataMapper
   {
     if($mode === null)
     {
-      $mode = new ConnectionMode(ConnectionMode::READ);
+      $mode = ConnectionMode::READ();
     }
 
     $connection = Container::servicemanager()->getWithType(
@@ -545,7 +541,7 @@ abstract class RecordMapper extends DataMapper
 
     $this->_changes = [];
 
-    $connection = $this->connection(new ConnectionMode(ConnectionMode::WRITE));
+    $connection = $this->connection(ConnectionMode::WRITE());
     $modified   = $this->getModifiedAttributes();
     $updates    = $inserts = array();
     $cache      = EphemeralCache::getCache($this->id(), $this, null);
@@ -993,7 +989,9 @@ abstract class RecordMapper extends DataMapper
       {
         $this->dropTable();
       }
-      $build = new DBBuilder($this->connection(), $this, true);
+      $build = new DBBuilder(
+        $this->connection(ConnectionMode::WRITE()), $this, true
+      );
       return $build->success();
     }
     return true;
@@ -1001,7 +999,7 @@ abstract class RecordMapper extends DataMapper
 
   public function dropTable()
   {
-    return $this->connection(ConnectionMode::WRITE)->query(
+    return $this->connection(ConnectionMode::WRITE())->query(
       "DROP TABLE IF EXISTS %T",
       $this->getTableName()
     );
