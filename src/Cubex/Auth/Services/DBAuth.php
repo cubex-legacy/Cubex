@@ -22,6 +22,7 @@ class DBAuth extends BaseAuthService implements IServiceManagerAware
 
   protected $_config;
   protected $_fields;
+  protected $_detailFields;
   protected $_table;
   protected $_connectionName;
 
@@ -54,11 +55,26 @@ class DBAuth extends BaseAuthService implements IServiceManagerAware
   {
     $args = func_get_args();
     array_shift($args);
-    $query = "SELECT %C,%C FROM %T WHERE " . $pattern;
+
+    $selectFieldCount = count($this->_detailFields);
+    $selectFieldCount++;
+    $query = "SELECT " . str_repeat('%C,', $selectFieldCount) . "%C ";
+    $query .= "FROM %T WHERE " . $pattern;
+
     array_unshift($args, $this->_table);
     array_unshift($args, $this->_fields['username']);
     array_unshift($args, $this->_fields['id']);
+
+    if($this->_detailFields !== null)
+    {
+      foreach($this->_detailFields as $dt)
+      {
+        array_unshift($args, $dt);
+      }
+    }
+
     array_unshift($args, $query);
+
     $formed = ParseQuery::parse($this->_connection(), $args);
 
     $user = $this->_connection()->getRow($formed);
@@ -66,7 +82,14 @@ class DBAuth extends BaseAuthService implements IServiceManagerAware
     {
       $idField   = $this->_fields['id'];
       $userField = $this->_fields['username'];
-      return new StdAuthedUser($user->$idField, $user->$userField);
+
+      $details = array();
+      foreach($this->_detailFields as $dt)
+      {
+        $details[$dt] = $user->$dt;
+      }
+
+      return new StdAuthedUser($user->$idField, $user->$userField, $details);
     }
     else
     {
@@ -103,6 +126,8 @@ class DBAuth extends BaseAuthService implements IServiceManagerAware
     $this->_fields['username'] = $config->getStr('field_user', 'username');
     $this->_fields['password'] = $config->getStr('field_pass', 'password');
     $this->_fields['id']       = $config->getStr('field_id', 'id');
+
+    $this->_detailFields = $config->getArr('detail_fields');
 
     $this->_table          = $config->getStr('table', 'users');
     $this->_connectionName = $config->getStr('connection', 'db');
