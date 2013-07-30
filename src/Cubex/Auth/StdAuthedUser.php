@@ -17,7 +17,7 @@ class StdAuthedUser implements IAuthedUser
   {
     $this->_id       = $id;
     $this->_username = $username;
-    $this->_details  = $details;
+    $this->_details  = (object)$details;
   }
 
   /**
@@ -51,7 +51,7 @@ class StdAuthedUser implements IAuthedUser
    */
   public function hasDetail($key)
   {
-    return isset($this->_details[$key]);
+    return isset($this->_details->$key);
   }
 
   /**
@@ -62,7 +62,7 @@ class StdAuthedUser implements IAuthedUser
    */
   public function addDetail($key, $value)
   {
-    $this->_details[$key] = $value;
+    $this->_details->$key = $value;
   }
 
   /**
@@ -75,7 +75,7 @@ class StdAuthedUser implements IAuthedUser
   {
     if($this->hasDetail($key))
     {
-      return $this->_details[$key];
+      return $this->_details->$key;
     }
 
     return $default;
