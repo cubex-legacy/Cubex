@@ -20,12 +20,22 @@ class DBAuth extends BaseAuthService implements IServiceManagerAware
 {
   use ServiceManagerAwareTrait;
 
+  /**
+   * @var ServiceConfig
+   */
   protected $_config;
   protected $_fields;
   protected $_detailFields;
   protected $_table;
   protected $_connectionName;
+  /**
+   * @var ILoginCredentials
+   */
+  protected $_credentials;
 
+  /**
+   * @return \Cubex\Database\IDatabaseService
+   */
   protected function _connection()
   {
     return $this->getServiceManager()->getWithType(
@@ -53,17 +63,23 @@ class DBAuth extends BaseAuthService implements IServiceManagerAware
 
   protected function _getResult($pattern)
   {
+    $idField       = $this->_fields['id'];
+    $userField     = $this->_fields['username'];
+    $passwordField = $this->_fields['password'];
+
     $args = func_get_args();
     array_shift($args);
 
     $selectFieldCount = count($this->_detailFields);
-    $selectFieldCount++;
+    $selectFieldCount = $selectFieldCount + 2;
+
     $query = "SELECT " . str_repeat('%C,', $selectFieldCount) . "%C ";
     $query .= "FROM %T WHERE " . $pattern;
 
     array_unshift($args, $this->_table);
-    array_unshift($args, $this->_fields['username']);
-    array_unshift($args, $this->_fields['id']);
+    array_unshift($args, $passwordField);
+    array_unshift($args, $userField);
+    array_unshift($args, $idField);
 
     if($this->_detailFields !== null)
     {
@@ -80,21 +96,26 @@ class DBAuth extends BaseAuthService implements IServiceManagerAware
     $user = $this->_connection()->getRow($formed);
     if($user)
     {
-      $idField   = $this->_fields['id'];
-      $userField = $this->_fields['username'];
-
-      $details = array();
-      foreach($this->_detailFields as $dt)
+      $pass = true;
+      if($this->_credentials !== null)
       {
-        $details[$dt] = $user->$dt;
+        $pass = $this->_validatePassword(
+          $this->_credentials->getPassword(),
+          $user->$passwordField
+        );
       }
-
-      return new StdAuthedUser($user->$idField, $user->$userField, $details);
+      $this->_credentials = null;
+      if($pass)
+      {
+        $details = array();
+        foreach($this->_detailFields as $dt)
+        {
+          $details[$dt] = $user->$dt;
+        }
+        return new StdAuthedUser($user->$idField, $user->$userField, $details);
+      }
     }
-    else
-    {
-      return null;
-    }
+    return null;
   }
 
   /**
@@ -104,13 +125,27 @@ class DBAuth extends BaseAuthService implements IServiceManagerAware
    */
   public function authByCredentials(ILoginCredentials $credentials)
   {
+    $this->_credentials = $credentials;
     return $this->_getResult(
-      "%C = %s AND %C = %s",
+      "%C = %s",
       $this->_fields['username'],
-      $credentials->getUsername(),
-      $this->_fields['password'],
-      $credentials->getPassword()
+      $credentials->getUsername()
     );
+  }
+
+  protected function _validatePassword($entered, $dbvalue)
+  {
+
+    $callback = $this->_config->getStr("password_callback", null);
+    $options  = $this->_config->getArr("password_callback_opts", []);
+    if($callback !== null)
+    {
+      return call_user_func($callback, $entered, $dbvalue, $options);
+    }
+    else
+    {
+      return $entered === $dbvalue;
+    }
   }
 
   /**
