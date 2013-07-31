@@ -243,9 +243,10 @@ class CliLogger
       $errMsg = 'PHP ERROR';
     }
 
-    $errMsg .= ' in ' . $event->getStr('errFile');
-    $errMsg .= ' at line ' . $event->getInt('errLine') . ' : ';
+    $errMsg .= ' : ';
     $errMsg .= $event->getStr('errMsg');
+    $errMsg .= ' in ' . $event->getStr('errFile');
+    $errMsg .= ' on line ' . $event->getInt('errLine');
 
     switch($event->getInt('errNo'))
     {
