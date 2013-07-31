@@ -556,6 +556,19 @@ class RecordCollection extends Collection
   }
 
   /**
+   * @param        $column
+   * @param array  $array
+   * @param string $type sprintf type (s|d|f)
+   *
+   * @return $this
+   */
+  public function whereNotIn($column, array $array, $type = 's')
+  {
+    $this->loadWhereAppend("%C NOT IN (%L$type)", $column, $array);
+    return $this;
+  }
+
+  /**
    * @param $column
    * @param $value
    *
