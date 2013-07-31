@@ -846,5 +846,13 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
         )
       );
     }
+
+    if($errNo == E_RECOVERABLE_ERROR)
+    {
+      trigger_error(
+        $errMsg . ' in ' . $errFile . ' on line ' . $errLine,
+        E_USER_ERROR
+      );
+    }
   }
 }
