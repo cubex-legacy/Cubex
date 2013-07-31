@@ -91,6 +91,15 @@ class WebpageController extends BaseController
     return $this;
   }
 
+  public function tryNest($name, $content)
+  {
+    if($content instanceof IRenderable)
+    {
+      return $this->nest($name, $content);
+    }
+    return false;
+  }
+
   public function renderBefore($name, IRenderable $item)
   {
     $this->_webpage->layout()->renderBefore($name, $item);
