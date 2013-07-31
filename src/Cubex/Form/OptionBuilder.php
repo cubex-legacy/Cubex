@@ -19,7 +19,7 @@ class OptionBuilder
     $this->_source = $source;
   }
 
-  public function getOptions()
+  public function getOptions($displayAttributes = null)
   {
     if($this->_source === null)
     {
@@ -35,18 +35,18 @@ class OptionBuilder
 
     if($this->_source instanceof RecordCollection)
     {
-      return $this->fromCollection($this->_source);
+      return $this->fromCollection($this->_source, $displayAttributes);
     }
 
     if($this->_source instanceof RecordMapper)
     {
-      return $this->fromRecordMapper($this->_source);
+      return $this->fromRecordMapper($this->_source, $displayAttributes);
     }
 
     return null;
   }
 
-  public function fromRecordMapper(RecordMapper $map)
+  public function fromRecordMapper(RecordMapper $map, $displayAttributes = null)
   {
     if($map->fromRelationshipType() == RecordMapper::RELATIONSHIP_BELONGSTO
     || $map->fromRelationshipType() == RecordMapper::RELATIONSHIP_HASONE
@@ -54,12 +54,12 @@ class OptionBuilder
     {
       $collection = new RecordCollection($map);
       $collection->loadAll();
-      return $this->fromCollection($collection);
+      return $this->fromCollection($collection, $displayAttributes);
     }
     return [];
   }
 
-  public function fromCollection(RecordCollection $c)
+  public function fromCollection(RecordCollection $c, $displayAttributes = null)
   {
     $c->setLimit(0, 101);
     if($c->count() > 100)
@@ -77,6 +77,12 @@ class OptionBuilder
       'option_name',
       'id'
     ];
+
+    if($displayAttributes !== null)
+    {
+      $attrOptions = array_merge((array)$displayAttributes, $attrOptions);
+    }
+
     foreach($c as $option)
     {
       if($option instanceof DataMapper)
