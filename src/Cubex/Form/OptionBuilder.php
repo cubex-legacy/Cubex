@@ -19,6 +19,11 @@ class OptionBuilder
     $this->_source = $source;
   }
 
+  /**
+   * @param array|null $displayAttributes
+   *
+   * @return array|null
+   */
   public function getOptions($displayAttributes = null)
   {
     if($this->_source === null)
