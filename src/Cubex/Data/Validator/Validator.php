@@ -262,7 +262,7 @@ class Validator
     {
       throw new \Exception(
         "Invalid " . get_class($type) . ".\nAvailable values: " .
-        implode(", ", $type->getConstList()) . "."
+        implode(", ", array_keys($type->getConstList())) . "."
       );
     }
     return true;
