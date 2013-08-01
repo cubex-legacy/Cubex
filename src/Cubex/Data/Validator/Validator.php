@@ -260,7 +260,10 @@ class Validator
   {
     if(!$type->constantExists($input))
     {
-      throw new \Exception("Invalid " . get_class($type));
+      throw new \Exception(
+        "Invalid " . get_class($type) . ".\nAvailable values: " .
+        implode(", ", $type->getConstList()) . "."
+      );
     }
     return true;
   }
