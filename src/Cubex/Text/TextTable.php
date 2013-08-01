@@ -39,6 +39,8 @@ class TextTable
   {
     $this->_decorator = $decorator;
     $this->_decorator->setTable($this);
+
+    return $this;
   }
 
   public function appendRows($rows)
@@ -47,11 +49,15 @@ class TextTable
     {
       $this->appendRow($row);
     }
+
+    return $this;
   }
 
   public function appendSpacer()
   {
     $this->_rows[] = self::SPACER;
+
+    return $this;
   }
 
   public function appendRow($data)
@@ -79,11 +85,15 @@ class TextTable
     }
 
     $this->_rows[] = $data;
+
+    return $this;
   }
 
   public function appendSubHeading($text)
   {
     $this->_rows[] = self::SUBHEADING . $text;
+
+    return $this;
   }
 
   protected function _ackColumnLength($column, $length)
