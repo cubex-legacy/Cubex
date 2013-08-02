@@ -175,6 +175,16 @@ class StdRouter implements IRouter
     if($match)
     {
       $route->setMatchedOn($matchedOn);
+
+      foreach($matches as $k => $v)
+      {
+        //Strip out all non declared matches
+        if(!\is_numeric($k))
+        {
+          $route->addRouteData($k, $v);
+        }
+      }
+
       if($route->hasSubRoutes())
       {
         $subRoutes = $route->subRoutes();
@@ -193,14 +203,7 @@ class StdRouter implements IRouter
           }
         }
       }
-      foreach($matches as $k => $v)
-      {
-        //Strip out all non declared matches
-        if(!\is_numeric($k))
-        {
-          $route->addRouteData($k, $v);
-        }
-      }
+
       return $route;
     }
 
