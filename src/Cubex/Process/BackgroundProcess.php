@@ -7,8 +7,8 @@ namespace Cubex\Process;
 
 abstract class BackgroundProcess
 {
-  public $childPid;
-  public $parentPid;
+  private $_childPid;
+  private $_parentPid;
   private $_killOnParentExit;
   private $_started;
   private $_returnCode;
@@ -21,8 +21,8 @@ abstract class BackgroundProcess
 
   public function __construct($killOnParentExit = false)
   {
-    $this->parentPid = posix_getpid();
-    $this->childPid = -1;
+    $this->_parentPid = posix_getpid();
+    $this->_childPid = -1;
     $this->_killOnParentExit = $killOnParentExit;
     $this->_started = false;
     $this->_returnCode = 0;
@@ -44,7 +44,7 @@ abstract class BackgroundProcess
     if($childPid > 0)
     {
       // Parent process
-      $this->childPid = $childPid;
+      $this->_childPid = $childPid;
       $this->_started = true;
       if($this->_killOnParentExit)
       {
@@ -54,7 +54,7 @@ abstract class BackgroundProcess
     else
     {
       // Child process
-      $this->childPid = posix_getpid();
+      $this->_childPid = posix_getpid();
       $this->_started = true;
       $retval = $this->execute();
       die($retval);
@@ -81,7 +81,7 @@ abstract class BackgroundProcess
     if($this->_started)
     {
       $status = null;
-      pcntl_waitpid($this->childPid, $status);
+      pcntl_waitpid($this->_childPid, $status);
       $this->_started = false;
       $this->_returnCode = pcntl_wexitstatus($status);
     }
@@ -96,7 +96,27 @@ abstract class BackgroundProcess
   {
     if($this->_started)
     {
-      posix_kill($this->childPid, $signal);
+      posix_kill($this->_childPid, $signal);
     }
+  }
+
+  /**
+   * The parent PID
+   *
+   * @return int
+   */
+  public function parentPid()
+  {
+    return $this->_parentPid;
+  }
+
+  /**
+   * The child PID
+   *
+   * @return int
+   */
+  public function childPid()
+  {
+    return $this->_childPid;
   }
 }
