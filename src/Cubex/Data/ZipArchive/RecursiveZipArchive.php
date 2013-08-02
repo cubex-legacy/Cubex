@@ -14,7 +14,7 @@ class RecursiveZipArchive extends \ZipArchive
     );
     foreach($iterator as $file)
     {
-      /***
+      /**
        * @var $file \SplFileInfo
        */
       if(in_array($file->getFilename(), ['.', '..']))
