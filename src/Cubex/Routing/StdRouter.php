@@ -164,7 +164,7 @@ class StdRouter implements IRouter
 
     if(!$match)
     {
-      $routePattern = $this->convertSimpleRoute($routePattern);
+      $routePattern = self::convertSimpleRoute($routePattern);
       $match        = preg_match(
         "#^{$routePattern}{$routeEnd}#",
         $pattern,
@@ -216,7 +216,7 @@ class StdRouter implements IRouter
    *
    * @return mixed
    */
-  public function convertSimpleRoute($route)
+  public static function convertSimpleRoute($route)
   {
     $idPat = "(_?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)";
     $repl  = [];
