@@ -22,18 +22,6 @@ class CliLogger
   public $logPhpErrors = true;
   public $logUnhandledExceptions = true;
 
-  // Log levels in order of importance
-  protected $_allLogLevels = [
-    LogLevel::EMERGENCY,
-    LogLevel::ALERT,
-    LogLevel::CRITICAL,
-    LogLevel::ERROR,
-    LogLevel::WARNING,
-    LogLevel::NOTICE,
-    LogLevel::INFO,
-    LogLevel::DEBUG
-  ];
-
   protected $_phpErrors = [
     E_ERROR             => 'ERROR',
     E_WARNING           => 'WARNING',
@@ -67,7 +55,7 @@ class CliLogger
     $this->_logLevel  = $logLevel;
 
     // find the longest level string we will encounter
-    foreach($this->_allLogLevels as $level)
+    foreach(Log::$logLevels as $level)
     {
       $len = strlen($level);
       if($len > $this->_longestLevel)
@@ -147,14 +135,6 @@ class CliLogger
     }
   }
 
-  protected function _logLevelLessThanOrEqual($checkLevel, $baselineLevel)
-  {
-    return array_search($checkLevel, $this->_allLogLevels) <= array_search(
-      $baselineLevel,
-      $this->_allLogLevels
-    );
-  }
-
   protected function _logLevelToDisplay($level)
   {
     $spaces = $this->_longestLevel - strlen($level);
@@ -169,14 +149,13 @@ class CliLogger
     ) . str_repeat(' ', $endSpaces) . ']';
   }
 
-
   public function handleLogEvent(IEvent $event)
   {
     $logData = $event->getData();
     $level   = $logData['level'];
     $logDate = date($this->_dateFormat) . " ";
 
-    if($this->_logLevelLessThanOrEqual($level, $this->_echoLevel))
+    if(Log::logLevelAllowed($level, $this->_echoLevel))
     {
       $color = null;
       switch($level)
@@ -220,7 +199,7 @@ class CliLogger
     $logMsg = $logDate;
     $logMsg .= $this->_logLevelToDisplay($level) . " " . $logData['message'];
 
-    if($this->_logLevelLessThanOrEqual($level, $this->_logLevel))
+    if(Log::logLevelAllowed($level, $this->_logLevel))
     {
       $this->_writeToLogFile($logMsg);
     }

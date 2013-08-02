@@ -12,6 +12,20 @@ class Log
   protected static $_eventType = EventManager::CUBEX_LOG;
 
   /**
+   * All log levels in order of importance
+   */
+  public static $logLevels = [
+    LogLevel::EMERGENCY,
+    LogLevel::ALERT,
+    LogLevel::CRITICAL,
+    LogLevel::ERROR,
+    LogLevel::WARNING,
+    LogLevel::NOTICE,
+    LogLevel::INFO,
+    LogLevel::DEBUG
+  ];
+
+  /**
    * System is unusable.
    *
    * @param string $message
@@ -138,6 +152,20 @@ class Log
   public static function custom($level, $message, array $context = array())
   {
     static::_log($level, $message, $context);
+  }
+
+  /**
+   * Is this log level allowed to log messages at the specified log level?
+   *
+   * @param string $messageLevel The level of the message to log
+   * @param string $logLevel     The current maximum log level
+   *
+   * @return bool
+   */
+  public static function logLevelAllowed($messageLevel, $logLevel)
+  {
+    return array_search($messageLevel, self::$logLevels) <=
+      array_search($logLevel, self::$logLevels);
   }
 
   protected static function _log($level, $message, array $context = array())
