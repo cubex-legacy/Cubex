@@ -224,7 +224,21 @@ abstract class Application
         if($matchRoute !== null)
         {
           $matchedUri = $matchRoute->pattern(true);
-          $dispatcher->setBaseUri($matchedUri);
+          $pattern    = StdRouter::convertSimpleRoute($matchedUri);
+          $matches    = [];
+          $match      = preg_match("#$pattern#", $request->path(), $matches);
+          $dispatcher->setBaseUri($request->path(substr_count($pattern, '/')));
+
+          if($match)
+          {
+            $dispatcher->setBaseUri($matches[0]);
+          }
+          else
+          {
+            $dispatcher->setBaseUri(
+              $request->path(substr_count($pattern, '/'))
+            );
+          }
         }
         $dispatcher->setApplication($this);
       }
