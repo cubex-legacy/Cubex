@@ -9,6 +9,7 @@ use Cubex\Core\Controllers\BaseController;
 use Cubex\Core\Interfaces\IDirectoryAware;
 use Cubex\Core\Interfaces\INamespaceAware;
 use Cubex\Core\Traits\NamespaceAwareTrait;
+use Cubex\Data\Handler\IDataHandler;
 use Cubex\Dispatch\Utils\ListenerTrait;
 use Cubex\Events\IEvent;
 use Cubex\Events\EventManager;
@@ -144,10 +145,12 @@ abstract class Application
     }
     else if($dispatcherRoute instanceof IRoute)
     {
+      $routeData        = $dispatcherRoute->routeData();
       $dispatcherResult = $dispatcherRoute->result();
     }
     else
     {
+      $routeData        = [];
       $dispatcherResult = $dispatcherRoute;
     }
 
@@ -208,6 +211,12 @@ abstract class Application
       {
         $dispatcher->forceAction($action);
       }
+
+      if($dispatcher instanceof IDataHandler)
+      {
+        $dispatcher->hydrate($routeData);
+      }
+
       if($dispatcher instanceof IController)
       {
         $dispatcher->setBaseUri($this->baseUri());
