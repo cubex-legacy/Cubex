@@ -51,6 +51,7 @@ class StdRouter implements IRouter
     foreach($this->_routes as $route)
     {
       $result = $this->_tryRoute($route, $pattern);
+
       if($result instanceof StdRoute)
       {
         $routeMatches[] = $result;
@@ -198,7 +199,7 @@ class StdRouter implements IRouter
             $result = $this->_tryRoute($subRoute, $pattern);
             if($result instanceof StdRoute)
             {
-              return $subRoute;
+              return $result;
             }
           }
         }
