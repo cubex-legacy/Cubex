@@ -193,15 +193,12 @@ class StdRouter implements IRouter
           }
         }
       }
-      else
+      foreach($matches as $k => $v)
       {
-        foreach($matches as $k => $v)
+        //Strip out all non declared matches
+        if(!\is_numeric($k))
         {
-          //Strip out all non declared matches
-          if(!\is_numeric($k))
-          {
-            $route->addRouteData($k, $v);
-          }
+          $route->addRouteData($k, $v);
         }
       }
       return $route;
