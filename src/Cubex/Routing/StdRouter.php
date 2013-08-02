@@ -218,21 +218,27 @@ class StdRouter implements IRouter
   public function convertSimpleRoute($route)
   {
     $idPat = "(_?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)";
+    $repl  = [];
     /* Allow Simple Routes */
     if(strstr($route, ':'))
     {
-      $route = preg_replace("/\:$idPat\@alpha/", "(?P<$1>\w+)/", $route);
-      $route = preg_replace("/\:$idPat\@all/", "(?P<$1>.*)/", $route);
-      $route = preg_replace("/\:$idPat\@num/", "(?P<$1>\d*)/", $route);
-      $route = preg_replace("/\:$idPat/", "(?P<$1>[^\/]+)/", $route);
+      $repl["/\:$idPat\@alpha/"] = "(?P<$1>\w+)/";
+      $repl["/\:$idPat\@all/"]   = "(?P<$1>.*)/";
+      $repl["/\:$idPat\@num/"]   = "(?P<$1>\d*)/";
+      $repl["/\:$idPat/"]        = "(?P<$1>[^\/]+)/";
     }
 
     if(strstr($route, '{'))
     {
-      $route = preg_replace("/{" . "$idPat\@alpha}/", "(?P<$1>\w+)/", $route);
-      $route = preg_replace("/{" . "$idPat\@all}/", "(?P<$1>.*)/", $route);
-      $route = preg_replace("/{" . "$idPat\@num}/", "(?P<$1>\d*)/", $route);
-      $route = preg_replace("/{" . "$idPat}/", "(?P<$1>[^\/]+)/", $route);
+      $repl["/{" . "$idPat\@alpha}/"] = "(?P<$1>\w+)/";
+      $repl["/{" . "$idPat\@all}/"]   = "(?P<$1>.*)/";
+      $repl["/{" . "$idPat\@num}/"]   = "(?P<$1>\d*)/";
+      $repl["/{" . "$idPat}/"]        = "(?P<$1>[^\/]+)/";
+    }
+
+    if(!empty($repl))
+    {
+      $route = preg_replace(array_keys($repl), array_values($repl), $route);
     }
 
     $route = str_replace('//', '/', $route);
