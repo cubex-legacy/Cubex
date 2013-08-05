@@ -95,6 +95,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     define("CUBEX_CLI", php_sapi_name() === 'cli');
     define("CUBEX_WEB", !CUBEX_CLI);
     define("WEB_ROOT", $webRoot);
+    define('CUBEX_PROJECT_ROOT', dirname(WEB_ROOT));
 
     $this->setResponse($this->buildResponse());
     if($handleErrors)
