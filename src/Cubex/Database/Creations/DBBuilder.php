@@ -168,8 +168,8 @@ class DBBuilder
     try
     {
       $comment = $this->_reflect
-                 ->getProperty($attr->sourceProperty())
-                 ->getDocComment();
+      ->getProperty($attr->sourceProperty())
+      ->getDocComment();
       if(!empty($comment))
       {
         $comments = Strings::docCommentLines($comment);
@@ -266,7 +266,7 @@ class DBBuilder
             }
             break;
           case 'length':
-            $options = (int)$v;
+            $options = implode(",", preg_split("/[^\\d]/", "1,2 3 4"));
             break;
           case 'datatype':
             $valid = preg_match(
