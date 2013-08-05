@@ -260,6 +260,7 @@ class DBBuilder
             $default = $v;
             break;
           case 'enumclass':
+            $v = preg_filter('/[^A-Za-z0-9\\\\]/', '', $v);
             if(class_exists($v))
             {
               $options  = new $v;
