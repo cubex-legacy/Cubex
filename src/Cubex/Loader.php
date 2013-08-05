@@ -64,6 +64,12 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
   protected $_smClass = '\Cubex\ServiceManager\ServiceManager';
 
   /**
+   * The default state dir for CLI scripts.
+   * This can be overridden by an environment variable.
+   */
+  const DEFAULT_STATE_DIR = '/var/run/cubex';
+
+  /**
    * Initiate Cubex
    *
    * @param null   $autoLoader   Composer AutoLoader
@@ -113,6 +119,11 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     {
       defined("CUBEX_ENV") or define("CUBEX_ENV", 'defaults');
       $this->handleException($e);
+    }
+
+    if(CUBEX_CLI)
+    {
+      $this->setupStateDir();
     }
 
     define("CUBEX_TRANSACTION", $this->createTransaction());
@@ -270,6 +281,30 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     }
 
     define("CUBEX_ENV", $env);
+  }
+
+  public function setupStateDir($stateDir = null)
+  {
+    if(! defined('CUBEX_STATE_DIR'))
+    {
+      if(! $stateDir)
+      {
+        $stateDir = getenv('CUBEX_STATE_DIR');
+      }
+      if((! $stateDir) && isset($_ENV['CUBEX_STATE_DIR']))
+      {
+        $stateDir = $_ENV['CUBEX_STATE_DIR'];
+      }
+
+      if(! $stateDir)
+      {
+        $stateDir = self::DEFAULT_STATE_DIR;
+      }
+
+      define('CUBEX_STATE_DIR', $stateDir);
+    }
+
+    putenv('CUBEX_STATE_DIR=' . CUBEX_STATE_DIR);
   }
 
   /**
