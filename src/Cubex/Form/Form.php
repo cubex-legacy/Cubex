@@ -66,6 +66,11 @@ class Form extends DataMapper implements IRenderable
     array $data, $setUnmodified = false, $createAttributes = false, $raw = true
   )
   {
+    if(!$this->hasAttributes())
+    {
+      return $this;
+    }
+
     $rawAttributes     = mpull($this->getRawAttributes(), "name", "name");
     $missingAttributes = array_diff_key($rawAttributes, $data);
 

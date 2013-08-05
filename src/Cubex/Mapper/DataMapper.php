@@ -484,6 +484,12 @@ abstract class DataMapper
     }
   }
 
+  public function hasAttributes()
+  {
+    $this->_checkAttributes();
+    return !empty($this->_attributes);
+  }
+
   public function availableAttributes()
   {
     $names = [];
