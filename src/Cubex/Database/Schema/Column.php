@@ -62,6 +62,8 @@ class Column
     {
       case DataType::VARCHAR:
       case DataType::CHAR:
+      case DataType::DOUBLE:
+      case DataType::DECIMAL:
         $sql .= "(" . $this->_options . ") ";
         break;
       case DataType::ENUM:

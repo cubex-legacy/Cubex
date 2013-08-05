@@ -10,6 +10,7 @@ use Cubex\Database\IDatabaseService;
 use Cubex\Database\Schema\Column;
 use Cubex\Database\Schema\DataType;
 use Cubex\Helpers\Strings;
+use Cubex\Log\Log;
 use Cubex\Mapper\DataMapper;
 use Cubex\Mapper\Database\RecordMapper;
 use Cubex\Sprintf\ParseQuery;
@@ -266,7 +267,7 @@ class DBBuilder
             }
             break;
           case 'length':
-            $options = implode(",", preg_split("/[^\\d]/", "1,2 3 4"));
+            $options = implode(",", preg_split("/[^\\d]/", $v));
             break;
           case 'datatype':
             $valid = preg_match(
@@ -391,6 +392,8 @@ class DBBuilder
     $sql .= "`" . $this->_tableName . "`";
     $sql .= "(" . implode(",", $content) . ") ";
     $sql .= implode(" ", $properties);
+
+    Log::debug($sql);
 
     return $sql;
   }
