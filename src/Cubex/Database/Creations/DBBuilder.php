@@ -267,11 +267,43 @@ class DBBuilder
             }
             break;
           case 'length':
+          case 'tinyint':
+          case 'smallint':
+          case 'mediumint':
+          case 'bigint':
+          case 'bit':
+          case 'int':
+          case 'float':
+          case 'double':
+          case 'decimal':
+          case 'char':
+          case 'varchar':
+          case 'tinytext':
+          case 'text':
+          case 'mediumtext':
+          case 'longtext':
+          case 'binary':
+          case 'varbinary':
+          case 'tinyblob':
+          case 'blob':
+          case 'mediumblob':
+          case 'longblob':
+          case 'date':
+          case 'time':
+          case 'year':
+          case 'datetime':
+          case 'timestamp':
+          case 'enum':
+          case 'bool':
+            if(strtolower($k) !== "length")
+            {
+              $dataType = $k;
+            }
             $options = implode(",", preg_split("/[^\\d]/", $v));
             break;
           case 'datatype':
             $valid = preg_match(
-              "/([a-zA-Z]+)(\s|\(|\s\(|)([0-9]+)?($|\))/",
+              "/([a-zA-Z]+)(\s|\(|\s\(|)([0-9]+)?(,|\s)?([0-9]+)?($|\))/",
               $v,
               $match
             );
@@ -281,6 +313,10 @@ class DBBuilder
               if((int)$match[3] > 0)
               {
                 $options = (int)$match[3];
+              }
+              if((int)$match[5] > 0)
+              {
+                $options .= "," . (int)$match[5];
               }
             }
             break;
