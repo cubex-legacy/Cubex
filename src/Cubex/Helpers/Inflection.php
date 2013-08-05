@@ -232,10 +232,9 @@ class Inflection
   protected function _fWords()
   {
     return [
-      'chef'  => 'chef',
-      'cliff' => 'cliff',
-      'ref'   => 'ref',
-      'roof'  => 'roof'
+      'chef' => 'chef',
+      'ref'  => 'ref',
+      'roof' => 'roof'
     ];
   }
 
@@ -243,7 +242,9 @@ class Inflection
   {
     if(ends_with($this->_lowerWord, 'f'))
     {
-      if(isset($this->_fWords()[$this->_lowerWord]))
+      if(isset($this->_fWords()[$this->_lowerWord])
+      || substr($this->_lowerWord, -2, 1) == 'f'
+      )
       {
         return $this->_complete($this->_word . 's');
       }
