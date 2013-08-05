@@ -137,10 +137,17 @@ class DBAuth extends BaseAuthService implements IServiceManagerAware
   {
 
     $callback = $this->_config->getStr("password_callback", null);
-    $options  = $this->_config->getArr("password_callback_opts", []);
+    $options  = $this->_config->getArr("password_callback_opts", null);
     if($callback !== null)
     {
-      return call_user_func($callback, $entered, $dbvalue, $options);
+      if($options !== null)
+      {
+        return call_user_func($callback, $entered, $dbvalue, $options);
+      }
+      else
+      {
+        return call_user_func($callback, $entered, $dbvalue);
+      }
     }
     else
     {
