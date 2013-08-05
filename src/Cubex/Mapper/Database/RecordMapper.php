@@ -1004,6 +1004,12 @@ abstract class RecordMapper extends DataMapper
     );
   }
 
+  public static function drop()
+  {
+    $mapper = new static();
+    return $mapper->dropTable();
+  }
+
   protected function _makeCacheKey($key = null)
   {
     if($key === null)
