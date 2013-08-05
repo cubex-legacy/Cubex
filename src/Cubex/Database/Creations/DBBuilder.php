@@ -240,6 +240,23 @@ class DBBuilder
     {
       $dataType = DataType::DATETIME;
     }
+    else if($uname == 'age')
+    {
+      $dataType = DataType::TINYINT;
+    }
+    else if($uname == 'notes')
+    {
+      $dataType = DataType::MEDIUMTEXT;
+    }
+    else if(starts_with($uname, 'comment'))
+    {
+      $options = 255;
+    }
+    else if(in_array($uname, ["price", "tax", "amount", "cost", "total"]))
+    {
+      $dataType = DataType::DECIMAL;
+      $options  = "10,2";
+    }
 
     if(!empty($annotation))
     {
