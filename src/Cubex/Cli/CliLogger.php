@@ -166,14 +166,14 @@ class CliLogger
       $len = 32;
       echo $echoMsg;
 
-      $lines = explode("\n", $logData['message']);
+      $lines  = explode("\n", $logData['message']);
       $indent = str_repeat(" ", $len);
-      $wrap = "\n" . $indent;
+      $wrap   = "\n" . $indent;
 
       $firstLine = true;
       foreach($lines as $line)
       {
-        if(! $firstLine)
+        if(!$firstLine)
         {
           echo $indent;
         }
@@ -199,6 +199,16 @@ class CliLogger
   public function setEchoLevel($echoLevel)
   {
     $this->_echoLevel = $echoLevel;
+  }
+
+  public function getLogLevel()
+  {
+    return $this->_logLevel;
+  }
+
+  public function getEchoLevel()
+  {
+    return $this->_echoLevel;
   }
 }
 
