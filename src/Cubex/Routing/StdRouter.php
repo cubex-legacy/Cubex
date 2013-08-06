@@ -223,18 +223,18 @@ class StdRouter implements IRouter
     /* Allow Simple Routes */
     if(strstr($route, ':'))
     {
-      $repl["/\:$idPat\@alpha/"] = "(?P<$1>\w+)/";
-      $repl["/\:$idPat\@all/"]   = "(?P<$1>.*)/";
-      $repl["/\:$idPat\@num/"]   = "(?P<$1>\d*)/";
-      $repl["/\:$idPat/"]        = "(?P<$1>[^\/]+)/";
+      $repl["/\:$idPat\@alpha/"] = "(?P<$1>\w+)";
+      $repl["/\:$idPat\@all/"]   = "(?P<$1>.*)";
+      $repl["/\:$idPat\@num/"]   = "(?P<$1>\d*)";
+      $repl["/\:$idPat/"]        = "(?P<$1>[^\/]+)";
     }
 
     if(strstr($route, '{'))
     {
-      $repl["/{" . "$idPat\@alpha}/"] = "(?P<$1>\w+)/";
-      $repl["/{" . "$idPat\@all}/"]   = "(?P<$1>.*)/";
-      $repl["/{" . "$idPat\@num}/"]   = "(?P<$1>\d*)/";
-      $repl["/{" . "$idPat}/"]        = "(?P<$1>[^\/]+)/";
+      $repl["/{" . "$idPat\@alpha}/"] = "(?P<$1>\w+)";
+      $repl["/{" . "$idPat\@all}/"]   = "(?P<$1>.*)";
+      $repl["/{" . "$idPat\@num}/"]   = "(?P<$1>\d*)";
+      $repl["/{" . "$idPat}/"]        = "(?P<$1>[^\/]+)";
     }
 
     if(!empty($repl))
