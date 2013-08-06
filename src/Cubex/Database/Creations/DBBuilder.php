@@ -262,6 +262,7 @@ class DBBuilder
     {
       foreach($annotation as $k => $v)
       {
+        $v = trim($v);
         switch(strtolower($k))
         {
           case 'index':
