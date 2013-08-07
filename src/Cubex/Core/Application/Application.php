@@ -330,7 +330,6 @@ abstract class Application
    */
   protected function _getRoutes()
   {
-    $finalRoutes   = array();
     $interalRoutes = $this->getRoutes();
     $bundleRoutes  = $this->getAllBundleRoutes();
     $routes        = array_merge((array)$interalRoutes, (array)$bundleRoutes);
@@ -340,32 +339,7 @@ abstract class Application
       $routes = array($this->_baseUri => $routes);
     }
 
-    if(!empty($routes))
-    {
-      foreach($routes as $routePattern => $routeResult)
-      {
-        if($routeResult instanceof IRoute)
-        {
-          $finalRoutes[] = $routeResult;
-        }
-        else if(is_array($routeResult))
-        {
-          $subRoutes = StdRoute::fromArray($routeResult);
-          $route     = new StdRoute($routePattern, '');
-          foreach($subRoutes as $sr)
-          {
-            $route->addSubRoute($sr);
-          }
-          $finalRoutes[] = $route;
-        }
-        else
-        {
-          $finalRoutes[] = new StdRoute($routePattern, $routeResult);
-        }
-      }
-    }
-
-    return $finalRoutes;
+    return StdRoute::fromArray($routes);
   }
 
   /**

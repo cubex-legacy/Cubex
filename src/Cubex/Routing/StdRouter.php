@@ -193,9 +193,6 @@ class StdRouter implements IRouter
         {
           if($subRoute instanceof StdRoute)
           {
-            $subPattern = $route->pattern() . '/' . $subRoute->pattern();
-            $subPattern = str_replace('//', '/', $subPattern);
-            $subRoute->setPattern($subPattern);
             $result = $this->_tryRoute($subRoute, $pattern);
             if($result instanceof StdRoute)
             {
@@ -224,16 +221,16 @@ class StdRouter implements IRouter
     if(strstr($route, ':'))
     {
       $repl["/\:$idPat\@alpha/"] = "(?P<$1>\w+)";
-      $repl["/\:$idPat\@all/"]   = "(?P<$1>.*)";
-      $repl["/\:$idPat\@num/"]   = "(?P<$1>\d*)";
+      $repl["/\:$idPat\@all/"]   = "(?P<$1>.+)";
+      $repl["/\:$idPat\@num/"]   = "(?P<$1>\d+)";
       $repl["/\:$idPat/"]        = "(?P<$1>[^\/]+)";
     }
 
     if(strstr($route, '{'))
     {
       $repl["/{" . "$idPat\@alpha}/"] = "(?P<$1>\w+)";
-      $repl["/{" . "$idPat\@all}/"]   = "(?P<$1>.*)";
-      $repl["/{" . "$idPat\@num}/"]   = "(?P<$1>\d*)";
+      $repl["/{" . "$idPat\@all}/"]   = "(?P<$1>.+)";
+      $repl["/{" . "$idPat\@num}/"]   = "(?P<$1>\d+)";
       $repl["/{" . "$idPat}/"]        = "(?P<$1>[^\/]+)";
     }
 

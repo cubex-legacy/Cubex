@@ -450,42 +450,7 @@ class BaseController
     {
       $routes = array($this->_baseUri => $routes);
     }
-
-    $finalRoutes = array();
-    if(!empty($routes))
-    {
-      foreach($routes as $routePattern => $routeResult)
-      {
-        if($routeResult instanceof IRoute)
-        {
-          $finalRoutes[] = $routeResult;
-        }
-        else if(is_array($routeResult))
-        {
-          try
-          {
-            assert_instances_of($routeResult, '\Cubex\Routing\IRoute');
-            $subRoutes = $routeResult;
-          }
-          catch(\Exception $e)
-          {
-            $subRoutes = StdRoute::fromArray($routeResult);
-          }
-          $route = new StdRoute($routePattern, '');
-          foreach($subRoutes as $sr)
-          {
-            $route->addSubRoute($sr);
-          }
-          $finalRoutes[] = $route;
-        }
-        else
-        {
-          $finalRoutes[] = new StdRoute($routePattern, $routeResult);
-        }
-      }
-    }
-
-    return $finalRoutes;
+    return StdRoute::fromArray($routes);
   }
 
   /**

@@ -184,28 +184,57 @@ class StdRoute implements IRoute, IDataHandler, \JsonSerializable
   }
 
   /**
-   * @param array $routes
+   * @param array  $routes
+   * @param string $parentPattern
    *
-   * @return IRoute[]
+   * @return array
    */
-  public static function fromArray(array $routes)
+  public static function fromArray(array $routes, $parentPattern = '')
   {
     $finalRoutes = array();
 
     foreach($routes as $pattern => $result)
     {
-      if(is_array($result))
+      if(starts_with($pattern, '^'))
       {
-        $route = new StdRoute($pattern, null);
+        $formPattern = $pattern;
+      }
+      else
+      {
+        $formPattern = build_path_custom('/', [$parentPattern, $pattern]);
+      }
+
+      if($result instanceof IRoute)
+      {
+        $result->setPattern(
+          build_path_custom('/', [$formPattern, $result->pattern()])
+        );
+        $finalRoutes[] = $result;
+      }
+      else if(is_array($result))
+      {
+        $route = new StdRoute($formPattern, null);
         foreach($result as $subPattern => $subResult)
         {
+          if(!starts_with($subPattern, '^'))
+          {
+            $subPattern = build_path_custom('/', [$formPattern, $subPattern]);
+          }
+
           if($subPattern == '')
           {
             $route->setResult($subResult);
           }
+          if($subResult instanceof IRoute)
+          {
+            $subResult->setPattern(
+              build_path_custom('/', [$formPattern, $subResult->pattern()])
+            );
+            $route->addSubRoute($subResult);
+          }
           else if(is_array($subResult))
           {
-            $subRoutes = static::fromArray($subResult);
+            $subRoutes = static::fromArray($subResult, $subPattern);
             foreach($subRoutes as $subRoute)
             {
               $route->addSubRoute($subRoute);
@@ -221,7 +250,7 @@ class StdRoute implements IRoute, IDataHandler, \JsonSerializable
       }
       else
       {
-        $finalRoutes[] = new StdRoute($pattern, $result);
+        $finalRoutes[] = new StdRoute($formPattern, $result);
       }
     }
     return $finalRoutes;
