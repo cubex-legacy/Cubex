@@ -299,6 +299,10 @@ class BaseController
     {
       $result = $buffered;
     }
+    else if($result instanceof ViewModel)
+    {
+      $result->setHostController($this);
+    }
 
     $this->_processFilters($action, $this->_actionFiltersAfter);
 
