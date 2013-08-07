@@ -551,4 +551,15 @@ class Collection
   {
     return $this->setCache($days * 86400, $cacheKey);
   }
+
+  public function orderByKeys(array $keyOrder)
+  {
+    $result = [];
+    foreach($keyOrder as $id)
+    {
+      $result[$id] = $this->_mappers[$id];
+    }
+    $this->_mappers = $result;
+    return $this;
+  }
 }
