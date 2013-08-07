@@ -33,7 +33,7 @@ class OptionBuilder
 
     if($this->_source instanceof Enum)
     {
-      $options = array_flip($this->_source->getConstList());
+      $options = array_fuse(array_flip($this->_source->getConstList()));
       $options = array_map('\Cubex\Helpers\Strings::titleize', $options);
       return $options;
     }
