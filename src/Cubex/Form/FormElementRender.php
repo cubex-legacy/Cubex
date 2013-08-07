@@ -252,19 +252,21 @@ class FormElementRender implements IFormElementRender
 
     foreach($options as $k => $v)
     {
-      $id = $this->_element->id() . '-' . md5($k);
+      $id      = $this->_element->id();
+      $multiId = $id . '-' . md5($k);
+
       if($multi && $this->_labelPosition == Form::LABEL_BEFORE)
       {
-        $out .= $this->renderLabel($v, $id);
+        $out .= $this->renderLabel($v, $multiId);
       }
 
       $input = '<input';
       $input .= $this->_renderAttributes(
         [
         "type"  => $type,
-        "name"  => $this->_element->name(
-        ) . ($multi && !$type == 'radio' ? '[]' : ''),
-        "id"    => $id,
+        "name"  => $this->_element->name() .
+          ($multi && !$type == 'radio' ? '[]' : ''),
+        "id"    => $multi ? $multiId : $id,
         "value" => esc($multi ? $k : $this->_element->selectedValue()),
         ]
       );
@@ -301,11 +303,11 @@ class FormElementRender implements IFormElementRender
 
       if($this->_labelPosition == Form::LABEL_SURROUND_LEFT)
       {
-        $out .= $this->renderLabel($v . $input, $id);
+        $out .= $this->renderLabel($v . $input, $multi ? $multiId : $id);
       }
       else if($this->_labelPosition == Form::LABEL_SURROUND_RIGHT)
       {
-        $out .= $this->renderLabel($input . $v, $id);
+        $out .= $this->renderLabel($input . $v, $multi ? $multiId : $id);
       }
       else
       {
@@ -314,7 +316,7 @@ class FormElementRender implements IFormElementRender
 
       if($multi && $this->_labelPosition == Form::LABEL_AFTER)
       {
-        $out .= $this->renderLabel($v, $id);
+        $out .= $this->renderLabel($v, $multiId);
       }
       else if($this->_labelPosition == Form::LABEL_AFTER)
       {
