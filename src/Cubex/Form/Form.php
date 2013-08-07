@@ -90,6 +90,14 @@ class Form extends DataMapper implements IRenderable
     parent::hydrate($data, $setUnmodified, $createAttributes);
   }
 
+  /**
+   * @return DataMapper|null
+   */
+  public function getMapper()
+  {
+    return $this->_mapper;
+  }
+
   public function bindMapper(DataMapper $mapper, $relations = true)
   {
     $this->_mapper = $mapper;
