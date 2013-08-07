@@ -27,12 +27,15 @@ class DatabaseQueue implements IQueueProvider
 
   public function push(IQueue $queue, $data = null, $delay = 0)
   {
+    $date = DateTimeHelper::dateTimeFromAnything(
+      time() + $delay
+    );
+    $date->setTimezone(new \DateTimeZone('UTC'));
+
     $mapper                = $this->_queueMapper(true);
     $mapper->queueName     = $queue->name();
     $mapper->data          = $data;
-    $mapper->availableFrom = DateTimeHelper::dateTimeFromAnything(
-      time() + $delay
-    );
+    $mapper->availableFrom = $date;
     $mapper->saveChanges();
   }
 
@@ -58,9 +61,12 @@ class DatabaseQueue implements IQueueProvider
     $mapper     = $this->_queueMapper(true);
     $collection = new RecordCollection($mapper);
 
+    $now = DateTimeHelper::dateTimeFromAnything(time());
+    $now->setTimezone(new \DateTimeZone('UTC'));
+
     $collection->runQuery(
       "UPDATE %T SET %C = %d, %C = %s " .
-      "WHERE %C = %s AND %C = %d AND %C <= NOW() LIMIT " . $limit,
+      "WHERE %C = %s AND %C = %d AND %C <= %s LIMIT " . $limit,
       $mapper->getTableName(),
       'locked',
       1,
@@ -70,7 +76,8 @@ class DatabaseQueue implements IQueueProvider
       $queue->name(),
       'locked',
       0,
-      'available_from'
+      'available_from',
+      $now->format('Y-m-d H:i:s')
     );
     return $collection;
   }
