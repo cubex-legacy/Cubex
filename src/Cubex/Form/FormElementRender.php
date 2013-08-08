@@ -165,6 +165,7 @@ class FormElementRender implements IFormElementRender
         "type"  => $this->_element->name(),
         "name"  => $this->_element->name(),
         "id"    => $this->_element->id(),
+        "value" => $value,
       ]
     );
     $out .= $this->_renderAttributes();
