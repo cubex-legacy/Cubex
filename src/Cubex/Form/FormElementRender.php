@@ -87,6 +87,9 @@ class FormElementRender implements IFormElementRender
       case FormElement::MULTI_CHECKBOX:
         $input = $this->renderMultiInput(FormElement::CHECKBOX, true);
         break;
+      case FormElement::BUTTON:
+        $input = $this->renderButton();
+        break;
       case FormElement::HIDDEN:
         return $this->renderInput($type);
       default:
@@ -141,14 +144,33 @@ class FormElementRender implements IFormElementRender
     $out = '<input';
     $out .= $this->_renderAttributes(
       [
-      "type"  => $type,
-      "name"  => $this->_element->name(),
-      "id"    => $this->_element->id(),
-      "value" => $value,
+        "type"  => $type,
+        "name"  => $this->_element->name(),
+        "id"    => $this->_element->id(),
+        "value" => $value,
       ]
     );
     $out .= $this->_renderAttributes();
     $out .= '/>';
+    return $out;
+  }
+
+  public function renderButton()
+  {
+    $value = esc($this->_element->data());
+
+    $out = '<button';
+    $out .= $this->_renderAttributes(
+      [
+        "type"  => $this->_element->name(),
+        "name"  => $this->_element->name(),
+        "id"    => $this->_element->id(),
+      ]
+    );
+    $out .= $this->_renderAttributes();
+    $out .= '>';
+    $out .= $value;
+    $out .= '</button>';
     return $out;
   }
 
@@ -187,8 +209,8 @@ class FormElementRender implements IFormElementRender
     $out = '<select';
     $out .= $this->_renderAttributes(
       [
-      "name" => $this->_element->name(),
-      "id"   => $this->_element->id(),
+        "name" => $this->_element->name(),
+        "id"   => $this->_element->id(),
       ]
     );
     $out .= $this->_renderAttributes();
@@ -215,8 +237,8 @@ class FormElementRender implements IFormElementRender
     $out = '<textarea';
     $out .= $this->_renderAttributes(
       [
-      "name" => $this->_element->name(),
-      "id"   => $this->_element->id(),
+        "name" => $this->_element->name(),
+        "id"   => $this->_element->id(),
       ]
     );
     $out .= $this->_renderAttributes();
@@ -263,11 +285,11 @@ class FormElementRender implements IFormElementRender
       $input = '<input';
       $input .= $this->_renderAttributes(
         [
-        "type"  => $type,
-        "name"  => $this->_element->name() .
+          "type"  => $type,
+          "name"  => $this->_element->name() .
           ($multi && !$type == 'radio' ? '[]' : ''),
-        "id"    => $multi ? $multiId : $id,
-        "value" => esc($multi ? $k : $this->_element->selectedValue()),
+          "id"    => $multi ? $multiId : $id,
+          "value" => esc($multi ? $k : $this->_element->selectedValue()),
         ]
       );
 
@@ -293,7 +315,7 @@ class FormElementRender implements IFormElementRender
       {
         $input .= $this->_renderAttributes(
           [
-          "checked" => "checked",
+            "checked" => "checked",
           ]
         );
       }
