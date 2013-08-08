@@ -230,7 +230,7 @@ if(!function_exists("strip_start"))
 
 if(!function_exists('implode_list'))
 {
-  function implode_list($glue = ' , ', array $pieces = [], $finalGlue = ' & ')
+  function implode_list(array $pieces = [], $glue = ' , ', $finalGlue = ' & ')
   {
     $pieceCount = count($pieces);
     switch($pieceCount)
