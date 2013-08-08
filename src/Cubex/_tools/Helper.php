@@ -228,6 +228,24 @@ if(!function_exists("strip_start"))
   }
 }
 
+if(!function_exists('implode_list'))
+{
+  function implode_list($glue, array $pieces, $finalGlue = '&')
+  {
+    $pieceCount = count($pieces);
+    switch($pieceCount)
+    {
+      case 0:
+        return '';
+      case 1:
+        return $pieces[0];
+      default:
+        $final = array_pop($pieces);
+        return implode($finalGlue, [implode($glue, $pieces), $final]);
+    }
+  }
+}
+
 if(!function_exists("url"))
 {
   /**
@@ -270,7 +288,7 @@ if(!function_exists("get_namespace"))
   }
 }
 
-if(! function_exists('build_path'))
+if(!function_exists('build_path'))
 {
   /**
    * Concatenate any number of path sections and correctly
@@ -278,29 +296,29 @@ if(! function_exists('build_path'))
    *
    * @return string
    */
-  function build_path(/* string... */)
+  function build_path( /* string... */)
   {
     return build_path_custom(DS, func_get_args());
   }
 }
 
-if(! function_exists('build_path_win'))
+if(!function_exists('build_path_win'))
 {
-  function build_path_win(/* string... */)
+  function build_path_win( /* string... */)
   {
     return build_path_custom('\\', func_get_args());
   }
 }
 
-if(! function_exists('build_path_unix'))
+if(!function_exists('build_path_unix'))
 {
-  function build_path_unix(/* string... */)
+  function build_path_unix( /* string... */)
   {
     return build_path_custom('/', func_get_args());
   }
 }
 
-if(! function_exists('build_path_custom'))
+if(!function_exists('build_path_custom'))
 {
   /**
    * @param string   $directorySeparator
@@ -322,7 +340,7 @@ if(! function_exists('build_path_custom'))
         else
         {
           $fullPath = rtrim($fullPath, '/\\' . $directorySeparator) .
-            $directorySeparator . ltrim($section, '/\\' . $directorySeparator);
+          $directorySeparator . ltrim($section, '/\\' . $directorySeparator);
         }
       }
     }
