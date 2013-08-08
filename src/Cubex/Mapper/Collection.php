@@ -6,7 +6,6 @@
 namespace Cubex\Mapper;
 
 use Cubex\Data\Refine\Refiner;
-use Cubex\View\Partial;
 
 /**
  * @var Collection DataMapper[]
@@ -221,22 +220,23 @@ class Collection
    */
   public function getById($id, $import = true)
   {
-    if($this->contains($id) && isset($this->_mappers[$id]))
+    $idkey = is_array($id) ? implode(',', $id) : $id;
+    if($this->contains($idkey) && isset($this->_mappers[$idkey]))
     {
-      return $this->_mappers[$id];
+      return $this->_mappers[$idkey];
     }
     else
     {
       $mapper = new $this->_mapperType;
-      if(method_exists($mapper, "load"))
+      if($mapper instanceof DataMapper)
       {
         $mapper->load($id);
+        if($import)
+        {
+          $this->addMapper($mapper);
+        }
       }
 
-      if($import)
-      {
-        $this->addMapper($mapper);
-      }
       return $mapper;
     }
   }
