@@ -10,6 +10,7 @@ use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\Foundation\Config\ConfigGroup;
+use Cubex\Log\Log;
 use Cubex\View\Templates\Errors\Error404;
 
 class Serve extends Dispatcher implements IDispatchable
@@ -106,6 +107,7 @@ class Serve extends Dispatcher implements IDispatchable
     if(!isset($this->getSupportedTypes()[$resourceType]))
     {
       // Either hack attempt or a dev needs a slapped wrist
+      Log::debug("'{$resourceType}' is not a supported type");
       $response->fromRenderable(new Error404())->setStatusCode(404);
     }
     else
