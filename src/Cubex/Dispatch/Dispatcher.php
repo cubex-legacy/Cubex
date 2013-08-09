@@ -624,7 +624,7 @@ class Dispatcher
       case 'js':
         //Strip Comments
         $data = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $data);
-        $data = preg_replace('!^([\t ]+)?\/\/.+$!m', '', $data);
+        $data = preg_replace('!^([\t ]+)?\/\/.?$!m', '', $data);
         //remove tabs, spaces, newlines, etc.
         $data = str_replace(array("\t"), ' ', $data);
         $data = str_replace(
