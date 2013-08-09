@@ -232,16 +232,14 @@ if(!function_exists('implode_list'))
 {
   function implode_list(array $pieces = [], $glue = ' , ', $finalGlue = ' & ')
   {
-    $pieceCount = count($pieces);
-    switch($pieceCount)
+    if(count($pieces) > 1)
     {
-      case 0:
-        return '';
-      case 1:
-        return $pieces[0];
-      default:
-        $final = array_pop($pieces);
-        return implode($finalGlue, [implode($glue, $pieces), $final]);
+      $final = array_pop($pieces);
+      return implode($finalGlue, [implode($glue, $pieces), $final]);
+    }
+    else
+    {
+      return implode($glue, $pieces);
     }
   }
 }
