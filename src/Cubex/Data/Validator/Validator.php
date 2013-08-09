@@ -258,13 +258,20 @@ class Validator
 
   public static function enum($input, Enum $type)
   {
-    if(!$type->constantExists($input))
+    try
+    {
+      $type::constFromValue($input);
+    }
+    catch(\UnexpectedValueException $e)
     {
       throw new \Exception(
-        "Invalid " . get_class($type) . ".\nAvailable values: " .
-        implode(", ", array_keys($type->getConstList())) . "."
+        $e->getMessage() . "\nAvailable values: " .
+        implode(", ", array_keys($type->getConstList())) . ".",
+        0,
+        $e
       );
     }
+
     return true;
   }
 
