@@ -47,7 +47,8 @@ class Dispatcher
     "afm"   => "application/x-font-afm",
     "svg"   => "image/svg+xml",
     "eot"   => "application/vnd.ms-fontobject",
-    "woff"  => "application/x-font-woff"
+    "woff"  => "application/x-font-woff",
+    "zip"   => "application/zip",
   ];
 
   const BUILD_OPT_FORCE_SECURE = "force_secure";
