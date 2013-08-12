@@ -776,11 +776,20 @@ abstract class RecordMapper extends DataMapper
     return $rel->belongsTo($entity, $foreignKey, $localKey);
   }
 
-  public function hasAndBelongsToMany(RecordMapper $entity)
+  public function hasAndBelongsToMany(
+    RecordMapper $entity, PivotMapper $through = null
+  )
   {
     $this->_load();
-    $pivot = PivotMapper::with($this, $entity);
-    return $pivot->loadCollection($this);
+    if($through === null)
+    {
+      $pivot = PivotMapper::with($this, $entity);
+      return $pivot->loadCollection($this);
+    }
+    else
+    {
+      return $through->loadCollection($this);
+    }
   }
 
   public static function schema()
