@@ -218,13 +218,6 @@ class StdRouter implements IRouter
     $idPat = "(_?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)";
     $repl  = [];
     /* Allow Simple Routes */
-    if(strstr($route, ':'))
-    {
-      $repl["/\:$idPat\@alpha/"] = "(?P<$1>\w+)";
-      $repl["/\:$idPat\@all/"]   = "(?P<$1>.+)";
-      $repl["/\:$idPat\@num/"]   = "(?P<$1>\d+)";
-      $repl["/\:$idPat/"]        = "(?P<$1>[^\/]+)";
-    }
 
     if(strstr($route, '{'))
     {
@@ -232,6 +225,14 @@ class StdRouter implements IRouter
       $repl["/{" . "$idPat\@all}/"]   = "(?P<$1>.+)";
       $repl["/{" . "$idPat\@num}/"]   = "(?P<$1>\d+)";
       $repl["/{" . "$idPat}/"]        = "(?P<$1>[^\/]+)";
+    }
+
+    if(strstr($route, ':'))
+    {
+      $repl["/\:$idPat\@alpha/"] = "(?P<$1>\w+)";
+      $repl["/\:$idPat\@all/"]   = "(?P<$1>.+)";
+      $repl["/\:$idPat\@num/"]   = "(?P<$1>\d+)";
+      $repl["/\:$idPat/"]        = "(?P<$1>[^\/]+)";
     }
 
     if(!empty($repl))
