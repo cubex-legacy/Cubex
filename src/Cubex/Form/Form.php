@@ -224,7 +224,7 @@ class Form extends DataMapper implements IRenderable
     }
 
     $name = class_shortname($mapper);
-    $name = ucwords(Strings::variableToUnderScore($name));
+    $name = ucwords(Strings::titleize(Strings::variableToUnderScore($name)));
 
     if($mapper->exists())
     {
