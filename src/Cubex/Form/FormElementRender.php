@@ -162,7 +162,7 @@ class FormElementRender implements IFormElementRender
     $out = '<button';
     $out .= $this->_renderAttributes(
       [
-        "type"  => $this->_element->name(),
+        "type"  => FormElement::BUTTON,
         "name"  => $this->_element->name(),
         "id"    => $this->_element->id(),
         "value" => $value,
