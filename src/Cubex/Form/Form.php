@@ -166,7 +166,10 @@ class Form extends DataMapper implements IRenderable
 
         if($mapper->getIdKey() == $a->name())
         {
-          $this->addHiddenElement($a->name(), $a->data());
+          if($mapper->exists())
+          {
+            $this->addHiddenElement($a->name(), $a->data());
+          }
         }
         else
         {
