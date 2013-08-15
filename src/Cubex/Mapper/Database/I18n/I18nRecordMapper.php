@@ -161,4 +161,17 @@ abstract class I18nRecordMapper extends RecordMapper
     $this->_loadProperties();
     return parent::getData($attribute);
   }
+
+  public function delete()
+  {
+    parent::delete();
+    $textContainers = new RecordCollection($this->getTextContainer());
+    $textContainers = $textContainers->loadAll();
+    foreach($textContainers as $textContainer)
+    {
+      $textContainer->delete();
+    }
+
+    return $this;
+  }
 }
