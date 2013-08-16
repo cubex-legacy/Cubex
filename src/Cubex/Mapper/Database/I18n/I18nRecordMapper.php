@@ -167,7 +167,9 @@ abstract class I18nRecordMapper extends RecordMapper
   {
     parent::delete();
     $textContainers = new RecordCollection($this->getTextContainer());
-    $textContainers = $textContainers->loadAll();
+    $textContainers = $textContainers->loadWhere(
+      ['resource' => [$this->id(), $this->textResourceType()]]
+    );
     foreach($textContainers as $textContainer)
     {
       $textContainer->delete();
