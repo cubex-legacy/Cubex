@@ -48,6 +48,11 @@ class OptionBuilder
       return $this->fromRecordMapper($this->_source, $displayAttributes);
     }
 
+    if(is_array($this->_source))
+    {
+      return $this->fromArray($this->_source);
+    }
+
     return null;
   }
 
@@ -107,6 +112,23 @@ class OptionBuilder
         $options[$option->id()] = $option->getData($attrName);
       }
     }
+    return $options;
+  }
+
+  /**
+   * @param array $arr keyed array of options
+   *
+   * @return array
+   */
+  public function fromArray(array $arr)
+  {
+    $options = [];
+
+    foreach($arr as $optionKey => $option)
+    {
+      $options[$optionKey] = $option;
+    }
+
     return $options;
   }
 }
