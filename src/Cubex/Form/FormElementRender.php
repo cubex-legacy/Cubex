@@ -159,10 +159,19 @@ class FormElementRender implements IFormElementRender
   {
     $value = esc($this->_element->data());
 
+    $type = FormElement::BUTTON;
+
+    $allowedTypes = ["button" => true, "submit" => true, "reset" => true,];
+
+    if(array_key_exists($this->_element->name(), $allowedTypes))
+    {
+      $type = $this->_element->name();
+    }
+
     $out = '<button';
     $out .= $this->_renderAttributes(
       [
-        "type"  => FormElement::BUTTON,
+        "type"  => $type,
         "name"  => $this->_element->name(),
         "id"    => $this->_element->id(),
         "value" => $value,
