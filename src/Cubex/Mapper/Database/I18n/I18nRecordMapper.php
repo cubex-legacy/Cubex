@@ -7,6 +7,7 @@ namespace Cubex\Mapper\Database\I18n;
 
 use Cubex\Data\Attribute\CallbackAttribute;
 use Cubex\Data\Handler\DataHandler;
+use Cubex\Mapper\Database\RecordCollection;
 use Cubex\Mapper\Database\RecordMapper;
 
 abstract class I18nRecordMapper extends RecordMapper
