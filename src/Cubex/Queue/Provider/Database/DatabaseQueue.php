@@ -10,13 +10,13 @@ use Cubex\Helpers\DateTimeHelper;
 use Cubex\Helpers\Strings;
 use Cubex\Mapper\Database\RecordCollection;
 use Cubex\Queue\IBatchQueueConsumer;
+use Cubex\Queue\IBatchQueueProvider;
 use Cubex\Queue\IQueue;
 use Cubex\Queue\IQueueConsumer;
-use Cubex\Queue\IQueueProvider;
 use Cubex\ServiceManager\ServiceConfigTrait;
 use Cubex\Sprintf\ParseQuery;
 
-class DatabaseQueue implements IQueueProvider
+class DatabaseQueue implements IBatchQueueProvider
 {
   use ServiceConfigTrait;
 
@@ -37,6 +37,62 @@ class DatabaseQueue implements IQueueProvider
     $mapper->data          = $data;
     $mapper->availableFrom = $date;
     $mapper->saveChanges();
+  }
+
+  public function pushBatch(IQueue $queue, array $data, $delay = 0)
+  {
+    // TODO: Change this to use a batched mapper group once T179 has been implemented
+    $date = DateTimeHelper::dateTimeFromAnything(
+      time() + $delay
+    );
+    $date->setTimezone(new \DateTimeZone('UTC'));
+
+    $db = $this->_queueMapper()->connection();
+
+    $created = date('Y-m-d H:i:s');
+    $availableStr = DateTimeHelper::formattedDateFromAnything($date);
+
+    $fields = [
+      'created_at',
+      'updated_at',
+      'queue_name',
+      'data',
+      'locked',
+      'locked_by',
+      'attempts',
+      'available_from'
+    ];
+
+    $escFields = [];
+    foreach($fields as $field)
+    {
+      $escFields[] = $db->escapeColumnName($field);
+    }
+
+    $query = 'INSERT INTO %T (' . implode(", ", $escFields) . ') VALUES ';
+    $inserts = [];
+    foreach($data as $item)
+    {
+      $values = [
+        "'" . $created . "'",
+        "'" . $created . "'",
+        "'" . $db->escapeString($queue->name()) . "'",
+        "'" . $db->escapeString(json_encode($item)) . "'",
+        0,
+        "''",
+        0,
+        "'" . $availableStr . "'"
+      ];
+
+      $inserts[] = implode(", ", $values);
+    }
+
+    $query .= '(' . implode('), (', $inserts) . ')';
+    $query = ParseQuery::parse(
+      $db, $query, $this->_queueMapper()->getTableName()
+    );
+
+    $db->query($query);
   }
 
   public function consume(IQueue $queue, IQueueConsumer $consumer)
