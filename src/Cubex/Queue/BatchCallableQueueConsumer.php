@@ -27,6 +27,6 @@ class BatchCallableQueueConsumer extends CallableQueueConsumer
 
   public function process(IQueue $queue, $data, $taskId = null)
   {
-    parent::process($queue, $data);
+    return parent::process($queue, $data);
   }
 }
