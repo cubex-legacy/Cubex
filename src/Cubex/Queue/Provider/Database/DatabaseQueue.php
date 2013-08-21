@@ -47,7 +47,7 @@ class DatabaseQueue implements IBatchQueueProvider
     );
     $date->setTimezone(new \DateTimeZone('UTC'));
 
-    $db = $this->_queueMapper()->connection();
+    $db = $this->_queueMapper(false, true)->connection();
 
     $created      = date('Y-m-d H:i:s');
     $availableStr = DateTimeHelper::formattedDateFromAnything($date);
