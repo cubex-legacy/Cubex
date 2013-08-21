@@ -87,14 +87,17 @@ class DatabaseQueue implements IBatchQueueProvider
       $inserts[] = implode(", ", $values);
     }
 
-    $query .= '(' . implode('), (', $inserts) . ')';
-    $query = ParseQuery::parse(
-      $db,
-      $query,
-      $this->_queueMapper()->getTableName()
-    );
+    if(count($inserts) > 0)
+    {
+      $query .= '(' . implode('), (', $inserts) . ')';
+      $query = ParseQuery::parse(
+        $db,
+        $query,
+        $this->_queueMapper()->getTableName()
+      );
 
-    $db->query($query);
+      $db->query($query);
+    }
   }
 
   public function consume(IQueue $queue, IQueueConsumer $consumer)
