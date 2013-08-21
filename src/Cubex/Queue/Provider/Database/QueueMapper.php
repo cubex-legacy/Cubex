@@ -6,8 +6,13 @@
 namespace Cubex\Queue\Provider\Database;
 
 use Cubex\Data\Attribute\Attribute;
+use Cubex\Database\Schema\DataType;
 use Cubex\Mapper\Database\RecordMapper;
 
+/**
+ * @index locked, locked_by, queue_name
+ * @index queue_name, locked, available_from
+ */
 class QueueMapper extends RecordMapper
 {
   public $queueName;
@@ -29,6 +34,11 @@ class QueueMapper extends RecordMapper
    * @datatype DateTime
    */
   public $availableFrom;
+
+  public function getIdStorageDataType()
+  {
+    return DataType::BIGINT;
+  }
 
   protected function _configure()
   {

@@ -399,9 +399,15 @@ class DBBuilder
     && !$this->_mapper->isCompositeId()
     )
     {
-      $this->_addedAutoId      = true;
+      $this->_addedAutoId = true;
+      $idDataType         = DataType::INT;
+      if(method_exists($this->_mapper, 'getIdStorageDataType'))
+      {
+        $idDataType = $this->_mapper->getIdStorageDataType();
+      }
+
       $this->_primaryColumns[] = new Column(
-        $this->_mapper->getIdKey(), DataType::INT, 10, true, false, null, true
+        $this->_mapper->getIdKey(), $idDataType, 10, true, false, null, true
       );
     }
 
