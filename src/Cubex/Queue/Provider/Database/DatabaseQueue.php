@@ -24,6 +24,7 @@ class DatabaseQueue implements IBatchQueueProvider
   protected $_maxAttempts;
   protected $_ownKey;
   protected $_waits;
+  protected $_deleteBatchIds = [];
 
   public function push(IQueue $queue, $data = null, $delay = 0)
   {
@@ -207,7 +208,11 @@ class DatabaseQueue implements IBatchQueueProvider
             $result = false;
           }
 
-          $this->_completeMapper($mapper, $result);
+          $this->_completeMapper($mapper, $result, true);
+        }
+        if($batchMappers)
+        {
+          $this->_processBatchDeletes();
         }
       }
     }
@@ -240,16 +245,25 @@ class DatabaseQueue implements IBatchQueueProvider
       {
         $this->_waits = 0;
         $result       = $consumer->process($queue, $mapper->data);
-        $this->_completeMapper($mapper, $result);
+        $this->_completeMapper($mapper, $result, false);
       }
     }
   }
 
-  protected function _completeMapper(QueueMapper $mapper, $result)
+  protected function _completeMapper(
+    QueueMapper $mapper, $result, $batchDelete = false
+  )
   {
     if($result || $mapper->attempts > $this->_maxAttempts)
     {
-      $mapper->delete();
+      if($batchDelete)
+      {
+        $this->_deleteBatchIds[] = $mapper->id();
+      }
+      else
+      {
+        $mapper->delete();
+      }
     }
     else
     {
@@ -294,5 +308,26 @@ class DatabaseQueue implements IBatchQueueProvider
     }
 
     return $this->_map;
+  }
+
+  protected function _processBatchDeletes()
+  {
+    if(empty($this->_deleteBatchIds))
+    {
+      return true;
+    }
+
+    $mapper = $this->_queueMapper();
+    $query  = ParseQuery::parse(
+      $mapper->connection(),
+      "DELETE FROM %T WHERE %C IN (%Ld)",
+      $mapper->getTableName(),
+      $mapper->getIdKey(),
+      $this->_deleteBatchIds
+    );
+
+    $mapper->connection()->query($query);
+    $this->_deleteBatchIds = [];
+    return true;
   }
 }
