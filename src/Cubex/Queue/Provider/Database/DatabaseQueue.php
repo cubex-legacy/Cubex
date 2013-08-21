@@ -41,7 +41,7 @@ class DatabaseQueue implements IBatchQueueProvider
 
   public function pushBatch(IQueue $queue, array $data, $delay = 0)
   {
-    // TODO: Change this to use a batched mapper group once T179 has been implemented
+    // TODO: Change to use a batched mapper group once T179 has been implemented
     $date = DateTimeHelper::dateTimeFromAnything(
       time() + $delay
     );
@@ -49,7 +49,7 @@ class DatabaseQueue implements IBatchQueueProvider
 
     $db = $this->_queueMapper()->connection();
 
-    $created = date('Y-m-d H:i:s');
+    $created      = date('Y-m-d H:i:s');
     $availableStr = DateTimeHelper::formattedDateFromAnything($date);
 
     $fields = [
@@ -69,7 +69,7 @@ class DatabaseQueue implements IBatchQueueProvider
       $escFields[] = $db->escapeColumnName($field);
     }
 
-    $query = 'INSERT INTO %T (' . implode(", ", $escFields) . ') VALUES ';
+    $query   = 'INSERT INTO %T (' . implode(", ", $escFields) . ') VALUES ';
     $inserts = [];
     foreach($data as $item)
     {
@@ -89,7 +89,9 @@ class DatabaseQueue implements IBatchQueueProvider
 
     $query .= '(' . implode('), (', $inserts) . ')';
     $query = ParseQuery::parse(
-      $db, $query, $this->_queueMapper()->getTableName()
+      $db,
+      $query,
+      $this->_queueMapper()->getTableName()
     );
 
     $db->query($query);
@@ -153,7 +155,11 @@ class DatabaseQueue implements IBatchQueueProvider
     {
       $collection   = $this->_lockRecords($queue, $batchSize);
       $batchMappers = $collection->loadWhere(
-        ['locked' => 1, 'locked_by' => $this->_ownKey]
+        [
+        'locked'     => 1,
+        'locked_by'  => $this->_ownKey,
+        'queue_name' => $queue->name()
+        ]
       )->get();
 
       if($batchMappers->count() === 0)
@@ -212,7 +218,11 @@ class DatabaseQueue implements IBatchQueueProvider
     {
       $collection = $this->_lockRecords($queue, 1);
       $mapper     = $collection->loadOneWhere(
-        ['locked' => 1, 'locked_by' => $this->_ownKey]
+        [
+        'locked'     => 1,
+        'locked_by'  => $this->_ownKey,
+        'queue_name' => $queue->name()
+        ]
       );
 
       if($mapper === null)
