@@ -178,7 +178,7 @@ class FileSystem
   {
     $path = str_replace("\\", "/", $path);
 
-    if(is_dir($path))
+    if(file_exists($path) && is_dir($path))
     {
       $path = rtrim($path, "/");
     }
