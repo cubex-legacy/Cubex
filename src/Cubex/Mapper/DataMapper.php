@@ -43,7 +43,7 @@ abstract class DataMapper
   /**
    * Unique ID based on uniqid and class name
    */
-  const ID_UUID = 'uuid';
+  const ID_UNIQID = 'uuid';
 
   const SCHEMA_UNDERSCORE = 'underscore';
   const SCHEMA_CAMELCASE  = 'camel';
@@ -160,7 +160,7 @@ abstract class DataMapper
         case self::ID_CUBID:
           $id = Cubid::generateCubid($this);
           break;
-        case self::ID_UUID:
+        case self::ID_UNIQID:
           $id = uniqid(class_shortname($this), true);
           break;
       }
