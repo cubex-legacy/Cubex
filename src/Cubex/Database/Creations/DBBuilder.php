@@ -448,7 +448,7 @@ class DBBuilder
     $sql = "CREATE TABLE ";
     if($this->_database !== null)
     {
-      $sql .= `" . $this->_database . "`;
+      $sql .= '`' . $this->_database . '`';
     }
     $sql .= "`" . $this->_tableName . "`";
     $sql .= "(" . implode(",", $content) . ") ";
