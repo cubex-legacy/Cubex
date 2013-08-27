@@ -50,6 +50,25 @@ class DispatchMapper extends Dispatcher
   }
 
   /**
+   * @param string $path Path to a directory to start looking for external
+   *                     entities. We try our best to return what we think would
+   *                     be the actual entity from here.
+   *
+   * @return array
+   */
+  public function findExtendedEntities($path)
+  {
+    $entities = $this->findEntities(CUBEX_PROJECT_ROOT . DS . $path);
+
+    foreach($entities as $ii => $entity)
+    {
+      $entities[$ii] = trim(last(explode($path, $entity)), "/\\");
+    }
+
+    return $entities;
+  }
+
+  /**
    * Find all directories in the current project matching the resource
    * direcotry. The entity is the path inside the project including the project
    * namespace;

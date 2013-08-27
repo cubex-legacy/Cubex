@@ -50,6 +50,11 @@ class Dispatcher
     "woff"  => "application/x-font-woff",
     "zip"   => "application/zip",
   ];
+  /**
+   * @var string $_extends Path to the source directory of an extended project
+   *                       starting at the project base.
+   */
+  protected $_extends;
 
   const BUILD_OPT_FORCE_SECURE = "force_secure";
   const BUILD_OPT_TYPE         = "type";
@@ -61,6 +66,7 @@ class Dispatcher
 
   protected static $_dispatchInis = [];
   protected static $_entities;
+  protected static $_externalEntities;
   /**
    * @var \Cubex\Foundation\Config\Config
    */
@@ -90,6 +96,10 @@ class Dispatcher
     $this->_projectNamespace    = $projectConfig->getStr(
       "namespace",
       "Project"
+    );
+    $this->_extends             = trim(
+      $projectConfig->getStr("extends", ""),
+      "/\\"
     );
     $this->_domainMap           = $dispatchConfig->getArr("domain_map", []);
     $this->_externalMap         = $dispatchConfig->getArr("external_map", []);
@@ -260,6 +270,22 @@ class Dispatcher
   }
 
   /**
+   * @return bool
+   */
+  public function isExtending()
+  {
+    return strlen($this->_extends) > 0;
+  }
+
+  /**
+   * @return string
+   */
+  public function getExtendsPath()
+  {
+    return $this->_extends;
+  }
+
+  /**
    * @param $entityHash
    *
    * @return string
@@ -310,12 +336,27 @@ class Dispatcher
     $mapper = new DispatchMapper($this->getConfig(), $this->getFileSystem());
     $path   = $this->findEntityFromHash($entityHash, $mapper);
 
-    if($path === null)
+    if($path !== null)
     {
-      return rawurldecode($entityHash);
+      if($this->getFileSystem()->isDir($path))
+      {
+        return $path;
+      }
+
+      if($this->isExtending())
+      {
+        return sprintf(
+          "%s%s%s%s%s",
+          CUBEX_PROJECT_ROOT,
+          DS,
+          $this->getExtendsPath(),
+          DS,
+          $path
+        );
+      }
     }
 
-    return $path;
+    return rawurldecode($entityHash);
   }
 
   /**
@@ -583,6 +624,24 @@ class Dispatcher
       if($this->generateEntityHash($entity, strlen($hash)) === $hash)
       {
         return $entity;
+      }
+    }
+
+    if($this->isExtending())
+    {
+      if(self::$_externalEntities === null)
+      {
+        self::$_externalEntities = $mapper->findExtendedEntities(
+          $this->getExtendsPath()
+        );
+      }
+
+      foreach(self::$_externalEntities as $entity)
+      {
+        if($this->generateEntityHash($entity, strlen($hash)) === $hash)
+        {
+          return $entity;
+        }
       }
     }
 
