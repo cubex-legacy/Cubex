@@ -35,7 +35,6 @@ class MySQL implements IDatabaseService
     $this->_config = $config;
   }
 
-
   public function connect($mode = 'w')
   {
     $hostname = $this->_config->getStr('hostname', 'localhost');
@@ -178,13 +177,12 @@ class MySQL implements IDatabaseService
   /**
    * @param $query
    *
-   * @return bool
+   * @return \mysqli_result
    */
   public function query($query)
   {
-    $this->_prepareConnection('w');
-
-    return $this->_doQuery($query) === true;
+    $this->_prepareConnection(starts_with($query, "select", false) ? 'r' : 'w');
+    return $this->_doQuery($query);
   }
 
   /**
