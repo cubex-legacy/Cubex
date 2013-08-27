@@ -4,6 +4,7 @@
  */
 namespace Cubex\Mapper;
 
+use Cubex\Cubid\Cubid;
 use Cubex\Data\Attribute\Attribute;
 use Cubex\Data\Attribute\CallbackAttribute;
 use Cubex\Data\Attribute\CompositeAttribute;
@@ -34,6 +35,15 @@ abstract class DataMapper
    * Base ID on multiple keys
    */
   const ID_COMPOSITE_SPLIT = 'compositesplit';
+
+  /**
+   * Cubex ID for the item
+   */
+  const ID_CUBID = 'cubid';
+  /**
+   * Unique ID based on uniqid and class name
+   */
+  const ID_UUID = 'uuid';
 
   const SCHEMA_UNDERSCORE = 'underscore';
   const SCHEMA_CAMELCASE  = 'camel';
@@ -142,6 +152,20 @@ abstract class DataMapper
 
   public function setId($id)
   {
+    if($id === null)
+    {
+      $idType = $this->getConfiguration()[self::CONFIG_IDS];
+      switch($idType)
+      {
+        case self::ID_CUBID:
+          $id = Cubid::generateCubid($this);
+          break;
+        case self::ID_UUID:
+          $id = uniqid(class_shortname($this), true);
+          break;
+      }
+    }
+
     if($this->attributeExists($this->getIdKey()))
     {
       $this->setData($this->getIdKey(), $id);

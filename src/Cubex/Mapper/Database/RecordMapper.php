@@ -46,6 +46,7 @@ abstract class RecordMapper extends DataMapper
   {
     parent::__construct();
     $this->_addIdAttribute();
+    $this->setId($id);
     if($id !== null)
     {
       $this->load($id, $columns);
