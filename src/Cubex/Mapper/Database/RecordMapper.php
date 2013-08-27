@@ -943,6 +943,7 @@ abstract class RecordMapper extends DataMapper
     $final = [];
     foreach($data as $k => $v)
     {
+      $col = $this->stringToColumnName($k);
       if(is_array($v))
       {
         $attr = $this->getAttribute($k);
@@ -951,6 +952,7 @@ abstract class RecordMapper extends DataMapper
           $keys = array_keys($attr->getNamedArray());
           if(count($keys) == count($v))
           {
+            $keys  = array_map([$this, "stringToColumnName"], $keys);
             $out   = array_combine($keys, $v);
             $final = array_merge($final, $out);
           }
@@ -960,23 +962,23 @@ abstract class RecordMapper extends DataMapper
             {
               if(isset($v[$i]))
               {
-                $final[$key] = $v[$i];
+                $final[$this->stringToColumnName($key)] = $v[$i];
               }
             }
           }
         }
         else if($attr !== null)
         {
-          $final[$k] = $attr->serialize($v);
+          $final[$col] = $attr->serialize($v);
         }
         else
         {
-          $final[$k] = $v;
+          $final[$col] = $v;
         }
       }
       else
       {
-        $final[$k] = $v;
+        $final[$col] = $v;
       }
     }
     return $final;

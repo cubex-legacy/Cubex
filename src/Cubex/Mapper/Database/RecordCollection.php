@@ -75,6 +75,10 @@ class RecordCollection extends Collection
   public function setColumns($columns = ['*'])
   {
     $this->_columns = Filter::arr($columns);
+    $this->_columns = array_map(
+      [$this->_mapperType, "stringToColumnName"],
+      $this->_columns
+    );
     return $this;
   }
 
@@ -499,7 +503,6 @@ class RecordCollection extends Collection
     return parent::first($default);
   }
 
-
   /**
    * Get a selection from the entire result set
    *
@@ -522,7 +525,8 @@ class RecordCollection extends Collection
    */
   public function whereEq($column, $value)
   {
-    $type = substr(ParseQuery::valueType($value), 1);
+    $column = $this->_mapperType->stringToColumnName($column);
+    $type   = substr(ParseQuery::valueType($value), 1);
     $this->loadWhereAppend("%C %=" . $type, $column, $value);
     return $this;
   }
@@ -537,7 +541,8 @@ class RecordCollection extends Collection
    */
   public function whereNeq($column, $value)
   {
-    $type = substr(ParseQuery::valueType($value), 1);
+    $column = $this->_mapperType->stringToColumnName($column);
+    $type   = substr(ParseQuery::valueType($value), 1);
     $this->loadWhereAppend("%C != %" . $type, $column, $value);
     return $this;
   }
@@ -551,6 +556,7 @@ class RecordCollection extends Collection
    */
   public function whereIn($column, array $array, $type = 's')
   {
+    $column = $this->_mapperType->stringToColumnName($column);
     $this->loadWhereAppend("%C IN (%L$type)", $column, $array);
     return $this;
   }
@@ -564,6 +570,7 @@ class RecordCollection extends Collection
    */
   public function whereNotIn($column, array $array, $type = 's')
   {
+    $column = $this->_mapperType->stringToColumnName($column);
     $this->loadWhereAppend("%C NOT IN (%L$type)", $column, $array);
     return $this;
   }
@@ -576,6 +583,7 @@ class RecordCollection extends Collection
    */
   public function whereLike($column, $value)
   {
+    $column = $this->_mapperType->stringToColumnName($column);
     $this->loadWhereAppend("%C LIKE %~", $column, $value);
     return $this;
   }
@@ -588,6 +596,7 @@ class RecordCollection extends Collection
    */
   public function whereStartsLike($column, $value)
   {
+    $column = $this->_mapperType->stringToColumnName($column);
     $this->loadWhereAppend("%C LIKE %>", $column, $value);
     return $this;
   }
@@ -600,6 +609,7 @@ class RecordCollection extends Collection
    */
   public function whereEndsLike($column, $value)
   {
+    $column = $this->_mapperType->stringToColumnName($column);
     $this->loadWhereAppend("%C LIKE %<", $column, $value);
     return $this;
   }
@@ -614,6 +624,7 @@ class RecordCollection extends Collection
    */
   public function whereBetween($column, $value1, $value2 = null, $type = "s")
   {
+    $column = $this->_mapperType->stringToColumnName($column);
     if($value2 === null && is_array($value1))
     {
       list($value1, $value2) = array_values($value1);
@@ -636,6 +647,7 @@ class RecordCollection extends Collection
    */
   public function whereGreaterThan($column, $value, $type = 's')
   {
+    $column = $this->_mapperType->stringToColumnName($column);
     $this->loadWhereAppend("%C > %" . $type, $column, $value);
     return $this;
   }
@@ -649,12 +661,14 @@ class RecordCollection extends Collection
    */
   public function whereLessThan($column, $value, $type = 's')
   {
+    $column = $this->_mapperType->stringToColumnName($column);
     $this->loadWhereAppend("%C < %" . $type, $column, $value);
     return $this;
   }
 
   protected function _aggregateNotLoaded($column)
   {
+    $column = $this->_mapperType->stringToColumnName($column);
     if(!$this->_loaded)
     {
       list(, $rows) = $this->_doQuery([$column . ' AS `c`'], false, true, true);
@@ -678,6 +692,7 @@ class RecordCollection extends Collection
 
   public function min($key = 'id')
   {
+    $key    = $this->_mapperType->stringToColumnName($key);
     $result = $this->_aggregateNotLoaded('MIN(`' . $key . '`)');
     if($result === null)
     {
@@ -688,6 +703,7 @@ class RecordCollection extends Collection
 
   public function max($key = 'id')
   {
+    $key    = $this->_mapperType->stringToColumnName($key);
     $result = $this->_aggregateNotLoaded('MAX(`' . $key . '`)');
     if($result === null)
     {
@@ -698,6 +714,7 @@ class RecordCollection extends Collection
 
   public function avg($key = 'id')
   {
+    $key    = $this->_mapperType->stringToColumnName($key);
     $result = $this->_aggregateNotLoaded('AVG(`' . $key . '`)');
     if($result === null)
     {
@@ -708,6 +725,7 @@ class RecordCollection extends Collection
 
   public function sum($key = 'id')
   {
+    $key    = $this->_mapperType->stringToColumnName($key);
     $result = $this->_aggregateNotLoaded('SUM(`' . $key . '`)');
     if($result === null)
     {
