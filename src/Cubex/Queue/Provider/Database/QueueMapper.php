@@ -5,6 +5,7 @@
 
 namespace Cubex\Queue\Provider\Database;
 
+use Cubex\Cubid\ICubid;
 use Cubex\Data\Attribute\Attribute;
 use Cubex\Database\Schema\DataType;
 use Cubex\Mapper\Database\RecordMapper;
@@ -13,7 +14,7 @@ use Cubex\Mapper\Database\RecordMapper;
  * @index locked, locked_by, queue_name
  * @index queue_name, locked, available_from
  */
-class QueueMapper extends RecordMapper
+class QueueMapper extends RecordMapper implements ICubid
 {
   public $queueName;
   /**
@@ -35,9 +36,11 @@ class QueueMapper extends RecordMapper
    */
   public $availableFrom;
 
+  protected $_idType = self::ID_CUBID;
+
   public function getIdStorageDataType()
   {
-    return DataType::BIGINT;
+    return DataType::VARCHAR;
   }
 
   protected function _configure()
@@ -55,5 +58,21 @@ class QueueMapper extends RecordMapper
   {
     $this->_dbServiceName = $name;
     return $this;
+  }
+
+  /**
+   * @return string sub type for the class e.g. USER | COMMENT
+   */
+  public static function getCubidSubType()
+  {
+    return 'Q';
+  }
+
+  /**
+   * @return int Length of the final CUBID
+   */
+  public static function getCubidLength()
+  {
+    return 32;
   }
 }
