@@ -338,12 +338,7 @@ class Dispatcher
 
     if($path !== null)
     {
-      $fullPath = sprintf(
-        "%s%s%s",
-        $this->getProjectBase(),
-        DS,
-        $path
-      );
+      $fullPath = build_path($this->getProjectBase(), $path);
 
       if($this->getFileSystem()->isDir($fullPath))
       {
