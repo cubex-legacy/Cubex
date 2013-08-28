@@ -65,7 +65,7 @@ class DatabaseQueue implements IBatchQueueProvider
       'attempts',
       'available_from'
     ];
-    if(! $autoIncrementId)
+    if(!$autoIncrementId)
     {
       $fields[] = 'id';
     }
@@ -91,7 +91,7 @@ class DatabaseQueue implements IBatchQueueProvider
         "'" . $availableStr . "'"
       ];
 
-      if(! $autoIncrementId)
+      if(!$autoIncrementId)
       {
         $values[] = "'" . $this->_queueMapper(true)->setId(null)->id() . "'";
       }
@@ -331,7 +331,7 @@ class DatabaseQueue implements IBatchQueueProvider
     $mapper = $this->_queueMapper();
     $query  = ParseQuery::parse(
       $mapper->connection(),
-      "DELETE FROM %T WHERE %C IN (%Ld)",
+      "DELETE FROM %T WHERE %C IN (%Ls)",
       $mapper->getTableName(),
       $mapper->getIdKey(),
       $this->_deleteBatchIds
