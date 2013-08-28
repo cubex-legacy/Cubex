@@ -53,6 +53,8 @@ class DatabaseQueue implements IBatchQueueProvider
     $created      = date('Y-m-d H:i:s');
     $availableStr = DateTimeHelper::formattedDateFromAnything($date);
 
+    $autoIncrementId = $this->_queueMapper(true)->setId(null)->id() === null;
+
     $fields = [
       'created_at',
       'updated_at',
@@ -63,6 +65,10 @@ class DatabaseQueue implements IBatchQueueProvider
       'attempts',
       'available_from'
     ];
+    if(! $autoIncrementId)
+    {
+      $fields[] = 'id';
+    }
 
     $escFields = [];
     foreach($fields as $field)
@@ -84,6 +90,11 @@ class DatabaseQueue implements IBatchQueueProvider
         0,
         "'" . $availableStr . "'"
       ];
+
+      if(! $autoIncrementId)
+      {
+        $values[] = "'" . $this->_queueMapper(true)->setId(null)->id() . "'";
+      }
 
       $inserts[] = implode(", ", $values);
     }
