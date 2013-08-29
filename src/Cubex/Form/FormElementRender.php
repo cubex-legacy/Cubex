@@ -272,7 +272,7 @@ class FormElementRender implements IFormElementRender
       if(empty($options))
       {
         $options = array(
-          $this->_element->data() => $this->_element->name()
+          $this->_element->data() => $this->_element->label()
         );
       }
     }
@@ -282,14 +282,14 @@ class FormElementRender implements IFormElementRender
       $out .= $this->renderLabel();
     }
 
-    foreach($options as $k => $v)
+    foreach($options as $k => $labelText)
     {
-      $id      = $this->_element->id();
-      $multiId = $id . '-' . md5($k);
+      $id = $this->_element->id();
+      $id = $multi ? $id . '-' . md5($k) : $id;
 
       if($multi && $this->_labelPosition == Form::LABEL_BEFORE)
       {
-        $out .= $this->renderLabel($v, $multiId);
+        $out .= $this->renderLabel($labelText, $id);
       }
 
       $input = '<input';
@@ -298,7 +298,7 @@ class FormElementRender implements IFormElementRender
           "type"  => $type,
           "name"  => $this->_element->name() .
           ($multi && !$type == 'radio' ? '[]' : ''),
-          "id"    => $multi ? $multiId : $id,
+          "id"    => $id,
           "value" => esc($multi ? $k : $this->_element->selectedValue()),
         ]
       );
@@ -335,11 +335,11 @@ class FormElementRender implements IFormElementRender
 
       if($this->_labelPosition == Form::LABEL_SURROUND_LEFT)
       {
-        $out .= $this->renderLabel($v . $input, $multi ? $multiId : $id);
+        $out .= $this->renderLabel($labelText . $input, $id);
       }
       else if($this->_labelPosition == Form::LABEL_SURROUND_RIGHT)
       {
-        $out .= $this->renderLabel($input . $v, $multi ? $multiId : $id);
+        $out .= $this->renderLabel($input . $labelText, $id);
       }
       else
       {
@@ -348,7 +348,7 @@ class FormElementRender implements IFormElementRender
 
       if($multi && $this->_labelPosition == Form::LABEL_AFTER)
       {
-        $out .= $this->renderLabel($v, $multiId);
+        $out .= $this->renderLabel($labelText, $id);
       }
       else if($this->_labelPosition == Form::LABEL_AFTER)
       {
