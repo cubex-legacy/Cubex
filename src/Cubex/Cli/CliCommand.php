@@ -614,10 +614,17 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
    * @param string $longArgName The long name of the argument
    *
    * @return bool
+   *
+   * @throws \Exception
    */
   public function argumentIsSet($longArgName)
   {
-    return $this->_getArgObjByName($longArgName, true)->hasData();
+    $arg = $this->_getArgObjByName($longArgName, true);
+    if($arg === null)
+    {
+      throw new \Exception('Argument does not exist: ' . $longArgName);
+    }
+    return $arg->hasData();
   }
 
   /**
@@ -629,6 +636,8 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
    *                        not set - overrides the argument's own default
    *
    * @return string|null
+   *
+   * @throws \Exception
    */
   public function argumentValue($longArgName, $default = null)
   {
@@ -638,6 +647,10 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
     }
 
     $argObj = $this->_getArgObjByName($longArgName, true);
+    if($argObj === null)
+    {
+      throw new \Exception('Argument does not exist: ' . $longArgName);
+    }
     if($argObj->hasData())
     {
       return $argObj->getData();
