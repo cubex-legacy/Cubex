@@ -85,7 +85,6 @@ interface IDatabaseService extends IService
    */
   public function getColumns($query);
 
-
   /**
    * Escape column name
    *

@@ -112,4 +112,24 @@ class SearchObject
     $this->_fields[$field] = $type;
     return $this;
   }
+
+  public static function create($data)
+  {
+    $result = new self();
+    if(!$data)
+    {
+      return $result;
+    }
+
+    if($data instanceof SearchObject)
+    {
+      return $data;
+    }
+
+    foreach($data as $field => $value)
+    {
+      $result->addSearch($field, $value);
+    }
+    return $result;
+  }
 }

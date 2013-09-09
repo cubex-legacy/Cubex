@@ -12,6 +12,7 @@ use Cubex\Mapper\Database\RecordMapper;
 
 abstract class I18nRecordMapper extends RecordMapper
 {
+  protected $_translateAttributes = [];
   protected $_textProperties;
   protected $_loadedProperties;
   protected $_language = 'en';
@@ -104,10 +105,24 @@ abstract class I18nRecordMapper extends RecordMapper
 
     foreach($names as $name)
     {
+      $this->_translateAttributes[$name] = true;
+
       $attr = new CallbackAttribute($name);
       $attr->setCallback("saveProperty");
       $attr->setStoreOriginal(false);
       $this->_addAttribute($attr);
+    }
+  }
+
+  public function getTranslationAttributes($keysOnly = true)
+  {
+    if($keysOnly)
+    {
+      return array_keys($this->_translateAttributes);
+    }
+    else
+    {
+      return $this->_translateAttributes;
     }
   }
 
@@ -176,5 +191,33 @@ abstract class I18nRecordMapper extends RecordMapper
     }
 
     return $this;
+  }
+
+  public static function loadWhereWith(array $columns, $where/**,$where*/)
+  {
+    $args = func_get_args();
+    array_shift($args);
+    $collection = new I18nRecordCollection(new static);
+    $collection->setColumns($columns);
+    return call_user_func_array(
+      [
+      $collection,
+      'loadOneWhere'
+      ],
+      $args
+    );
+  }
+
+  /**
+   * @return RecordCollection
+   */
+  public static function collection()
+  {
+    $collection = new I18nRecordCollection(new static);
+    if(func_num_args() > 0)
+    {
+      call_user_func_array([$collection, 'loadWhere'], func_get_args());
+    }
+    return $collection;
   }
 }
