@@ -207,7 +207,6 @@ class PivotMapper extends RecordMapper
     return $this;
   }
 
-
   public function loadIds($ida, $idb, $columns = ['*'])
   {
     if($ida instanceof DataMapper)

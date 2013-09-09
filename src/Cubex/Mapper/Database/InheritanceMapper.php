@@ -47,7 +47,6 @@ abstract class InheritanceMapper extends RecordMapper
     return $parent;
   }
 
-
   public function idPattern()
   {
     $pattern = parent::idPattern();
