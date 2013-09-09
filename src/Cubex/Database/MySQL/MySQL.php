@@ -136,19 +136,15 @@ class MySQL implements IDatabaseService
   }
 
   /**
-   * @returns \mysqli_result
+   * @param $query
+   *
+   * @return bool|\mysqli_result
+   * @throws \Exception
    */
   protected function _doQuery($query)
   {
     $this->_errorno = $this->_errormsg = null;
     $result         = $this->_connection->query($query);
-    if(!$result)
-    {
-      $this->_errorno  = $this->_connection->errno;
-      $this->_errormsg = $this->_connection->error;
-      Log::error('(' . $this->_errorno . ') ' . $this->_errormsg);
-      throw new \Exception($this->_errormsg, $this->_errorno);
-    }
 
     EventManager::trigger(
       EventManager::CUBEX_QUERY,
@@ -159,6 +155,14 @@ class MySQL implements IDatabaseService
       ],
       $this
     );
+
+    if(!$result)
+    {
+      $this->_errorno  = $this->_connection->errno;
+      $this->_errormsg = $this->_connection->error;
+      Log::error('(' . $this->_errorno . ') ' . $this->_errormsg);
+      throw new \Exception($this->_errormsg, $this->_errorno);
+    }
 
     return $result;
   }
