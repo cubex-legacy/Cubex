@@ -1431,6 +1431,12 @@ abstract class DataMapper
 
   public function stringToColumnName($string)
   {
+    //Handle probable method columns
+    if(stristr($string, ' ') || stristr($string, '('))
+    {
+      return $string;
+    }
+
     switch($this->schemaType())
     {
       case self::SCHEMA_UNDERSCORE:
