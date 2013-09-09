@@ -43,6 +43,7 @@ class RecordCollection extends Collection
 
   public function setOrderBy($field, $order = 'ASC')
   {
+    $field          = $this->_mapperType->stringToColumnName($field);
     $this->_orderBy = ParseQuery::parse(
       $this->connection(),
       ["%C $order", $field]
@@ -58,6 +59,7 @@ class RecordCollection extends Collection
 
   public function setGroupBy($groupBy = 'id')
   {
+    $groupBy = $this->_mapperType->stringToColumnName($groupBy);
     if(stristr($groupBy, ' ') || stristr($groupBy, ','))
     {
       $this->_groupBy = $groupBy;
