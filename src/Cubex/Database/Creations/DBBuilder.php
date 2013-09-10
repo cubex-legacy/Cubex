@@ -11,7 +11,6 @@ use Cubex\Database\Schema\Column;
 use Cubex\Database\Schema\DataType;
 use Cubex\Helpers\Strings;
 use Cubex\Log\Log;
-use Cubex\Mapper\DataMapper;
 use Cubex\Mapper\Database\RecordMapper;
 use Cubex\Sprintf\ParseQuery;
 
@@ -100,7 +99,7 @@ class DBBuilder
   {
     $sql = 'ALTER TABLE `' . $this->_tableName . '` ';
 
-    $schema = call_user_func([$this->_mapperClass, 'schema']);
+    $schema = call_user_func([$this->_mapperClass, 'schema'], $this->_mapper);
     $keys   = array_keys($schema);
 
     $cols = [];

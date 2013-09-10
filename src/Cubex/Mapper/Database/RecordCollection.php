@@ -196,12 +196,10 @@ class RecordCollection extends Collection
     );
   }
 
-  protected function _doQuery(
-    $columns, $useOrder = false, $useLimit = false, $cache = false
-  )
+  protected function _makeTableQuery($columns)
   {
-    $query      = 'SELECT %LC FROM %T';
-    $tableQuery = $query = ParseQuery::parse(
+    $query = 'SELECT %LC FROM %T';
+    return ParseQuery::parse(
       $this->connection(),
       [
       $query,
@@ -209,6 +207,13 @@ class RecordCollection extends Collection
       $this->_mapperType->getTableName(),
       ]
     );
+  }
+
+  protected function _doQuery(
+    $columns, $useOrder = false, $useLimit = false, $cache = false
+  )
+  {
+    $tableQuery = $query = $this->_makeTableQuery($columns);
 
     $this->_query = trim($this->_query);
     if(!empty($this->_query) && $this->_query != '1=1')

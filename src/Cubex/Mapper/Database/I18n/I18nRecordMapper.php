@@ -5,17 +5,16 @@
 
 namespace Cubex\Mapper\Database\I18n;
 
-use Cubex\Data\Attribute\CallbackAttribute;
-use Cubex\Data\Handler\DataHandler;
-use Cubex\Mapper\Database\RecordCollection;
 use Cubex\Mapper\Database\RecordMapper;
 
 abstract class I18nRecordMapper extends RecordMapper
 {
   protected $_translateAttributes = [];
+  protected $_loadedData;
   protected $_textProperties;
   protected $_loadedProperties;
   protected $_language = 'en';
+  protected $_textMapper;
 
   public function __construct($id = null, $columns = ['*'], $language = null)
   {
@@ -28,16 +27,45 @@ abstract class I18nRecordMapper extends RecordMapper
       $this->setLanguage(LOCALE2);
     }
     parent::__construct($id, $columns);
+    $this->_textMapper = I18nTextRecordMapper::create($this);
+    $this->_loadTextMapper();
+  }
+
+  public function getTextMapper()
+  {
+    return $this->_textMapper;
   }
 
   /**
-   * @return TextContainer
+   * @param bool|array $validate   all fields, or array of fields to validate
+   * @param bool       $processAll Process all validators, or fail on first
+   * @param bool       $failFirst  Perform all checks within a validator
+   *
+   * @return bool|mixed
+   * @throws \Exception
    */
-  abstract public function getTextContainer();
-
-  public function textResourceType()
+  public function saveChanges(
+    $validate = false, $processAll = false, $failFirst = false
+  )
   {
-    return class_shortname($this);
+    $result = parent::saveChanges($validate, $processAll, $failFirst);
+    foreach($this->_translateAttributes as $property => $e)
+    {
+      $this->_textMapper->setData($property, $this->getData($property));
+    }
+    $this->_textMapper->setId([$this->id(), $this->language()]);
+    $this->_textMapper->saveChanges($validate, $processAll, $failFirst);
+    return $result;
+  }
+
+  protected function _load()
+  {
+    $loaded = parent::_load();
+    if($loaded && $this->_textMapper)
+    {
+      $this->_textMapper->exists();
+    }
+    return true;
   }
 
   public function language()
@@ -47,49 +75,18 @@ abstract class I18nRecordMapper extends RecordMapper
 
   public function setLanguage($language)
   {
-    $this->_language = $language;
+    $this->_language   = $language;
+    $this->_textMapper = I18nTextRecordMapper::create($this);
+    $this->_loadTextMapper();
     return $this;
   }
 
-  /**
-   * @param string $language
-   *
-   * @return \Cubex\Data\Handler\DataHandler
-   */
-  protected function _getTextProperties($language = null)
+  protected function _loadTextMapper()
   {
-    if($language === null)
+    if($this->_load())
     {
-      $language = $this->language();
+      $this->_textMapper->load([$this->id(), $this->language()]);
     }
-    if(!isset($this->_textProperties[$language]))
-    {
-      $this->_textProperties[$language] = null;
-    }
-    $load = [];
-    if($this->_textProperties[$language] === null)
-    {
-      $container = $this->getTextContainer();
-      $prefetch  = new TextPrefetch($container, $this->_language);
-      $load      = $prefetch->load($this->textResourceType(), $this->id());
-
-      if(!$load)
-      {
-        $prefetch->preFetch($this->textResourceType(), [$this->id()]);
-        $load = $prefetch->load($this->textResourceType(), $this->id());
-      }
-      $this->_textProperties[$language] = $load;
-    }
-    return new DataHandler($load);
-  }
-
-  public function propertyText($property, $default = null, $language = null)
-  {
-    if($language === null)
-    {
-      $language = $this->language();
-    }
-    return $this->_getTextProperties($language)->getStr($property, $default);
   }
 
   protected function _addTranslationAttribute($names)
@@ -105,12 +102,8 @@ abstract class I18nRecordMapper extends RecordMapper
 
     foreach($names as $name)
     {
+      $this->_attribute($name)->setSaveToDatabase(false);
       $this->_translateAttributes[$name] = true;
-
-      $attr = new CallbackAttribute($name);
-      $attr->setCallback("saveProperty");
-      $attr->setStoreOriginal(false);
-      $this->_addAttribute($attr);
     }
   }
 
@@ -126,90 +119,8 @@ abstract class I18nRecordMapper extends RecordMapper
     }
   }
 
-  public function saveProperty(CallbackAttribute $attr)
-  {
-    $lang     = $this->language();
-    $resource = [$this->id(), $this->textResourceType()];
-
-    $textContainer = $this->getTextContainer();
-    $translation   = $textContainer::loadWhereOrNew(
-      [
-      'resource' => $resource,
-      'language' => $lang,
-      'property' => $attr->name()
-      ]
-    );
-    /**
-     * @var $translation TextContainer
-     */
-    $translation->language = $lang;
-    $translation->resource = $resource;
-    $translation->text     = $attr->data();
-    $translation->property = $attr->name();
-    $translation->saveChanges();
-  }
-
-  protected function _loadProperties()
-  {
-    if($this->_loadedProperties !== true)
-    {
-      $props = $this->_getTextProperties();
-      foreach($props->availableKeys() as $key)
-      {
-        $this->_attribute($key)->setData($props->getStr($key))->unsetModified();
-      }
-      $this->_loadedProperties = true;
-    }
-  }
-
-  protected function _load()
-  {
-    $loaded = parent::_load();
-    if($loaded)
-    {
-      $this->_loadProperties();
-    }
-    return true;
-  }
-
-  public function getData($attribute)
-  {
-    $this->_loadProperties();
-    return parent::getData($attribute);
-  }
-
-  public function delete()
-  {
-    parent::delete();
-    $textContainers = new RecordCollection($this->getTextContainer());
-    $textContainers = $textContainers->loadWhere(
-      ['resource' => [$this->id(), $this->textResourceType()]]
-    );
-    foreach($textContainers as $textContainer)
-    {
-      $textContainer->delete();
-    }
-
-    return $this;
-  }
-
-  public static function loadWhereWith(array $columns, $where/**,$where*/)
-  {
-    $args = func_get_args();
-    array_shift($args);
-    $collection = new I18nRecordCollection(new static);
-    $collection->setColumns($columns);
-    return call_user_func_array(
-      [
-      $collection,
-      'loadOneWhere'
-      ],
-      $args
-    );
-  }
-
   /**
-   * @return RecordCollection
+   * @return I18nRecordCollection
    */
   public static function collection()
   {
@@ -219,5 +130,28 @@ abstract class I18nRecordMapper extends RecordMapper
       call_user_func_array([$collection, 'loadWhere'], func_get_args());
     }
     return $collection;
+  }
+
+  /**
+   * @param string $locale
+   *
+   * @return I18nRecordCollection
+   */
+  public static function localeCollection($locale = 'en')
+  {
+    $collection = new I18nRecordCollection(new static);
+    $collection->setLanguage($locale);
+    $args = func_get_args();
+    array_shift($args);
+    if(func_num_args() > 1)
+    {
+      call_user_func_array([$collection, 'loadWhere'], $args);
+    }
+    return $collection;
+  }
+
+  public function getTextMapperTableAppend()
+  {
+    return "translation";
   }
 }

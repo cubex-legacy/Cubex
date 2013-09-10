@@ -793,12 +793,12 @@ abstract class RecordMapper extends DataMapper
     }
   }
 
-  public static function schema()
+  public static function schema(RecordMapper $source = null)
   {
-    /**
-     * @var $source self
-     */
-    $source = new static;
+    if($source === null)
+    {
+      $source = new static;
+    }
     $schema = $source->conn()->getKeyedRows(
       "DESCRIBE `" . $source->getTableName() . '`'
     );

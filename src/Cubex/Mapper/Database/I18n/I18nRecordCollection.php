@@ -6,7 +6,6 @@
 namespace Cubex\Mapper\Database\I18n;
 
 use Cubex\Mapper\Database\RecordCollection;
-use Cubex\Mapper\Database\SearchObject;
 use Cubex\Sprintf\ParseQuery;
 
 class I18nRecordCollection extends RecordCollection
@@ -15,108 +14,48 @@ class I18nRecordCollection extends RecordCollection
    * @var I18nRecordMapper
    */
   protected $_mapperType;
+  protected $_language = 'en';
 
-  public function loadWhere($pattern /* , $arg, $arg, $arg ... */)
+  public function __construct(
+    I18nRecordMapper $map, array $mappers = null, $language = null
+  )
   {
-    $args = func_get_args();
-
-    if(func_num_args() === 1)
+    if($language !== null)
     {
-      $args = ["%QO", SearchObject::create($pattern)];
+      $this->setLanguage($language);
     }
-    else if(func_num_args() === 2 && $pattern == "%QA")
+    else
     {
-      $args = ["%QO", $this->_mapperType->queryArrayParse($args[1])];
+      $this->setLanguage($map->language());
     }
 
-    $this->clear();
-    $queryAppend = '';
+    parent::__construct($map, $mappers);
+  }
 
-    if($args[0] === "%QO")
-    {
-      $textContainer = $this->_mapperType->getTextContainer();
-      //TODO: Make compatible with non joinable data sources
-      $splitSearch = $this->_splitSearch($args[1]);
-      $args[1]     = $splitSearch['origin'];
+  public function language()
+  {
+    return $this->_language;
+  }
 
-      $subQuery = "SELECT DISTINCT %C FROM %T WHERE %C = %s AND %C = %s";
-      $subArgs  = [
-        "resource_id",
-        $textContainer->getTableName(),
-        "resource_type",
-        $this->_mapperType->textResourceType(),
-        "language",
-        $this->_mapperType->language()
-      ];
-
-      $textSo      = $splitSearch['text'];
-      $textQueries = [];
-      /**
-       * @var $textSo SearchObject
-       */
-      foreach($textSo as $field => $value)
-      {
-        $textQueries[] = "(%C = %s AND %QO)";
-        $subArgs[]     = "property";
-        $subArgs[]     = $field;
-        $subArgs[]     = (new SearchObject())->addSearch(
-          "text",
-          $value,
-          $textSo->getMatchType($field)
-        );
-      }
-
-      $subQuery .= " AND (" . implode(" OR ", $textQueries) . ")";
-
-      array_unshift($subArgs, $subQuery);
-      $subQuery = ParseQuery::parse($textContainer->connection(), $subArgs);
-
-      $queryAppend = " AND `id` IN ($subQuery)";
-    }
-
-    $this->_query = ParseQuery::parse($this->connection(), $args);
-    if(!empty($this->_query))
-    {
-      $this->_query = $this->_mapperType->softDeleteWhere() .
-      ' AND ' . $this->_query;
-    }
-
-    $this->_query .= $queryAppend;
-
+  public function setLanguage($language)
+  {
+    $this->_language = $language;
     return $this;
   }
 
-  protected function _splitSearch($query)
+  protected function _makeTableQuery($columns)
   {
-    $queryObject         = SearchObject::create($query);
-    $textContainerSearch = new SearchObject();
-    $originSearch        = new SearchObject();
-
-    $textFields = $this->_mapperType->getTranslationAttributes(false);
-
-    foreach($queryObject as $field => $value)
-    {
-      if(isset($textFields[$field]))
-      {
-        $textContainerSearch->addSearch(
-          $field,
-          $value,
-          $queryObject->getMatchType($field)
-        );
-      }
-      else
-      {
-        $originSearch->addSearch(
-          $field,
-          $value,
-          $queryObject->getMatchType($field)
-        );
-      }
-    }
-
-    return [
-      'origin' => $originSearch,
-      'text'   => $textContainerSearch
-    ];
+    $query = 'SELECT %LC FROM %T AS src ';
+    $query .= 'LEFT JOIN %T AS trans ON src.id = trans.source_id ';
+    $query .= 'AND trans.language = \'' . $this->language() . '\'';
+    return ParseQuery::parse(
+      $this->connection(),
+      [
+      $query,
+      $columns,
+      $this->_mapperType->getTableName(),
+      $this->_mapperType->getTextMapper()->getTableName()
+      ]
+    );
   }
 }
