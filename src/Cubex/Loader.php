@@ -142,6 +142,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
   public function init()
   {
+    $this->_configure();
+
     /**
      * @var $sm \Cubex\ServiceManager\ServiceManager
      */
@@ -286,18 +288,18 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
   public function setupStateDir($stateDir = null)
   {
-    if(! defined('CUBEX_STATE_DIR'))
+    if(!defined('CUBEX_STATE_DIR'))
     {
-      if(! $stateDir)
+      if(!$stateDir)
       {
         $stateDir = getenv('CUBEX_STATE_DIR');
       }
-      if((! $stateDir) && isset($_ENV['CUBEX_STATE_DIR']))
+      if((!$stateDir) && isset($_ENV['CUBEX_STATE_DIR']))
       {
         $stateDir = $_ENV['CUBEX_STATE_DIR'];
       }
 
-      if(! $stateDir)
+      if(!$stateDir)
       {
         $stateDir = self::DEFAULT_STATE_DIR;
       }
@@ -369,6 +371,47 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     return $this;
   }
 
+  protected function _configure()
+  {
+    if(!isset($this->_configuration) || $this->_configuration === null)
+    {
+      $cfg = [];
+      $cfg = $this->_mergeConfigIni($cfg, $this->_defaultIniPath('defaults'));
+      $cfg = $this->_mergeConfigIni($cfg, $this->_defaultIniPath(CUBEX_ENV));
+      if(is_array($cfg))
+      {
+        $this->configure(ConfigGroup::fromArray($cfg));
+      }
+    }
+  }
+
+  protected function _defaultIniPath($file)
+  {
+    return build_path(CUBEX_PROJECT_ROOT, 'conf', $file . '.ini');
+  }
+
+  protected function _mergeConfigIni($config, $iniFilePath)
+  {
+    if(!file_exists($iniFilePath))
+    {
+      throw new \Exception("Config file '$iniFilePath' could not be found");
+    }
+    else
+    {
+      $configData = parse_ini_file($iniFilePath, true);
+      if($configData)
+      {
+        return array_replace_recursive($config, $configData);
+      }
+      else
+      {
+        throw new \Exception(
+          "The ini file '$iniFilePath' is corrupt or invalid"
+        );
+      }
+    }
+  }
+
   /**
    * @return \Composer\Autoload\ClassLoader
    */
@@ -382,7 +425,9 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
    *
    * @return $this
    */
-  public function setDispatchable(IDispatchable $dispatcher)
+  public function setDispatchable(
+    IDispatchable $dispatcher
+  )
   {
     $this->_dispatcher = $dispatcher;
     return $this;
@@ -489,7 +534,9 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     return null;
   }
 
-  public function getMainProjectClass($classOnly = false)
+  public function getMainProjectClass(
+    $classOnly = false
+  )
   {
     $dispatch = $this->_namespace . '\Project';
     if(substr($dispatch, 0, 1) != '\\')
@@ -509,7 +556,9 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
    *
    * @return \Cubex\Loader
    */
-  public function setRequest(Request $request)
+  public function setRequest(
+    Request $request
+  )
   {
     $this->_request = $request;
     Foundation\Container::bind(
@@ -564,7 +613,9 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
    *
    * @return \Cubex\Loader
    */
-  public function setResponse(Response $response)
+  public function setResponse(
+    Response $response
+  )
   {
     $this->_response = $response;
     Foundation\Container::bind(
@@ -624,7 +675,15 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
    */
   public function respondToWebRequest()
   {
-    $this->init();
+    try
+    {
+      $this->init();
+    }
+    catch(\Exception $e)
+    {
+      $this->handleException($e, $this->_response);
+      return $this->_response->respond();
+    }
 
     if($this->getConfig()->get("project")->getBool("gzip", false))
     {
@@ -697,16 +756,25 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
    * @throws \RuntimeException
    * @throws \Exception
    */
-  public function respondToCliRequest(array $args)
+  public function respondToCliRequest(
+    array $args
+  )
   {
+    try
+    {
+      $this->init();
+    }
+    catch(\Exception $e)
+    {
+      $this->handleException($e, $this->_response);
+    }
+
     if($this->_failed)
     {
       return $this->_response->respond();
     }
 
     $_REQUEST['__path__'] = '';
-
-    $this->init();
 
     if($this->_response === null)
     {
@@ -836,7 +904,9 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     return $this->_response->respond();
   }
 
-  public function handleException(\Exception $e)
+  public function handleException(
+    \Exception $e
+  )
   {
     $this->_response->addHeader("Content-Type", "text/plain; charset=utf-8");
 
@@ -859,14 +929,15 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
            'formatted_message' => $output
       )
     );
-
     $this->_failed = true;
 
     $this->_response->fromText($output);
     return $this->_response;
   }
 
-  public function handleError($errNo, $errMsg, $errFile, $errLine, $errContext)
+  public function handleError(
+    $errNo, $errMsg, $errFile, $errLine, $errContext
+  )
   {
     $errorLevel = error_reporting();
     if(($errNo & $errorLevel) == $errNo)
