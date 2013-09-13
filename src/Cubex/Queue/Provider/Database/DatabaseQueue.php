@@ -22,6 +22,7 @@ class DatabaseQueue implements IBatchQueueProvider
 
   protected $_map;
   protected $_maxAttempts;
+  protected $_lockReleaseTime;
   protected $_ownKey;
   protected $_waits;
   protected $_deleteBatchIds = [];
@@ -115,6 +116,7 @@ class DatabaseQueue implements IBatchQueueProvider
   public function consume(IQueue $queue, IQueueConsumer $consumer)
   {
     $this->_maxAttempts = $this->config()->getInt("max_attempts", 3);
+    $this->_lockReleaseTime = $this->config()->getInt("lock_release", 3600);
     $this->_ownKey      = FileSystem::readRandomCharacters(30);
     $this->_waits       = 0;
 
@@ -287,6 +289,8 @@ class DatabaseQueue implements IBatchQueueProvider
 
   protected function _handleWait(IQueueConsumer $consumer)
   {
+    $this->_releaseLocks();
+
     $waitTime = $consumer->waitTime($this->_waits);
     if($waitTime === false)
     {
@@ -298,6 +302,22 @@ class DatabaseQueue implements IBatchQueueProvider
       sleep($waitTime);
     }
     return true;
+  }
+
+  protected function _releaseLocks()
+  {
+    $mapper = $this->_queueMapper();
+    $query  = ParseQuery::parse(
+      $mapper->connection(),
+      "UPDATE %T SET %C = 0, %C = NULL WHERE %C = 1 AND %C < %s",
+      $mapper->getTableName(),
+      'locked',
+      'locked_by',
+      'locked',
+      'updated_at',
+      DateTimeHelper::formattedDateFromAnything(time() - $this->_lockReleaseTime)
+    );
+    $mapper->connection()->query($query);
   }
 
   protected function _queueMapper($createNew = false, $createTable = false)
