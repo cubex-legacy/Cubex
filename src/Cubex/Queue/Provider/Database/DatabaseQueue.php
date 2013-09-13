@@ -7,7 +7,6 @@ namespace Cubex\Queue\Provider\Database;
 
 use Cubex\FileSystem\FileSystem;
 use Cubex\Helpers\DateTimeHelper;
-use Cubex\Helpers\Strings;
 use Cubex\Mapper\Database\RecordCollection;
 use Cubex\Queue\IBatchQueueConsumer;
 use Cubex\Queue\IBatchQueueProvider;
@@ -22,7 +21,6 @@ class DatabaseQueue implements IBatchQueueProvider
 
   protected $_map;
   protected $_maxAttempts;
-  protected $_lockReleaseTime;
   protected $_ownKey;
   protected $_waits;
   protected $_deleteBatchIds = [];
@@ -116,7 +114,6 @@ class DatabaseQueue implements IBatchQueueProvider
   public function consume(IQueue $queue, IQueueConsumer $consumer)
   {
     $this->_maxAttempts = $this->config()->getInt("max_attempts", 3);
-    $this->_lockReleaseTime = $this->config()->getInt("lock_release", 3600);
     $this->_ownKey      = FileSystem::readRandomCharacters(30);
     $this->_waits       = 0;
 
@@ -289,7 +286,11 @@ class DatabaseQueue implements IBatchQueueProvider
 
   protected function _handleWait(IQueueConsumer $consumer)
   {
-    $this->_releaseLocks();
+    $releaseTime = $consumer->lockReleaseTime();
+    if($releaseTime !== false)
+    {
+      $this->_releaseLocks($releaseTime);
+    }
 
     $waitTime = $consumer->waitTime($this->_waits);
     if($waitTime === false)
@@ -304,7 +305,7 @@ class DatabaseQueue implements IBatchQueueProvider
     return true;
   }
 
-  protected function _releaseLocks()
+  protected function _releaseLocks($releaseTime)
   {
     $mapper = $this->_queueMapper();
     $query  = ParseQuery::parse(
@@ -315,7 +316,7 @@ class DatabaseQueue implements IBatchQueueProvider
       'locked_by',
       'locked',
       'updated_at',
-      DateTimeHelper::formattedDateFromAnything(time() - $this->_lockReleaseTime)
+      DateTimeHelper::formattedDateFromAnything(time() - $releaseTime)
     );
     $mapper->connection()->query($query);
   }
