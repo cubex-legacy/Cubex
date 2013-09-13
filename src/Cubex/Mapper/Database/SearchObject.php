@@ -116,7 +116,7 @@ class SearchObject
   public static function create($data)
   {
     $result = new self();
-    if(!$data)
+    if(!$data || empty($data) || is_scalar($data))
     {
       return $result;
     }
@@ -130,6 +130,7 @@ class SearchObject
     {
       $result->addSearch($field, $value);
     }
+
     return $result;
   }
 }
