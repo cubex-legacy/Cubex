@@ -116,7 +116,7 @@ class SearchObject
   public static function create($data)
   {
     $result = new self();
-    if(!$data || empty($data))
+    if(!$data || empty($data) || is_scalar($data))
     {
       return $result;
     }
