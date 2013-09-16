@@ -27,11 +27,9 @@ interface IQueueConsumer
   /**
    * Time in seconds to treat queue locks as stale, false to never unlock
    *
-   * @param int $timeout
-   *
-   * @return mixed
+   * @return bool|int
    */
-  public function lockReleaseTime($timeout = 3600);
+  public function lockReleaseTime();
 
   /**
    * This method will be called once all the items in the queue have been

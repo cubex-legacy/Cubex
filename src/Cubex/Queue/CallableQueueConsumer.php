@@ -57,4 +57,14 @@ class CallableQueueConsumer implements IQueueConsumer
   public function shutdown()
   {
   }
+
+  /**
+   * Time in seconds to treat queue locks as stale, false to never unlock
+   *
+   * @return bool|int
+   */
+  public function lockReleaseTime()
+  {
+    return 3600;
+  }
 }
