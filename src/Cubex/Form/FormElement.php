@@ -25,6 +25,10 @@ class FormElement extends Attribute implements IRenderable
   const BUTTON         = 'button';
   const RESET          = 'reset';
   const SUBMIT         = 'submit';
+  /**
+   * @const NONE instructs the renderer to not render this field
+   */
+  const NONE           = 'none';
 
   const COLOUR         = 'color';
   const DATE           = 'date';

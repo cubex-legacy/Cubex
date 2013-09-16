@@ -72,6 +72,8 @@ class FormElementRender implements IFormElementRender
 
     switch($type)
     {
+      case FormElement::NONE:
+        return '';
       case FormElement::TEXTAREA:
         $input = $this->renderTextarea();
         break;
