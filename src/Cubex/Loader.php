@@ -425,9 +425,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
    *
    * @return $this
    */
-  public function setDispatchable(
-    IDispatchable $dispatcher
-  )
+  public function setDispatchable(IDispatchable $dispatcher)
   {
     $this->_dispatcher = $dispatcher;
     return $this;
@@ -534,9 +532,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     return null;
   }
 
-  public function getMainProjectClass(
-    $classOnly = false
-  )
+  public function getMainProjectClass($classOnly = false)
   {
     $dispatch = $this->_namespace . '\Project';
     if(substr($dispatch, 0, 1) != '\\')
@@ -556,9 +552,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
    *
    * @return \Cubex\Loader
    */
-  public function setRequest(
-    Request $request
-  )
+  public function setRequest(Request $request)
   {
     $this->_request = $request;
     Foundation\Container::bind(
@@ -613,9 +607,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
    *
    * @return \Cubex\Loader
    */
-  public function setResponse(
-    Response $response
-  )
+  public function setResponse(Response $response)
   {
     $this->_response = $response;
     Foundation\Container::bind(
@@ -756,9 +748,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
    * @throws \RuntimeException
    * @throws \Exception
    */
-  public function respondToCliRequest(
-    array $args
-  )
+  public function respondToCliRequest(array $args)
   {
     try
     {
@@ -904,9 +894,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     return $this->_response->respond();
   }
 
-  public function handleException(
-    \Exception $e
-  )
+  public function handleException(\Exception $e)
   {
     $this->_response->addHeader("Content-Type", "text/plain; charset=utf-8");
 
@@ -935,9 +923,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     return $this->_response;
   }
 
-  public function handleError(
-    $errNo, $errMsg, $errFile, $errLine, $errContext
-  )
+  public function handleError($errNo, $errMsg, $errFile, $errLine, $errContext)
   {
     $errorLevel = error_reporting();
     if(($errNo & $errorLevel) == $errNo)
