@@ -581,7 +581,7 @@ class DBBuilder
     if($this->_mapper->isCompositeId())
     {
       $query  = ParseQuery::parse(
-        $this->_mapper->conn(),
+        $this->_mapper->connection(),
         [
         "PRIMARY KEY ( %LC )",
         $primaryIds
