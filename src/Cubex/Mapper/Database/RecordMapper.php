@@ -590,7 +590,7 @@ abstract class RecordMapper extends DataMapper
           }
         }
 
-        if($attr->isModified() && $attr->saveToDatabase())
+        if($attr->isModified() && $attr->saveToDatabase($this))
         {
           if(in_array($attr->name(), $idFields) && $this->exists())
           {
@@ -733,7 +733,10 @@ abstract class RecordMapper extends DataMapper
       }
       foreach($this->_attributes as $attr)
       {
-        $attr->unsetModified();
+        if($attr->saveToDatabase($this))
+        {
+          $attr->unsetModified();
+        }
       }
     }
 

@@ -15,6 +15,7 @@ abstract class I18nRecordMapper extends RecordMapper
   protected $_loadedProperties;
   protected $_language = 'en';
   protected $_textMapper;
+  protected $_attributeType = 'Cubex\Mapper\Database\I18n\I18nAttribute';
 
   public function __construct($id = null, $columns = ['*'], $language = null)
   {
@@ -49,11 +50,12 @@ abstract class I18nRecordMapper extends RecordMapper
   )
   {
     $result = parent::saveChanges($validate, $processAll, $failFirst);
-    foreach($this->_translateAttributes as $property => $e)
-    {
-      $this->_textMapper->setData($property, $this->getData($property));
-    }
-    $this->_textMapper->setId([$this->id(), $this->language()]);
+    $this->_textMapper->setId(
+      [
+      $this->_attribute($this->getIdKey())->data(),
+      $this->language()
+      ]
+    );
     $this->_textMapper->saveChanges($validate, $processAll, $failFirst);
     return $result;
   }
@@ -85,7 +87,12 @@ abstract class I18nRecordMapper extends RecordMapper
   {
     if($this->_load())
     {
-      $this->_textMapper->load([$this->id(), $this->language()]);
+      $this->_textMapper->load(
+        [
+        $this->_attribute($this->getIdKey()),
+        $this->language()
+        ]
+      );
     }
   }
 
@@ -102,7 +109,12 @@ abstract class I18nRecordMapper extends RecordMapper
 
     foreach($names as $name)
     {
-      $this->_attribute($name)->setSaveToDatabase(false);
+      $a = $this->_attribute($name);
+      $a->setSaveToDatabase(false);
+      if($a instanceof I18nAttribute)
+      {
+        $a->setTranslation(true);
+      }
       $this->_translateAttributes[$name] = true;
     }
   }

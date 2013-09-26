@@ -6,11 +6,13 @@
 namespace Cubex\Database\Creations;
 
 use Cubex\Data\Attribute\Attribute;
+use Cubex\Data\Attribute\CompositeAttribute;
 use Cubex\Database\IDatabaseService;
 use Cubex\Database\Schema\Column;
 use Cubex\Database\Schema\DataType;
 use Cubex\Helpers\Strings;
 use Cubex\Log\Log;
+use Cubex\Mapper\Database\I18n\I18nTextRecordMapper;
 use Cubex\Mapper\Database\RecordMapper;
 use Cubex\Sprintf\ParseQuery;
 
@@ -134,7 +136,7 @@ class DBBuilder
 
   protected function _columnFromAttribute(Attribute $attr)
   {
-    if(!$attr->saveToDatabase())
+    if(!$attr->saveToDatabase($this->_mapper))
     {
       return null;
     }
@@ -418,7 +420,6 @@ class DBBuilder
       );
       $priKeys = $idcomp->attributeOrder();
     }
-
     foreach($attrs as $attr)
     {
       $col = $this->_columnFromAttribute($attr);

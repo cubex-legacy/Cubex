@@ -28,7 +28,8 @@ class I18nTextRecordMapper extends RecordMapper
    */
   public static function create(I18nRecordMapper $source)
   {
-    $map             = new self;
+    $map = new self;
+    $map->connection()->configure($source->connection()->config());
     $map->_tableName = Inflection::pluralise(
       $source->getTableName(false) . '_' . $source->getTextMapperTableAppend()
     );

@@ -7,6 +7,7 @@ namespace Cubex\Data\Attribute;
 
 use Cubex\Data\Filter\IFilterable;
 use Cubex\Data\Filter\FilterableTrait;
+use Cubex\Data\Mapper\IDataMapper;
 use Cubex\Data\Validator\IValidatable;
 use Cubex\Data\Validator\ValidatableTrait;
 use Cubex\Type\Enum;
@@ -352,7 +353,7 @@ class Attribute implements IValidatable, IFilterable, \JsonSerializable
     $this->setData($this->defaultValue());
   }
 
-  public function saveToDatabase()
+  public function saveToDatabase(IDataMapper $mapper = null)
   {
     return $this->_saveable;
   }

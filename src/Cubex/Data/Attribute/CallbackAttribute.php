@@ -5,6 +5,8 @@
 
 namespace Cubex\Data\Attribute;
 
+use Cubex\Data\Mapper\IDataMapper;
+
 class CallbackAttribute extends Attribute
 {
   protected $_callback;
@@ -27,7 +29,7 @@ class CallbackAttribute extends Attribute
     return $this->_storeOriginal;
   }
 
-  public function saveToDatabase()
+  public function saveToDatabase(IDataMapper $mapper = null)
   {
     return $this->storeOriginal();
   }

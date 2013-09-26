@@ -76,6 +76,7 @@ abstract class DataMapper
   protected $_attributeType = '\Cubex\Data\Attribute\Attribute';
 
   protected static $reflectedAttributes;
+  protected $_tableNameCache;
 
   /**
    * @var \Cubex\Cache\ICacheService
@@ -1366,37 +1367,44 @@ abstract class DataMapper
   {
     if($this->_tableName === null)
     {
-      $excludeParts = [
-        'bundl',
-        'mappers',
-        'applications',
-        'modules',
-        'components'
-      ];
-      $nsparts      = explode('\\', $this->getTableClass());
-      $ignoreFirst  = $nsparts[0] == 'Bundl' ? 2 : 1;
-
-      foreach($nsparts as $i => $part)
+      if($this->_tableNameCache === null)
       {
-        if($i < $ignoreFirst || in_array(strtolower($part), $excludeParts))
+        $excludeParts = [
+          'bundl',
+          'mappers',
+          'applications',
+          'modules',
+          'components'
+        ];
+        $nsparts      = explode('\\', $this->getTableClass());
+        $ignoreFirst  = $nsparts[0] == 'Bundl' ? 2 : 1;
+
+        foreach($nsparts as $i => $part)
         {
-          unset($nsparts[$i]);
+          if($i < $ignoreFirst || in_array(strtolower($part), $excludeParts))
+          {
+            unset($nsparts[$i]);
+          }
         }
-      }
 
-      $table = implode('_', $nsparts);
-      if($this->_underscoreTable)
-      {
-        $table = Strings::variableToUnderScore($table);
-      }
+        $table = implode('_', $nsparts);
+        if($this->_underscoreTable)
+        {
+          $table = Strings::variableToUnderScore($table);
+        }
 
-      $this->_tableName = strtolower(str_replace('\\', '_', $table));
+        $this->_tableNameCache = strtolower(str_replace('\\', '_', $table));
+      }
       if($plural)
       {
-        $this->_tableName = Inflection::pluralise($this->_tableName);
+        return Inflection::pluralise($this->_tableNameCache);
       }
+      return $this->_tableNameCache;
     }
-    return $this->_tableName;
+    else
+    {
+      return $this->_tableName;
+    }
   }
 
   /**
