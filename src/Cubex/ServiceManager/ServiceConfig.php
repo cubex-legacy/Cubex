@@ -53,10 +53,7 @@ class ServiceConfig extends Config
 
     foreach($config as $k => $v)
     {
-      if($k !== 'register_service_as')
-      {
-        $this->$k = $v;
-      }
+      $this->$k = $v;
     }
 
     return $this;

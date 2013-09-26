@@ -9,6 +9,7 @@ use Cubex\Database\IDatabaseService;
 use Cubex\Events\EventManager;
 use Cubex\Log\Log;
 use Cubex\ServiceManager\ServiceConfig;
+use Cubex\ServiceManager\ServiceConfigTrait;
 
 class MySQL implements IDatabaseService
 {
@@ -25,15 +26,7 @@ class MySQL implements IDatabaseService
   protected $_errorno;
   protected $_errormsg;
 
-  /**
-   * @param \Cubex\ServiceManager\ServiceConfig $config
-   *
-   * @return mixed|void
-   */
-  public function configure(ServiceConfig $config)
-  {
-    $this->_config = $config;
-  }
+  use ServiceConfigTrait;
 
   public function connect($mode = 'w')
   {

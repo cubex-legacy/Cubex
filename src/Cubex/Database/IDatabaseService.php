@@ -9,6 +9,10 @@ use Cubex\ServiceManager\IService;
 
 interface IDatabaseService extends IService
 {
+  /**
+   * @return \Cubex\ServiceManager\ServiceConfig
+   */
+  public function config();
 
   /**
    * @param string $mode Either 'r' (reading) or 'w' (reading and writing)

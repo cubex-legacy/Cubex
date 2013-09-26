@@ -7,6 +7,7 @@ namespace Cubex\Database;
 
 use Cubex\Events\EventManager;
 use Cubex\ServiceManager\ServiceConfig;
+use Cubex\ServiceManager\ServiceConfigTrait;
 
 abstract class PDOBase implements IDatabaseService
 {
@@ -22,15 +23,7 @@ abstract class PDOBase implements IDatabaseService
 
   protected $_affectedRows;
 
-  /**
-   * @param \Cubex\ServiceManager\ServiceConfig $config
-   *
-   * @return mixed|void
-   */
-  public function configure(ServiceConfig $config)
-  {
-    $this->_config = $config;
-  }
+  use ServiceConfigTrait;
 
   abstract protected function _dsn();
 
