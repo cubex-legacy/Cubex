@@ -57,6 +57,27 @@ abstract class ViewModel implements IRenderable, ITranslatable
     return $this;
   }
 
+  public function setTitleOnDomain($title = '', $domain = null, $tld = null)
+  {
+    $customise = true;
+
+    if($domain !== null && strtolower($domain) !== url("%d"))
+    {
+      $customise = false;
+    }
+
+    if($tld !== null && strtolower($tld) !== url("%t"))
+    {
+      $customise = false;
+    }
+
+    if($customise)
+    {
+      $this->setTitle($title);
+    }
+    return $this;
+  }
+
   /**
    * Set the controller hosting this view
    *

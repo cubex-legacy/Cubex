@@ -249,6 +249,14 @@ if(!function_exists("url"))
   /**
    * @param string $format
    *
+   * - %r = Port Number (no colon)
+   * - %i = Path (leading slash)
+   * - %p = Scheme with //: (Usually http:// or https://)
+   * - %h = Host (Subdomain . Domain . Tld : Port [port may not be set])
+   * - %d = Domain
+   * - %s = Sub Domain
+   * - %t = Tld
+   *
    * @return string
    */
   function url($format = "%p%h")
