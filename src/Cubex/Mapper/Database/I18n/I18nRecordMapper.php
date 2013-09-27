@@ -21,15 +21,23 @@ abstract class I18nRecordMapper extends RecordMapper
   {
     if($language !== null)
     {
-      $this->setLanguage($language);
+      $this->_language = $language;
     }
     else if(defined('LOCALE2'))
     {
-      $this->setLanguage(LOCALE2);
+      $this->_language = LOCALE2;
     }
+
     parent::__construct($id, $columns);
-    $this->_textMapper = I18nTextRecordMapper::create($this);
-    $this->_loadTextMapper();
+    $this->setLanguage($this->_language);
+  }
+
+  public function hydrate(
+    array $data, $setUnmodified = false, $createAttributes = false, $raw = true
+  )
+  {
+    parent::hydrate($data, $setUnmodified, $createAttributes, $raw);
+    $this->setLanguage($this->_language);
   }
 
   public function getTextMapper()
