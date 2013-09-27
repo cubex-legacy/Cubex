@@ -58,12 +58,7 @@ abstract class I18nRecordMapper extends RecordMapper
   )
   {
     $result = parent::saveChanges($validate, $processAll, $failFirst);
-    $this->_textMapper->setId(
-      [
-      $this->_attribute($this->getIdKey())->data(),
-      $this->language()
-      ]
-    );
+    $this->_textMapper->setId([$this->id(), $this->language()]);
     $this->_textMapper->saveChanges($validate, $processAll, $failFirst);
     return $result;
   }
@@ -95,12 +90,7 @@ abstract class I18nRecordMapper extends RecordMapper
   {
     if($this->_load())
     {
-      $this->_textMapper->load(
-        [
-        $this->_attribute($this->getIdKey()),
-        $this->language()
-        ]
-      );
+      $this->_textMapper->load([$this->id(), $this->language()]);
     }
   }
 
