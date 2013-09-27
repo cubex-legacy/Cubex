@@ -327,9 +327,10 @@ class RecordCollection extends Collection
         EphemeralCache::storeCache($query, $rows, $this);
       }
 
+      $mapperClass = get_class($this->_mapperType);
       foreach($rows as $row)
       {
-        $map = clone $this->_mapperType;
+        $map = new $mapperClass;
         $map->disableLoading();
         $map->hydrate((array)$row, true, 'dynamic');
         $map->setExists(true);
