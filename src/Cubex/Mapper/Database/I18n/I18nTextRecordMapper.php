@@ -30,7 +30,7 @@ class I18nTextRecordMapper extends RecordMapper
   {
     $map = new self;
     $map->_dbServiceName = $source->connection()->config()
-      ->getStr("register_service_as","db");
+      ->getStr("register_service_as", "db");
     $map->_tableName = Inflection::pluralise(
       $source->getTableName(false) . '_' . $source->getTextMapperTableAppend()
     );

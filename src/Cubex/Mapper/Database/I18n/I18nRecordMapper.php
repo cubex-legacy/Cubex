@@ -32,14 +32,6 @@ abstract class I18nRecordMapper extends RecordMapper
     $this->setLanguage($this->_language);
   }
 
-  public function hydrate(
-    array $data, $setUnmodified = false, $createAttributes = false, $raw = true
-  )
-  {
-    parent::hydrate($data, $setUnmodified, $createAttributes, $raw);
-    $this->setLanguage($this->_language);
-  }
-
   public function getTextMapper()
   {
     return $this->_textMapper;
@@ -61,6 +53,12 @@ abstract class I18nRecordMapper extends RecordMapper
     $this->_textMapper->setId([$this->id(), $this->language()]);
     $this->_textMapper->saveChanges($validate, $processAll, $failFirst);
     return $result;
+  }
+
+  public function reload()
+  {
+    $this->setLanguage($this->language());
+    return parent::reload();
   }
 
   protected function _load()
