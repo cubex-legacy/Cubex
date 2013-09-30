@@ -51,7 +51,7 @@ abstract class InheritanceMapper extends RecordMapper
   {
     $pattern = parent::idPattern();
     $pattern .= ParseQuery::parse(
-      $this->conn(),
+      $this->connection(),
       [
       " AND %C = %s",
       $this->_typeField,

@@ -802,7 +802,7 @@ abstract class RecordMapper extends DataMapper
     {
       $source = new static;
     }
-    $schema = $source->conn()->getKeyedRows(
+    $schema = $source->connection()->getKeyedRows(
       "DESCRIBE `" . $source->getTableName() . '`'
     );
     return $schema;
