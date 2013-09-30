@@ -231,7 +231,7 @@ class FormElementRender implements IFormElementRender
     foreach($this->_element->options() as $k => $v)
     {
       $out .= '<option value="' . $k . '"';
-      if($this->_element->data() == $k)
+      if((string)($this->_element->data()) === (string)$k)
       {
         $out .= ' selected="selected"';
       }
@@ -309,7 +309,7 @@ class FormElementRender implements IFormElementRender
       {
         $rawData  = $this->_element->rawData();
         $data     = $this->_element->data();
-        $selected = $data == $k;
+        $selected = (string)$data === (string)$k;
         if(is_array($rawData))
         {
           if(in_array($k, $rawData))
@@ -320,7 +320,7 @@ class FormElementRender implements IFormElementRender
       }
       else
       {
-        $selected = $k == $this->_element->selectedValue();
+        $selected = (string)$k === (string)($this->_element->selectedValue());
       }
 
       if($selected)
