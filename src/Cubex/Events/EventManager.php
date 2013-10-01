@@ -24,6 +24,8 @@ class EventManager
 
   const CUBEX_WEBPAGE_RENDER_BODY = 'cubex.webpage.renderbody';
 
+  const CUBEX_PROJECT_PREPARE = 'cubex.project.prepare';
+
   const CUBEX_APPLICATION_CANLAUNCH  = 'cubex.application.canlaunch';
   const CUBEX_APPLICATION_LAUNCHFAIL = 'cubex.application.launchfailed';
   const CUBEX_APPLICATION_PRELAUNCH  = 'cubex.application.launching';
@@ -33,7 +35,7 @@ class EventManager
   const CUBEX_DEBUG = 'cubex.debug';
   const CUBEX_LOG   = 'cubex.log';
 
-  const CUBEX_PHP_ERROR = 'cubex.php.error';
+  const CUBEX_PHP_ERROR           = 'cubex.php.error';
   const CUBEX_UNHANDLED_EXCEPTION = 'cubex.unhandled.exception';
 
   const CUBEX_QUERY = 'cubex.query';
@@ -152,10 +154,10 @@ class EventManager
   }
 
   /**
-   * @param       $eventName
+   * @param        $eventName
    * @param IEvent $event
-   * @param bool  $returnFirst
-   * @param null  $namespace
+   * @param bool   $returnFirst
+   * @param null   $namespace
    *
    * @return array|mixed|null
    */

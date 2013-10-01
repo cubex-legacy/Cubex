@@ -6,6 +6,7 @@ namespace Cubex\Core\Project;
 
 use Cubex\Bundle\BundlerTrait;
 use Cubex\Core\Application\Application;
+use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\ConfigTrait;
 use Cubex\Core\Http\IDispatchable;
 use Cubex\Core\Http\IDispatchableAccess;
@@ -156,6 +157,8 @@ abstract class Project
 
   public function prepareProject($isCli = false)
   {
+    EventManager::trigger(EventManager::CUBEX_PROJECT_PREPARE);
+
     $this->init();
     if($isCli)
     {
