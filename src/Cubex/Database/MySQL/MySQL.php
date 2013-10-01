@@ -17,10 +17,6 @@ class MySQL implements IDatabaseService
    * @var \mysqli
    */
   protected $_connection;
-  /**
-   * @var \Cubex\ServiceManager\ServiceConfig
-   */
-  protected $_config;
   protected $_connected = false;
 
   protected $_errorno;
