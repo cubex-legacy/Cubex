@@ -48,12 +48,6 @@ class QueueMapper extends RecordMapper implements ICubid
     $this->_attribute("data")->setSerializer(Attribute::SERIALIZATION_JSON);
   }
 
-  public function setTableName($table)
-  {
-    $this->_tableName = $table;
-    return $this;
-  }
-
   public function setServiceName($name)
   {
     $this->_dbServiceName = $name;

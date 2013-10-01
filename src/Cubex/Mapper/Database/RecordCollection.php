@@ -331,10 +331,14 @@ class RecordCollection extends Collection
       foreach($rows as $row)
       {
         $map = new $mapperClass;
-        $map->disableLoading();
-        $map->hydrate((array)$row, true, 'dynamic');
-        $map->setExists(true);
-        $this->addMapper($map);
+        if($map instanceof RecordMapper)
+        {
+          $map->setTableName($this->_mapperType->getTableName());
+          $map->disableLoading();
+          $map->hydrate((array)$row, true, 'dynamic');
+          $map->setExists(true);
+          $this->addMapper($map);
+        }
 
         if($this->_columns == ['*'])
         {

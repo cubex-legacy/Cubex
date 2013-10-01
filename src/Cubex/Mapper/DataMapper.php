@@ -1407,6 +1407,12 @@ abstract class DataMapper
     }
   }
 
+  public function setTableName($table)
+  {
+    $this->_tableName = $table;
+    return $this;
+  }
+
   /**
    * @param bool $plural
    *
