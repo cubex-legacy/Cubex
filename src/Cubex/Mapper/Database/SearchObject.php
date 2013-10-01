@@ -5,6 +5,8 @@
 
 namespace Cubex\Mapper\Database;
 
+use Cubex\Mapper\DataMapper;
+
 class SearchObject
 {
   const MATCH_EXACT      = '=';
@@ -113,7 +115,7 @@ class SearchObject
     return $this;
   }
 
-  public static function create($data)
+  public static function create($data, DataMapper $mapper = null)
   {
     $result = new self();
     if(!$data || empty($data) || is_scalar($data))
@@ -128,6 +130,10 @@ class SearchObject
 
     foreach($data as $field => $value)
     {
+      if($mapper !== null)
+      {
+        $field = $mapper->stringToColumnName($field);
+      }
       $result->addSearch($field, $value);
     }
 

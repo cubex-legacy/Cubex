@@ -149,7 +149,7 @@ class RecordCollection extends Collection
 
     if(func_num_args() === 1)
     {
-      $args = ["%QO", SearchObject::create($pattern)];
+      $args = ["%QO", SearchObject::create($pattern, $this->_mapperType)];
     }
     else if(func_num_args() === 2 && $pattern == "%QA")
     {
