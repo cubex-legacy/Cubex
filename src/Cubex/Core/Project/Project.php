@@ -157,8 +157,6 @@ abstract class Project
 
   public function prepareProject($isCli = false)
   {
-    EventManager::trigger(EventManager::CUBEX_PROJECT_PREPARE);
-
     $this->init();
     if($isCli)
     {
@@ -171,6 +169,7 @@ abstract class Project
     $this->_configure();
     $this->addDefaultBundles();
     $this->initialiseBundles();
+    EventManager::trigger(EventManager::CUBEX_PROJECT_PREPARE);
     return $this;
   }
 
