@@ -46,7 +46,7 @@ class Webpage implements
   {
     $this->setRequest($request);
     $this->setResponse($response);
-    $this->registerPageTitleListener();
+    $this->registerListeners();
   }
 
   public function __toString()
@@ -96,13 +96,20 @@ class Webpage implements
     return $this->_title;
   }
 
-  public function registerPageTitleListener()
+  public function registerListeners()
   {
     EM::listen(
       EM::CUBEX_PAGE_TITLE,
       array(
            $this,
            "setTitle"
+      )
+    );
+    EM::listen(
+      EM::CUBEX_PAGE_META,
+      array(
+           $this,
+           "addMetaEvent"
       )
     );
     return $this;
@@ -116,6 +123,13 @@ class Webpage implements
   public function charset()
   {
     return 'UTF-8';
+  }
+
+  public function addMetaEvent(IEvent $event)
+  {
+    $name    = $event->getStr("name");
+    $content = $event->getStr("content");
+    return $this->addMeta($name, $content);
   }
 
   public function addMeta($name, $content)
@@ -137,7 +151,8 @@ class Webpage implements
     {
       return $this->_meta;
     }
-    else {
+    else
+    {
       return $this->_meta[$key];
     }
   }
@@ -260,7 +275,7 @@ class Webpage implements
     $jsBlockItems = new Partial(
       '<script type="text/javascript">%s</script>'
     );
-    $jsBlocks  = Resource::getResourceBlocks(TypeEnum::JS());
+    $jsBlocks     = Resource::getResourceBlocks(TypeEnum::JS());
     if($jsBlocks)
     {
       $jsBlockItems->escapeInput(false);
@@ -394,9 +409,9 @@ class Webpage implements
   {
     if($this->_renderType == 'content')
     {
-      $lay = $this->_layout;
+      $lay           = $this->_layout;
       $this->_layout = null;
-      $render = $this->body();
+      $render        = $this->body();
       $this->_layout = $lay;
       return $render;
     }

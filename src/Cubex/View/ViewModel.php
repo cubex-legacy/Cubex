@@ -59,23 +59,46 @@ abstract class ViewModel implements IRenderable, ITranslatable
 
   public function setTitleOnDomain($title = '', $domain = null, $tld = null)
   {
-    $customise = true;
-
-    if($domain !== null && strtolower($domain) !== url("%d"))
-    {
-      $customise = false;
-    }
-
-    if($tld !== null && strtolower($tld) !== url("%t"))
-    {
-      $customise = false;
-    }
-
-    if($customise)
+    if($this->_domainMatch($domain, $tld))
     {
       $this->setTitle($title);
     }
     return $this;
+  }
+
+  public function addMeta($name, $content)
+  {
+    EventManager::trigger(
+      EventManager::CUBEX_PAGE_META,
+      ['name' => $name, 'content' => $content],
+      $this
+    );
+    return $this;
+  }
+
+  public function addMetaOnDomain($name, $content, $domain = null, $tld = null)
+  {
+    if($this->_domainMatch($domain, $tld))
+    {
+      $this->addMeta($name, $content);
+    }
+    return $this;
+  }
+
+  protected function _domainMatch($domain = null, $tld = null)
+  {
+    $match = true;
+
+    if($domain !== null && strtolower($domain) !== url("%d"))
+    {
+      $match = false;
+    }
+
+    if($tld !== null && strtolower($tld) !== url("%t"))
+    {
+      $match = false;
+    }
+    return $match;
   }
 
   /**

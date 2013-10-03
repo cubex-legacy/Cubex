@@ -52,9 +52,13 @@ class WebpageController extends BaseController
     return $this;
   }
 
-  public function addMeta($name, $value)
+  public function addMeta($name, $content)
   {
-    $this->_webpage->addMeta($name, $value);
+    EventManager::trigger(
+      EventManager::CUBEX_PAGE_META,
+      ['name' => $name, 'content' => $content],
+      $this
+    );
     return $this;
   }
 

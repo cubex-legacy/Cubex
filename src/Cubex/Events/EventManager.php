@@ -18,6 +18,7 @@ class EventManager
   const CUBEX_REQUEST_BIND = 'cubex.request.bind';
 
   const CUBEX_PAGE_TITLE = 'cubex.page.title';
+  const CUBEX_PAGE_META  = 'cubex.page.meta';
 
   const CUBEX_TRANSLATE_T = 'cubex.translation.t';
   const CUBEX_TRANSLATE_P = 'cubex.translation.p';
