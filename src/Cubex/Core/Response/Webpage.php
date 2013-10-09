@@ -132,7 +132,7 @@ class Webpage implements
 
   public function addMeta($name, $content)
   {
-    $this->_meta = array_add($this->_meta, $content, $name);
+    $this->_meta = array_add((array)$this->_meta, $content, $name);
     return $this;
   }
 
