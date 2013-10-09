@@ -76,6 +76,12 @@ abstract class ViewModel implements IRenderable, ITranslatable
     return $this;
   }
 
+  public function addDynamicMeta($data)
+  {
+    EventManager::trigger(EventManager::CUBEX_PAGE_META, $data, $this);
+    return $this;
+  }
+
   public function addMetaOnDomain($name, $content, $domain = null, $tld = null)
   {
     if($this->_domainMatch($domain, $tld))

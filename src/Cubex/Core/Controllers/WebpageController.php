@@ -62,6 +62,12 @@ class WebpageController extends BaseController
     return $this;
   }
 
+  public function addDynamicMeta($data)
+  {
+    EventManager::trigger(EventManager::CUBEX_PAGE_META, $data, $this);
+    return $this;
+  }
+
   public function layout()
   {
     return $this->_webpage->layout();
