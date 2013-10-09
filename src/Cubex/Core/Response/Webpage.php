@@ -127,14 +127,12 @@ class Webpage implements
 
   public function addMetaEvent(IEvent $event)
   {
-    $name    = $event->getStr("name");
-    $content = $event->getStr("content");
-    return $this->addMeta($name, $content);
+    return $this->addMeta($event->getStr("name", null), $event->getData());
   }
 
   public function addMeta($name, $content)
   {
-    $this->_meta[$name] = $content;
+    $this->_meta = array_add($this->_meta, $content, $name);
     return $this;
   }
 
@@ -171,7 +169,19 @@ class Webpage implements
     $html = '';
     foreach($this->_meta as $name => $content)
     {
-      $html .= '<meta name="' . $name . '" content="' . $content . '" />';
+      if(is_scalar($content))
+      {
+        $html .= '<meta name="' . $name . '" content="' . $content . '" />';
+      }
+      else if(is_array($content) || is_object($content))
+      {
+        $html .= '<meta ';
+        foreach($content as $key => $value)
+        {
+          $html .= "$key=\"$value\" ";
+        }
+        $html .= '/>';
+      }
     }
 
     return $html;

@@ -354,3 +354,28 @@ if(!function_exists('build_path_custom'))
     return $fullPath;
   }
 }
+
+if(!function_exists("array_add"))
+{
+  /**
+   * Add a new value to an array, by name or pushed onto the end
+   *
+   * @param array $array
+   * @param bool  $value
+   * @param null  $name
+   *
+   * @return array
+   */
+  function array_add(array $array, $value = true, $name = null)
+  {
+    if($name === null)
+    {
+      $array[] = $value;
+    }
+    else
+    {
+      $array[$name] = $value;
+    }
+    return $array;
+  }
+}
