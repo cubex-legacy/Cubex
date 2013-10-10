@@ -8,7 +8,11 @@ namespace Cubex\Mapper\Database;
 use Cubex\Mapper\DataMapper;
 
 /**
- * Sidekick Mapper Edges
+ * Class EdgeRecordMapper
+ * Extend this class within your project, to create a global mapper edge table.
+ *
+ * This replaces the requirement of many pivot mapper classes, and tables.
+ *
  */
 abstract class EdgeRecordMapper extends RecordMapper
 {
