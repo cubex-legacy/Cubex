@@ -147,7 +147,7 @@ class RecordCollection extends Collection
   {
     $args = func_get_args();
 
-    if(func_num_args() === 1)
+    if(func_num_args() === 1 && !is_scalar($pattern))
     {
       $args = ["%QO", SearchObject::create($pattern, $this->_mapperType)];
     }
