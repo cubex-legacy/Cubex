@@ -160,13 +160,15 @@ class CliLogger
           $color = Shell::COLOUR_FOREGROUND_YELLOW;
           break;
       }
+
+      $lines  = explode("\n", $logData['message']);
+
       $echoMsg = $logDate;
       $echoMsg .= Shell::colourText($this->_logLevelToDisplay($level), $color);
       $echoMsg .= " ";
       $len = 32;
       echo $echoMsg;
 
-      $lines  = explode("\n", $logData['message']);
       $indent = str_repeat(" ", $len);
       $wrap   = "\n" . $indent;
 
