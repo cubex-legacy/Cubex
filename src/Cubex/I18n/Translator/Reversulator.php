@@ -14,14 +14,34 @@ class Reversulator implements ITranslator
   use ConfigTrait;
 
   /**
-   * @param string $text            Text to translate
-   * @param string $sourceLanguage  original text language
-   * @param string $targetLanguage  expected return language
+   * @param string $text           Text to translate
+   * @param string $sourceLanguage original text language
+   * @param string $targetLanguage expected return language
    *
    * @return string Translation
    */
   public function translate($text, $sourceLanguage, $targetLanguage)
   {
-    return \strrev($text);
+    $words = explode(' ', $text);
+    return implode(' ', array_map([$this, "reverse"], $words));
+  }
+
+  public function reverse($word)
+  {
+    //Handle sprintf special cases
+    if(strlen($word) < 3 ||
+    preg_match(
+      '/(&[^\s]*;|(?:%%|%(?:[0-9]+\$)?[+-]?(?:[ 0]|\'.)' .
+      '?-?[0-9]*(?:\.[0-9]+)?[bcdeufFosxX]))/',
+      $word
+    )
+    )
+    {
+      return $word;
+    }
+    else
+    {
+      return \strrev($word);
+    }
   }
 }

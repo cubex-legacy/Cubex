@@ -14,9 +14,9 @@ class Jumbler implements ITranslator
   use ConfigTrait;
 
   /**
-   * @param string $text            Text to translate
-   * @param string $sourceLanguage  original text language
-   * @param string $targetLanguage  expected return language
+   * @param string $text           Text to translate
+   * @param string $sourceLanguage original text language
+   * @param string $targetLanguage expected return language
    *
    * @return string Translation
    */
@@ -28,6 +28,18 @@ class Jumbler implements ITranslator
 
   public function jumble($word)
   {
+    //Handle sprintf special cases
+    if(strlen($word) < 3 ||
+    preg_match(
+      '/(&[^\s]*;|(?:%%|%(?:[0-9]+\$)?[+-]?(?:[ 0]|\'.)' .
+      '?-?[0-9]*(?:\.[0-9]+)?[bcdeufFosxX]))/',
+      $word
+    )
+    )
+    {
+      return $word;
+    }
+
     $first  = substr($word, 0, 1);
     $last   = substr($word, -1);
     $middle = substr($word, 1, -1);
