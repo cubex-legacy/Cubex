@@ -212,6 +212,11 @@ class Analyse
           $message     = $data['data'];
         }
 
+        if(empty($message))
+        {
+          continue;
+        }
+
         foreach($appearances as $appearance)
         {
           $result .= "\n#: " . implode(":", $appearance);
@@ -448,4 +453,3 @@ class Analyse
     return str_replace('"', '\"', $text);
   }
 }
-
