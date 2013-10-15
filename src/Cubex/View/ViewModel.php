@@ -91,6 +91,15 @@ abstract class ViewModel implements IRenderable, ITranslatable
     return $this;
   }
 
+  public function addDynamicMetaOnDomain($data, $domain = null, $tld = null)
+  {
+    if($this->_domainMatch($domain, $tld))
+    {
+      $this->addDynamicMeta($data);
+    }
+    return $this;
+  }
+
   protected function _domainMatch($domain = null, $tld = null)
   {
     $match = true;
