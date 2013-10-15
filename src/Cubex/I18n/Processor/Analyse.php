@@ -9,6 +9,7 @@ namespace Cubex\I18n\Processor;
  * Analyse codebase
  */
 use Cubex\I18n\Translator\ITranslator;
+use Cubex\Log\Log;
 
 class Analyse
 {
@@ -26,6 +27,7 @@ class Analyse
   {
     if($handle = opendir($base . $directory))
     {
+      Log::debug("Processing $base$directory");
       while(false !== ($entry = readdir($handle)))
       {
         if(in_array($entry, array('.', '..', 'locale', 'res')))
@@ -41,8 +43,8 @@ class Analyse
           );
         }
         else if(
-          substr($entry, -4) == '.php'
-          || substr($entry, -6) == '.phtml'
+        substr($entry, -4) == '.php'
+        || substr($entry, -6) == '.phtml'
         )
         {
           $this->processFile($base, $directory . DIRECTORY_SEPARATOR . $entry);
@@ -171,9 +173,9 @@ class Analyse
   }
 
   /**
-   * @param            $language
+   * @param             $language
    * @param ITranslator $translator
-   * @param string     $sourceLanguage
+   * @param string      $sourceLanguage
    *
    * @return string
    */
@@ -200,6 +202,7 @@ class Analyse
 
     foreach($this->_translations as $buildType => $translations)
     {
+      Log::info("Processing $buildType translations");
       foreach($translations as $message => $appearances)
       {
         if($buildType == 'plural')

@@ -10,6 +10,7 @@ namespace Cubex\I18n\Processor;
  */
 use Cubex\I18n\Translator\NoTranslator;
 use Cubex\I18n\Translator\ITranslator;
+use Cubex\Log\Log;
 
 class Build
 {
@@ -33,6 +34,7 @@ class Build
 
   public function __construct($projectDir, ITranslator $translator)
   {
+    Log::info("Starting translation build process");
     $this->_projectDir = $projectDir;
     $this->setTranslator($translator);
   }
@@ -63,12 +65,13 @@ class Build
 
   public function run()
   {
+    Log::info("Running builder.");
     foreach($this->_areas as $directory => $depth)
     {
       $found = $this->getSubDirectories($directory, $depth);
       foreach($found as $dir)
       {
-        echo $dir . "\n";
+        Log::info("Compiling $dir");
         $this->compile($dir);
       }
     }
@@ -126,12 +129,15 @@ class Build
     {
       $mfile   = md5(str_replace('\\', '/', $directory));
       $analyse = new Analyse();
+      Log::info("Processing $directory");
       $analyse->processDirectory($this->_projectDir . DS, $directory);
       $localeDir = $runDir . DS . 'locale';
       if(!file_exists($localeDir))
       {
         mkdir($localeDir);
       }
+
+      Log::info("Generating messages.po");
       file_put_contents(
         $localeDir . DS . 'messages.po',
         $analyse->generatePO('', new NoTranslator())
@@ -139,6 +145,7 @@ class Build
 
       foreach($this->_languages as $language)
       {
+        Log::info("Building LC_MESSAGES [$language]");
         $languageDir = $localeDir . DS . $language . DS . 'LC_MESSAGES';
 
         if(!file_exists($languageDir))
@@ -146,18 +153,23 @@ class Build
           mkdir($languageDir, 0777, true);
         }
 
+        Log::info("Writing PO File [$language]");
+
         file_put_contents(
           $languageDir . DS . $mfile . '.po',
           $analyse->generatePO($language, $this->_translator)
         );
+
+        Log::info("Creating Mo File [$language]");
 
         $tfile = $languageDir . DS . $mfile;
         shell_exec(
           $this->_msgFmt . ' -o "' . $tfile . '.mo" "' . $tfile . '.po"'
         );
 
-        echo $this->_msgFmt . ' -o "' . $tfile . '.mo" "';
-        echo $tfile . '.po"' . "\n";
+        Log::info(
+          $this->_msgFmt . ' -o "' . $tfile . '.mo" "' . $tfile . '.po"'
+        );
       }
     }
   }
