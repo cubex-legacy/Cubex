@@ -10,7 +10,7 @@ use Cubex\I18n\Loader\GetText;
 trait Translation
 {
   protected $_translator;
-  protected $_textdomain = 'messages';
+  protected $_textdomain;
   protected $_boundTd = false;
 
   protected $_filepathCache;
