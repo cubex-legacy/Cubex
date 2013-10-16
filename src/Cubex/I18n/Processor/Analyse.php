@@ -205,6 +205,7 @@ class Analyse
       Log::info("Processing $buildType translations");
       foreach($translations as $message => $appearances)
       {
+        Log::debug("Translating: $message");
         if($buildType == 'plural')
         {
           $data        = $appearances;
@@ -320,7 +321,7 @@ class Analyse
       }
       if(strlen($result) > $at)
       {
-        $result = $this->iconvWordwrap($result, $at, " \n");
+        $result = $this->wordwrap($result, $at, " \n");
       }
       $result = explode("\n", $result);
       foreach($result as $p)
@@ -349,13 +350,13 @@ class Analyse
    * @return string
    * @throws \Exception
    */
-  public function iconvWordwrap(
+  public function wordwrap(
     $string, $width = 75, $break = "\n",
     $cut = false, $charset = 'utf-8'
   )
   {
-    $stringWidth = iconv_strlen($string, $charset);
-    $breakWidth  = iconv_strlen($break, $charset);
+    $stringWidth = mb_strlen($string, $charset);
+    $breakWidth  = mb_strlen($break, $charset);
 
     if(strlen($string) === 0)
     {
@@ -375,7 +376,7 @@ class Analyse
 
     for($current = 0; $current < $stringWidth; $current++)
     {
-      $char = iconv_substr($string, $current, 1, $charset);
+      $char = mb_substr($string, $current, 1, $charset);
 
       if($breakWidth === 1)
       {
@@ -383,7 +384,7 @@ class Analyse
       }
       else
       {
-        $possibleBreak = iconv_substr(
+        $possibleBreak = mb_substr(
           $string,
           $current,
           $breakWidth,
@@ -393,7 +394,7 @@ class Analyse
 
       if($possibleBreak === $break)
       {
-        $result .= iconv_substr(
+        $result .= mb_substr(
           $string,
           $lastStart,
           ($current - $lastStart + $breakWidth),
@@ -407,7 +408,7 @@ class Analyse
         if($current - $lastStart >= $width)
         {
           $result .=
-          iconv_substr($string, $lastStart, $current - $lastStart, $charset)
+          mb_substr($string, $lastStart, $current - $lastStart, $charset)
           . $break;
           $lastStart = $current + 1;
         }
@@ -420,14 +421,14 @@ class Analyse
       )
       {
         $result .=
-        iconv_substr($string, $lastStart, $current - $lastStart, $charset)
+        mb_substr($string, $lastStart, $current - $lastStart, $charset)
         . $break;
         $lastStart = $lastSpace = $current;
       }
       elseif($current - $lastStart >= $width && $lastStart < $lastSpace)
       {
         $result .=
-        iconv_substr($string, $lastStart, $lastSpace - $lastStart, $charset)
+        mb_substr($string, $lastStart, $lastSpace - $lastStart, $charset)
         . $break;
         $lastStart = $lastSpace = $lastSpace + 1;
       }
@@ -436,7 +437,7 @@ class Analyse
     if($lastStart !== $current)
     {
       $result .=
-      iconv_substr($string, $lastStart, $current - $lastStart, $charset);
+      mb_substr($string, $lastStart, $current - $lastStart, $charset);
     }
     return $result;
   }
