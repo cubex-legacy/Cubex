@@ -52,22 +52,20 @@ class Cli extends CliCommand
       $this->addLanguage($language);
     }
 
-    $this->run();
-
-    return 0;
+    return $this->run();
   }
 
   public function run()
   {
     try
     {
-      $this->_builder->run();
+      return $this->_builder->run();
     }
     catch(\Exception $e)
     {
       print_r($e);
     }
-    return $this;
+    return 1;
   }
 
   public function addLanguage($language)

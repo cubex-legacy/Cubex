@@ -72,10 +72,14 @@ class Build
       foreach($found as $dir)
       {
         Log::info("Compiling $dir");
-        $this->compile($dir);
+        $result = $this->compile($dir);
+        if($result !== 0)
+        {
+          return $result;
+        }
       }
     }
-    return true;
+    return 0;
   }
 
   public function getSubDirectories($directory, $depth)
@@ -163,15 +167,28 @@ class Build
         Log::info("Creating Mo File [$language]");
 
         $tfile = $languageDir . DS . $mfile;
-        shell_exec(
-          $this->_msgFmt . ' -o "' . $tfile . '.mo" "' . $tfile . '.po"'
+
+        $return = -1;
+        $output = null;
+
+        exec(
+          $this->_msgFmt . ' -o "' . $tfile . '.mo" "' . $tfile . '.po"',
+          $output,
+          $return
         );
 
         Log::info(
           $this->_msgFmt . ' -o "' . $tfile . '.mo" "' . $tfile . '.po"'
         );
+        Log::debug("MsgFmt Return Code: " . $return);
+
+        if($return !== 0)
+        {
+          return $return;
+        }
       }
     }
+    return 0;
   }
 
   /**
