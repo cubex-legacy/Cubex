@@ -5,6 +5,8 @@
 
 namespace Cubex\Facade;
 
+use Cubex\Queue\IBatchQueueProvider;
+use Cubex\Queue\IQueue;
 use Cubex\Queue\IQueueConsumer;
 
 class Queue extends BaseFacade
@@ -31,14 +33,28 @@ class Queue extends BaseFacade
     return static::getServiceManager()->get($queue);
   }
 
-  public static function push(\Cubex\Queue\IQueue $queue, $message, $delay = 0)
+  public static function push(IQueue $queue, $message, $delay = 0)
   {
     return static::getAccessor()->push($queue, $message, $delay);
   }
 
-  public static function consume(
-    \Cubex\Queue\IQueue $queue, IQueueConsumer $consumer
-  )
+  public static function pushBatch(IQueue $queue, array $data, $delay = 0)
+  {
+    $accessor = static::getAccessor();
+    if($accessor instanceof IBatchQueueProvider)
+    {
+      $accessor->pushBatch($queue, $data, $delay);
+    }
+    else
+    {
+      foreach($data as $message)
+      {
+        $accessor->push($queue, $message, $delay);
+      }
+    }
+  }
+
+  public static function consume(IQueue $queue, IQueueConsumer $consumer)
   {
     return static::getAccessor()->consume($queue, $consumer);
   }
