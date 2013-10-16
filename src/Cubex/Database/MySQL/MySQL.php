@@ -22,7 +22,23 @@ class MySQL implements IDatabaseService
   protected $_errorno;
   protected $_errormsg;
 
+  private static $_connectionCache = [];
+
   use ServiceConfigTrait;
+
+  protected static function _getConnection(
+    $hostname, $database, $username, $password, $port
+  )
+  {
+    $key = implode('|', [$hostname, $database, $username, $password, $port]);
+    if(!isset(self::$_connectionCache[$key]))
+    {
+      self::$_connectionCache[$key] =
+        new \mysqli($hostname, $username, $password, $database, $port);
+    }
+
+    return self::$_connectionCache[$key];
+  }
 
   public function connect($mode = 'w')
   {
@@ -35,11 +51,9 @@ class MySQL implements IDatabaseService
       $hostname = current($slaves);
     }
 
-    $this->_connection = new \mysqli(
-      $hostname,
-      $this->_config->getStr('username', 'root'),
+    $this->_connection = self::_getConnection(
+      $hostname, $database, $this->_config->getStr('username', 'root'),
       $this->_config->getStr('password', ''),
-      $database,
       $this->_config->getStr('port', 3306)
     );
 
