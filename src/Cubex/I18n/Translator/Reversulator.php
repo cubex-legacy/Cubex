@@ -29,8 +29,7 @@ class Reversulator implements ITranslator
   public function reverse($word)
   {
     //Handle sprintf special cases
-    if(strlen($word) < 3 ||
-    preg_match(
+    if(preg_match(
       '/(&[^\s]*;|(?:%%|%(?:[0-9]+\$)?[+-]?(?:[ 0]|\'.)' .
       '?-?[0-9]*(?:\.[0-9]+)?[bcdeufFosxX]))/',
       $word
