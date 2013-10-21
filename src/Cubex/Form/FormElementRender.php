@@ -299,7 +299,7 @@ class FormElementRender implements IFormElementRender
         [
         "type"  => $type,
         "name"  => $this->_element->name() .
-        ($multi && !$type == 'radio' ? '[]' : ''),
+        ($multi && ($type != 'radio') ? '[]' : ''),
         "id"    => $multi ? $multiId : $id,
         "value" => esc($multi ? $k : $this->_element->selectedValue()),
         ]
