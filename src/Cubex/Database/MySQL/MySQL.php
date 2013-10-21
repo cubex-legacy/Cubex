@@ -17,7 +17,6 @@ class MySQL implements IDatabaseService
    * @var \mysqli
    */
   protected $_connection;
-  protected $_connected = false;
 
   protected $_errorno;
   protected $_errormsg;
@@ -65,8 +64,6 @@ class MySQL implements IDatabaseService
         $this->_connection->connect_error
       );
     }
-
-    $this->_connected = true;
 
     return $this;
   }
@@ -175,10 +172,7 @@ class MySQL implements IDatabaseService
    */
   protected function _prepareConnection($mode = 'r')
   {
-    if(!$this->_connected)
-    {
-      $this->connect($mode);
-    }
+    $this->connect($mode);
   }
 
   /**
