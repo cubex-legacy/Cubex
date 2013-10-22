@@ -30,7 +30,14 @@ if(!function_exists("var_dump_json"))
    */
   function var_dump_json($object)
   {
-    var_dump(json_encode($object, JSON_PRETTY_PRINT));
+    if(defined(CUBEX_CLI) && CUBEX_CLI)
+    {
+      echo json_pretty($object);
+    }
+    else
+    {
+      var_dump(json_encode($object, JSON_PRETTY_PRINT));
+    }
   }
 }
 
