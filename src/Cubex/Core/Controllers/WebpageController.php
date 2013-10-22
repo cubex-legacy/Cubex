@@ -101,6 +101,12 @@ class WebpageController extends BaseController
     return $this;
   }
 
+  public function unNest($name)
+  {
+    $this->_webpage->layout()->unNest($name);
+    return $this;
+  }
+
   public function tryNest($name, $content)
   {
     if($content instanceof IRenderable)

@@ -33,6 +33,12 @@ trait Yielder
     return $this;
   }
 
+  public function unNest($name)
+  {
+    unset($this->_nested[$name]);
+    return $this;
+  }
+
   /**
    * @param      $name
    * @param bool $containDivId
