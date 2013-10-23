@@ -187,6 +187,11 @@ class Session implements ISessionService
 
       foreach(self::$_sessionData as $key => $data)
       {
+        if($data === null)
+        {
+          continue;
+        }
+
         $ttl = $this->_getTtl($key);
 
         if(!array_key_exists($ttl, $ttlKeyedData))
