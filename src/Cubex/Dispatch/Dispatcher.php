@@ -49,6 +49,7 @@ class Dispatcher
     "eot"   => "application/vnd.ms-fontobject",
     "woff"  => "application/x-font-woff",
     "zip"   => "application/zip",
+    "pdf"   => "application/pdf",
   ];
   /**
    * @var string $_extends Path to the source directory of an extended project
