@@ -63,6 +63,15 @@ class Collection
     return $default;
   }
 
+  public function last($default = null)
+  {
+    if($this->count() > 0)
+    {
+      return end($this->_mappers);
+    }
+    return $default;
+  }
+
   /**
    * (En|Dis)able loading on record collection
    *
