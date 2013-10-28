@@ -27,6 +27,7 @@ class Validator
   const VALIDATE_DOMAIN     = '\Cubex\Data\Validator\Validator::domain';
   const VALIDATE_ENUM       = '\Cubex\Data\Validator\Validator::enum';
   const VALIDATE_CONST      = '\Cubex\Data\Validator\Validator::constant';
+  const VALIDATE_JSON       = '\Cubex\Data\Validator\Validator::json';
 
   /**
    * @param $email
@@ -283,5 +284,17 @@ class Validator
       throw new \Exception("Invalid " . get_class($type) . ' constant');
     }
     return true;
+  }
+
+  public static function json($input)
+  {
+    json_decode($input);
+
+    if(json_last_error() === JSON_ERROR_NONE)
+    {
+      return true;
+    }
+
+    throw new \Exception('Invalid JSON string');
   }
 }
