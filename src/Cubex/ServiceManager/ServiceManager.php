@@ -314,6 +314,19 @@ class ServiceManager
     {
       /** @var $param \ReflectionParameter */
       $class = $param->getClass();
+
+      // This forces the class var to null if the object is already passed via a
+      // construct param. This stops strange scenarios wher you can pass a class
+      // instantiated with some variables, but it gets replaced with an
+      // attempted class with no construct vars.
+      if($class !== null && isset($constructParams[$ii]))
+      {
+        if($constructParams[$ii] instanceof $class->name)
+        {
+          $class = null;
+        }
+      }
+
       if($class === null)
       {
         if(isset($constructParams[$ii]))
