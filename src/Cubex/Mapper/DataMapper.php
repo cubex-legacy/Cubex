@@ -1069,6 +1069,16 @@ abstract class DataMapper
     return true;
   }
 
+  public function getCreationTime()
+  {
+    return $this->getAttribute($this->createdAttribute())->data();
+  }
+
+  public function getLastUpdateTime()
+  {
+    return $this->getAttribute($this->updatedAttribute())->data();
+  }
+
   public function softDelete($instantSave = true)
   {
     if($this->_deleteTimestamp)
