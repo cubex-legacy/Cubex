@@ -289,7 +289,7 @@ class Serve extends Dispatcher implements IDispatchable
     }
 
     $data = preg_replace_callback(
-      '~url\(\s*[\'"]?((?:["\']{1}\s*\+\s*)[^\s\'"]*(?:\s*\+\s*["\']{1}))[\'"]?\s*\)~',
+      '~url\(\s*[\'"]?([^\s\'"]*)[\'"]?\s*\)~',
       array($this, "dispatchUrlWrappedUrl"),
       $data
     );
