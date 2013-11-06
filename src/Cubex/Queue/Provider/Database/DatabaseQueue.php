@@ -47,12 +47,21 @@ class DatabaseQueue implements IBatchQueueProvider
     );
     $date->setTimezone(new \DateTimeZone('UTC'));
 
-    $db = $this->_queueMapper(false, true)->connection();
+    $mapper = $this->_queueMapper(false, true);
+    $db     = $mapper->connection();
 
     $created      = date('Y-m-d H:i:s');
     $availableStr = DateTimeHelper::formattedDateFromAnything($date);
 
-    $autoIncrementId = $this->_queueMapper(true)->setId(null)->id() === null;
+    $idType = $mapper->getConfiguration()[$mapper::CONFIG_IDS];
+    if($idType == $mapper::ID_CUBID || $idType == $mapper::ID_UNIQID)
+    {
+      $autoIncrementId = false;
+    }
+    else
+    {
+      $autoIncrementId = true;
+    }
 
     $fields = [
       'created_at',
@@ -75,7 +84,13 @@ class DatabaseQueue implements IBatchQueueProvider
       $escFields[] = $db->escapeColumnName($field);
     }
 
-    $query   = 'INSERT INTO %T (' . implode(", ", $escFields) . ') VALUES ';
+    $tableName = ParseQuery::parse(
+      $db,
+      '%T',
+      $this->_queueMapper()->getTableName()
+    );
+
+    $query   = 'INSERT INTO '.$tableName.' (' . implode(", ", $escFields) . ') VALUES ';
     $inserts = [];
     foreach($data as $item)
     {
@@ -92,7 +107,7 @@ class DatabaseQueue implements IBatchQueueProvider
 
       if(!$autoIncrementId)
       {
-        $values[] = "'" . $this->_queueMapper(true)->setId(null)->id() . "'";
+        $values[] = "'" . $mapper->generateId() . "'";
       }
 
       $inserts[] = implode(", ", $values);
@@ -101,12 +116,6 @@ class DatabaseQueue implements IBatchQueueProvider
     if(count($inserts) > 0)
     {
       $query .= '(' . implode('), (', $inserts) . ')';
-      $query = ParseQuery::parse(
-        $db,
-        $query,
-        $this->_queueMapper()->getTableName()
-      );
-
       $db->query($query);
     }
   }
