@@ -151,20 +151,27 @@ abstract class DataMapper
     }
   }
 
+  public function generateId() {
+    $idType = $this->getConfiguration()[self::CONFIG_IDS];
+    switch($idType)
+    {
+      case self::ID_CUBID:
+        $id = Cubid::generateCubid($this);
+        break;
+      case self::ID_UNIQID:
+        $id = uniqid(class_shortname($this), true);
+        break;
+      default:
+        $id = null;
+    }
+    return $id;
+  }
+
   public function setId($id)
   {
     if($id === null)
     {
-      $idType = $this->getConfiguration()[self::CONFIG_IDS];
-      switch($idType)
-      {
-        case self::ID_CUBID:
-          $id = Cubid::generateCubid($this);
-          break;
-        case self::ID_UNIQID:
-          $id = uniqid(class_shortname($this), true);
-          break;
-      }
+      $id = $this->generateId();
     }
 
     if($this->attributeExists($this->getIdKey()))
