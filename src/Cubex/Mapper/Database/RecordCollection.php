@@ -333,6 +333,7 @@ class RecordCollection extends Collection
         $map = new $mapperClass;
         if($map instanceof RecordMapper)
         {
+          $map->setServiceName($this->_mapperType->getServiceName());
           $map->setTableName($this->_mapperType->getTableName());
           $map->disableLoading();
           $map->hydrate((array)$row, true, 'dynamic');

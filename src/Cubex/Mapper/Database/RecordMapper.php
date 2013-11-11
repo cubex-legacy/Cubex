@@ -1054,4 +1054,15 @@ abstract class RecordMapper extends DataMapper
     }
     return "1=1";
   }
+
+  public function setServiceName($name)
+  {
+    $this->_dbServiceName = $name;
+    return $this;
+  }
+
+  public function getServiceName()
+  {
+    return $this->_dbServiceName;
+  }
 }
