@@ -159,7 +159,7 @@ abstract class Application
     if(is_scalar($dispatcherResult))
     {
       if(starts_with($dispatcherResult, '\\')
-      && class_exists($dispatcherResult)
+        && class_exists($dispatcherResult)
       )
       {
         $dispatcher = new $dispatcherResult;
@@ -265,12 +265,20 @@ abstract class Application
 
   protected function _attemptClass($dispatcherResult)
   {
-    $ns    = $this->getNamespace();
-    $try   = [];
-    $try[] = $ns . '\Controllers\\' . $dispatcherResult;
-    $try[] = $ns . '\\' . $dispatcherResult;
-    $try[] = $ns . '\Controllers\\' . $dispatcherResult . "Controller";
-    $try[] = $ns . '\\' . $dispatcherResult . "Controller";
+    $namespaces = $this->config('project')->getArr('controller_namespaces');
+    if(!$namespaces)
+    {
+      $namespaces = [$this->getNamespace()];
+    }
+
+    $try = [];
+    foreach($namespaces as $ns)
+    {
+      $try[] = $ns . '\Controllers\\' . $dispatcherResult;
+      $try[] = $ns . '\\' . $dispatcherResult;
+      $try[] = $ns . '\Controllers\\' . $dispatcherResult . "Controller";
+      $try[] = $ns . '\\' . $dispatcherResult . "Controller";
+    }
 
     foreach($try as $controller)
     {
