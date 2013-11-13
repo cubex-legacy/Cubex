@@ -17,6 +17,7 @@ use Cubex\Core\Http\IDispatchable;
 use Cubex\Core\Http\IDispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
+use Cubex\Foundation\Config\Provider\IniConfigProvider;
 use Cubex\ServiceManager\IServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
@@ -318,41 +319,16 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
   {
     if(!isset($this->_configuration) || $this->_configuration === null)
     {
-      $cfg = [];
-      $cfg = $this->_mergeConfigIni($cfg, $this->_defaultIniPath('defaults'));
-      $cfg = $this->_mergeConfigIni($cfg, $this->_defaultIniPath(CUBEX_ENV));
-      if(is_array($cfg))
-      {
-        $this->configure(ConfigGroup::fromArray($cfg));
-      }
+      $configProvider = new IniConfigProvider();
+      $configProvider->appendIniFile($this->_defaultIniPath('defaults'));
+      $configProvider->appendIniFile($this->_defaultIniPath(CUBEX_ENV));
+      $this->configure($configProvider->getConfig());
     }
   }
 
   protected function _defaultIniPath($file)
   {
     return build_path(CUBEX_PROJECT_ROOT, 'conf', $file . '.ini');
-  }
-
-  protected function _mergeConfigIni($config, $iniFilePath)
-  {
-    if(!file_exists($iniFilePath))
-    {
-      throw new \Exception("Config file '$iniFilePath' could not be found");
-    }
-    else
-    {
-      $configData = parse_ini_file($iniFilePath, true);
-      if($configData)
-      {
-        return array_replace_recursive($config, $configData);
-      }
-      else
-      {
-        throw new \Exception(
-          "The ini file '$iniFilePath' is corrupt or invalid"
-        );
-      }
-    }
   }
 
   /**
