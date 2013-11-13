@@ -77,6 +77,7 @@ abstract class DataMapper
 
   protected static $reflectedAttributes;
   protected $_tableNameCache;
+  protected $_columnNameCache;
 
   /**
    * @var \Cubex\Cache\ICacheService
@@ -1488,24 +1489,35 @@ abstract class DataMapper
 
   public function stringToColumnName($string)
   {
-    //Handle probable method columns
-    if(stristr($string, ' ') || stristr($string, '('))
+    if(!isset($this->_columnNameCache[$string]))
     {
-      return $string;
+      $converted = $string;
+      //Handle probable method columns
+      if(stristr($string, ' ') || stristr($string, '('))
+      {
+        $converted = $string;
+      }
+      else
+      {
+        switch($this->schemaType())
+        {
+          case self::SCHEMA_UNDERSCORE:
+            $converted = Strings::variableToUnderScore($string);
+            break;
+          case self::SCHEMA_PASCALCASE:
+            $converted = Strings::variableToPascalCase($string);
+            break;
+          case self::SCHEMA_CAMELCASE:
+            $converted = Strings::variableToCamelCase($string);
+            break;
+          case self::SCHEMA_AS_IS:
+            $converted = $string;
+            break;
+        }
+      }
+      $this->_columnNameCache[$string] = $converted;
     }
-
-    switch($this->schemaType())
-    {
-      case self::SCHEMA_UNDERSCORE:
-        return Strings::variableToUnderScore($string);
-      case self::SCHEMA_PASCALCASE:
-        return Strings::variableToPascalCase($string);
-      case self::SCHEMA_CAMELCASE:
-        return Strings::variableToCamelCase($string);
-      case self::SCHEMA_AS_IS:
-        return $string;
-    }
-    return $string;
+    return $this->_columnNameCache[$string];
   }
 
   /**
