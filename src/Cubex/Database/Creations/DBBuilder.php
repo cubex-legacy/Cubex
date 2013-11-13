@@ -497,7 +497,7 @@ class DBBuilder
 
   protected function _getTableProperties()
   {
-    $engine   = 'MYISAM';
+    $engine   = 'InnoDB';
     $comments = [];
     $charset  = $collation = null;
     $doclines = Strings::docCommentLines($this->_reflect->getDocComment());
