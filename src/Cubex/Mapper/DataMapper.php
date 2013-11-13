@@ -86,6 +86,8 @@ abstract class DataMapper
   protected $_autoCacheOnSave = false;
   protected $_autoCacheSeconds = 3600;
 
+  protected static $_attributeConversions = [];
+
   /**
    * Automatically add all public properties as attributes
    * and unset them for automatic handling of data
@@ -108,9 +110,15 @@ abstract class DataMapper
 
   protected function _cleanAttributeName($name)
   {
-    $name = strtolower($name);
-    $name = str_replace([' ', '_'], '', $name);
-    return $name;
+    if(!isset(static::$_attributeConversions[$name]))
+    {
+      $converted = strtolower($name);
+      $converted = str_replace([' ', '_'], '', $converted);
+
+      static::$_attributeConversions[$name] = $converted;
+    }
+
+    return static::$_attributeConversions[$name];
   }
 
   /**
@@ -151,7 +159,8 @@ abstract class DataMapper
     }
   }
 
-  public function generateId() {
+  public function generateId()
+  {
     $idType = $this->getConfiguration()[self::CONFIG_IDS];
     switch($idType)
     {
