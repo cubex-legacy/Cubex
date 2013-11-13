@@ -525,6 +525,23 @@ abstract class DataMapper
     }
   }
 
+  public function tryGetData($attribute, $default = null)
+  {
+    try
+    {
+      $data = $this->getData($attribute);
+      if($data !== null)
+      {
+        return $data;
+      }
+    }
+    catch(\Exception $e)
+    {
+      return $default;
+    }
+    return $default;
+  }
+
   public function hasAttributes()
   {
     $this->_checkAttributes();
