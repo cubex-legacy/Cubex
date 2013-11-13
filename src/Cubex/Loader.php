@@ -17,7 +17,6 @@ use Cubex\Core\Http\IDispatchable;
 use Cubex\Core\Http\IDispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
-use Cubex\ServiceManager\ServiceConfig;
 use Cubex\ServiceManager\IServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 

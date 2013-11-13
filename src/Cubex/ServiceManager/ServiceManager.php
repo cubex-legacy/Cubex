@@ -13,9 +13,10 @@ use Cubex\Foundation\Config\ConfigGroup;
 
 class ServiceManager
 {
-  protected $_services = array();
-  protected $_shared = array();
-  protected $_alias = array();
+  protected $_services = [];
+  protected $_shared = [];
+  protected $_alias = [];
+  protected $_serviceAliases = [];
 
   public function configure(ConfigGroup $configuration)
   {
@@ -42,6 +43,7 @@ class ServiceManager
 
         if($registerServiceAs)
         {
+          $serviceName     = $conf->getStr('register_service_as', $section);
           $factory         = $conf->getRaw("factory", false);
           $serviceProvider = $conf->getRaw("service_provider", false);
           if($factory || $serviceProvider)
@@ -50,7 +52,7 @@ class ServiceManager
             $service->fromConfig($conf);
             $shared = $conf->getBool('register_service_shared', true);
             $this->register(
-              $conf->getStr('register_service_as', $section),
+              $serviceName,
               $service,
               $shared
             );
@@ -71,9 +73,36 @@ class ServiceManager
             {
               $this->get($conf->getStr('register_service_as', $section));
             }
+
+            $aliases = $conf->getArr("service_name_alias");
+            if($aliases !== null)
+            {
+              foreach($aliases as $alias)
+              {
+                $this->addServiceNameAlias($alias, $serviceName);
+              }
+            }
           }
         }
       }
+    }
+  }
+
+  public function addServiceNameAlias($alias, $serviceName)
+  {
+    $this->_serviceAliases[$alias] = $serviceName;
+    return $this;
+  }
+
+  protected function _getFinalServiceName($name)
+  {
+    if(isset($this->_serviceAliases[$name]) && !isset($this->_services[$name]))
+    {
+      return $this->_serviceAliases[$name];
+    }
+    else
+    {
+      return $name;
     }
   }
 
@@ -85,6 +114,7 @@ class ServiceManager
    */
   public function get($name /*[, mixed $constructParam, ...]*/)
   {
+    $name            = $this->_getFinalServiceName($name);
     $constructParams = func_get_args();
     array_shift($constructParams);
 
@@ -119,6 +149,7 @@ class ServiceManager
    */
   public function getServiceConfig($name)
   {
+    $name = $this->_getFinalServiceName($name);
     if($this->exists($name))
     {
       return $this->_services[$name]["config"];
