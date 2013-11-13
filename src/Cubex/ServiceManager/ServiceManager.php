@@ -4,6 +4,9 @@
  */
 namespace Cubex\ServiceManager;
 
+use Cubex\Foundation\Config\Config;
+use Cubex\Foundation\Config\ConfigGroup;
+
 /**
  * Container for services
  */
@@ -13,6 +16,66 @@ class ServiceManager
   protected $_services = array();
   protected $_shared = array();
   protected $_alias = array();
+
+  public function configure(ConfigGroup $configuration)
+  {
+    foreach($configuration as $section => $conf)
+    {
+      if($conf instanceof Config)
+      {
+        if(stristr($section, '\\'))
+        {
+          $parent = current(explode('\\', $section));
+          if($configuration->get($parent) !== null)
+          {
+            foreach($configuration->get($parent) as $k => $v)
+            {
+              if(!$conf->getExists($k))
+              {
+                $conf->setData($k, $v);
+              }
+            }
+          }
+        }
+
+        $registerServiceAs = $conf->getRaw("register_service_as", false);
+
+        if($registerServiceAs)
+        {
+          $factory         = $conf->getRaw("factory", false);
+          $serviceProvider = $conf->getRaw("service_provider", false);
+          if($factory || $serviceProvider)
+          {
+            $service = new ServiceConfig();
+            $service->fromConfig($conf);
+            $shared = $conf->getBool('register_service_shared', true);
+            $this->register(
+              $conf->getStr('register_service_as', $section),
+              $service,
+              $shared
+            );
+
+            $autoload = $conf->getBool("autoload", false);
+
+            if(!$autoload)
+            {
+              $autoload = $conf->getBool("autoloadweb", false) && CUBEX_WEB;
+            }
+
+            if(!$autoload)
+            {
+              $autoload = $conf->getBool("autoloadcli", false) && CUBEX_CLI;
+            }
+
+            if($autoload)
+            {
+              $this->get($conf->getStr('register_service_as', $section));
+            }
+          }
+        }
+      }
+    }
+  }
 
   /**
    * @param string $name

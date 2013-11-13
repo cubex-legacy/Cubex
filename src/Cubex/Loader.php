@@ -143,67 +143,11 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
   public function init()
   {
     $this->_configure();
-
     /**
      * @var $sm \Cubex\ServiceManager\ServiceManager
      */
     $sm = new $this->_smClass();
-    foreach($this->_configuration as $section => $conf)
-    {
-      if($conf instanceof Config)
-      {
-        if(stristr($section, '\\'))
-        {
-          $parent = current(explode('\\', $section));
-          if($this->_configuration->get($parent) !== null)
-          {
-            foreach($this->_configuration->get($parent) as $k => $v)
-            {
-              if(!$conf->getExists($k))
-              {
-                $conf->setData($k, $v);
-              }
-            }
-          }
-        }
-
-        $registerServiceAs = $conf->getRaw("register_service_as", false);
-
-        if($registerServiceAs)
-        {
-          $factory         = $conf->getRaw("factory", false);
-          $serviceProvider = $conf->getRaw("service_provider", false);
-          if($factory || $serviceProvider)
-          {
-            $service = new ServiceConfig();
-            $service->fromConfig($conf);
-            $shared = $conf->getBool('register_service_shared', true);
-            $sm->register(
-              $conf->getStr('register_service_as', $section),
-              $service,
-              $shared
-            );
-
-            $autoload = $conf->getBool("autoload", false);
-
-            if(!$autoload)
-            {
-              $autoload = $conf->getBool("autoloadweb", false) && CUBEX_WEB;
-            }
-
-            if(!$autoload)
-            {
-              $autoload = $conf->getBool("autoloadcli", false) && CUBEX_CLI;
-            }
-
-            if($autoload)
-            {
-              $sm->get($conf->getStr('register_service_as', $section));
-            }
-          }
-        }
-      }
-    }
+    $sm->configure($this->_configuration);
 
     Foundation\Container::bind(
       Foundation\Container::SERVICE_MANAGER,
