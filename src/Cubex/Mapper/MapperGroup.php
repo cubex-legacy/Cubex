@@ -102,6 +102,11 @@ class MapperGroup
     return $this->_process(__FUNCTION__);
   }
 
+  public function count()
+  {
+    return count($this->_mappers);
+  }
+
   protected function _process($method, $args = null)
   {
     $failed = false;
