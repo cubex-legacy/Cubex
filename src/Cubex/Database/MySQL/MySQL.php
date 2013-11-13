@@ -22,6 +22,7 @@ class MySQL implements IDatabaseService
   protected $_errormsg;
 
   private static $_connectionCache = [];
+  protected $_escapeStringCache = [];
 
   use ServiceConfigTrait;
 
@@ -120,9 +121,13 @@ class MySQL implements IDatabaseService
    */
   public function escapeString($string)
   {
-    $this->_prepareConnection('r');
-
-    return $this->_connection->real_escape_string($string);
+    if(!isset($this->_escapeStringCache[$string]))
+    {
+      $this->_prepareConnection('r');
+      $this->_escapeStringCache[$string] =
+        $this->_connection->real_escape_string($string);
+    }
+    return $this->_escapeStringCache[$string];
   }
 
   public function errorNo()
