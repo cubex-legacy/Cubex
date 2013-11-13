@@ -27,9 +27,26 @@ class CassandraCollection extends Collection
     parent::__construct($map, $mappers);
   }
 
+  protected function _getPredicate()
+  {
+    $predicate = new SlicePredicate();
+    if($this->_columns === null)
+    {
+      $range                  = new SliceRange();
+      $range->start           = '';
+      $range->finish          = '';
+      $range->count           = 100;
+      $predicate->slice_range = $range;
+    }
+    else
+    {
+      $predicate->column_names = $this->_columns;
+    }
+    return $predicate;
+  }
+
   public function getByIndex(
-  $index, $value, $operator = IndexOperator::EQ,
-  SlicePredicate $predicate = null
+    $index, $value, $operator = IndexOperator::EQ
   )
   {
     $expression              = new IndexExpression();
@@ -42,16 +59,7 @@ class CassandraCollection extends Collection
     $clause->start_key     = '';
     $clause->count         = $this->_limit;
 
-    if($predicate === null)
-    {
-      $predicate                      = new SlicePredicate();
-      $predicate->slice_range         = new SliceRange();
-      $predicate->slice_range->count  = $this->_limit;
-      $predicate->slice_range->start  = '';
-      $predicate->slice_range->finish = '';
-    }
-
-    $results = $this->cf()->getIndexSlice($clause, $predicate);
+    $results = $this->cf()->getIndexSlice($clause, $this->_getPredicate());
     $this->_populate($results);
     return $this;
   }
@@ -123,7 +131,7 @@ class CassandraCollection extends Collection
   }
 
   public function makeSlice(
-  $start = '', $finish = '', $reverse = false, $limit = 100
+    $start = '', $finish = '', $reverse = false, $limit = 100
   )
   {
     return $this->cf()->makeSlice($start, $finish, $reverse, $limit);
