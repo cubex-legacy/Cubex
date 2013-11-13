@@ -160,6 +160,7 @@ class DatabaseQueue implements IBatchQueueProvider
       'available_from',
       $now->format('Y-m-d H:i:s')
     );
+    $collection->setColumns(['id', 'data', 'attempts']);
     return $collection;
   }
 
