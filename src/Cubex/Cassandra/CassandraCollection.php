@@ -5,6 +5,11 @@
 
 namespace Cubex\Cassandra;
 
+use cassandra\IndexClause;
+use cassandra\IndexExpression;
+use cassandra\IndexOperator;
+use cassandra\SlicePredicate;
+use cassandra\SliceRange;
 use Cubex\Cassandra\ColumnAttribute;
 use Cubex\Mapper\Collection;
 
@@ -20,6 +25,35 @@ class CassandraCollection extends Collection
   public function __construct(CassandraMapper $map, array $mappers = null)
   {
     parent::__construct($map, $mappers);
+  }
+
+  public function getByIndex(
+  $index, $value, $operator = IndexOperator::EQ,
+  SlicePredicate $predicate = null
+  )
+  {
+    $expression              = new IndexExpression();
+    $expression->column_name = $index;
+    $expression->op          = $operator;
+    $expression->value       = $value;
+
+    $clause                = new IndexClause();
+    $clause->expressions[] = $expression;
+    $clause->start_key     = '';
+    $clause->count         = $this->_limit;
+
+    if($predicate === null)
+    {
+      $predicate                      = new SlicePredicate();
+      $predicate->slice_range         = new SliceRange();
+      $predicate->slice_range->count  = $this->_limit;
+      $predicate->slice_range->start  = '';
+      $predicate->slice_range->finish = '';
+    }
+
+    $results = $this->cf()->getIndexSlice($clause, $predicate);
+    $this->_populate($results);
+    return $this;
   }
 
   public function getKeys($start = '', $finish = '', $predicate = null)
@@ -89,7 +123,7 @@ class CassandraCollection extends Collection
   }
 
   public function makeSlice(
-    $start = '', $finish = '', $reverse = false, $limit = 100
+  $start = '', $finish = '', $reverse = false, $limit = 100
   )
   {
     return $this->cf()->makeSlice($start, $finish, $reverse, $limit);

@@ -5,6 +5,7 @@
 
 namespace Cubex\Cassandra;
 
+use cassandra\IndexClause;
 use Cubex\Data\Attribute\Attribute;
 use Cubex\Cassandra\DataType\BytesType;
 use Cubex\Cassandra\DataType\CassandraType;
@@ -321,7 +322,7 @@ class ColumnFamily
   }
 
   public function getSlice(
-    $key, $start = '', $finish = '', $reverse = false, $limit = 100
+  $key, $start = '', $finish = '', $reverse = false, $limit = 100
   )
   {
     $result = null;
@@ -347,8 +348,31 @@ class ColumnFamily
     return $this->_formColumnResult($result);
   }
 
+  public function getIndexSlice(
+  IndexClause $index, SlicePredicate $predicate = null
+  )
+  {
+    $parent = $this->_columnParent();
+    $level  = $this->readConsistencyLevel();
+
+    try
+    {
+      $result = $this->_client()->get_indexed_slices(
+        $parent,
+        $index,
+        $predicate,
+        $level
+      );
+    }
+    catch(\Exception $e)
+    {
+      throw $this->formException($e);
+    }
+    return $this->_formKeySliceResult($result);
+  }
+
   public function multiGetSlice(
-    array $keys, $start = '', $finish = '', $reverse = false, $limit = 100
+  array $keys, $start = '', $finish = '', $reverse = false, $limit = 100
   )
   {
     $result = null;
@@ -388,7 +412,7 @@ class ColumnFamily
   }
 
   public function makeSlice(
-    $start = '', $finish = '', $reverse = false, $limit = 100
+  $start = '', $finish = '', $reverse = false, $limit = 100
   )
   {
     $range           = new SliceRange();
@@ -450,7 +474,7 @@ class ColumnFamily
   }
 
   public function getKeys(
-    $start = '', $finish = '', $count = 100, $predicate = null
+  $start = '', $finish = '', $count = 100, $predicate = null
   )
   {
     if($predicate === null)
@@ -469,8 +493,8 @@ class ColumnFamily
   }
 
   public function getTokens(
-    $startToken = 0, $finishToken = 0, $count = 100,
-    $predicate = null
+  $startToken = 0, $finishToken = 0, $count = 100,
+  $predicate = null
   )
   {
     if($predicate === null)
@@ -608,7 +632,7 @@ class ColumnFamily
   }
 
   protected function _remove(
-    $keys, $superColumn = null, array $columns = null, $timestamp = null
+  $keys, $superColumn = null, array $columns = null, $timestamp = null
   )
   {
     if($keys === null)
@@ -703,7 +727,7 @@ class ColumnFamily
   }
 
   public function removeSuper(
-    $key, $superColumn, array $columns = null, $timestamp = null
+  $key, $superColumn, array $columns = null, $timestamp = null
   )
   {
     $this->_remove($key, $superColumn, $columns, $timestamp);
@@ -740,7 +764,7 @@ class ColumnFamily
           new Mutation(
             [
             'column_or_supercolumn' => new ColumnOrSuperColumn(
-              ['counter_column' => $counter]
+            ['counter_column' => $counter]
             )
             ]
           )
@@ -816,6 +840,48 @@ class ColumnFamily
     }
 
     return $result;
+  }
+
+  protected function _formKeySliceResult($result)
+  {
+    if($result === null)
+    {
+      return $result;
+    }
+
+    if(is_array($result))
+    {
+      $final = [];
+      foreach($result as $keySlice)
+      {
+        if($keySlice instanceof KeySlice)
+        {
+          $final[$keySlice->key] = $this->_formKeySliceResult($keySlice);
+        }
+      }
+      return $final;
+    }
+    else if($result instanceof KeySlice)
+    {
+      $row = [];
+      foreach($result->columns as $column)
+      {
+        $col = $this->_formColumn($column);
+        if($this->returnAttribute())
+        {
+          $row[$col->name()] = $col;
+        }
+        else
+        {
+          $row[$col[0]] = $col[1];
+        }
+      }
+      return $row;
+    }
+    else
+    {
+      return $result;
+    }
   }
 
   protected function _formColumnResult($result)
@@ -991,7 +1057,7 @@ class ColumnFamily
     else
     {
       $cfName = $this->name();
-      if(! is_array($mutations))
+      if(!is_array($mutations))
       {
         $mutations = [$mutations];
       }
@@ -1000,7 +1066,7 @@ class ColumnFamily
         $this->_batchMutation = [];
       }
 
-      if(! isset($this->_batchMutation[$key]))
+      if(!isset($this->_batchMutation[$key]))
       {
         $this->_batchMutation[$key] = [];
       }
