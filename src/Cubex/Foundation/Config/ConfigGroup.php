@@ -100,6 +100,11 @@ class ConfigGroup
     $baseConfig = new Config();
     foreach($array as $configName => $config)
     {
+      if($config instanceof \stdClass)
+      {
+        $config = (array)$config;
+      }
+
       if(is_array($config))
       {
         $cfg = new Config();
