@@ -20,15 +20,33 @@ class Config implements \IteratorAggregate, IDataHandler, \ArrayAccess
    */
   public function setData($name, $value)
   {
-    if(is_scalar($value) && strstr($value, "::") !== false)
+    if(is_scalar($value))
     {
-      if(defined($value))
-      {
-        $value = constant($value);
-      }
+      $value = $this->_attemptConstantFromString($value);
+    }
+    else if(is_array($value))
+    {
+      $value = array_map([$this, "_attemptConstantFromString"], $value);
     }
     $this->_data[$name] = $value;
     return $this;
+  }
+
+  protected function _attemptConstantFromString($string)
+  {
+    if(is_scalar($string) && strstr($string, "::") !== false)
+    {
+      if(starts_with($string, "::"))
+      {
+        $string = substr($string, 2);
+      }
+
+      if(defined($string))
+      {
+        $string = constant($string);
+      }
+    }
+    return $string;
   }
 
   /**
