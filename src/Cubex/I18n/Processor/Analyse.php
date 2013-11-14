@@ -450,7 +450,7 @@ class Analyse
   public function slash($text)
   {
     $pattern = '/<span class="notranslate">([^<]*)<\/span>/';
-    $text    = preg_replace($pattern, '$1', \urldecode($text));
+    $text    = preg_replace($pattern, '$1', $text);
     return str_replace('"', '\"', $text);
   }
 }
