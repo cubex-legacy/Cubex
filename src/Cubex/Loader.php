@@ -507,12 +507,23 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
   {
     if(CUBEX_WEB && !isset($_REQUEST['__path__']))
     {
-      throw new \RuntimeException(
-        "__path__ is not set. Your rewrite rules are not configured correctly."
-      );
+      if(isset($_SERVER["REQUEST_URI"]) && !empty($_SERVER["REQUEST_URI"]))
+      {
+        $path = $_SERVER["REQUEST_URI"];
+      }
+      else
+      {
+        throw new \RuntimeException(
+          "__path__ is not set. " .
+          "Your rewrite rules are not configured correctly."
+        );
+      }
+    }
+    else
+    {
+      $path = $_REQUEST['__path__'];
     }
 
-    $path = $_REQUEST['__path__'];
     if(substr($path, 0, 1) !== '/')
     {
       $path = '/' . $path;
