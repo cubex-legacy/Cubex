@@ -598,4 +598,25 @@ class Request implements \IteratorAggregate
 
     return str_replace(array_keys($formater), $formater, $format);
   }
+
+  public function matchDomain($domain = null, $tld = null, $subDomain = null)
+  {
+    $match = true;
+
+    if($domain !== null && strtolower($domain) !== $this->domain())
+    {
+      $match = false;
+    }
+
+    if($tld !== null && strtolower($tld) !== $this->tld())
+    {
+      $match = false;
+    }
+
+    if($subDomain !== null && strtolower($subDomain) !== $this->subDomain())
+    {
+      $match = false;
+    }
+    return $match;
+  }
 }

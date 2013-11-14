@@ -7,6 +7,7 @@ namespace Cubex\Core\Controllers;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Core\Response\Webpage;
+use Cubex\Core\Traits\OnDomainTrait;
 use Cubex\Dispatch\Utils\RequireTrait;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\IRenderable;
@@ -18,6 +19,7 @@ use Cubex\View\Templates\Exceptions\ExceptionView;
 class WebpageController extends BaseController
 {
   use RequireTrait;
+  use OnDomainTrait;
 
   /**
    * @var \Cubex\Core\Response\Webpage
