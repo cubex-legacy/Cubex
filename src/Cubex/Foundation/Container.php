@@ -12,6 +12,7 @@ class Container
 
   const LOADER          = 'cubex.loader';
   const CONFIG          = 'cubex.configuration';
+  const CUBEX_CONFIG    = 'cubex.internal.config';
   const SERVICE_MANAGER = 'cubex.servicemanager';
   const REQUEST         = 'cubex.request';
   const RESPONSE        = 'cubex.response';
@@ -59,6 +60,14 @@ class Container
   public static function config()
   {
     return static::get(self::CONFIG, new ConfigGroup());
+  }
+
+  /**
+   * @return \Cubex\Foundation\Config\ConfigGroup
+   */
+  public static function cubexConfig()
+  {
+    return static::get(self::CUBEX_CONFIG, new ConfigGroup());
   }
 
   /**

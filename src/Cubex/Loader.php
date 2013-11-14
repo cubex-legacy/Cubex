@@ -18,6 +18,7 @@ use Cubex\Core\Http\IDispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Foundation\Config\Provider\IniConfigProvider;
+use Cubex\Foundation\Container;
 use Cubex\ServiceManager\IServiceManagerAware;
 use Cubex\ServiceManager\ServiceManagerAwareTrait;
 
@@ -317,6 +318,19 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
   protected function _configure()
   {
+
+    $configProvider = new IniConfigProvider();
+    try
+    {
+      $configProvider->appendIniFile($this->_defaultIniPath('cubex'));
+      $cubexConfig = $configProvider->getConfig();
+    }
+    catch(\Exception $e)
+    {
+      $cubexConfig = $this->_defaultCubexConfig();
+    }
+    Container::bind(Container::CUBEX_CONFIG, $cubexConfig);
+
     if(!isset($this->_configuration) || $this->_configuration === null)
     {
       $configProvider = new IniConfigProvider();
@@ -329,6 +343,11 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
   protected function _defaultIniPath($file)
   {
     return build_path(CUBEX_PROJECT_ROOT, 'conf', $file . '.ini');
+  }
+
+  protected function _defaultCubexConfig()
+  {
+    return new ConfigGroup();
   }
 
   /**
