@@ -27,7 +27,7 @@ class Locale
 
   public function getTimezone()
   {
-    $timezone = $this->_locale;
+    $timezone = $this->_timezone;
     if($timezone === null)
     {
       $timezone = static::$_timezoneStatic;
