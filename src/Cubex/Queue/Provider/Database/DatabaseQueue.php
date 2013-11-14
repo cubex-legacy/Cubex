@@ -139,7 +139,7 @@ class DatabaseQueue implements IBatchQueueProvider
 
   protected function _lockRecords(IQueue $queue, $limit = 1)
   {
-    $mapper     = $this->_queueMapper(true);
+    $mapper     = $this->_queueMapper();
     $collection = new RecordCollection($mapper);
 
     $now = DateTimeHelper::dateTimeFromAnything(time());
