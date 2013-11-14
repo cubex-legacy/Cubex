@@ -116,9 +116,43 @@ class ConfigGroup
         $baseConfig->setData($configName, $config);
       }
     }
-    $group->addConfig('_unassigned_', $baseConfig);
+
+    if($baseConfig->getData() !== [])
+    {
+      $group->addConfig('_unassigned_', $baseConfig);
+    }
 
     return $group;
+  }
+
+  public function merge(ConfigGroup $replacements, $mergeChildArrays = true)
+  {
+    foreach($replacements as $name => $config)
+    {
+      if(!$this->exists($name))
+      {
+        $this->addConfig($name, $config);
+      }
+      else
+      {
+        foreach($config as $item => $value)
+        {
+          $cfg = $this->get($name);
+          if($mergeChildArrays && is_array($value) && $cfg->getExists($item))
+          {
+            $cfg->setData(
+              $item,
+              array_merge_recursive($cfg->getArr($item), $value)
+            );
+          }
+          else
+          {
+            $cfg->setData($item, $value);
+          }
+        }
+      }
+    }
+    return $this;
   }
 
   public function jsonSerialize()
