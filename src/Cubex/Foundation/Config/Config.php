@@ -10,10 +10,7 @@ use Cubex\Data\Handler\HandlerTrait;
 
 class Config implements \IteratorAggregate, IDataHandler, \ArrayAccess
 {
-  use HandlerTrait
-  {
-    setData as protected traitSetData;
-  }
+  use HandlerTrait;
 
   /**
    * @param $name
@@ -30,7 +27,7 @@ class Config implements \IteratorAggregate, IDataHandler, \ArrayAccess
         $value = constant($value);
       }
     }
-    $this->traitSetData($name, $value);
+    $this->_data[$name] = $value;
     return $this;
   }
 
