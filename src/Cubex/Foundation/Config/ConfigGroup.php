@@ -4,7 +4,8 @@
  */
 namespace Cubex\Foundation\Config;
 
-class ConfigGroup implements \Countable, \IteratorAggregate, \ArrayAccess
+class ConfigGroup
+  implements \Countable, \IteratorAggregate, \ArrayAccess, \JsonSerializable
 {
   protected $_count = 0;
   /**
@@ -113,5 +114,10 @@ class ConfigGroup implements \Countable, \IteratorAggregate, \ArrayAccess
     $group->addConfig('_unassigned_', $baseConfig);
 
     return $group;
+  }
+
+  public function jsonSerialize()
+  {
+    return $this->_configs;
   }
 }

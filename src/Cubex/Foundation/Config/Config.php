@@ -8,7 +8,8 @@ namespace Cubex\Foundation\Config;
 use Cubex\Data\Handler\IDataHandler;
 use Cubex\Data\Handler\HandlerTrait;
 
-class Config implements \IteratorAggregate, IDataHandler, \ArrayAccess
+class Config
+  implements \IteratorAggregate, IDataHandler, \ArrayAccess, \JsonSerializable
 {
   use HandlerTrait;
 
@@ -61,5 +62,10 @@ class Config implements \IteratorAggregate, IDataHandler, \ArrayAccess
       $this->setData($name, $value);
     }
     return $this;
+  }
+
+  public function jsonSerialize()
+  {
+    return $this->_data;
   }
 }
