@@ -17,6 +17,7 @@ use Cubex\Core\Http\IDispatchable;
 use Cubex\Core\Http\IDispatchableAccess;
 use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
+use Cubex\Foundation\Config\Provider\IConfigProvider;
 use Cubex\Foundation\Config\Provider\IniConfigProvider;
 use Cubex\Foundation\Container;
 use Cubex\ServiceManager\IServiceManagerAware;
@@ -318,36 +319,66 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
   protected function _configure()
   {
+    $cubexConfig = $this->_defaultCubexConfig();
 
-    $configProvider = new IniConfigProvider();
     try
     {
-      $configProvider->appendIniFile($this->_defaultIniPath('cubex'));
-      $cubexConfig = $configProvider->getConfig();
+      $configProvider = new IniConfigProvider();
+      $configProvider->appendIniFile(
+        build_path(CUBEX_PROJECT_ROOT, 'conf', 'cubex.ini')
+      );
+      $cubexConfig->merge($configProvider->getConfiguration(), false);
     }
     catch(\Exception $e)
     {
-      $cubexConfig = $this->_defaultCubexConfig();
     }
+
     Container::bind(Container::CUBEX_CONFIG, $cubexConfig);
 
     if(!isset($this->_configuration) || $this->_configuration === null)
     {
-      $configProvider = new IniConfigProvider();
-      $configProvider->appendIniFile($this->_defaultIniPath('defaults'));
-      $configProvider->appendIniFile($this->_defaultIniPath(CUBEX_ENV));
-      $this->configure($configProvider->getConfig());
+      $configCfg           = $cubexConfig->get("config", new Config());
+      $configProviderClass = $configCfg->getStr("config_provider");
+      if($configProviderClass !== null && class_exists($configProviderClass))
+      {
+        $configProvider = new $configProviderClass();
+        if($configProvider instanceof IConfigProvider)
+        {
+          $configProvider->configure($cubexConfig);
+          $this->configure($configProvider->getConfiguration());
+        }
+        else
+        {
+          throw new \Exception(
+            "Your config provider class '$configProviderClass' " .
+            "is not a valid IConfigProvider",
+            500
+          );
+        }
+      }
+      else
+      {
+        throw new \Exception(
+          "Your config provider class '$configProviderClass' cannot be loaded",
+          500
+        );
+      }
     }
-  }
-
-  protected function _defaultIniPath($file)
-  {
-    return build_path(CUBEX_PROJECT_ROOT, 'conf', $file . '.ini');
   }
 
   protected function _defaultCubexConfig()
   {
-    return new ConfigGroup();
+    $cubexConfig = new ConfigGroup();
+
+    $config = new Config();
+    $config->setData(
+      "config_provider",
+      '\Cubex\Foundation\Config\Provider\IniConfigProvider'
+    );
+    $config->setData("load_files", ["defaults", CUBEX_ENV]);
+    $cubexConfig->addConfig("config", $config);
+
+    return $cubexConfig;
   }
 
   /**
