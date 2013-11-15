@@ -755,6 +755,11 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
     }
   }
 
+  public function __isset($name)
+  {
+    return $this->argumentIsConfigured($name);
+  }
+
   public function nonCallableMethods()
   {
     return [
