@@ -21,6 +21,10 @@
     "cubex/figlet": "*",
     "psr/log":      "1.0.0"
   },
+  "replace":           {
+    "cubex/type": "self.version",
+    "cubex/data": "self.version"
+  },
   "suggest":           {
     "cubex/cassandra":              "Cassandra Connections",
     "rmccue/requests":              "HTTP Request Helper",
