@@ -24,6 +24,10 @@ trait BundlerTrait
   public function addDefaultBundles()
   {
     $bundles = $this->getBundles();
+    if(!is_array($bundles))
+    {
+      return false;
+    }
     foreach($bundles as $name => $bundle)
     {
       if(!$this->hasBundle($name))
