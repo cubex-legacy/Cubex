@@ -729,7 +729,7 @@ class Form extends DataMapper implements IRenderable
   }
 
   public function addCheckboxElement(
-    $name, $default, $selectedValue = 'true',
+    $name, $default, $selectedValue = '1',
     $labelPosition = null
   )
   {
