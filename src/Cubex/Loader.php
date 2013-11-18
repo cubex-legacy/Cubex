@@ -102,8 +102,10 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     $this->setResponse($this->buildResponse());
     if($handleErrors)
     {
-      set_exception_handler(array($this, 'handleException'));
-      set_error_handler(array($this, 'handleError'));
+      $run     = new \Whoops\Run();
+      $handler = new \Whoops\Handler\PrettyPageHandler();
+      $run->pushHandler($handler);
+      $run->register();
     }
 
     try
@@ -669,50 +671,43 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
 
     if(!$this->_failed)
     {
-      try
+      if($this->_response === null)
       {
-        if($this->_response === null)
-        {
-          $this->setResponse($this->buildResponse());
-        }
-
-        if($this->_request === null)
-        {
-          $this->setRequest($this->buildRequest());
-        }
-
-        $this->_response->addHeader("X-Cubex-TID", CUBEX_TRANSACTION);
-
-        if($this->_configuration === null)
-        {
-          $this->_newConfiguration();
-        }
-
-        $dispatcher = $this->getDispatchable();
-
-        $dispatcher->configure($this->_configuration);
-
-        if($dispatcher instanceof IServiceManagerAware)
-        {
-          $dispatcher->setServiceManager($this->getServiceManager());
-        }
-
-        $resp = $dispatcher->dispatch($this->_request, $this->_response);
-
-        if(!($resp instanceof Response))
-        {
-          throw new \RuntimeException(
-            "Invalid Response object received from dispatcher", 500
-          );
-        }
-        else
-        {
-          $this->_response = $resp;
-        }
+        $this->setResponse($this->buildResponse());
       }
-      catch(\Exception $e)
+
+      if($this->_request === null)
       {
-        $this->handleException($e, $this->_response);
+        $this->setRequest($this->buildRequest());
+      }
+
+      $this->_response->addHeader("X-Cubex-TID", CUBEX_TRANSACTION);
+
+      if($this->_configuration === null)
+      {
+        $this->_newConfiguration();
+      }
+
+      $dispatcher = $this->getDispatchable();
+
+      $dispatcher->configure($this->_configuration);
+
+      if($dispatcher instanceof IServiceManagerAware)
+      {
+        $dispatcher->setServiceManager($this->getServiceManager());
+      }
+
+      $resp = $dispatcher->dispatch($this->_request, $this->_response);
+
+      if(!($resp instanceof Response))
+      {
+        throw new \RuntimeException(
+          "Invalid Response object received from dispatcher", 500
+        );
+      }
+      else
+      {
+        $this->_response = $resp;
       }
     }
 

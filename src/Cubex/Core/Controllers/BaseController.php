@@ -67,7 +67,7 @@ class BaseController
   protected $_preActionResult;
 
   /**
-   * @param \Cubex\Core\Application\Application f$app
+   * @param \Cubex\Core\Application\Application $app
    *
    * @return mixed
    */

@@ -190,20 +190,6 @@ class WebpageController extends BaseController
     return $this->_response->fromRenderable($this->_webpage);
   }
 
-  protected function _processAction($action, $params)
-  {
-    try
-    {
-      $result = parent::_processAction($action, $params);
-    }
-    catch(\Exception $e)
-    {
-      return new ExceptionView($e);
-    }
-
-    return $result;
-  }
-
   public function esiRender($action, $path, $params = [])
   {
     $surrogateCapability = strpos(
