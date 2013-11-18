@@ -44,6 +44,14 @@ trait ValidatableTrait
     return false;
   }
 
+  /**
+   * Validators must be an array conforming to the following format
+   * array('validator' => $validator, 'options' => $options)
+   *
+   * @param $validators array
+   *
+   * @return $this
+   */
   public function setValidators($validators)
   {
     $this->_validators = $validators;
@@ -135,7 +143,8 @@ trait ValidatableTrait
         if(!empty($errors))
         {
           $this->_validationErrors = array_merge(
-            $this->_validationErrors, $errors
+            $this->_validationErrors,
+            $errors
           );
         }
       }
