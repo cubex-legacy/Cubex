@@ -771,10 +771,18 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
       $dictionary->configure($this->_configuration);
 
       $canLoadClass = false;
-      list($originalCommand, $action) = explode(':', $command);
-      if($action === null)
+      if(stristr($command, ':'))
       {
-        $action = 'execute';
+        list($originalCommand, $action) = explode(':', $command);
+        if($action === null)
+        {
+          $action = 'execute';
+        }
+      }
+      else
+      {
+        $originalCommand = $command;
+        $action          = 'execute';
       }
 
       $attempted = [];
