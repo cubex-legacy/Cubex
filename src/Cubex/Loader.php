@@ -559,7 +559,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     {
       if(isset($_SERVER["REQUEST_URI"]) && !empty($_SERVER["REQUEST_URI"]))
       {
-        $path = $_SERVER["REQUEST_URI"];
+        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
       }
       else
       {
