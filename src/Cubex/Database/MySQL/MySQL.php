@@ -119,13 +119,22 @@ class MySQL implements IDatabaseService
   /**
    * @param $string
    *
-   * @return string
+   * @return mixed
+   * @throws \Exception
    */
   public function escapeString($string)
   {
     if($string === null || empty($string))
     {
       return $string;
+    }
+
+    if(!is_scalar($string))
+    {
+      throw new \Exception(
+        "Unable to escape string, when " . gettype($string) . ' has been passed'
+        . print_r($string, true)
+      );
     }
 
     if(!isset($this->_escapeStringCache[$string]))
