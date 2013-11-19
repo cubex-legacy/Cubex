@@ -34,7 +34,7 @@ class MySQL implements IDatabaseService
     if(!isset(self::$_connectionCache[$key]))
     {
       self::$_connectionCache[$key] =
-        new \mysqli($hostname, $username, $password, $database, $port);
+      new \mysqli($hostname, $username, $password, $database, $port);
     }
 
     return self::$_connectionCache[$key];
@@ -52,7 +52,9 @@ class MySQL implements IDatabaseService
     }
 
     $this->_connection = self::_getConnection(
-      $hostname, $database, $this->_config->getStr('username', 'root'),
+      $hostname,
+      $database,
+      $this->_config->getStr('username', 'root'),
       $this->_config->getStr('password', ''),
       $this->_config->getStr('port', 3306)
     );
@@ -121,11 +123,16 @@ class MySQL implements IDatabaseService
    */
   public function escapeString($string)
   {
+    if($string === null || empty($string))
+    {
+      return $string;
+    }
+
     if(!isset($this->_escapeStringCache[$string]))
     {
       $this->_prepareConnection('r');
       $this->_escapeStringCache[$string] =
-        $this->_connection->real_escape_string($string);
+      $this->_connection->real_escape_string($string);
     }
     return $this->_escapeStringCache[$string];
   }
