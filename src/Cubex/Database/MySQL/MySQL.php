@@ -129,13 +129,8 @@ class MySQL implements IDatabaseService
       return $string;
     }
 
-    if(!is_scalar($string))
-    {
-      throw new \Exception(
-        "Unable to escape string, when " . gettype($string) . ' has been passed'
-        . print_r($string, true)
-      );
-    }
+    //Correctly handle objects which perform toString e.g. Enums
+    $string = (string)$string;
 
     if(!isset($this->_escapeStringCache[$string]))
     {
