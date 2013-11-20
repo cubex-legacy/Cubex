@@ -386,3 +386,15 @@ if(!function_exists("array_add"))
     return $array;
   }
 }
+
+if(!function_exists("idp"))
+{
+  /**
+   * Access an object property, retrieving the value stored there
+   * if it exists or a default if it does not.
+   */
+  function idp($object, $property, $default = null)
+  {
+    return isset($object->$property) ? $object->$property : $default;
+  }
+}
