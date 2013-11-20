@@ -105,6 +105,11 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
       $run     = new \Whoops\Run();
       $handler = new \Whoops\Handler\PrettyPageHandler();
       $run->pushHandler($handler);
+      $throwNotices = \getenv('CUBEX_THROW_NOTICES');
+      if(!$throwNotices)
+      {
+        $run->silenceErrorsInPaths("/.ph(tml|p)$/", E_NOTICE);
+      }
       $run->register();
     }
 
