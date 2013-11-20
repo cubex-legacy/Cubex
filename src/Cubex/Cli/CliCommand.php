@@ -10,7 +10,6 @@ use Cubex\Data\DocBlock\IDocBlockAware;
 use Cubex\Data\Filter\Filter;
 use Cubex\Data\Validator\Validator;
 use Cubex\Foundation\Config\ConfigTrait;
-use Cubex\Helpers\Strings;
 use Cubex\Loader;
 use Psr\Log\LogLevel;
 
@@ -74,17 +73,6 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
   {
     (new DocBlockParser($this))->parse();
 
-    /**
-     * If you wish to log to a file, or use CLI logger in a more detailed way,
-     * Set _autoLog to false and initiate the CliLogger within your class
-     */
-    if($this->_autoLog)
-    {
-      $this->_logger = new CliLogger(
-        $this->_echoLevel, $this->_defaultLogLevel
-      );
-    }
-
     $this->_loader  = $loader;
     $this->_rawArgs = $rawArgs;
 
@@ -108,6 +96,22 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
       echo "\nERROR: " . $e->getMessage() . "\n";
       $this->_help();
       die();
+    }
+
+    if($this->argumentValue('disable-logging'))
+    {
+      $this->_autoLog = false;
+    }
+
+    /**
+     * If you wish to log to a file, or use CLI logger in a more detailed way,
+     * Set _autoLog to false and initiate the CliLogger within your class
+     */
+    if($this->_autoLog)
+    {
+      $this->_logger = new CliLogger(
+        $this->_echoLevel, $this->_defaultLogLevel
+      );
     }
 
     if($this->_autoLog && $this->argumentIsSet('log-level'))
@@ -195,12 +199,27 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
       }
     }
 
+    static::_addDisableLoggingArgIfRequired();
     static::_addEchoLevelArgIfRequired();
     static::_addLogLevelArgIfRequired();
   }
 
   protected function _configure()
   {
+  }
+
+  protected function _addDisableLoggingArgIfRequired()
+  {
+    if(!isset($this->_argsByName['disable-logging']))
+    {
+      $arg = new CliArgument(
+        'disable-logging', 'Disable all logging', '',
+        CliArgument::VALUE_NONE, '', false, false
+      );
+
+      $this->_options[]              = $arg;
+      $this->_argsByName[$arg->name] = $arg;
+    }
   }
 
   protected function _addLogLevelArgIfRequired()
