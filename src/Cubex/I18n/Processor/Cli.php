@@ -6,12 +6,9 @@
 namespace Cubex\I18n\Processor;
 
 use Cubex\Cli\CliCommand;
-use Cubex\Foundation\Config\ConfigTrait;
 
 class Cli extends CliCommand
 {
-  use ConfigTrait;
-
   /**
    * @var Build
    */
