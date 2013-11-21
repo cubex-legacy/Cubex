@@ -6,11 +6,13 @@
 namespace Cubex\Helpers;
 
 use Cubex\Exception\CubexException;
+use Cubex\Log\Log;
 
 class Curl
 {
   public static function request($uri, $timeout = 30)
   {
+    Log::notice("Please switch to use rmccue/requests");
     $res = \curl_init();
     \curl_setopt($res, CURLOPT_URL, $uri);
     \curl_setopt($res, CURLOPT_HEADER, 0);
