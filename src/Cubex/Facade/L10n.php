@@ -8,9 +8,11 @@ namespace Cubex\Facade;
 class L10n extends BaseFacade
 {
   /**
+   * @param $serviceName
+   *
    * @return \Cubex\L10n\ILocationService
    */
-  public static function getAccessor()
+  public static function getAccessor($serviceName = null)
   {
     return static::getServiceManager()->get("l10n");
   }
