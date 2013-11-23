@@ -144,7 +144,6 @@ class Strings
     return substr($str1, 0, $preLen);
   }
 
-
   /**
    * @param $string string String to split
    * @param $offset int character position to split on

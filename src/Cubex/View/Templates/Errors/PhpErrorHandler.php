@@ -15,7 +15,6 @@ class PhpErrorHandler extends ViewModel
   protected $_line;
   protected $_context;
 
-
   public function __construct($num, $msg, $file = null, $line = null,
                               $context = null)
   {

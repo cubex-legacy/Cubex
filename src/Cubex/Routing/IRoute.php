@@ -35,7 +35,6 @@ interface IRoute
    */
   public function result();
 
-
   /**
    * @param $result
    *

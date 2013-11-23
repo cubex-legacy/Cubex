@@ -322,7 +322,7 @@ class ColumnFamily
   }
 
   public function getSlice(
-  $key, $start = '', $finish = '', $reverse = false, $limit = 100
+    $key, $start = '', $finish = '', $reverse = false, $limit = 100
   )
   {
     $result = null;
@@ -349,7 +349,7 @@ class ColumnFamily
   }
 
   public function getIndexSlice(
-  IndexClause $index, SlicePredicate $predicate = null
+    IndexClause $index, SlicePredicate $predicate = null
   )
   {
     $parent = $this->_columnParent();
@@ -372,7 +372,7 @@ class ColumnFamily
   }
 
   public function multiGetSlice(
-  array $keys, $start = '', $finish = '', $reverse = false, $limit = 100
+    array $keys, $start = '', $finish = '', $reverse = false, $limit = 100
   )
   {
     $result = null;
@@ -412,7 +412,7 @@ class ColumnFamily
   }
 
   public function makeSlice(
-  $start = '', $finish = '', $reverse = false, $limit = 100
+    $start = '', $finish = '', $reverse = false, $limit = 100
   )
   {
     $range           = new SliceRange();
@@ -474,7 +474,7 @@ class ColumnFamily
   }
 
   public function getKeys(
-  $start = '', $finish = '', $count = 100, $predicate = null
+    $start = '', $finish = '', $count = 100, $predicate = null
   )
   {
     if($predicate === null)
@@ -493,8 +493,8 @@ class ColumnFamily
   }
 
   public function getTokens(
-  $startToken = 0, $finishToken = 0, $count = 100,
-  $predicate = null
+    $startToken = 0, $finishToken = 0, $count = 100,
+    $predicate = null
   )
   {
     if($predicate === null)
@@ -632,7 +632,7 @@ class ColumnFamily
   }
 
   protected function _remove(
-  $keys, $superColumn = null, array $columns = null, $timestamp = null
+    $keys, $superColumn = null, array $columns = null, $timestamp = null
   )
   {
     if($keys === null)
@@ -727,7 +727,7 @@ class ColumnFamily
   }
 
   public function removeSuper(
-  $key, $superColumn, array $columns = null, $timestamp = null
+    $key, $superColumn, array $columns = null, $timestamp = null
   )
   {
     $this->_remove($key, $superColumn, $columns, $timestamp);
@@ -764,7 +764,7 @@ class ColumnFamily
           new Mutation(
             [
             'column_or_supercolumn' => new ColumnOrSuperColumn(
-            ['counter_column' => $counter]
+              ['counter_column' => $counter]
             )
             ]
           )

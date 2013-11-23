@@ -59,7 +59,6 @@ abstract class PDOBase implements IDatabaseService
     }
   }
 
-
   /**
    * @param $string
    *
@@ -71,7 +70,6 @@ abstract class PDOBase implements IDatabaseService
 
     return substr($this->_connection->quote($string), 1, -1);
   }
-
 
   /**
    * @returns \PDOStatement
@@ -90,7 +88,6 @@ abstract class PDOBase implements IDatabaseService
     );
     return $result;
   }
-
 
   /**
    * @param $query
@@ -220,8 +217,15 @@ abstract class PDOBase implements IDatabaseService
             }
             $keyField = $keyField[0];
           }
-          $rows[$row->$keyField] = !$valueAsArray && !empty($valueKey)
-          ? $row->$valueKey : $row;
+
+          if(!$valueAsArray && !empty($valueKey))
+          {
+            $rows[$row->$keyField] = $row->$valueKey;
+          }
+          else
+          {
+            $rows[$row->$keyField] = $row;
+          }
         }
       }
 

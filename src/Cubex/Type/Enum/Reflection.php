@@ -14,7 +14,6 @@ abstract class Reflection
 
   protected static $_defaultKey = "__default";
 
-
   /**
    * @param mixed $enum
    * @param bool  $strict

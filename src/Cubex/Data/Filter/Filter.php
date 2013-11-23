@@ -83,13 +83,24 @@ class Filter
 
   public static function arr($string)
   {
-    if(is_array($string)) return $string;
-    if(is_object($string)) return (array)$string;
+    if(is_array($string))
+    {
+      return $string;
+    }
+
+    if(is_object($string))
+    {
+      return (array)$string;
+    }
+
     if(stristr($string, ','))
     {
       return explode(',', $string);
     }
-    else return array($string);
+    else
+    {
+      return array($string);
+    }
   }
 
   /**
@@ -102,7 +113,9 @@ class Filter
   public static function splitName($fullName)
   {
     $fullName        = preg_replace(
-      '!\s+!', ' ', $fullName
+      '!\s+!',
+      ' ',
+      $fullName
     ); // Make multiple spaces single
     $name            = new \stdClass();
     $parts           = explode(' ', trim($fullName));

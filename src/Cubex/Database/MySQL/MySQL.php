@@ -297,8 +297,14 @@ class MySQL implements IDatabaseService
           }
           $keyField = $keyField[0];
         }
-        $rows[$row->$keyField] = !$valueAsArray && !empty($valueKey)
-        ? $row->$valueKey : $row;
+        if(!$valueAsArray && !empty($valueKey))
+        {
+          $rows[$row->$keyField] = $row->$valueKey;
+        }
+        else
+        {
+          $rows[$row->$keyField] = $row;
+        }
       }
     }
 

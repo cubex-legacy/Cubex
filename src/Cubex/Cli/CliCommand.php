@@ -688,8 +688,11 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
    */
   public function positionalArgValue($argNum, $default = null)
   {
-    return isset($this->_rawPositionalArgs[$argNum])
-    ? $this->_rawPositionalArgs[$argNum] : $default;
+    if(isset($this->_rawPositionalArgs[$argNum]))
+    {
+      return $this->_rawPositionalArgs[$argNum];
+    }
+    return $default;
   }
 
   /**
@@ -715,8 +718,8 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
         foreach($m->getParameters() as $param)
         {
           $params[] = '$' . $param->name . '' .
-          ($param->isDefaultValueAvailable()
-          ? '=' . $param->getDefaultValue() : '');
+          ($param->isDefaultValueAvailable() ?
+          '=' . $param->getDefaultValue() : '');
         }
         $this->_publicMethods[] = $methodName .
         (empty($params) ? '' : '(' . implode(',', $params) . ')');

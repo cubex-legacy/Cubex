@@ -82,8 +82,8 @@ class CliLogger
     {
       $logsDir = self::getDefaultLogPath($instanceName);
 
-      $fileName = (isset($_REQUEST['__path__'])
-      ? $_REQUEST['__path__'] : 'logfile') . '.log';
+      $fileName = idx($_REQUEST, '__path__', 'logfile');
+      $fileName = $fileName . '.log';
 
       $logFile = $logsDir . DS . $fileName;
     }
@@ -161,7 +161,7 @@ class CliLogger
           break;
       }
 
-      $lines  = explode("\n", $logData['message']);
+      $lines = explode("\n", $logData['message']);
 
       $echoMsg = $logDate;
       $echoMsg .= Shell::colourText($this->_logLevelToDisplay($level), $color);
