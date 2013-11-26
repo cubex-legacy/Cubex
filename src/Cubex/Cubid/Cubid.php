@@ -32,6 +32,12 @@ class Cubid
       $length = 20;
     }
 
+    if(function_exists('com_create_guid') && $length <= 36)
+    {
+      $guid = substr(trim(com_create_guid(), '{}'), 0, $length);
+      return "CUBID:$subType" . $guid;
+    }
+
     return "CUBID:$subType" . FileSystem::readRandomCharacters($length);
   }
 }
