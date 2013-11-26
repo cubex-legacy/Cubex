@@ -46,13 +46,11 @@ class FileSystem
       }
 
       fclose($urandom);
-    }
-    else
-    {
-      return static::_pseudoBytes($bytes);
+
+      return $data;
     }
 
-    return $data;
+    return static::_pseudoBytes($bytes);
   }
 
   protected static function _pseudoBytes($bytes)
