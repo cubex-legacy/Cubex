@@ -16,11 +16,11 @@ class Mail implements IEmailService
   protected $_ccs = [];
   protected $_bccs = [];
   protected $_subject;
-  protected $_message;
+  protected $_htmlBody;
+  protected $_textBody;
   protected $_from = [];
   protected $_sender;
   protected $_returnPath;
-  protected $_isHtml;
   protected $_headers = [];
   protected $_files = [];
 
@@ -38,11 +38,11 @@ class Mail implements IEmailService
     $this->_ccs        = [];
     $this->_bccs       = [];
     $this->_subject    = null;
-    $this->_message    = null;
+    $this->_textBody = null;
+    $this->_htmlBody   = null;
     $this->_from       = [];
     $this->_sender     = null;
     $this->_returnPath = null;
-    $this->_isHtml     = null;
     $this->_headers    = [];
 
     $sender = $this->_config->getStr("default.sender", null);
@@ -72,6 +72,11 @@ class Mail implements IEmailService
     return $this;
   }
 
+  public function config()
+  {
+    return $this->_config;
+  }
+
   public function setSubject($subject)
   {
     $this->_subject = $subject;
@@ -79,17 +84,16 @@ class Mail implements IEmailService
     return $this;
   }
 
-  public function setBody($body)
+  public function setTextBody($body)
   {
-    $this->_message = $body;
+    $this->_textBody = $body;
 
     return $this;
   }
 
-  public function isHtml($bool = true)
+  public function setHtmlBody($body)
   {
-    $this->_isHtml = $bool;
-
+    $this->_htmlBody = $body;
     return $this;
   }
 
@@ -196,33 +200,70 @@ class Mail implements IEmailService
     return $this;
   }
 
+  protected function _hasHtml()
+  {
+    return $this->_htmlBody !== null;
+  }
+
+  protected function _hasPlaintext()
+  {
+    return $this->_textBody !== null;
+  }
+
+  protected function _hasAttachments()
+  {
+    return count($this->_files) > 0;
+  }
+
   public function send()
   {
-    if(count($this->_files))
-    {
-      $this->_generatedAttachmentHeaders();
-    }
-    else
-    {
-      $this->_headers[] = "Content-Type: " .
-      ($this->_isHtml ? 'text/html' : 'text/plain') . "; charset=\"UTF-8\";";
-    }
-    $this->_headers[] = "From: " . implode(", ", $this->_from);
-    $this->_headers[] = "Bcc: " . implode(", ", $this->_bccs);
-    $this->_headers[] = "Cc: " . implode(", ", $this->_ccs);
-    $this->_headers[] = "Reply-To: " . $this->_sender;
-    $this->_headers[] = "Return-Path: " . $this->_returnPath;
-    $headers          = implode("\r\n", $this->_headers);
-    $to               = implode(",", $this->_recipients);
+    $message = $this->_generateMessageAndSetHeaders();
 
-    $mail = mail($to, $this->_subject, $this->_message, $headers);
+    $headers = implode("\r\n", $this->_headers);
+    $to      = implode(",", $this->_recipients);
+
+    $mail = mail($to, $this->_subject, $message, $headers);
 
     $this->reset();
 
     return $mail;
   }
 
-  protected function _generatedAttachmentHeaders()
+  protected function _generateMessageAndSetHeaders()
+  {
+    if($this->_hasAttachments() ||
+      ($this->_hasHtml() && $this->_hasPlaintext())
+    )
+    {
+      $message = $this->_generateMimeEmail();
+    }
+    else
+    {
+      if($this->_hasHtml())
+      {
+        $this->_headers[] = 'Content-Type: text/html; charset="UTF-8"';
+        $message = $this->_htmlBody;
+      }
+      else if($this->_hasPlaintext())
+      {
+        $this->_headers[] = 'Content-Type: text/plain; charset="UTF-8"';
+        $message = $this->_textBody;
+      }
+      else
+      {
+        throw new \Exception('Cannot send an empty email');
+      }
+    }
+    $this->_headers[] = "From: " . implode(", ", $this->_from);
+    $this->_headers[] = "Bcc: " . implode(", ", $this->_bccs);
+    $this->_headers[] = "Cc: " . implode(", ", $this->_ccs);
+    $this->_headers[] = "Reply-To: " . $this->_sender;
+    $this->_headers[] = "Return-Path: " . $this->_returnPath;
+
+    return $message;
+  }
+
+  protected function _generateMimeEmail()
   {
     $rand = FileSystem::readRandomCharacters(32);
 
@@ -230,25 +271,34 @@ class Mail implements IEmailService
     $this->_headers[] = "Content-Type: multipart/mixed; boundary=\"_1_$rand\"";
     $this->_headers[] = "--$rand";
 
-    if($this->_isHtml)
-    {
-      $contentType = "Content-Type: text/html; charset=\"UTF-8\";";
-    }
-    else
-    {
-      $contentType = "Content-Type: text/plain; charset=\"UTF-8\";";
-    }
-
     $message = <<<MSG
 --_1_$rand
 Content-Type: multipart/alternative; boundary="_2_$rand"
 
+MSG;
+    if($this->_hasPlaintext())
+    {
+      $message .= <<<MSG
 --_2_$rand
-$contentType
+Content-Type: text/plain; charset="UTF-8";
 Content-Transfer-Encoding: 7bit
 
-$this->_message
+$this->_textBody
+MSG;
+    }
 
+    if($this->_hasHtml())
+    {
+      $message .= <<<MSG
+--_2_$rand
+Content-Type: text/html; charset="UTF-8";
+Content-Transfer-Encoding: 7bit
+
+$this->_htmlBody
+MSG;
+    }
+
+    $message .= <<<MSG
 --_2_$rand--
 
 MSG;
@@ -276,6 +326,6 @@ MSG;
 --_1_$rand
 MSG;
 
-    $this->_message = $message;
+    return $message;
   }
 }

@@ -11,9 +11,9 @@ interface IEmailService extends IService
 {
   public function setSubject($subject);
 
-  public function setBody($body);
+  public function setTextBody($body);
 
-  public function isHtml($bool = true);
+  public function setHtmlBody($body);
 
   public function setFrom($email, $name = null);
 
