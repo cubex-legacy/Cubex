@@ -26,6 +26,14 @@ final class SwiftMail implements IEmailService
    * @var ServiceConfig
    */
   private $_config;
+  /**
+   * @var string
+   */
+  private $_htmlBody = null;
+  /**
+   * @var string
+   */
+  private $_textBody = null;
 
   /**
    * @return $this
@@ -33,7 +41,8 @@ final class SwiftMail implements IEmailService
   public function reset()
   {
     $this->_message = null;
-
+    $this->_htmlBody = null;
+    $this->_textBody = null;
     return $this;
   }
 
@@ -97,17 +106,15 @@ final class SwiftMail implements IEmailService
     return $this;
   }
 
-  public function setBody($body)
+  public function setTextBody($body)
   {
-    $this->_getMessage()->setBody($body);
-
+    $this->_textBody = $body;
     return $this;
   }
 
-  public function isHtml($bool = true)
+  public function setHtmlBody($body)
   {
-    $this->_getMessage()->setContentType($bool ? "text/html" : "text/plain");
-
+    $this->_htmlBody = $body;
     return $this;
   }
 
@@ -173,6 +180,24 @@ final class SwiftMail implements IEmailService
     $message            = $this->_getMessage();
     $this->_message     = null;
     $this->_lastMessage = $message;
+
+    // set message body and alternative parts
+    if($this->_htmlBody !== null)
+    {
+      $message->setBody($this->_htmlBody, 'text/html');
+      if($this->_textBody !== null)
+      {
+        $message->addPart($this->_textBody, 'text/plain');
+      }
+    }
+    else if($this->_textBody !== null)
+    {
+      $message->setBody($this->_textBody, 'text/plain');
+    }
+    else
+    {
+      throw new \Exception('Cannot send an empty email');
+    }
 
     try
     {

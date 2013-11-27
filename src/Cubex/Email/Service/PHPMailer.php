@@ -82,18 +82,16 @@ final class PHPMailer implements IEmailService
     return $this;
   }
 
-  public function setBody($body)
+  public function setTextBody($body)
   {
     $this->_mailer->Body = $body;
-
-    return $this;
+    $this->_mailer->IsHTML(false);
   }
 
-  public function isHtml($bool = true)
+  public function setHtmlBody($body)
   {
-    $this->_mailer->IsHTML($bool);
-
-    return $this;
+    $this->_mailer->Body = $body;
+    $this->_mailer->IsHTML(true);
   }
 
   public function setFrom($email, $name = null)
