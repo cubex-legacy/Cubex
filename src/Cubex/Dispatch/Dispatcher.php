@@ -116,7 +116,7 @@ class Dispatcher
       "resource_directory",
       "res"
     );
-    $this->_projectBase = $this->getFileSystem()->resolvePath(
+    $this->_projectBase         = $this->getFileSystem()->resolvePath(
       $cubexConfig->getStr("project_base", '../src')
     );
     // We do these bits at the end as we need the project base path to get the
@@ -235,7 +235,11 @@ class Dispatcher
    */
   public function getProjectPath()
   {
-    return $this->getProjectBase() . DS . $this->getProjectNamespace();
+    return $this->getProjectBase() . DS . str_replace(
+      '\\',
+      DS,
+      $this->getProjectNamespace()
+    );
   }
 
   /**
