@@ -114,4 +114,9 @@ abstract class ViewModel implements IRenderable, ITranslatable
   {
     return $this->getHostController()->baseUri();
   }
+
+  public function appBaseUri()
+  {
+    return $this->getHostController()->application()->baseUri();
+  }
 }
