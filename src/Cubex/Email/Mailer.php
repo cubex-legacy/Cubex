@@ -77,22 +77,20 @@ class Mailer implements IEmailService
    *
    * @return $this
    */
-  public function setBody($body)
+  public function setHtmlBody($body)
   {
-    $this->_service->setBody($body);
-
+    $this->_service->setHtmlBody($body);
     return $this;
   }
 
   /**
-   * @param bool $bool
+   * @param $body
    *
    * @return $this
    */
-  public function isHtml($bool = true)
+  public function setTextBody($body)
   {
-    $this->_service->isHtml($bool);
-
+    $this->_service->setTextBody($body);
     return $this;
   }
 
