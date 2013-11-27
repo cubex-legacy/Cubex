@@ -49,15 +49,12 @@ class AmazonSES extends Mail
   {
     if($this->_hasAttachments())
     {
-      $message = $this->_generateMessageAndSetHeaders();
-      //$to      = implode(",", $this->_recipients);
-      //$this->addHeader('To', $to);
+      $message = $this->_generateMessageAndSetHeaders(true);
       $headers = implode("\r\n", $this->_headers);
-
       $msgId = $this->conn()->sendRawEmail(
         [
           'RawMessage' => [
-            'Data' => $headers . "\r\n\r\n" . $message
+            'Data' => base64_encode($headers . "\r\n\r\n" . $message)
           ]
         ]
       );

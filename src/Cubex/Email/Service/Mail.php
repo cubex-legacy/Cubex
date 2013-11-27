@@ -229,8 +229,32 @@ class Mail implements IEmailService
     return $mail;
   }
 
-  protected function _generateMessageAndSetHeaders()
+  protected function _generateMessageAndSetHeaders($includeToAndSubject = false)
   {
+    $from = $this->_from ? implode(",", $this->_from) : $this->_sender;
+    $this->_headers[] = "From: " . $from;
+    if($includeToAndSubject)
+    {
+      $this->_headers[] = "To: " . implode(",", $this->_recipients);
+    }
+    if(count($this->_bccs) > 0)
+    {
+      $this->_headers[] = "Bcc: " . implode(", ", $this->_bccs);
+    }
+    if(count($this->_ccs) > 0)
+    {
+      $this->_headers[] = "Cc: " . implode(", ", $this->_ccs);
+    }
+    $this->_headers[] = "Reply-To: " . $this->_sender;
+    if($this->_returnPath)
+    {
+      $this->_headers[] = "Return-Path: " . $this->_returnPath;
+    }
+    if($includeToAndSubject)
+    {
+      $this->_headers[] = "Subject: " . $this->_subject;
+    }
+
     if($this->_hasAttachments() ||
       ($this->_hasHtml() && $this->_hasPlaintext())
     )
@@ -254,11 +278,6 @@ class Mail implements IEmailService
         throw new \Exception('Cannot send an empty email');
       }
     }
-    $this->_headers[] = "From: " . implode(", ", $this->_from);
-    $this->_headers[] = "Bcc: " . implode(", ", $this->_bccs);
-    $this->_headers[] = "Cc: " . implode(", ", $this->_ccs);
-    $this->_headers[] = "Reply-To: " . $this->_sender;
-    $this->_headers[] = "Return-Path: " . $this->_returnPath;
 
     return $message;
   }
@@ -269,6 +288,7 @@ class Mail implements IEmailService
 
     $this->_headers[] = "MIME-Version: 1.0";
     $this->_headers[] = "Content-Type: multipart/mixed; boundary=\"_1_$rand\"";
+    $this->_headers[] = "";
     $this->_headers[] = "--$rand";
 
     $message = <<<MSG
@@ -279,26 +299,31 @@ MSG;
     if($this->_hasPlaintext())
     {
       $message .= <<<MSG
+
 --_2_$rand
 Content-Type: text/plain; charset="UTF-8";
 Content-Transfer-Encoding: 7bit
 
 $this->_textBody
+
 MSG;
     }
 
     if($this->_hasHtml())
     {
       $message .= <<<MSG
+
 --_2_$rand
 Content-Type: text/html; charset="UTF-8";
 Content-Transfer-Encoding: 7bit
 
 $this->_htmlBody
+
 MSG;
     }
 
     $message .= <<<MSG
+
 --_2_$rand--
 
 MSG;
@@ -312,6 +337,7 @@ MSG;
         $fileData = chunk_split(base64_encode(file_get_contents($file)));
 
         $message .= <<<MSG
+
 --_1_$rand
 Content-Type: application/octet-stream; name="$fileName"; size="$fileSize"
 Content-Transfer-Encoding: base64
@@ -323,6 +349,7 @@ MSG;
     }
 
     $message .= <<<MSG
+
 --_1_$rand
 MSG;
 
