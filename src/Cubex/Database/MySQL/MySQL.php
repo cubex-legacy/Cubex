@@ -42,6 +42,9 @@ class MySQL implements IDatabaseService
 
   public function connect($mode = 'w')
   {
+    //TODO: Find some optimisation around reading config on every connect
+    //Called from RecordMapper->connection() many times.
+
     $hostname = $this->_config->getStr('hostname', 'localhost');
     $database = $this->_config->getStr('database', 'test');
     if($mode == 'r')
