@@ -38,7 +38,7 @@ class Email extends BaseFacade
     }
 
     static::getAccessor()->setSubject($subject);
-    static::getAccessor()->setBody($message);
+    static::getAccessor()->setTextBody($message);
 
     foreach($headers as $headerName => $headerValue)
     {
