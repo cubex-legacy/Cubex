@@ -85,20 +85,24 @@ class AmazonSES extends Mail
         ];
       }
 
+      $sender = $this->_from ? implode(",", $this->_from) : $this->_sender;
+
       $msgId = $this->conn()->sendEmail(
         [
-          'Source' => implode(",", $this->_from),
+          'Source' => $sender,
           'Destination' => [
             'ToAddresses' => $this->_recipients,
             'CcAddresses' => $this->_ccs,
             'BccAddresses' => $this->_bccs
           ],
-          'ReplyToAddresses' => $this->_sender,
-          'Subject' => [
-            'Data' => $this->_subject,
-            'Charset' => 'UTF-8'
-          ],
-          'Body' => $body
+          'ReplyToAddresses' => [$this->_sender],
+          'Message' => [
+            'Subject' => [
+              'Data' => $this->_subject,
+              'Charset' => 'UTF-8'
+            ],
+            'Body' => $body
+          ]
         ]
       );
     }
