@@ -442,6 +442,11 @@ class BaseController
     return $this;
   }
 
+  public function appBaseUri()
+  {
+    return $this->application()->baseUri();
+  }
+
   /**
    * @param array $routes
    *
