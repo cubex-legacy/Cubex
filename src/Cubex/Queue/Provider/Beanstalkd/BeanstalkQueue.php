@@ -64,7 +64,7 @@ class BeanstalkQueue implements IQueueProvider
         $waitTime = $consumer->waitTime($this->_waits);
         if($waitTime === false)
         {
-          return false;
+          break;
         }
         else if($waitTime > 0)
         {
