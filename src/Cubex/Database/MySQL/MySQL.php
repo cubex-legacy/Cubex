@@ -20,7 +20,7 @@ class MySQL implements IDatabaseService
 
   protected $_errorno;
   protected $_errormsg;
-  protected $_deadlockRetries = 2;
+  protected $_deadlockRetries = 5;
 
   private static $_connectionCache = [];
   protected $_escapeStringCache = [];
@@ -170,6 +170,7 @@ class MySQL implements IDatabaseService
     while($this->_connection->errno == 1213 &&
       $tries++ < $this->_deadlockRetries)
     {
+      msleep(50);
       $result = $this->_connection->query($query);
     }
 
