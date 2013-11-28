@@ -7,8 +7,8 @@ namespace Cubex\Database\MySQL;
 
 use Cubex\Database\IDatabaseService;
 use Cubex\Events\EventManager;
+use Cubex\Foundation\Config\Config;
 use Cubex\Log\Log;
-use Cubex\ServiceManager\ServiceConfig;
 use Cubex\ServiceManager\ServiceConfigTrait;
 
 class MySQL implements IDatabaseService
@@ -28,14 +28,28 @@ class MySQL implements IDatabaseService
   use ServiceConfigTrait;
 
   protected static function _getConnection(
-    $hostname, $database, $username, $password, $port
+    $hostname, $database, $username, $password, $port, Config $config = null
   )
   {
     $key = implode('|', [$hostname, $database, $username, $password, $port]);
     if(!isset(self::$_connectionCache[$key]))
     {
-      self::$_connectionCache[$key] =
-      new \mysqli($hostname, $username, $password, $database, $port);
+      try
+      {
+        self::$_connectionCache[$key] =
+        new \mysqli($hostname, $username, $password, $database, $port);
+      }
+      catch(\Exception $e)
+      {
+        $conn = $hostname;
+        if($config !== null)
+        {
+          $conn = $config->getStr("register_service_as", $hostname);
+        }
+        throw new \Exception(
+          "Unable to connect to '$conn': " . $e->getMessage(), $e->getCode(), $e
+        );
+      }
     }
 
     return self::$_connectionCache[$key];
@@ -60,7 +74,8 @@ class MySQL implements IDatabaseService
       $database,
       $this->_config->getStr('username', 'root'),
       $this->_config->getStr('password', ''),
-      $this->_config->getStr('port', 3306)
+      $this->_config->getStr('port', 3306),
+      $this->_config
     );
 
     if($this->_connection->connect_errno)
@@ -168,7 +183,7 @@ class MySQL implements IDatabaseService
     $result = $this->_connection->query($query);
     $tries  = 0;
     while($this->_connection->errno == 1213 &&
-      $tries++ < $this->_deadlockRetries)
+    $tries++ < $this->_deadlockRetries)
     {
       msleep(50);
       $result = $this->_connection->query($query);
