@@ -20,6 +20,7 @@ class MySQL implements IDatabaseService
 
   protected $_errorno;
   protected $_errormsg;
+  protected $_deadlockRetries = 2;
 
   private static $_connectionCache = [];
   protected $_escapeStringCache = [];
@@ -163,7 +164,14 @@ class MySQL implements IDatabaseService
   protected function _doQuery($query)
   {
     $this->_errorno = $this->_errormsg = null;
-    $result         = $this->_connection->query($query);
+
+    $result = $this->_connection->query($query);
+    $tries  = 0;
+    while($this->_connection->errno == 1213 &&
+      $tries++ < $this->_deadlockRetries)
+    {
+      $result = $this->_connection->query($query);
+    }
 
     EventManager::trigger(
       EventManager::CUBEX_QUERY,
