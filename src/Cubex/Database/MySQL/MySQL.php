@@ -174,6 +174,13 @@ class MySQL implements IDatabaseService
       $result = $this->_connection->query($query);
     }
 
+    if(!$result)
+    {
+      $this->_errorno  = $this->_connection->errno;
+      $this->_errormsg = $this->_connection->error;
+      Log::error('(' . $this->_errorno . ') ' . $this->_errormsg);
+    }
+
     EventManager::trigger(
       EventManager::CUBEX_QUERY,
       [
@@ -186,9 +193,6 @@ class MySQL implements IDatabaseService
 
     if(!$result)
     {
-      $this->_errorno  = $this->_connection->errno;
-      $this->_errormsg = $this->_connection->error;
-      Log::error('(' . $this->_errorno . ') ' . $this->_errormsg);
       throw new \Exception($this->_errormsg, $this->_errorno);
     }
 
