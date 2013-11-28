@@ -39,5 +39,7 @@ class DatabaseMailer extends Mail
     $mapper->files = implode("\r\n", $this->_files);
     $mapper->rawMessage = $rawMessage;
     $mapper->saveChanges();
+
+    $this->reset();
   }
 }
