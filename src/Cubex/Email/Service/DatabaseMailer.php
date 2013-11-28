@@ -16,8 +16,8 @@ class DatabaseMailer extends Mail
   protected function _newMapper($id = null)
   {
     $mapper = new MailerMapper($id);
-    $mapper->setTableName($this->config()->getStr('tablename', 'dbmailer'));
-    $mapper->setServiceName($this->config()->getStr('dbservice', 'db'));
+    $mapper->setTableName($this->config()->getStr('table_name', 'dbmailer'));
+    $mapper->setServiceName($this->config()->getStr('db_service', 'db'));
     return $mapper;
   }
 
