@@ -921,7 +921,8 @@ abstract class RecordMapper extends DataMapper
     {
       case 1146: //Table does not exist
       case 1054: //Column does not exist
-        if(Container::config()->get("devtools")->getBool("creations", false))
+        $config = Container::config()->get("devtools");
+        if($config && $config->getBool("creations", false))
         {
           $builder = new DBBuilder($connection, $this);
           if($builder->success())
