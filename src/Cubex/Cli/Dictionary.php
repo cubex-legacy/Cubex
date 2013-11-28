@@ -69,6 +69,7 @@ class Dictionary implements IConfigurable
   public function defaultTasks()
   {
     return [
+      'serve'     => '\Cubex\Cli\Tools\BuiltInWebServer',
       'dispatch'  => '\Cubex\Dispatch\Mapper\CliInit',
       'branding'  => '\Cubex\View\Branding\ViewMapper',
       'translate' => '\Cubex\I18n\Processor\Cli',
