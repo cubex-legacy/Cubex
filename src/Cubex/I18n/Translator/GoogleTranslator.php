@@ -14,9 +14,9 @@ class GoogleTranslator implements ITranslator
   use ConfigTrait;
 
   /**
-   * @param string $text            Text to translate
-   * @param string $sourceLanguage  original text language
-   * @param string $targetLanguage  expected return language
+   * @param string $text           Text to translate
+   * @param string $sourceLanguage original text language
+   * @param string $targetLanguage expected return language
    *
    * @return string Translation
    */
@@ -43,9 +43,10 @@ class GoogleTranslator implements ITranslator
 
     $service = curl_init();
     curl_setopt(
-      $service, CURLOPT_URL,
-      'https://www.googleapis.com/language/translate/v2?' .
-      http_build_query($data)
+      $service,
+      CURLOPT_URL,
+      ('https://www.googleapis.com/language/translate/v2?' .
+      http_build_query($data))
     );
     curl_setopt($service, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($service, CURLOPT_SSL_VERIFYHOST, false);
@@ -57,6 +58,11 @@ class GoogleTranslator implements ITranslator
     $response = preg_replace($pattern, '$1', urldecode($response));
 
     $response = json_decode($response);
+    if(isset($response->error))
+    {
+      \Log::warning($response->error->message);
+      return $text;
+    }
     if(isset($response->data->translations[0]->translatedText))
     {
       $translation = $response->data->translations[0]->translatedText;
