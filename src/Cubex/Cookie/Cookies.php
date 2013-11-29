@@ -4,7 +4,9 @@
  */
 namespace Cubex\Cookie;
 
+use Cubex\Core\Http\Response;
 use Cubex\Events\EventManager;
+use Cubex\Foundation\Container;
 
 class Cookies
 {
@@ -88,7 +90,14 @@ class Cookies
    */
   public static function write()
   {
-    if(self::$_written === false && headers_sent() === false)
+    $response = Container::response();
+    $dispatch = false;
+    if($response)
+    {
+      $dispatch = $response->renderType() === Response::RENDER_DISPATCH;
+    }
+
+    if(!$dispatch && self::$_written === false && headers_sent() === false)
     {
       foreach(self::$_cookies as $cookie)
       {
