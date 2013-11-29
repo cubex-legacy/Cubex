@@ -52,7 +52,7 @@ class AmqpQueue implements IQueueProvider
 
       $this->_channel()->exchange_declare(
         $this->_exchange,
-        $this->config()->getStr("exchange_type", "topic"),
+        $this->config()->getStr("exchange_type", "direct"),
         $this->config()->getBool("exchange_passive", false),
         $this->config()->getBool("exchange_durable", true),
         $this->config()->getBool("exchange_autodelete", false),
@@ -107,7 +107,7 @@ class AmqpQueue implements IQueueProvider
     try
     {
       $msg = new AMQPMessage(serialize($data));
-      $this->_channel()->basic_publish($msg, $this->_exchange);
+      $this->_channel()->basic_publish($msg, $this->_exchange, $queue->name());
     }
     catch(\Exception $e)
     {
@@ -208,6 +208,10 @@ class AmqpQueue implements IQueueProvider
 
   protected function _processBatch($push = false)
   {
+    if($this->_batchQueueCount == 0)
+    {
+      return;
+    }
     /**
      * @var $consumer IBatchQueueConsumer
      */
