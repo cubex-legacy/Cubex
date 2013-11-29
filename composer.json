@@ -19,9 +19,8 @@
   "require":           {
     "php":          ">=5.4.0",
     "cubex/figlet": "*",
-
-    "filp/whoops": "1.*",
-    "psr/log":     "1.0.0"
+    "filp/whoops":  "1.*",
+    "psr/log":      "1.0.0"
   },
   "replace":           {
     "cubex/type": "self.version",
@@ -32,7 +31,8 @@
     "rmccue/requests":              "HTTP Request Helper",
     "mobiledetect/mobiledetectlib": "Supported platform detection library",
     "phpseclib/phpseclib":          "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
-    "pda/pheanstalk":               "Required if you wish to use Beanstalkd Queue Provider"
+    "pda/pheanstalk":               "Required if you wish to use Beanstalkd Queue Provider",
+    "videlalvaro/php-amqplib":      "Required if you wish to use AMQP Queue Provider"
   },
   "bin":               ["bin/kill-cubex-script.sh"],
   "autoload":          {
