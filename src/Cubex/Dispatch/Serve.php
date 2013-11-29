@@ -83,7 +83,7 @@ class Serve extends Dispatcher implements IDispatchable
     )
     {
       // Stop possible hacks for disk paths, e.g. /js/../../../etc/passwd
-      $response->fromRenderable(new Error404())->setStatusCode(404);
+      $response->fromDispatch(new Error404())->setStatusCode(404);
     }
     else
     {
@@ -108,7 +108,7 @@ class Serve extends Dispatcher implements IDispatchable
     {
       // Either hack attempt or a dev needs a slapped wrist
       Log::debug("'{$resourceType}' is not a supported type");
-      $response->fromRenderable(new Error404())->setStatusCode(404);
+      $response->fromDispatch(new Error404())->setStatusCode(404);
     }
     else
     {
@@ -124,7 +124,7 @@ class Serve extends Dispatcher implements IDispatchable
       if(empty($data))
       {
         // No data found, assume 404
-        $response->fromRenderable(new Error404())->setStatusCode(404);
+        $response->fromDispatch(new Error404())->setStatusCode(404);
       }
       else
       {
