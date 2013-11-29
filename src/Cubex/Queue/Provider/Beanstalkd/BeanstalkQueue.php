@@ -112,12 +112,12 @@ class BeanstalkQueue implements IQueueProvider
       for($i = 0; $i < $consumer->getBatchSize(); $i++)
       {
         $job                 = $conn->reserveFromTube($queue->name());
-        $jobs[$job->getId()] = $job;
-        $consumer->process($queue, $job->getData(), $job->getId());
         if($job === false)
         {
           break;
         }
+        $jobs[$job->getId()] = $job;
+        $consumer->process($queue, $job->getData(), $job->getId());
       }
 
       $results = $consumer->runBatch();
