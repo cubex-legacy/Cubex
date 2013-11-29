@@ -15,20 +15,20 @@ class BeanstalkQueue implements IQueueProvider
 {
   use ServiceConfigTrait;
 
-  protected $_connection;
+  protected $_conn;
   protected $_waits;
 
   protected function _connection()
   {
-    if($this->_connection === null)
+    if($this->_conn === null)
     {
-      $this->_connection = new \Pheanstalk_Pheanstalk(
+      $this->_conn = new \Pheanstalk_Pheanstalk(
         $this->config()->getStr("host", 'localhost'),
         $this->config()->getInt("port", 11300),
         $this->config()->getInt("timeout", null)
       );
     }
-    return $this->_connection;
+    return $this->_conn;
   }
 
   public function push(IQueue $queue, $data = null, $delay = 0)
