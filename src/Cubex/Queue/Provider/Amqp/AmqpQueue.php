@@ -56,7 +56,9 @@ class AmqpQueue implements IQueueProvider
         $this->config()->getBool("exchange_passive", false),
         $this->config()->getBool("exchange_durable", true),
         $this->config()->getBool("exchange_autodelete", false),
-        $this->config()->getBool("exchange_internal", false)
+        $this->config()->getBool("exchange_internal", false),
+        $this->config()->getBool("exchange_nowait", false),
+        $this->config()->getArr("exchange_args", null)
       );
     }
   }
@@ -70,7 +72,9 @@ class AmqpQueue implements IQueueProvider
         $this->config()->getBool("queue_passive", false),
         $this->config()->getBool("queue_durable", true),
         $this->config()->getBool("queue_exclusive", false),
-        $this->config()->getBool("queue_autodelete", false)
+        $this->config()->getBool("queue_autodelete", false),
+        $this->config()->getBool("queue_nowait", false),
+        $this->config()->getArr("queue_args", null)
       );
       $this->_lastQueue = $name;
     }
