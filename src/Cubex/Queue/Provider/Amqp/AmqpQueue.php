@@ -67,6 +67,14 @@ class AmqpQueue implements IQueueProvider
   {
     if($this->_lastQueue !== $name)
     {
+      $args        = $this->config()->getArr("queue_args", null);
+      $x_ha_policy = $this->config()->getArr("x-ha-policy", null);
+      if($x_ha_policy)
+      {
+        $args                = (array)$args;
+        $args['x-ha-policy'] = $x_ha_policy;
+      }
+
       $this->_channel()->queue_declare(
         $name,
         $this->config()->getBool("queue_passive", false),
@@ -74,7 +82,7 @@ class AmqpQueue implements IQueueProvider
         $this->config()->getBool("queue_exclusive", false),
         $this->config()->getBool("queue_autodelete", false),
         $this->config()->getBool("queue_nowait", false),
-        $this->config()->getArr("queue_args", null)
+        $args
       );
       $this->_lastQueue = $name;
     }
