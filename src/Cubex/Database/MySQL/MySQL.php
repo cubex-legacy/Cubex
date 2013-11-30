@@ -47,7 +47,14 @@ class MySQL implements IDatabaseService
           $conn = $config->getStr("register_service_as", $hostname);
         }
         throw new \Exception(
-          "Unable to connect to '$conn': " . $e->getMessage(), $e->getCode(), $e
+          sprintf(
+            "Unable to connect to host: '%s', Service: '%s' - Error: %s",
+            $hostname,
+            $conn,
+            $e->getMessage()
+          ),
+          $e->getCode(),
+          $e
         );
       }
     }
