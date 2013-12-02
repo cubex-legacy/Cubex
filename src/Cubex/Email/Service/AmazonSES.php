@@ -108,5 +108,11 @@ class AmazonSES extends Mail
 
     $this->reset();
   }
+
+  public function reset()
+  {
+    $this->_conn = null;
+    parent::reset();
+  }
 }
 
