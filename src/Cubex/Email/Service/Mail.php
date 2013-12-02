@@ -38,12 +38,13 @@ class Mail implements IEmailService
     $this->_ccs        = [];
     $this->_bccs       = [];
     $this->_subject    = null;
-    $this->_textBody = null;
     $this->_htmlBody   = null;
+    $this->_textBody   = null;
     $this->_from       = [];
     $this->_sender     = null;
     $this->_returnPath = null;
     $this->_headers    = [];
+    $this->_files      = [];
 
     $sender = $this->_config->getStr("default.sender", null);
     if($sender !== null)
