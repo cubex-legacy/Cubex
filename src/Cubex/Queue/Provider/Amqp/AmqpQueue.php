@@ -11,7 +11,9 @@ use Cubex\Queue\IQueueConsumer;
 use Cubex\Queue\IQueueProvider;
 use Cubex\ServiceManager\ServiceConfigTrait;
 use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Exception\AMQPProtocolException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
@@ -43,6 +45,8 @@ class AmqpQueue implements IQueueProvider
   protected $_batchQueueCount;
 
   protected $_waits;
+
+  protected $_retries = 3;
 
   protected function _configureExchange()
   {
@@ -118,15 +122,46 @@ class AmqpQueue implements IQueueProvider
     $this->_configureQueue($queue->name());
     try
     {
-      $msg = new AMQPMessage(serialize($data));
-      $this->_channel()->basic_publish($msg, $this->_exchange, $queue->name());
+      $this->_publish($queue, $data);
     }
     catch(\Exception $e)
     {
-      \Log::debug($e->getMessage() . ' : ' . $e->getCode());
+      $this->_retries--;
+      $this->_reconnect($queue);
+
+      \Log::debug(
+        '(' . $this->_retries . ') ' . get_class($e) .
+        ', ' . $e->getMessage() . ' : ' . $e->getCode()
+      );
+
+      if($this->_retries > 0)
+      {
+        return $this->push($queue, $data, $delay);
+      }
+      else
+      {
+        $this->_retries = 3;
+      }
+
       return false;
     }
+    $this->_retries = 3;
     return true;
+  }
+
+  protected function _reconnect(IQueue $queue)
+  {
+    $this->disconnect();
+    $this->_exchange  = null;
+    $this->_lastQueue = null;
+    $this->_configureExchange();
+    $this->_configureQueue($queue->name());
+  }
+
+  protected function _publish(IQueue $queue, $data = null)
+  {
+    $msg = new AMQPMessage(serialize($data));
+    $this->_channel()->basic_publish($msg, $this->_exchange, $queue->name());
   }
 
   public function consume(IQueue $queue, IQueueConsumer $consumer)
@@ -190,7 +225,7 @@ class AmqpQueue implements IQueueProvider
     }
     catch(\Exception $e)
     {
-      \Log::debug($e->getMessage());
+      \Log::debug('Line ' . __LINE__ . ': ' . $e->getMessage());
     }
     $consumer->shutdown();
     return true;
@@ -279,28 +314,33 @@ class AmqpQueue implements IQueueProvider
 
   public function __destruct()
   {
+    $this->disconnect();
+  }
+
+  public function disconnect()
+  {
     try
     {
       if($this->_chan !== null && $this->_chan instanceof AMQPChannel)
       {
         $this->_chan->close();
-        $this->_chan = null;
       }
     }
     catch(\Exception $e)
     {
     }
+    $this->_chan = null;
 
     try
     {
-      if($this->_conn !== null && $this->_conn instanceof AMQPStreamConnection)
+      if($this->_conn !== null && $this->_conn instanceof AbstractConnection)
       {
         $this->_conn->close();
-        $this->_conn = null;
       }
     }
     catch(\Exception $e)
     {
     }
+    $this->_conn = null;
   }
 }
