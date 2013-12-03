@@ -11,8 +11,6 @@
  * @author gareth.evans
  */
 
-// TODO: add some other services, get_browser is really slow!
-
 namespace Cubex\Detection\Browser\Service;
 
 use Cubex\Data\Ephemeral\EphemeralCache;

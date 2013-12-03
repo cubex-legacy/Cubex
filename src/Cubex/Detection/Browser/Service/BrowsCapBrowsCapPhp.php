@@ -1,25 +1,43 @@
 <?php
 /**
- * http://tempdownloads.browserscap.com/
+ * @link   : https://github.com/browscap/browscap-php
  *
- * lite_php_browscap.ini is usually good enough, and faster than the full one.
+ * This service requires the browscap/browscap-php package:
  *
- * register_service_as=detection\platform
+ *      "browscap/browscap-php":  "1.0.*@dev"
+ *
+ * The required configs are:
+ *
+ *         ```
+ * [detection]
  * register_service_shared=0
- * service_provider=\Cubex\Detection\Platform\Service\BrowserCap
+ * cache_dir="/path/to/cache/dir/tmp"
+ *
+ * [detection\browser]
+ * register_service_as=detection\browser
+ * service_provider=\Cubex\Detection\Browser\Service\BrowsCapBrowsCapPhp
+ * ```
+ *
+ * The only config you should need to change is the `cache_dir`
+ *
+ * The cache directory is set on the `detection` config as it is shared with
+ * the platform detection service from the same provider.
  *
  * @author gareth.evans
  */
 
-namespace Cubex\Detection\Platform\Service;
+namespace Cubex\Detection\Browser\Service;
 
 use Cubex\Data\Ephemeral\EphemeralCache;
-use Cubex\Detection\Platform\IPlatformDetection;
+use Cubex\Detection\Browser\IBrowserDetection;
 use Cubex\ServiceManager\ServiceConfig;
+use phpbrowscap\Browscap;
 
-class BrowserCap implements IPlatformDetection
+class BrowsCapBrowsCapPhp implements IBrowserDetection
 {
-  private static $_platform = [];
+  private $_browsCapPhp;
+
+  private static $_browser = [];
   private static $_version = [];
 
   private static $_serverUserAgent;
@@ -28,11 +46,11 @@ class BrowserCap implements IPlatformDetection
   /**
    * @return string
    */
-  public function getPlatform()
+  public function getBrowser()
   {
-    $this->_setPlatformData();
+    $this->_setBrowserData();
 
-    return static::$_platform[$this->_getUserAgent()];
+    return static::$_browser[$this->_getUserAgent()];
   }
 
   /**
@@ -40,7 +58,7 @@ class BrowserCap implements IPlatformDetection
    */
   public function getVersion()
   {
-    $this->_setPlatformData();
+    $this->_setBrowserData();
 
     return static::$_version[$this->_getUserAgent()];
   }
@@ -69,9 +87,19 @@ class BrowserCap implements IPlatformDetection
         static::$_serverUserAgent = $_SERVER['HTTP_USER_AGENT'];
       }
     }
+
+    $this->_browsCapPhp = new Browscap($config->getStr('cache_dir'));
+    $this->_browsCapPhp->remoteIniUrl = $config->getStr(
+      'browscap_browscapphp_remote_ini_url',
+      'http://browscap.org/stream?q=Full_PHP_BrowsCapINI'
+    );
+    $this->_browsCapPhp->remoteVerUrl = $config->getStr(
+      'browscap_browscapphp_remote_ver_url',
+      'http://browscap.org/version'
+    );
   }
 
-  private function _setPlatformData()
+  private function _setBrowserData()
   {
     $userAgent = $this->_getUserAgent();
     $cacheKey  = EphemeralCache::generateID($userAgent);
@@ -81,12 +109,12 @@ class BrowserCap implements IPlatformDetection
     }
     else
     {
-      $browser = get_browser($this->_getUserAgent());
+      $browser = $this->_browsCapPhp->getBrowser($this->_getUserAgent());
       EphemeralCache::storeCache($cacheKey, $browser, "detection");
     }
 
-    static::$_platform[$userAgent] = $browser->platform;
-    static::$_version[$userAgent] = $browser->platform_version;
+    static::$_browser[$userAgent] = $browser->Browser;
+    static::$_version[$userAgent] = $browser->Version;
   }
 
   /**
