@@ -185,6 +185,7 @@ class MySQL implements IDatabaseService
    */
   protected function _doQuery($query)
   {
+    $startTime      = microtime(true);
     $this->_errorno = $this->_errormsg = null;
 
     $result = $this->_connection->query($query);
@@ -203,12 +204,17 @@ class MySQL implements IDatabaseService
       Log::error('(' . $this->_errorno . ') ' . $this->_errormsg);
     }
 
+    $endTime = microtime(true);
+
     EventManager::trigger(
       EventManager::CUBEX_QUERY,
       [
-      'query'  => $query,
-      'result' => $result,
-      'error'  => ['num' => $this->_errorno, 'msg' => $this->_errormsg]
+      'execution_time' => $endTime - $startTime,
+      'start_time'     => $startTime,
+      'end_time'       => $endTime,
+      'query'          => $query,
+      'result'         => $result,
+      'error'          => ['num' => $this->_errorno, 'msg' => $this->_errormsg]
       ],
       $this
     );
