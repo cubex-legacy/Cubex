@@ -8,6 +8,7 @@ use Cubex\Cli\CliCommand;
 use Cubex\Cli\ICliTask;
 use Cubex\Core\Http\IDispatchInjection;
 use Cubex\Core\Project\Project;
+use Cubex\Dispatch\Passthrough;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
@@ -693,16 +694,24 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
         $this->_newConfiguration();
       }
 
-      $dispatcher = $this->getDispatchable();
+      $passthrough = new Passthrough(
+        $this->_request, $this->_configuration->get("dispatch")
+      );
+      $resp        = $passthrough->attempt();
 
-      $dispatcher->configure($this->_configuration);
-
-      if($dispatcher instanceof IServiceManagerAware)
+      if($resp === null)
       {
-        $dispatcher->setServiceManager($this->getServiceManager());
-      }
+        $dispatcher = $this->getDispatchable();
 
-      $resp = $dispatcher->dispatch($this->_request, $this->_response);
+        $dispatcher->configure($this->_configuration);
+
+        if($dispatcher instanceof IServiceManagerAware)
+        {
+          $dispatcher->setServiceManager($this->getServiceManager());
+        }
+
+        $resp = $dispatcher->dispatch($this->_request, $this->_response);
+      }
 
       if(!($resp instanceof Response))
       {
