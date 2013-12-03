@@ -224,6 +224,18 @@ class Webpage implements
     }
 
     $head = '';
+
+    $processed = EM::triggerUntil(
+      EM::CUBEX_WEBPAGE_RENDER_HEAD,
+      ["content" => $head],
+      $this
+    );
+
+    if($processed !== null)
+    {
+      $head = $processed;
+    }
+
     $head .= $cssHeaders;
     $head .= implode('', $this->_headerElements);
     $head .= $this->metaHTML();
@@ -483,6 +495,7 @@ class Webpage implements
    */
   public function minifyHtml($html)
   {
+    //TODO: Do not strip any content within form elements
     if($html instanceof IEvent)
     {
       $html = $html->getStr("content");

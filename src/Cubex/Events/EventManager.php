@@ -24,6 +24,7 @@ class EventManager
   const CUBEX_TRANSLATE_P = 'cubex.translation.p';
 
   const CUBEX_WEBPAGE_RENDER_BODY = 'cubex.webpage.renderbody';
+  const CUBEX_WEBPAGE_RENDER_HEAD = 'cubex.webpage.renderhead';
 
   const CUBEX_PROJECT_PREPARE = 'cubex.project.prepare';
 
