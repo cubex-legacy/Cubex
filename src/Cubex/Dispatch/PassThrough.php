@@ -43,11 +43,7 @@ class PassThrough
   public function respond($root)
   {
     $file = build_path($root, $this->_request->offsetPath(1));
-    if(file_exists($file))
-    {
-      return $this->buildResponse($file);
-    }
-    return null;
+    return file_exists($file) ? $this->buildResponse($file) : null;
   }
 
   public function buildResponse($file)
@@ -55,6 +51,7 @@ class PassThrough
     $parts = explode('.', $file);
     $ext   = end($parts);
     $type  = 'html';
+
     switch($ext)
     {
       case 'css':
@@ -64,6 +61,7 @@ class PassThrough
         $type = 'javascript';
         break;
     }
+
     $response = new Response(file_get_contents($file));
     $response->addHeader("Content-Type", "text/" . $type . "; charset=UTF-8");
     return $response;
