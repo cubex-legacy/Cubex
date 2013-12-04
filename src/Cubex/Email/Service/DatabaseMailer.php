@@ -23,23 +23,31 @@ class DatabaseMailer extends Mail
 
   public function send()
   {
-    $rawMessage = $this->_generateMessageAndSetHeaders(true);
+    try
+    {
+      $rawMessage = $this->_generateMessageAndSetHeaders(true);
 
-    $mapper = $this->_newMapper();
-    $mapper->recipients = implode(",", $this->_recipients);
-    $mapper->ccs = implode(",", $this->_ccs);
-    $mapper->bccs = implode(",", $this->_bccs);
-    $mapper->subject = $this->_subject;
-    $mapper->htmlBody = $this->_htmlBody;
-    $mapper->textBody = $this->_textBody;
-    $mapper->from = implode(",", $this->_from);
-    $mapper->sender = $this->_sender;
-    $mapper->returnPath = $this->_returnPath;
-    $mapper->headers = implode("\r\n", $this->_headers);
-    $mapper->files = implode("\r\n", $this->_files);
-    $mapper->rawMessage = $rawMessage;
-    $mapper->saveChanges();
+      $mapper             = $this->_newMapper();
+      $mapper->recipients = implode(",", $this->_recipients);
+      $mapper->ccs        = implode(",", $this->_ccs);
+      $mapper->bccs       = implode(",", $this->_bccs);
+      $mapper->subject    = $this->_subject;
+      $mapper->htmlBody   = $this->_htmlBody;
+      $mapper->textBody   = $this->_textBody;
+      $mapper->from       = implode(",", $this->_from);
+      $mapper->sender     = $this->_sender;
+      $mapper->returnPath = $this->_returnPath;
+      $mapper->headers    = implode("\r\n", $this->_headers);
+      $mapper->files      = implode("\r\n", $this->_files);
+      $mapper->rawMessage = $rawMessage;
+      $mapper->saveChanges();
 
-    $this->reset();
+      $this->reset();
+      return true;
+    }
+    catch(\Exception $e)
+    {
+    }
+    return false;
   }
 }
