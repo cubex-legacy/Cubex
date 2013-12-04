@@ -722,7 +722,7 @@ abstract class RecordMapper extends DataMapper
     $connection = $this->connection(ConnectionMode::WRITE());
 
     $pattern = 'INSERT INTO %T SET ' . $this->idPattern(',') . ' , %C = %d'
-      . ' ON DUPLICATE KEY UPDATE %C = %C + %d';
+      . ' ON DUPLICATE KEY UPDATE %C = IFNULL(%C, 0) + %d';
 
     $idValues = [];
     $idAttr   = $this->getAttribute($this->getIdKey());
