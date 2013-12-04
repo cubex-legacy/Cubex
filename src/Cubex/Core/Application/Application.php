@@ -123,6 +123,14 @@ abstract class Application
    */
   public function dispatch(Request $request, Response $response)
   {
+    EventManager::trigger(
+      EventManager::CUBEX_TIMETRACK_START,
+      [
+      'name'  => 'application.dispatch',
+      'label' => "Dispatch Application"
+      ]
+    );
+
     $this->_request  = $request;
     $this->_response = $response;
     $this->_listen($this->getNamespace(), $this->getConfig());
@@ -159,7 +167,7 @@ abstract class Application
     if(is_scalar($dispatcherResult))
     {
       if(starts_with($dispatcherResult, '\\')
-        && class_exists($dispatcherResult)
+      && class_exists($dispatcherResult)
       )
       {
         $dispatcher = new $dispatcherResult;
@@ -259,6 +267,13 @@ abstract class Application
     }
 
     $this->shutdownBundles();
+
+    EventManager::trigger(
+      EventManager::CUBEX_TIMETRACK_END,
+      [
+      'name' => 'application.dispatch'
+      ]
+    );
 
     return $response;
   }

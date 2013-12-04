@@ -15,6 +15,9 @@ class EventManager
   const CUBEX_RESPONSE_PREPARE = 'cubex.response.start';
   const CUBEX_RESPONSE_SENT    = 'cubex.response.sent';
 
+  const CUBEX_TIMETRACK_START = 'cubex.timetrack.start';
+  const CUBEX_TIMETRACK_END   = 'cubex.timetrack.end';
+
   const CUBEX_REQUEST_BIND = 'cubex.request.bind';
 
   const CUBEX_PAGE_TITLE = 'cubex.page.title';

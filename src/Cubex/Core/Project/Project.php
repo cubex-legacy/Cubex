@@ -134,6 +134,14 @@ abstract class Project
     $this->_request  = $request;
     $this->_response = $response;
 
+    EventManager::trigger(
+      EventManager::CUBEX_TIMETRACK_START,
+      [
+      'name'  => 'project.dispatch',
+      'label' => "Dispatch Project"
+      ]
+    );
+
     $this->prepareProject();
 
     $app = $this->getApplication($request);
@@ -151,6 +159,13 @@ abstract class Project
     $return = $app->dispatch($request, $response);
 
     $this->shutdownBundles();
+
+    EventManager::trigger(
+      EventManager::CUBEX_TIMETRACK_END,
+      [
+      'name' => 'project.dispatch'
+      ]
+    );
 
     return $return;
   }
