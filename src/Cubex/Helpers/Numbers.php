@@ -8,11 +8,12 @@ namespace Cubex\Helpers;
 class Numbers
 {
   /**
-   * @param int $bytes
+   * @param int         $bytes
+   * @param string|null $unitTag an optional html tag to wrap the unit in
    *
    * @return string
    */
-  public static function bytesToHumanReadable($bytes)
+  public static function bytesToHumanReadable($bytes, $unitTag = null)
   {
     $unitsList  = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB'];
     $num        = (int)$bytes;
@@ -27,6 +28,11 @@ class Numbers
       $finalUnits = $units;
     }
     $num = round($num, 1);
+
+    if($unitTag)
+    {
+      return sprintf("%d<%s>%s</%s>", $num, $unitTag, $finalUnits, $unitTag);
+    }
 
     return $num . $finalUnits;
   }
