@@ -121,7 +121,7 @@ abstract class RecordMapper extends DataMapper
   /**
    * @return string
    */
-  public function idPattern()
+  public function idPattern($compositeGlue = "AND")
   {
     $config = $this->getConfiguration();
     if(!isset($config[static::CONFIG_IDS]))
@@ -135,7 +135,7 @@ abstract class RecordMapper extends DataMapper
     else if($config[static::CONFIG_IDS] == static::ID_COMPOSITE)
     {
       $checks = array_fill(0, count($this->_getCompositeKeys()), "%C = %s");
-      return implode(" AND ", $checks);
+      return implode(" " . $compositeGlue . " ", $checks);
     }
     else
     {
@@ -449,8 +449,8 @@ abstract class RecordMapper extends DataMapper
       return in_array(
         $config[self::CONFIG_IDS],
         [
-        self::ID_COMPOSITE,
-        self::ID_COMPOSITE_SPLIT
+          self::ID_COMPOSITE,
+          self::ID_COMPOSITE_SPLIT
         ]
       );
     }
@@ -599,9 +599,9 @@ abstract class RecordMapper extends DataMapper
           }
 
           if(
-          $this->_autoTimestamp
-          && $attr->name() != $this->createdAttribute()
-          && $attr->name() != $this->updatedAttribute()
+            $this->_autoTimestamp
+            && $attr->name() != $this->createdAttribute()
+            && $attr->name() != $this->updatedAttribute()
           )
           {
             $this->_changes[$attr->name()] = [
@@ -637,9 +637,9 @@ abstract class RecordMapper extends DataMapper
             $updates[] = ParseQuery::parse(
               $connection,
               [
-              "%C = %ns",
-              $this->stringToColumnName($attr->name()),
-              $val
+                "%C = %ns",
+                $this->stringToColumnName($attr->name()),
+                $val
               ]
             );
           }
@@ -708,6 +708,57 @@ abstract class RecordMapper extends DataMapper
       $query = str_replace('#UPDATES#', implode(', ', $updates), $query);
     }
 
+    return $this->_saveQuery($query);
+  }
+
+  public function decrement($attribute, $count = 1)
+  {
+    $this->increment($attribute, -$count);
+  }
+
+  public function increment($attribute, $count = 1)
+  {
+    $attribute  = $this->getAttribute($attribute);
+    $connection = $this->connection(ConnectionMode::WRITE());
+
+    $pattern = 'INSERT INTO %T SET ' . $this->idPattern(',') . ' , %C = %d'
+      . ' ON DUPLICATE KEY UPDATE %C = %C + %d';
+
+    $idValues = [];
+    $idAttr   = $this->getAttribute($this->getIdKey());
+    if($idAttr instanceof CompositeAttribute)
+    {
+      $named = $idAttr->getNamedArray();
+      foreach($named as $k => $v)
+      {
+        $idValues[] = $k;
+        $idValues[] = $v;
+      }
+    }
+    else
+    {
+      $idValues[] = $this->getIdKey();
+      $idValues[] = $this->id();
+    }
+
+    $args  = array_merge(
+      [$pattern, $this->getTableName()],
+      $idValues,
+      [
+        $attribute->name(),
+        $count,
+        $attribute->name(),
+        $attribute->name(),
+        $count,
+      ]
+    );
+    $query = ParseQuery::parse($connection, $args);
+    return $this->_saveQuery($query);
+  }
+
+  protected function _saveQuery($query)
+  {
+    $connection = $this->connection(ConnectionMode::WRITE());
     try
     {
       $result = $connection->query($query);
@@ -885,8 +936,8 @@ abstract class RecordMapper extends DataMapper
     $collection->setColumns($columns);
     return call_user_func_array(
       [
-      $collection,
-      'loadOneWhere'
+        $collection,
+        'loadOneWhere'
       ],
       $args
     );
