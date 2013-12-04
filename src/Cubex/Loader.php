@@ -8,7 +8,7 @@ use Cubex\Cli\CliCommand;
 use Cubex\Cli\ICliTask;
 use Cubex\Core\Http\IDispatchInjection;
 use Cubex\Core\Project\Project;
-use Cubex\Dispatch\Passthrough;
+use Cubex\Dispatch\PassThrough;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\Config;
 use Cubex\Foundation\Config\ConfigGroup;
@@ -694,7 +694,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
         $this->_newConfiguration();
       }
 
-      $passthrough = new Passthrough(
+      $passthrough = new PassThrough(
         $this->_request, $this->_configuration->get("dispatch")
       );
       $resp        = $passthrough->attempt();

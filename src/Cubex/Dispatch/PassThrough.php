@@ -5,7 +5,7 @@ use Cubex\Core\Http\Request;
 use Cubex\Core\Http\Response;
 use Cubex\Foundation\Config\Config;
 
-class Passthrough
+class PassThrough
 {
   protected $_request;
   protected $_config;
@@ -22,7 +22,7 @@ class Passthrough
     {
       return null;
     }
-    
+
     $path = substr($this->_request->path(1), 1);
     if($path === false)
     {
@@ -68,4 +68,4 @@ class Passthrough
     $response->addHeader("Content-Type", "text/" . $type . "; charset=UTF-8");
     return $response;
   }
-} 
+}
