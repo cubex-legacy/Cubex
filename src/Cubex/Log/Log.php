@@ -170,7 +170,7 @@ class Log
 
   protected static function _log($level, $message, array $context = array())
   {
-    $backtrace  = \debug_backtrace();
+    $backtrace  = \debug_backtrace(null, 2);
     $sourceLine = $backtrace[1]['line'];
     $sourceFile = $backtrace[1]['file'];
 
