@@ -70,8 +70,7 @@ class SprintfEngine
       );
     }
 
-    $argv[0] = $pattern;
-
-    return call_user_func_array('sprintf', $argv);
+    array_shift($argv);
+    return vsprintf($pattern, $argv);
   }
 }
