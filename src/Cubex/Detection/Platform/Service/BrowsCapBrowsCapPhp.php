@@ -90,11 +90,11 @@ class BrowsCapBrowsCapPhp implements IPlatformDetection
 
     $this->_browsCapPhp = new Browscap($config->getStr('cache_dir'));
     $this->_browsCapPhp->remoteIniUrl = $config->getStr(
-      'browscap_browscapphp_remote_ini_url',
+      'browscapphp_remote_ini_url',
       'http://browscap.org/stream?q=Full_PHP_BrowsCapINI'
     );
     $this->_browsCapPhp->remoteVerUrl = $config->getStr(
-      'browscap_browscapphp_remote_ver_url',
+      'browscapphp_remote_ver_url',
       'http://browscap.org/version'
     );
   }
