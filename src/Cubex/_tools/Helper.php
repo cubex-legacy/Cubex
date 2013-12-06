@@ -398,3 +398,23 @@ if(!function_exists("idp"))
     return isset($object->$property) ? $object->$property : $default;
   }
 }
+
+if(!function_exists("exploded"))
+{
+  /**
+   * Explode a string, filling the remainder with provided defaults.
+   */
+  function exploded($delimiter, $string, array $defaults = [], $limit = null)
+  {
+    if($limit === null)
+    {
+      $parts = explode($delimiter, $string);
+    }
+    else
+    {
+      $parts = explode($delimiter, $string, $limit);
+    }
+
+    return array_replace($defaults, $parts);
+  }
+}
