@@ -392,6 +392,12 @@ if(!function_exists("idp"))
   /**
    * Access an object property, retrieving the value stored there
    * if it exists or a default if it does not.
+   *
+   * @param object $object   Source object
+   * @param string $property Property name to pull from the object
+   * @param mixed  $default  Default value to return if the property does not exist
+   *
+   * @return mixed
    */
   function idp($object, $property, $default = null)
   {
@@ -403,6 +409,14 @@ if(!function_exists("exploded"))
 {
   /**
    * Explode a string, filling the remainder with provided defaults.
+   *
+   * @param string   $delimiter The boundary string
+   * @param string   $string    The input string.
+   * @param array    $defaults  Array to return, with replacements made
+   * @param int|null $limit     Passed through to the initial explode
+   *
+   * @return array
+   *
    */
   function exploded($delimiter, $string, array $defaults = [], $limit = null)
   {
@@ -416,5 +430,30 @@ if(!function_exists("exploded"))
     }
 
     return array_replace($defaults, $parts);
+  }
+}
+
+if(!function_exists("between"))
+{
+  /**
+   * Return if a value is between two values
+   *
+   * @param int  $value     Value to compare against
+   * @param int  $lowest    Lowest value to compare
+   * @param int  $highest   Highest value to compare
+   * @param bool $inclusive If the value can be equal to highest or lowest
+   *
+   * @return bool
+   */
+  function between($value, $lowest, $highest, $inclusive = true)
+  {
+    if($inclusive)
+    {
+      return $value >= $lowest && $value <= $highest;
+    }
+    else
+    {
+      return $value > $lowest && $value < $highest;
+    }
   }
 }
