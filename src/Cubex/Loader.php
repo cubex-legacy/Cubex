@@ -109,7 +109,7 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
       $throwNotices = \getenv('CUBEX_THROW_NOTICES');
       if(!$throwNotices)
       {
-        $run->silenceErrorsInPaths("/.ph(tml|p)$/", E_NOTICE);
+        $run->silenceErrorsInPaths("/\.ph(tml|p)$/", E_NOTICE);
       }
       $run->register();
     }
