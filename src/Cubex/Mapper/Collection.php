@@ -459,6 +459,8 @@ class Collection
 
   public function getCacheProvider($accessMode = 'r')
   {
+    $this->_attemptBuildCacheProvider();
+
     if($this->_cacheProvider === null)
     {
       $this->_cacheProvider = $this->_mapperType->getCacheProvider();

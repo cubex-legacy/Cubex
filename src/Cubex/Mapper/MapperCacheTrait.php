@@ -5,6 +5,8 @@
 
 namespace Cubex\Mapper;
 
+use Cubex\Foundation\Container;
+
 trait MapperCacheTrait
 {
   /**
@@ -12,6 +14,18 @@ trait MapperCacheTrait
    */
   protected $_cacheProvider;
   protected $_loadedCacheKey;
+  protected $_cacheServiceName;
+
+  protected function _attemptBuildCacheProvider()
+  {
+    if($this->_cacheServiceName !== null && $this->_cacheProvider === null)
+    {
+      $this->_cacheProvider = Container::servicemanager()->getWithType(
+        $this->_cacheServiceName,
+        '\Cubex\Cache\ICacheService'
+      );
+    }
+  }
 
   /**
    * @param string $accessMode

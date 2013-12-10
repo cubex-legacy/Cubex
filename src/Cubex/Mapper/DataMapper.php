@@ -1556,6 +1556,8 @@ abstract class DataMapper
    */
   public function getCacheProvider($accessMode = 'r')
   {
+    $this->_attemptBuildCacheProvider();
+
     if($this->_cacheProvider === null)
     {
       throw new \Exception(
