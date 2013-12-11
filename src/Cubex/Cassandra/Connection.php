@@ -117,9 +117,11 @@ class Connection
     if($this->_client === null)
     {
       $this->_socket = new TSocketPool(
-        $this->_hosts, $this->_port, $this->_persistConnection
+        $this->_hosts, $this->_port, $this->_persistConnection,
+        ['\Cubex\Log\Log', 'debug']
       );
 
+      $this->_socket->setDebug(true);
       $this->_socket->setSendTimeout($this->_connectTimeout);
       $this->_socket->setRetryInterval(0);
       $this->_socket->setNumRetries(1);
