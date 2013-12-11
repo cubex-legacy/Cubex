@@ -199,7 +199,7 @@ class ServiceManager
     $config = new ServiceConfig();
     $config->appendData(
       [
-      'service_provider' => $class,
+        'service_provider' => $class,
       ]
     );
     $this->register($name, $config, $shared);
@@ -214,6 +214,17 @@ class ServiceManager
     }
     $this->_shared[$name] = $instance;
     return $this;
+  }
+
+  public function destroy($name)
+  {
+    unset($this->_shared[$name]);
+  }
+
+  public function regenerate($name)
+  {
+    $this->destroy($name);
+    return call_user_func_array([$this, 'get'], func_get_args());
   }
 
   public function setConfig($name, ServiceConfig $config)
