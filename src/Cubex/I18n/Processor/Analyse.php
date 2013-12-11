@@ -70,7 +70,7 @@ class Analyse
 
     foreach($tokens as $token)
     {
-      if($token[0] == 307 && $token[1] == 't')
+      if(in_array($token[0], [T_STRING_VARNAME, T_STRING]) && $token[1] == 't')
       {
         $building  = 0;
         $msgId     = $msgIdPlural = '';
@@ -79,7 +79,7 @@ class Analyse
         $started   = true;
       }
 
-      if($token[0] == 307 && $token[1] == 'tp')
+      if(in_array($token[0], [T_STRING_VARNAME, T_STRING]) && $token[1] == 'tp')
       {
         $building  = 0;
         $msgId     = $msgIdPlural = '';
@@ -88,7 +88,7 @@ class Analyse
         $started   = true;
       }
 
-      if($token[0] == 307 && $token[1] == 'p')
+      if(in_array($token[0], [T_STRING_VARNAME, T_STRING]) && $token[1] == 'p')
       {
         $msgId     = $msgIdPlural = '';
         $type      = 'plural';
@@ -155,7 +155,7 @@ class Analyse
         $started = false;
       }
 
-      if($started && $token[0] == 315)
+      if($started && in_array($token[0], [T_ECHO, T_CONSTANT_ENCAPSED_STRING]))
       {
         $quotetype = substr($token[1], 0, 1);
         $token[1]  = str_replace('\\' . $quotetype, $quotetype, $token[1]);
