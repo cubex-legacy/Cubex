@@ -147,7 +147,7 @@ class Mail implements IEmailService
     }
     else
     {
-      $name = addslashes($name);
+      $name = addcslashes($name, '"');
       return "\"$name\" <$email>";
     }
   }
