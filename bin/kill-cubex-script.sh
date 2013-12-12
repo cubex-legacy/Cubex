@@ -11,7 +11,7 @@ INST="$2"
 
 if [ "$INST" != "" ]
 then
-  INST="$INST(\s|$)"
+  INST="\s$INST(\s|$)"
 fi
 
 PID=`ps ax | grep "/cubex" | grep "$CLASSNAME" | grep -E "$INST" | grep -v grep | awk '{print $1}'`
