@@ -119,6 +119,7 @@ abstract class RecordMapper extends DataMapper
   }
 
   /**
+   * @param $compositeGlue
    * @return string
    */
   public function idPattern($compositeGlue = "AND")

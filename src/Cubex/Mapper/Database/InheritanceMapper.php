@@ -47,13 +47,13 @@ abstract class InheritanceMapper extends RecordMapper
     return $parent;
   }
 
-  public function idPattern()
+  public function idPattern($compositeGlue = "AND")
   {
-    $pattern = parent::idPattern();
+    $pattern = parent::idPattern($compositeGlue);
     $pattern .= ParseQuery::parse(
       $this->connection(),
       [
-      " AND %C = %s",
+      " $compositeGlue %C = %s",
       $this->_typeField,
       $this->_class()
       ]
