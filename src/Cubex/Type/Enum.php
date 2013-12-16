@@ -53,29 +53,38 @@ abstract class Enum extends EnumWrapper implements \IteratorAggregate
 
   /**
    * @param $value
+   * @param $default
    *
    * @return mixed
    */
-  public static function fromValue($value)
+  public static function fromValue($value, $default = null)
   {
-    $const = static::constFromValue($value);
+    $const = static::constFromValue($value, $default);
 
     return static::$const();
   }
 
   /**
    * @param $value
+   * @param $default
    *
    * @return mixed
    * @throws \UnexpectedValueException
    */
-  public static function constFromValue($value)
+  public static function constFromValue($value, $default = null)
   {
     $const = array_search($value, (new static)->getConstList());
 
     if($const === false)
     {
-      throw new \UnexpectedValueException("Value '{$value}' does not exist");
+      if($default === null)
+      {
+        throw new \UnexpectedValueException("Value '{$value}' does not exist");
+      }
+      else
+      {
+        return $default;
+      }
     }
 
     return $const;
@@ -131,8 +140,8 @@ abstract class Enum extends EnumWrapper implements \IteratorAggregate
    * (PHP 5 &gt;= 5.0.0)<br/>
    * Retrieve an external iterator
    * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
-   * @return Traversable An instance of an object implementing <b>Iterator</b> or
-   * <b>Traversable</b>
+   * @return Traversable An instance of an object implementing <b>Iterator</b>
+   * or <b>Traversable</b>
    */
   public function getIterator()
   {
