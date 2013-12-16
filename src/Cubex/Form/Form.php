@@ -272,7 +272,7 @@ class Form extends DataMapper implements IRenderable
     }
     else if($a->validatorExists(Validator::VALIDATE_BOOL))
     {
-      $this->addCheckboxElement($name, $data);
+      $this->addCheckboxElement($name, $data, '1', Form::LABEL_NONE);
     }
     else if($a->validatorExists(Validator::VALIDATE_URL))
     {
