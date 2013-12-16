@@ -5,7 +5,7 @@
 
 namespace Cubex\Mapper\Database;
 
-use Cubex\Database\MySQL\MySQL;
+use Cubex\Database\MySQL\MySQL as CubexMySQL;
 use Cubex\Foundation\Container;
 use Cubex\Data\Attribute\Attribute;
 use Cubex\Data\Attribute\CallbackAttribute;
@@ -255,13 +255,13 @@ abstract class RecordMapper extends DataMapper
       {
         $connection = $this->connection(ConnectionMode::WRITE());
         $revert     = true;
-        if($connection instanceof MySQL)
+        if($connection instanceof CubexMySQL)
         {
           $revert = $connection->isAutoContextSwitchingEnabled();
           $connection->disableAutoContextSwitching();
         }
         $rows = $connection->getRows($query);
-        if($connection instanceof MySQL && $revert)
+        if($connection instanceof CubexMySQL && $revert)
         {
           $connection->enableAutoContextSwitching();
         }
