@@ -27,9 +27,15 @@ class Cache extends BaseFacade
 
   public static function get($key, $default = null)
   {
-    $cache = static::getAccessor();
-    
-    return $cache->exists($key) ? $cache->get($key) : $default;
+    $cache  = static::getAccessor();
+    $result = $cache->get($key);
+
+    if($cache->checkForMiss($result))
+    {
+      return $default;
+    }
+
+    return $result;
   }
 
   public static function set($key, $value, $expire = 1800)
