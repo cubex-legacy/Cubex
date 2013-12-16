@@ -25,6 +25,8 @@ class MySQL implements IDatabaseService
   private static $_connectionCache = [];
   protected $_escapeStringCache = [];
 
+  protected $_autoContextSwitch = true;
+
   use ServiceConfigTrait;
 
   protected static function _getConnection(
@@ -60,6 +62,23 @@ class MySQL implements IDatabaseService
     }
 
     return self::$_connectionCache[$key];
+  }
+
+  public function enableAutoContextSwitching()
+  {
+    $this->_autoContextSwitch = true;
+    return $this;
+  }
+
+  public function disableAutoContextSwitching()
+  {
+    $this->_autoContextSwitch = false;
+    return $this;
+  }
+
+  public function isAutoContextSwitchingEnabled()
+  {
+    return (bool)$this->_autoContextSwitch;
   }
 
   public function connect($mode = 'w')
@@ -232,7 +251,10 @@ class MySQL implements IDatabaseService
    */
   protected function _prepareConnection($mode = 'r')
   {
-    $this->connect($mode);
+    if($this->_autoContextSwitch || $this->_connection === null)
+    {
+      $this->connect($mode);
+    }
   }
 
   /**
