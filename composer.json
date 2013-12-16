@@ -27,7 +27,7 @@
     "cubex/data": "self.version"
   },
   "suggest":           {
-    "cubex/cassandra":              "Cassandra Connections",
+    "packaged/cassandrathrift":     "Cassandra Connections",
     "rmccue/requests":              "HTTP Request Helper",
     "mobiledetect/mobiledetectlib": "Supported platform detection library",
     "phpseclib/phpseclib":          "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
