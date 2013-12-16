@@ -62,4 +62,18 @@ class EphemeralCache
     unset(static::$_storage[static::_storageKey($source)][$id]);
     return true;
   }
+
+  public static function retrieveCache($id, $source, \Closure $gather)
+  {
+    if(self::inCache($id, $source))
+    {
+      return self::getCache($id, $source);
+    }
+    else
+    {
+      $value = $gather();
+      self::storeCache($id, $value, $source);
+      return $value;
+    }
+  }
 }
