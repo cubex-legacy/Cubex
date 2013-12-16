@@ -43,7 +43,7 @@ abstract class RecordMapper extends DataMapper
   protected $_autoCacheOnLoad = false;
   protected $_attemptLoadFromCache = false;
 
-  protected $_retryEmptyReadOnMaster = true;
+  protected $_retryEmptyReadOnMaster = false;
 
   public function __construct($id = null, $columns = ['*'])
   {
@@ -123,6 +123,7 @@ abstract class RecordMapper extends DataMapper
 
   /**
    * @param $compositeGlue
+   *
    * @return string
    */
   public function idPattern($compositeGlue = "AND")
