@@ -136,7 +136,7 @@ class PivotMapper extends RecordMapper
     $this->addCompositeAttribute("id", [$localKey, $foreignKey]);
   }
 
-  public function idPattern()
+  public function idPattern($compositeGlue = "AND")
   {
     $patterns = [];
     $comp     = $this->getCompAttribute($this->getIdKey());
@@ -153,7 +153,7 @@ class PivotMapper extends RecordMapper
       }
     }
 
-    return implode(" AND ", $patterns);
+    return implode(" $compositeGlue ", $patterns);
   }
 
   public function setTableName($table)
