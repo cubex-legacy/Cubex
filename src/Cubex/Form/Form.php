@@ -290,6 +290,17 @@ class Form extends DataMapper implements IRenderable
     {
       $this->_addInputElement(FormElement::RANGE, [$name, $data]);
     }
+    else if(($options = $a->options()))
+    {
+      if($a->getIsArray())
+      {
+        $this->addCheckboxElements($name, $data, $options);
+      }
+      else
+      {
+        $this->addSelectElement($name, $options, $data);
+      }
+    }
     else
     {
       $this->addTextElement($name, $data);

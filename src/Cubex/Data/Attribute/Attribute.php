@@ -36,6 +36,7 @@ class Attribute implements IValidatable, IFilterable, \JsonSerializable
   protected $_requireUnserialize = false;
   protected $_saveable = true;
   protected $_description;
+  protected $_isArray;
 
   public function __construct(
     $name,
@@ -145,6 +146,17 @@ class Attribute implements IValidatable, IFilterable, \JsonSerializable
       }
     }
     return $this->_id;
+  }
+
+  public function setIsArray($bool = true)
+  {
+    $this->_isArray = $bool;
+    return $this;
+  }
+
+  public function getIsArray()
+  {
+    return $this->_isArray;
   }
 
   public function setRequired($required = false)
