@@ -9,6 +9,7 @@ use cassandra\IndexClause;
 use Cubex\Data\Attribute\Attribute;
 use Cubex\Cassandra\DataType\BytesType;
 use Cubex\Cassandra\DataType\CassandraType;
+use Cubex\Log\Log;
 use Thrift\Exception\TApplicationException;
 use cassandra\AuthenticationException;
 use cassandra\AuthorizationException;
@@ -45,6 +46,8 @@ class ColumnFamily
   protected $_processingBatch = false;
   protected $_batchMutation;
 
+  protected $_readRetries = 1;
+
   /**
    * @var DataType\BytesType
    */
@@ -67,6 +70,12 @@ class ColumnFamily
     $this->_connection        = $connection;
     $this->_name              = $name;
     $this->_keyspace          = $keyspace;
+  }
+
+  public function setReadRetries($count = 2)
+  {
+    $this->_readRetries = $count;
+    return $this;
   }
 
   public function setKeyDataType(CassandraType $type)
@@ -240,6 +249,11 @@ class ColumnFamily
 
   public function columnCount($key, array $columnNames = null)
   {
+    return $this->_readRetry("_columnCount", func_get_args());
+  }
+
+  protected function _columnCount($key, array $columnNames = null)
+  {
     $parent      = $this->_columnParent();
     $level       = $this->readConsistencyLevel();
     $columnNames = $this->prepareDataType(
@@ -272,10 +286,20 @@ class ColumnFamily
 
   public function multiColumnCount(array $keys, array $columnNames = null)
   {
+    return $this->_readRetry("_multiColumnCount", func_get_args());
+  }
+
+  protected function _multiColumnCount(array $keys, array $columnNames = null)
+  {
     return $this->columnCount($keys, $columnNames);
   }
 
   public function get($key, array $columns)
+  {
+    return $this->_readRetry("_get", func_get_args());
+  }
+
+  protected function _get($key, array $columns)
   {
     $key     = $this->prepareDataType($this->keyDataType(), $key);
     $columns = $this->prepareDataType($this->columnDataType(), $columns);
@@ -325,6 +349,13 @@ class ColumnFamily
     $key, $start = '', $finish = '', $reverse = false, $limit = 100
   )
   {
+    return $this->_readRetry("_getSlice", func_get_args());
+  }
+
+  protected function _getSlice(
+    $key, $start = '', $finish = '', $reverse = false, $limit = 100
+  )
+  {
     $result = null;
 
     $key   = $this->prepareDataType($this->keyDataType(), $key);
@@ -352,6 +383,13 @@ class ColumnFamily
     IndexClause $index, SlicePredicate $predicate = null
   )
   {
+    return $this->_readRetry("_getIndexSlice", func_get_args());
+  }
+
+  protected function _getIndexSlice(
+    IndexClause $index, SlicePredicate $predicate = null
+  )
+  {
     $parent = $this->_columnParent();
     $level  = $this->readConsistencyLevel();
 
@@ -372,6 +410,13 @@ class ColumnFamily
   }
 
   public function multiGetSlice(
+    array $keys, $start = '', $finish = '', $reverse = false, $limit = 100
+  )
+  {
+    return $this->_readRetry("_multiGetSlice", func_get_args());
+  }
+
+  protected function _multiGetSlice(
     array $keys, $start = '', $finish = '', $reverse = false, $limit = 100
   )
   {
@@ -438,6 +483,11 @@ class ColumnFamily
 
   public function multiGet(array $keys, array $columns = null)
   {
+    return $this->_readRetry("_multiGet", func_get_args());
+  }
+
+  protected function _multiGet(array $keys, array $columns = null)
+  {
     $keys    = $this->prepareDataType($this->keyDataType(), $keys);
     $columns = $this->prepareDataType($this->columnDataType(), $columns);
     $result  = null;
@@ -477,6 +527,13 @@ class ColumnFamily
     $start = '', $finish = '', $count = 100, $predicate = null
   )
   {
+    return $this->_readRetry("_getKeys", func_get_args());
+  }
+
+  protected function _getKeys(
+    $start = '', $finish = '', $count = 100, $predicate = null
+  )
+  {
     if($predicate === null)
     {
       $predicate = new SliceRange(['start' => '', 'finish' => '']);
@@ -493,8 +550,14 @@ class ColumnFamily
   }
 
   public function getTokens(
-    $startToken = 0, $finishToken = 0, $count = 100,
-    $predicate = null
+    $startToken = 0, $finishToken = 0, $count = 100, $predicate = null
+  )
+  {
+    return $this->_readRetry("_getTokens", func_get_args());
+  }
+
+  protected function _getTokens(
+    $startToken = 0, $finishToken = 0, $count = 100, $predicate = null
   )
   {
     if($predicate === null)
@@ -1161,5 +1224,55 @@ class ColumnFamily
     {
       return new CassandraException($e->getMessage(), $e->getCode(), $e);
     }
+  }
+
+  protected function _readRetry($method, array $args)
+  {
+    $retries = 0;
+    while($retries <= $this->_readRetries)
+    {
+      try
+      {
+        $response = call_user_func_array([$this, $method], $args);
+        return $response;
+      }
+      catch(NotFoundException $e)
+      {
+        throw $e;
+      }
+      catch(InvalidRequestException $e)
+      {
+        throw $e;
+      }
+      catch(TApplicationException $e)
+      {
+        throw $e;
+      }
+      catch(AuthenticationException $e)
+      {
+        throw $e;
+      }
+      catch(AuthorizationException $e)
+      {
+        throw $e;
+      }
+      catch(SchemaDisagreementException $e)
+      {
+        throw $e;
+      }
+      catch(\Exception $e)
+      {
+        $retries++;
+        if($retries > $this->_readRetries)
+        {
+          throw $e;
+        }
+        else
+        {
+          Log::debug("Retrying read ($retries) $this->_name::$method");
+        }
+      }
+    }
+    throw new \Exception("Read retry on '$method' did something bad :s");
   }
 }
