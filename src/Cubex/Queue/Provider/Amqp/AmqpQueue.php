@@ -6,6 +6,7 @@
 namespace Cubex\Queue\Provider\Amqp;
 
 use Cubex\Queue\IBatchQueueConsumer;
+use Cubex\Queue\IBatchQueueProvider;
 use Cubex\Queue\IQueue;
 use Cubex\Queue\IQueueConsumer;
 use Cubex\Queue\IQueueProvider;
@@ -17,7 +18,7 @@ use PhpAmqpLib\Exception\AMQPProtocolException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
-class AmqpQueue implements IQueueProvider
+class AmqpQueue implements IBatchQueueProvider
 {
   use ServiceConfigTrait;
 
@@ -118,11 +119,20 @@ class AmqpQueue implements IQueueProvider
 
   public function push(IQueue $queue, $data = null, $delay = 0)
   {
+    $this->pushBatch($queue, [$data]);
+  }
+
+  public function pushBatch(IQueue $queue, array $data, $delay = 0)
+  {
     $this->_configureExchange();
     $this->_configureQueue($queue->name());
     try
     {
-      $this->_publish($queue, $data);
+      foreach($data as $msg)
+      {
+        $this->_publish($queue, $msg);
+      }
+      $this->_channel()->publish_batch();
     }
     catch(\Exception $e)
     {
@@ -136,7 +146,7 @@ class AmqpQueue implements IQueueProvider
 
       if($this->_retries > 0)
       {
-        return $this->push($queue, $data, $delay);
+        return $this->pushBatch($queue, $data, $delay);
       }
       else
       {
@@ -161,7 +171,9 @@ class AmqpQueue implements IQueueProvider
   protected function _publish(IQueue $queue, $data = null)
   {
     $msg = new AMQPMessage(serialize($data));
-    $this->_channel()->basic_publish($msg, $this->_exchange, $queue->name());
+    $this->_channel()->batch_basic_publish(
+      $msg, $this->_exchange, $queue->name()
+    );
   }
 
   public function consume(IQueue $queue, IQueueConsumer $consumer)
