@@ -22,15 +22,15 @@ class DispatchMapper extends Dispatcher
   private $_configLines = [];
 
   /**
-   * @param ConfigGroup                   $configGroup
-   * @param \Cubex\FileSystem\FileSystem  $fileSystem
+   * @param ConfigGroup                  $configGroup
+   * @param \Cubex\FileSystem\FileSystem $fileSystem
    */
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
     parent::__construct($configGroup, $fileSystem);
 
     $this->_ignoredFiles[$this->getDispatchIniFilename()] = true;
-    $this->_ignoredFiles[".gitignore"] = true;
+    $this->_ignoredFiles[".gitignore"]                    = true;
   }
 
   /**
@@ -43,7 +43,7 @@ class DispatchMapper extends Dispatcher
     $this->setEntityMapConfigLines($entities);
     $this->setExternalMapConfigLines();
     $this->writeConfig();
-    $maps = $this->mapEntities($entities);
+    $maps      = $this->mapEntities($entities);
     $savedMaps = $this->saveMaps($maps);
 
     return [$entities, $maps, $savedMaps];
@@ -236,7 +236,7 @@ class DispatchMapper extends Dispatcher
         $cleanedCurrentEntity = str_replace(
           "\\",
           "/",
-          ($entityPath ? $entityPath . DS : "") . $directoryListItem
+        ($entityPath ? $entityPath . DS : "") . $directoryListItem
         );
 
         // Little bit weak, but we don't want to risk adding an empty key to the
@@ -249,7 +249,7 @@ class DispatchMapper extends Dispatcher
             $directoryListItem
           );
 
-          $directoryContent           .= $content;
+          $directoryContent .= $content;
           $map[$cleanedCurrentEntity] = md5($content);
         }
       }
@@ -301,7 +301,9 @@ class DispatchMapper extends Dispatcher
     }
 
     $dispatchFile = $this->getProjectBase() . DS . $entity . DS .
-      $this->getDispatchIniFilename();
+    $this->getDispatchIniFilename();
+
+    //TODO: Read out existing file, and keep old keys
 
     try
     {
@@ -311,6 +313,12 @@ class DispatchMapper extends Dispatcher
     {
       // Seems we don't have one yet, let just set an emtyp string md5
       $existingHash = md5("");
+    }
+
+    //Do not replace existing files with a blank one
+    if(empty($toMap))
+    {
+      return true;
     }
 
     if($existingHash !== md5($toMap))
@@ -391,7 +399,8 @@ class DispatchMapper extends Dispatcher
       $brandDirectory = $directory . DS . $directoryListItem;
 
       if($this->getFileSystem()->isDir($brandDirectory)
-        && strncmp($directoryListItem, ".", 1) === 0)
+      && strncmp($directoryListItem, ".", 1) === 0
+      )
       {
         $directories[] = $brandDirectory;
       }
@@ -414,7 +423,7 @@ class DispatchMapper extends Dispatcher
       $this->getProjectBase() . "/../conf"
     );
 
-    $file = $directory  . DS . $this->getDispatchIniFilename();
+    $file = $directory . DS . $this->getDispatchIniFilename();
 
     try
     {
@@ -461,7 +470,7 @@ class DispatchMapper extends Dispatcher
     if($path)
     {
       $normalizedPath = str_replace("\\", "/", $path);
-      $pathParts = explode("/", $normalizedPath);
+      $pathParts      = explode("/", $normalizedPath);
 
       foreach($pathParts as $pathPartKey => $pathPart)
       {
