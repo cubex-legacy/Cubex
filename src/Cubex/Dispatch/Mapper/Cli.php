@@ -17,22 +17,36 @@ class Cli extends DispatchMapper
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
     parent::__construct($configGroup, $fileSystem);
+  }
 
+  public function execute($path = null)
+  {
     $this->_startMapper();
 
+    if($path !== null)
+    {
+      $this->_projectBase      = null;
+      $this->_projectNamespace = null;
+    }
+
     echo Shell::colourText("Using Path: ", Shell::COLOUR_FOREGROUND_CYAN);
-    echo $this->getProjectPath() . "\n\n";
+    echo ($path ? : $this->getProjectPath()) . "\n\n";
     echo Shell::colourText(
       "============================================================\n\n",
       Shell::COLOUR_FOREGROUND_DARK_GREY
     );
 
-    $entities         = $this->findEntities();
+    $entities = $this->findEntities($path);
     $this->setEntityMapConfigLines($entities);
     $this->setExternalMapConfigLines();
-    $maps      = $this->mapEntities($entities);
+    $maps = $this->mapEntities($entities);
     $this->saveMaps($maps);
-    $this->writeConfig();
+
+    //Do not write configs if processing a specified path
+    if($path === null)
+    {
+      $this->writeConfig();
+    }
 
     foreach($this->_output as $outputEntity)
     {

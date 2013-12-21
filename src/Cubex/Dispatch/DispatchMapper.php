@@ -1,11 +1,6 @@
 <?php
-/**
- * @author: gareth.evans
- */
 namespace Cubex\Dispatch;
 
-use Cubex\Foundation\Container;
-use Cubex\Dispatch\Dependency\Resource\TypeEnum;
 use Cubex\FileSystem\FileSystem;
 use Cubex\Foundation\Config\ConfigGroup;
 
@@ -58,7 +53,7 @@ class DispatchMapper extends Dispatcher
    */
   public function findExtendedEntities($path)
   {
-    $entities = $this->findEntities(CUBEX_PROJECT_ROOT . DS . $path);
+    $entities = $this->findEntities(build_path(CUBEX_PROJECT_ROOT, $path));
 
     foreach($entities as $ii => $entity)
     {
@@ -97,7 +92,7 @@ class DispatchMapper extends Dispatcher
     {
       $traversing = false;
       $directory  = $this->getFileSystem()->resolvePath(
-        $this->getProjectPath() . DS . $entityPath
+        build_path($this->getProjectPath(), $entityPath)
       );
     }
 
@@ -112,12 +107,15 @@ class DispatchMapper extends Dispatcher
 
     foreach($directoryList as $directoryListItem)
     {
-      if($this->getFileSystem()->isDir($directory . DS . $directoryListItem))
+      if($this->getFileSystem()->isDir(
+        build_path($directory, $directoryListItem)
+      )
+      )
       {
         $newEntityPath = $directoryListItem;
         if($entityPath)
         {
-          $newEntityPath = $entityPath . DS . $directoryListItem;
+          $newEntityPath = build_path($entityPath, $directoryListItem);
         }
 
         if($directoryListItem === $this->getResourceDirectory())
@@ -138,7 +136,7 @@ class DispatchMapper extends Dispatcher
           else
           {
             $entities[] = $this->getFileSystem()->normalizePath(
-              $this->getProjectNamespace() . DS . $newEntityPath
+              build_path($this->getProjectNamespace(), $newEntityPath)
             );
           }
         }
@@ -198,7 +196,7 @@ class DispatchMapper extends Dispatcher
   public function mapEntity($entity, $entityPath = "")
   {
     $map       = [];
-    $directory = $this->getProjectBase() . DS . $entity;
+    $directory = build_path($this->getProjectBase(), $entity);
 
     if($entityPath)
     {
@@ -207,7 +205,7 @@ class DispatchMapper extends Dispatcher
         return [];
       }
 
-      $directory .= DS . $entityPath;
+      $directory = build_path($directory, $entityPath);
     }
 
     try
@@ -224,19 +222,21 @@ class DispatchMapper extends Dispatcher
 
     foreach($directoryList as $directoryListItem)
     {
-      $currentEntity = $directory . DS . $directoryListItem;
+      $currentEntity = build_path($directory, $directoryListItem);
       if($this->getFileSystem()->isDir($currentEntity))
       {
-        $newEntityPath = $entityPath ? $entityPath . DS : "";
-        $newEntityPath .= $directoryListItem;
-        $map = array_merge($map, $this->mapEntity($entity, $newEntityPath));
+        $newEntityPath = build_path($entityPath, $directoryListItem);
+        $map           = array_merge(
+          $map,
+          $this->mapEntity($entity, $newEntityPath)
+        );
       }
       else if(!isset($this->_ignoredFiles[$directoryListItem]))
       {
         $cleanedCurrentEntity = str_replace(
           "\\",
           "/",
-        ($entityPath ? $entityPath . DS : "") . $directoryListItem
+          (build_path($entityPath, $directoryListItem))
         );
 
         // Little bit weak, but we don't want to risk adding an empty key to the
@@ -300,10 +300,14 @@ class DispatchMapper extends Dispatcher
       $toMap .= "$file = \"$checksum\"\n";
     }
 
-    $dispatchFile = $this->getProjectBase() . DS . $entity . DS .
-    $this->getDispatchIniFilename();
+    $dispatchFile = build_path(
+      $this->getProjectBase(),
+      $entity,
+      $this->getDispatchIniFilename()
+    );
 
     //TODO: Read out existing file, and keep old keys
+    //dispatch.prepend.ini dispatch.append.ini
 
     try
     {
@@ -356,16 +360,16 @@ class DispatchMapper extends Dispatcher
   private function _concatAllRelatedFiles($entity, $entityPath, $filename)
   {
     $contents           = "";
-    $entityDirectory    = $this->getProjectBase() . DS . $entity;
+    $entityDirectory    = build_path($this->getProjectBase(), $entity);
     $brandDirectories   = $this->_getBrandDirectoryList($entityDirectory);
-    $brandDirectories[] = $this->getProjectBase() . DS . $entity;
+    $brandDirectories[] = build_path($this->getProjectBase(), $entity);
 
     foreach($brandDirectories as $brandDirectory)
     {
       $brandedEntityPath = $brandDirectory;
       if($entityPath)
       {
-        $brandedEntityPath .= DS . $entityPath;
+        $brandedEntityPath = build_path($brandedEntityPath, $entityPath);
       }
       $contents .= $this->getFileMerge($brandedEntityPath, $filename);
     }
@@ -396,7 +400,7 @@ class DispatchMapper extends Dispatcher
 
     foreach($directoryList as $directoryListItem)
     {
-      $brandDirectory = $directory . DS . $directoryListItem;
+      $brandDirectory = build_path($directory, $directoryListItem);
 
       if($this->getFileSystem()->isDir($brandDirectory)
       && strncmp($directoryListItem, ".", 1) === 0
@@ -423,7 +427,7 @@ class DispatchMapper extends Dispatcher
       $this->getProjectBase() . "/../conf"
     );
 
-    $file = $directory . DS . $this->getDispatchIniFilename();
+    $file = build_path($directory, $this->getDispatchIniFilename());
 
     try
     {
