@@ -84,13 +84,13 @@ class CassandraService implements IDataService
     $receiveTimeout = $this->config()->getInt("receive_timeout");
     if($receiveTimeout !== null)
     {
-    $this->_connection->setReceiveTimeout($receiveTimeout);
+      $this->_connection->setReceiveTimeout($receiveTimeout);
     }
 
     $sendTimeout = $this->config()->getInt("send_timeout");
     if($sendTimeout !== null)
     {
-    $this->_connection->setSendTimeout($sendTimeout);
+      $this->_connection->setSendTimeout($sendTimeout);
     }
 
     $this->_connection->setKeyspace($this->_keyspace);
