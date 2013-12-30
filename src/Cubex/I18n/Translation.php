@@ -96,10 +96,7 @@ trait Translation
   {
     if($this->_textdomain === null)
     {
-      $projectBase       = $this->projectBase();
-      $path              = str_replace($projectBase, '', $this->filePath());
-      $path              = ltrim($path, '\\');
-      $this->_textdomain = md5(str_replace('\\', '/', $path));
+      $this->_textdomain = $this->_generateTextDomain();
     }
 
     if(!$this->_boundTd)
@@ -110,25 +107,63 @@ trait Translation
     return $this->_textdomain;
   }
 
+  protected function _generateTextDomain($path = null)
+  {
+    if($path === null)
+    {
+      $path = $this->filePath();
+    }
+    $path = ltrim(
+      str_replace($this->projectBase(), '', $path),
+      '\\'
+    );
+    return md5(str_replace('\\', '/', $path));
+  }
+
   public function bindLanguage()
   {
-    $this->_boundTd = true;
-    $path           = $this->filePath() . DS . 'locale';
+    if(!$this->_boundTd)
+    {
+      $this->_boundTd = true;
+      return $this->_bindLanguage(
+        $this->textDomain(),
+        build_path($this->filePath(), 'locale')
+      );
+    }
+    return true;
+  }
 
-    return $this->getTranslator()->bindLanguage($this->textDomain(), $path);
+  protected function _bindLanguagePath($path)
+  {
+    return $this->_bindLanguage($this->_generateTextDomain($path), $path);
+  }
+
+  protected function _bindLanguage($textDomain, $path)
+  {
+    return $this->getTranslator()->bindLanguage($textDomain, $path);
   }
 
   /**
    * File path for the current class
    *
+   * @param $useCache
+   *
    * @return string
    */
-  public function filePath()
+  public function filePath($useCache = true)
   {
-    if($this->_filepathCache === null)
+    if($this->_filepathCache === null || !$useCache)
     {
-      $reflector            = new \ReflectionClass(get_class($this));
-      $this->_filepathCache = dirname($reflector->getFileName());
+      $reflector = new \ReflectionClass(get_class($this));
+      $filePath  = dirname($reflector->getFileName());
+      if($useCache)
+      {
+        $this->_filepathCache = $filePath;
+      }
+      else
+      {
+        return $filePath;
+      }
     }
     return $this->_filepathCache;
   }

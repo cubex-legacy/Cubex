@@ -15,10 +15,6 @@ class GetText implements ITanslationLoader
    * @var string
    */
   protected $_textdomain = 'messages';
-  /**
-   * @var bool
-   */
-  protected $_boundTd = false;
 
   /**
    * Translate String
@@ -89,7 +85,6 @@ class GetText implements ITanslationLoader
    */
   public function bindLanguage($textDomain, $filePath)
   {
-    $this->_boundTd = true;
     if(!function_exists('bindtextdomain'))
     {
       return false;
