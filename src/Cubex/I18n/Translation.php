@@ -12,6 +12,7 @@ trait Translation
   protected $_translator;
   protected $_textdomain;
   protected $_boundTd = false;
+  protected $_boundTextDomains = [];
 
   protected $_filepathCache;
 
@@ -37,17 +38,31 @@ trait Translation
    */
   public function t($message)
   {
+    $translation = $this->_t($message);
     if(func_num_args() > 1)
     {
       $args = func_get_args();
       array_shift($args);
-      $translation = $this->getTranslator()->t($this->textDomain(), $message);
       return vsprintf($translation, $args);
     }
-    else
+
+    return $translation;
+  }
+
+  protected function _t($message)
+  {
+    if(!empty($this->_boundTextDomains))
     {
-      return $this->getTranslator()->t($this->textDomain(), $message);
+      foreach($this->_boundTextDomains as $textDomain)
+      {
+        $translation = $this->getTranslator()->t($textDomain, $message);
+        if($translation != $message)
+        {
+          return $translation;
+        }
+      }
     }
+    return $message;
   }
 
   /**
@@ -75,12 +90,25 @@ trait Translation
    */
   public function p($singular, $plural = null, $number = 0)
   {
-    $translated = $this->getTranslator()->p(
-      $this->textDomain(),
-      $singular,
-      $plural,
-      $number
-    );
+    $translated = null;
+
+    if(!empty($this->_boundTextDomains))
+    {
+      foreach($this->_boundTextDomains as $textDomain)
+      {
+        $translated = $this->getTranslator()->p(
+          $textDomain,
+          $singular,
+          $plural,
+          $number
+        );
+      }
+    }
+
+    if($translated === null)
+    {
+      $translated = $number == 1 ? $singular : $plural;
+    }
 
     if(\substr_count($translated, '%d') == 1)
     {
@@ -125,10 +153,7 @@ trait Translation
     if(!$this->_boundTd)
     {
       $this->_boundTd = true;
-      return $this->_bindLanguage(
-        $this->textDomain(),
-        build_path($this->filePath(), 'locale')
-      );
+      return $this->_bindLanguage($this->textDomain(), $this->filePath());
     }
     return true;
   }
@@ -140,6 +165,8 @@ trait Translation
 
   protected function _bindLanguage($textDomain, $path)
   {
+    $this->_boundTextDomains[$textDomain] = $textDomain;
+    $path                                 = build_path($path, 'locale');
     return $this->getTranslator()->bindLanguage($textDomain, $path);
   }
 

@@ -406,13 +406,24 @@ abstract class Application
 
   public function init()
   {
+    $this->_registerI18nListeners();
+    $this->_configure();
+  }
+
+  protected function _registerI18nListeners($namespace = null)
+  {
+    if($namespace == null)
+    {
+      $namespace = $this->getNamespace();
+    }
+
     EventManager::listen(
       EventManager::CUBEX_TRANSLATE_T,
       function (IEvent $e)
       {
         return call_user_func([$this, 't'], $e->getStr("text"));
       },
-      $this->getNamespace()
+      $namespace
     );
 
     EventManager::listen(
@@ -427,10 +438,8 @@ abstract class Application
 
         return call_user_func_array([$this, 'p'], $args);
       },
-      $this->getNamespace()
+      $namespace
     );
-
-    $this->_configure();
   }
 
   public function projectBase()
