@@ -491,8 +491,16 @@ class Dispatcher
   {
     if(!array_key_exists($entity, self::$_dispatchInis))
     {
-      $fullEntityPath               = $this->getProjectBase() . DS . $entity;
-      self::$_dispatchInis[$entity] = $this->loadDispatchIni($fullEntityPath);
+      if(isset($this->_externalMap[$entity]))
+      {
+        $path                         = $this->_externalMap[$entity];
+        self::$_dispatchInis[$entity] = $this->loadDispatchIni($path);
+      }
+      else
+      {
+        $fullEntityPath               = $this->getProjectBase() . DS . $entity;
+        self::$_dispatchInis[$entity] = $this->loadDispatchIni($fullEntityPath);
+      }
     }
 
     return self::$_dispatchInis[$entity];
