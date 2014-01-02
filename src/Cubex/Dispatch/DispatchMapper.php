@@ -120,7 +120,9 @@ class DispatchMapper extends Dispatcher
 
         if($directoryListItem === $this->getResourceDirectory())
         {
-          if($this->getFileSystem()->isAbsolute($newEntityPath))
+          if($this->getProjectBase() !== null
+          && $this->getFileSystem()->isAbsolute($newEntityPath)
+          )
           {
             $newEntityPath = $this->getFileSystem()->getRelativePath(
               $this->getProjectBase(),
