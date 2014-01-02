@@ -326,6 +326,7 @@ class DatabaseQueue implements IBatchQueueProvider
     else if($waitTime > 0)
     {
       $this->_waits++;
+      \Log::debug('Nothing to consume, sleeping for '.$waitTime);
       sleep($waitTime);
     }
     return true;
