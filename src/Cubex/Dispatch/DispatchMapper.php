@@ -423,6 +423,12 @@ class DispatchMapper extends Dispatcher
       $config .= "$configLine\n";
     }
 
+    //Avoid writing blank files
+    if(empty($config))
+    {
+      return true;
+    }
+
     $directory = $this->getFileSystem()->resolvePath(
       $this->getProjectBase() . "/../conf"
     );
