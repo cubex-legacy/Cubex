@@ -90,7 +90,8 @@ class DatabaseQueue implements IBatchQueueProvider
       $this->_queueMapper()->getTableName()
     );
 
-    $query   = 'INSERT INTO '.$tableName.' (' . implode(", ", $escFields) . ') VALUES ';
+    $query   = 'INSERT INTO ' . $tableName
+      . ' (' . implode(", ", $escFields) . ') VALUES ';
     $inserts = [];
     foreach($data as $item)
     {
