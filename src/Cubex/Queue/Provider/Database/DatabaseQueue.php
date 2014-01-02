@@ -120,10 +120,24 @@ class DatabaseQueue implements IBatchQueueProvider
     }
   }
 
+  public function setOwnKey($key)
+  {
+    $this->_ownKey = $key;
+  }
+
+  protected function _getOwnKey()
+  {
+    if(!$this->_ownKey)
+    {
+      $this->_ownKey = FileSystem::readRandomCharacters(30);
+    }
+    return $this->_ownKey;
+  }
+
   public function consume(IQueue $queue, IQueueConsumer $consumer)
   {
     $this->_maxAttempts = $this->config()->getInt("max_attempts", 3);
-    $this->_ownKey      = FileSystem::readRandomCharacters(30);
+    $this->_ownKey      = $this->_getOwnKey();
     $this->_waits       = 0;
 
     if($consumer instanceof IBatchQueueConsumer)
@@ -152,7 +166,7 @@ class DatabaseQueue implements IBatchQueueProvider
       'locked',
       1,
       'locked_by',
-      $this->_ownKey,
+      $this->_getOwnKey(),
       'queue_name',
       $queue->name(),
       'locked',
@@ -180,9 +194,9 @@ class DatabaseQueue implements IBatchQueueProvider
       $collection   = $this->_lockRecords($queue, $batchSize);
       $batchMappers = $collection->loadWhere(
         [
-        'locked'     => 1,
-        'locked_by'  => $this->_ownKey,
-        'queue_name' => $queue->name()
+          'locked'     => 1,
+          'locked_by'  => $this->_getOwnKey(),
+          'queue_name' => $queue->name()
         ]
       )->get();
 
@@ -247,9 +261,9 @@ class DatabaseQueue implements IBatchQueueProvider
       $collection = $this->_lockRecords($queue, 1);
       $mapper     = $collection->loadOneWhere(
         [
-        'locked'     => 1,
-        'locked_by'  => $this->_ownKey,
-        'queue_name' => $queue->name()
+          'locked'     => 1,
+          'locked_by'  => $this->_getOwnKey(),
+          'queue_name' => $queue->name()
         ]
       );
 
