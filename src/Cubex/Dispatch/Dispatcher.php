@@ -498,7 +498,16 @@ class Dispatcher
       }
       else
       {
-        $fullEntityPath               = $this->getProjectBase() . DS . $entity;
+        $sys = new FileSystem();
+        if($sys->isAbsolute($entity))
+        {
+          $fullEntityPath = $entity;
+        }
+        else
+        {
+          $fullEntityPath = $this->getProjectBase() . DS . $entity;
+        }
+
         self::$_dispatchInis[$entity] = $this->loadDispatchIni($fullEntityPath);
       }
     }
@@ -789,6 +798,8 @@ class Dispatcher
 
     $pathToResource = $this->addRootResourceDirectory($uri);
 
+    //TODO: Strip off cache busters while generating resource e.g. #iefix
+
     if($entityMap)
     {
       if(isset($entityMap[$pathToResource]))
@@ -805,7 +816,6 @@ class Dispatcher
       $resourceHash,
       $pathToResource
     );
-
     return $this->getDispatchUrl($dispatchPath, Container::request());
   }
 
