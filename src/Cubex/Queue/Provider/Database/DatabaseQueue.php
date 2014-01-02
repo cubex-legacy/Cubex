@@ -22,6 +22,7 @@ class DatabaseQueue implements IBatchQueueProvider
   protected $_map;
   protected $_maxAttempts;
   protected $_ownKey;
+  protected $_isCustomKey = false;
   protected $_waits;
   protected $_deleteBatchIds = [];
 
@@ -123,7 +124,8 @@ class DatabaseQueue implements IBatchQueueProvider
 
   public function setOwnKey($key)
   {
-    $this->_ownKey = $key;
+    $this->_ownKey      = $key;
+    $this->_isCustomKey = true;
   }
 
   protected function _getOwnKey()
@@ -161,13 +163,15 @@ class DatabaseQueue implements IBatchQueueProvider
     $now->setTimezone(new \DateTimeZone('UTC'));
 
     $collection->runQuery(
-      "UPDATE %T SET %C = %d, %C = %s " .
+      "UPDATE %T SET %C = %d, %C = %s, %C = %s " .
       "WHERE %C = %s AND %C = %d AND %C <= %s LIMIT %d",
       $mapper->getTableName(),
       'locked',
       1,
       'locked_by',
       $this->_getOwnKey(),
+      'updated_at',
+      DateTimeHelper::formattedDateFromAnything(time()),
       'queue_name',
       $queue->name(),
       'locked',
@@ -204,7 +208,7 @@ class DatabaseQueue implements IBatchQueueProvider
 
       if($batchMappers->count() === 0)
       {
-        $keepAlive = $this->_handleWait($consumer);
+        $keepAlive = $this->_handleWait($queue, $consumer);
         if(!$keepAlive)
         {
           break;
@@ -271,7 +275,7 @@ class DatabaseQueue implements IBatchQueueProvider
 
       if($mapper === null)
       {
-        $keepAlive = $this->_handleWait($consumer);
+        $keepAlive = $this->_handleWait($queue, $consumer);
         if(!$keepAlive)
         {
           break;
@@ -310,12 +314,12 @@ class DatabaseQueue implements IBatchQueueProvider
     }
   }
 
-  protected function _handleWait(IQueueConsumer $consumer)
+  protected function _handleWait(IQueue $queue, IQueueConsumer $consumer)
   {
     $releaseTime = $consumer->lockReleaseTime();
     if($releaseTime !== false)
     {
-      $this->_releaseLocks($releaseTime);
+      $this->_releaseLocks($queue, $releaseTime);
     }
 
     $waitTime = $consumer->waitTime($this->_waits);
@@ -326,28 +330,34 @@ class DatabaseQueue implements IBatchQueueProvider
     else if($waitTime > 0)
     {
       $this->_waits++;
-      \Log::debug('Nothing to consume, sleeping for '.$waitTime);
+      \Log::debug('Nothing to consume, sleeping for ' . $waitTime);
       sleep($waitTime);
     }
     return true;
   }
 
-  protected function _releaseLocks($releaseTime)
+  protected function _releaseLocks(IQueue $queue, $releaseTime)
   {
-    $mapper = $this->_queueMapper();
-    $query  = ParseQuery::parse(
-      $mapper->connection(),
-      "UPDATE %T SET %C = 0, %C = NULL, %C = %s WHERE %C = 1 AND %C < %s",
-      $mapper->getTableName(),
-      'locked',
-      'locked_by',
-      'updated_at',
-      DateTimeHelper::formattedDateFromAnything(time()),
-      'locked',
-      'updated_at',
-      DateTimeHelper::formattedDateFromAnything(time() - $releaseTime)
-    );
-    $mapper->connection()->query($query);
+    if(!$this->_isCustomKey)
+    {
+      $mapper = $this->_queueMapper();
+      $query  = ParseQuery::parse(
+        $mapper->connection(),
+        "UPDATE %T SET %C = 0, %C = NULL, %C = %s " .
+        "WHERE %C = %s AND %C = 1 AND %C < %s",
+        $mapper->getTableName(),
+        'locked',
+        'locked_by',
+        'updated_at',
+        DateTimeHelper::formattedDateFromAnything(time()),
+        'queue_name',
+        $queue->name(),
+        'locked',
+        'updated_at',
+        DateTimeHelper::formattedDateFromAnything(time() - $releaseTime)
+      );
+      $mapper->connection()->query($query);
+    }
   }
 
   protected function _queueMapper($createNew = false, $createTable = false)
