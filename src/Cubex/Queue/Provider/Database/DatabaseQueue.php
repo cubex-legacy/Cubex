@@ -320,10 +320,12 @@ class DatabaseQueue implements IBatchQueueProvider
     $mapper = $this->_queueMapper();
     $query  = ParseQuery::parse(
       $mapper->connection(),
-      "UPDATE %T SET %C = 0, %C = NULL WHERE %C = 1 AND %C < %s",
+      "UPDATE %T SET %C = 0, %C = NULL, %C = %s WHERE %C = 1 AND %C < %s",
       $mapper->getTableName(),
       'locked',
       'locked_by',
+      'updated_at',
+      DateTimeHelper::formattedDateFromAnything(time()),
       'locked',
       'updated_at',
       DateTimeHelper::formattedDateFromAnything(time() - $releaseTime)
