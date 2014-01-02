@@ -232,6 +232,7 @@ class AmqpQueue implements IBatchQueueProvider
         {
           $this->_waits++;
           sleep($waitTime);
+          $this->_reconnect($queue);
         }
       }
     }
