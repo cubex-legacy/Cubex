@@ -162,7 +162,7 @@ class DatabaseQueue implements IBatchQueueProvider
 
     $collection->runQuery(
       "UPDATE %T SET %C = %d, %C = %s " .
-      "WHERE %C = %s AND %C = %d AND %C <= %s LIMIT " . $limit,
+      "WHERE %C = %s AND %C = %d AND %C <= %s LIMIT %d",
       $mapper->getTableName(),
       'locked',
       1,
@@ -173,7 +173,8 @@ class DatabaseQueue implements IBatchQueueProvider
       'locked',
       0,
       'available_from',
-      $now->format('Y-m-d H:i:s')
+      $now->format('Y-m-d H:i:s'),
+      $limit
     );
     $collection->setColumns(['id', 'data', 'attempts']);
     return $collection;
