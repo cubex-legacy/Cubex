@@ -279,9 +279,10 @@ class DBBuilder
             $default = $v;
             break;
           case 'enumclass':
-            $v = preg_filter('/[^A-Za-z0-9\\\\]/', '', $v);
-            if(class_exists($v))
+            $matched = preg_match('/[A-Za-z0-9\\\\]+/', $v, $matches);
+            if($matched && class_exists($matches[0]))
             {
+              $v        = $matches[0];
               $options  = new $v;
               $dataType = DataType::ENUM;
             }
