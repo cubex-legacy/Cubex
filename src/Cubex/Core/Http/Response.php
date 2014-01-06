@@ -15,6 +15,7 @@ class Response
 
   protected $_httpStatus = 200;
   protected $_renderType = null;
+  protected $_disableCacheControl = false;
 
   /**
    * Number of seconds to cache response
@@ -395,10 +396,16 @@ class Response
         //Force no cache | Mayan EOW
         $this->addHeader("Expires", "Fri, 21 Dec 2012 11:11:11 GMT");
         $this->addHeader("Pragma", "no-cache");
-        $this->addHeader(
-          "Cache-Control",
-          "private, no-cache, no-store, must-revalidate"
-        );
+
+        // Disable no-cache and no-store on https connections
+        // https://support.microsoft.com/kb/323308
+        if(!$this->_disableCacheControl)
+        {
+          $this->addHeader(
+            "Cache-Control",
+            ("private, no-cache, no-store, must-revalidate")
+          );
+        }
       }
 
       foreach($this->_headers as $header)
@@ -500,6 +507,27 @@ class Response
   public function statusReason($code)
   {
     return isset(self::$statusTexts[$code]) ? self::$statusTexts[$code] : '';
+  }
+
+  /**
+   * Prepare response object with request
+   */
+  public function prepare(Request $request)
+  {
+    // @link http://support.microsoft.com/kb/323308
+    if($request->isHttps() && preg_match(
+      '/MSIE (.*?);/i',
+      $request->serverVariables('HTTP_USER_AGENT'),
+      $match
+    ) == 1
+    )
+    {
+      if(intval(preg_replace("/(MSIE )(.*?);/", "$2", $match[0])) < 9)
+      {
+        $this->_disableCacheControl = true;
+      }
+    }
+    return $this;
   }
 
   /**

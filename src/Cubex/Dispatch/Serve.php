@@ -88,6 +88,7 @@ class Serve extends Dispatcher implements IDispatchable
     else
     {
       $domain = $request->domain() . "." . $request->tld();
+      $response->prepare($request);
       $this->_buildResponse($response, $domain);
     }
 
