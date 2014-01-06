@@ -63,7 +63,7 @@ abstract class DataMapper
   /**
    * @var \Cubex\Data\Attribute\Attribute[]
    */
-  protected $_attributes;
+  protected $_attributes = [];
   protected $_invalidAttributes;
   protected $_exists = false;
   protected $_autoTimestamp = true;
