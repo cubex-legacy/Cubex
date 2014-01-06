@@ -164,7 +164,8 @@ class DatabaseQueue implements IBatchQueueProvider
 
     $collection->runQuery(
       "UPDATE %T SET %C = %d, %C = %s, %C = %s " .
-      "WHERE %C = %s AND %C = %d AND %C <= %s LIMIT %d",
+      "WHERE %C = %s AND (%C = %d OR %C = %s) AND %C <= %s " .
+      "ORDER BY %C DESC, %C LIMIT %d",
       $mapper->getTableName(),
       'locked',
       1,
@@ -176,8 +177,12 @@ class DatabaseQueue implements IBatchQueueProvider
       $queue->name(),
       'locked',
       0,
+      'locked_by',
+      $this->_getOwnKey(),
       'available_from',
       $now->format('Y-m-d H:i:s'),
+      'locked_by',
+      'id',
       $limit
     );
     $collection->setColumns(['id', 'data', 'attempts']);
