@@ -45,7 +45,7 @@ class Dependency extends Dispatcher
     $domainHash   = $this->generateDomainHash($domain);
     $entityHash   = $this->generateEntityHash($entity);
     $resourceHash = $this->getNomapHash();
-    $ini = null;
+    $ini          = null;
 
     if($event->getSource() instanceof ITheme)
     {
@@ -55,19 +55,30 @@ class Dependency extends Dispatcher
         false
       );
 
-      $themeIni = $this->getThemeConfig($relativePath);
+      if($this->getFileSystem()->isAbsolute(
+        $event->getSource()->getIniFileDirectory()
+      )
+      )
+      {
+        $themePath = $event->getSource()->getIniFileDirectory();
+      }
+      else
+      {
+        $themePath = $relativePath;
+      }
+
+      $themeIni = $this->getThemeConfig($themePath);
       if(idx($themeIni, "res_dir", false))
       {
         $ini = $this->getDispatchIni(
-          $relativePath . DS . $themeIni["res_dir"]
+          ($themePath . DS . $themeIni["res_dir"])
         );
       }
 
       if($ini !== null)
       {
-        $entityHash   = str_replace("/", ",", $relativePath);
+        $entityHash = str_replace("/", ",", $relativePath);
       }
-
     }
 
     if($ini === null)
