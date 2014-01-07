@@ -80,7 +80,9 @@ class Form extends DataMapper implements IRenderable
 
       if($attribute instanceof FormElement)
       {
-        if($attribute->type() === FormElement::CHECKBOX)
+        if($attribute->type() === FormElement::CHECKBOX
+          || $attribute->type() === FormElement::MULTI_CHECKBOX
+        )
         {
           $data[$attribute->name()] = false;
         }
