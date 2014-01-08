@@ -800,7 +800,8 @@ abstract class CliCommand implements ICliTask, IDocBlockAware
       'configure',
       'getConfig',
       'config',
-      'argumentIsConfigured'
+      'argumentIsConfigured',
+      '__isset'
     ];
   }
 
