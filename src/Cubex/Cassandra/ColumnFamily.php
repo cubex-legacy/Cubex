@@ -347,10 +347,10 @@ class ColumnFamily
 
   public function getSliceChunked(
     $key, $start = '', $end = '', $reverse = false, $limit = null,
-    $batchSize = 100
+    $chunkSize = 100
   )
   {
-    if($batchSize <= 1)
+    if($chunkSize <= 1)
     {
       throw new \InvalidArgumentException('Batch size must be greater than 1');
     }
@@ -360,13 +360,13 @@ class ColumnFamily
     {
       if($limit !== null)
       {
-        $thisBatchSize = min($batchSize, $limit - $total);
+        $thisChunkSize = min($chunkSize, $limit - $total);
       }
       else
       {
-        $thisBatchSize = $batchSize;
+        $thisChunkSize = $chunkSize;
       }
-      $columns = $this->getSlice($key, $start, $end, $reverse, $thisBatchSize);
+      $columns = $this->getSlice($key, $start, $end, $reverse, $thisChunkSize);
       $result  = $result + $columns;
 
       end($columns);
@@ -374,7 +374,7 @@ class ColumnFamily
       $thisTotal = count($columns);
       $total += $thisTotal;
     }
-    while($thisTotal === $batchSize && ($limit === null || $total <= $limit));
+    while($thisTotal === $chunkSize && ($limit === null || $total <= $limit));
 
     return $result;
   }
