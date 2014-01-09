@@ -1304,6 +1304,7 @@ class ColumnFamily
         else
         {
           Log::debug("Retrying read ($retries) $this->_name::$method");
+          $this->disconnect();
         }
       }
     }
