@@ -685,8 +685,8 @@ class ColumnFamily
       $mutations[] = new Mutation(
         [
           'column_or_supercolumn' => new ColumnOrSuperColumn(
-              ['column' => $column]
-            )
+            ['column' => $column]
+          )
         ]
       );
     }
@@ -861,8 +861,8 @@ class ColumnFamily
           new Mutation(
             [
               'column_or_supercolumn' => new ColumnOrSuperColumn(
-                  ['counter_column' => $counter]
-                )
+                ['counter_column' => $counter]
+              )
             ]
           )
         );
