@@ -345,6 +345,40 @@ class ColumnFamily
     return $this->_formColumnResult($result);
   }
 
+  public function getSliceChunked(
+    $key, $start = '', $end = '', $reverse = false, $limit = null,
+    $batchSize = 100
+  )
+  {
+    if($batchSize <= 1)
+    {
+      throw new \InvalidArgumentException('Batch size must be greater than 1');
+    }
+    $result = array();
+    $total  = 0;
+    do
+    {
+      if($limit !== null)
+      {
+        $thisBatchSize = min($batchSize, $limit - $total);
+      }
+      else
+      {
+        $thisBatchSize = $batchSize;
+      }
+      $columns = $this->getSlice($key, $start, $end, $reverse, $thisBatchSize);
+      $result  = $result + $columns;
+
+      end($columns);
+      $start     = key($columns);
+      $thisTotal = count($columns);
+      $total += $thisTotal;
+    }
+    while($thisTotal === $batchSize && ($limit === null || $total <= $limit));
+
+    return $result;
+  }
+
   public function getSlice(
     $key, $start = '', $finish = '', $reverse = false, $limit = 100
   )
@@ -450,7 +484,7 @@ class ColumnFamily
     foreach($keys as $key)
     {
       $final[$key] = !isset($result[$key]) ?
-      null : $this->_formColumnResult($result[$key]);
+        null : $this->_formColumnResult($result[$key]);
     }
 
     return $final;
@@ -517,7 +551,7 @@ class ColumnFamily
     foreach($keys as $key)
     {
       $final[$key] = !isset($result[$key]) ?
-      null : $this->_formColumnResult($result[$key]);
+        null : $this->_formColumnResult($result[$key]);
     }
 
     return $final;
@@ -540,8 +574,8 @@ class ColumnFamily
     }
     $range        = new KeyRange(
       [
-      'start_key' => $start,
-      'end_key'   => $finish
+        'start_key' => $start,
+        'end_key'   => $finish
       ]
     );
     $range->count = $count;
@@ -566,8 +600,8 @@ class ColumnFamily
     }
     $range        = new KeyRange(
       [
-      'start_token' => "$startToken",
-      'end_token'   => "$finishToken"
+        'start_token' => "$startToken",
+        'end_token'   => "$finishToken"
       ]
     );
     $range->count = $count;
@@ -650,9 +684,9 @@ class ColumnFamily
 
       $mutations[] = new Mutation(
         [
-        'column_or_supercolumn' => new ColumnOrSuperColumn(
-          ['column' => $column]
-        )
+          'column_or_supercolumn' => new ColumnOrSuperColumn(
+              ['column' => $column]
+            )
         ]
       );
     }
@@ -826,9 +860,9 @@ class ColumnFamily
           $key,
           new Mutation(
             [
-            'column_or_supercolumn' => new ColumnOrSuperColumn(
-              ['counter_column' => $counter]
-            )
+              'column_or_supercolumn' => new ColumnOrSuperColumn(
+                  ['counter_column' => $counter]
+                )
             ]
           )
         );
