@@ -239,20 +239,6 @@ class EventManager
       }
     }
 
-    if(isset(self::$_spies[$eventName]))
-    {
-      foreach(self::$_spies[$eventName] as $spy)
-      {
-        try
-        {
-          call_user_func($spy, $event);
-        }
-        catch(\Exception $e)
-        {
-        }
-      }
-    }
-
     $result = [];
     foreach($listeners as $listen)
     {
@@ -266,7 +252,7 @@ class EventManager
         $result[] = $res;
         if($returnFirst)
         {
-          return $res;
+          return self::_informant($eventName, $event, $res);
         }
       }
       if($event->isPropagationStopped())
@@ -275,7 +261,28 @@ class EventManager
       }
     }
 
-    return $returnFirst ? null : $result;
+    return self::_informant($eventName, $event, $returnFirst ? null : $result);
+  }
+
+  protected static function _informant(
+    $eventName, IEvent $event, $response = null
+  )
+  {
+    if(isset(self::$_spies[$eventName]))
+    {
+      foreach(self::$_spies[$eventName] as $spy)
+      {
+        try
+        {
+          call_user_func($spy, $event, $response);
+        }
+        catch(\Exception $e)
+        {
+        }
+      }
+    }
+    
+    return $response;
   }
 
   /**
