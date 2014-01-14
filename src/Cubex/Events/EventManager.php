@@ -52,6 +52,7 @@ class EventManager
 
   protected static $_nsListenEvents = array();
   protected static $_listeners = array();
+  protected static $_spies = array();
   protected static $_nsListeners = array();
 
   /**
@@ -77,6 +78,22 @@ class EventManager
     {
       self::_listen($eventName, $callback, $namespace);
     }
+  }
+
+  /**
+   * Spy on an event
+   *
+   * @param          $eventName
+   * @param callable $callback
+   */
+  public static function spy($eventName, callable $callback)
+  {
+    if(!isset(self::$_spies[$eventName]))
+    {
+      self::$_spies[$eventName] = [];
+    }
+
+    self::$_spies[$eventName][] = $callback;
   }
 
   /**
@@ -219,6 +236,20 @@ class EventManager
           $nsListeners,
           self::getListeners($eventName)
         );
+      }
+    }
+
+    if(isset(self::$_spies[$eventName]))
+    {
+      foreach(self::$_spies[$eventName] as $spy)
+      {
+        try
+        {
+          call_user_func($spy, $event);
+        }
+        catch(\Exception $e)
+        {
+        }
       }
     }
 
