@@ -1270,7 +1270,7 @@ class ColumnFamily
       {
         $startTime = microtime(true);
         $response  = call_user_func_array([$this, $method], $args);
-        $this->_triggerEvent($startTime, $method, $args);
+        $this->_triggerEvent($startTime, $method, $args, $response);
         return $response;
       }
       catch(NotFoundException $e)
@@ -1314,7 +1314,7 @@ class ColumnFamily
     throw new \Exception("Read retry on '$method' did something bad :s");
   }
 
-  protected function _triggerEvent($startTime, $method, $args)
+  protected function _triggerEvent($startTime, $method, $args, $result)
   {
     $endTime = microtime(true);
     EventManager::trigger(
@@ -1326,7 +1326,8 @@ class ColumnFamily
         'column_family'  => $this->_name,
         'keyspace'       => $this->_keyspace,
         'method'         => $method,
-        'args'           => $args
+        'args'           => $args,
+        'result'         => $result
       ],
       $this
     );
