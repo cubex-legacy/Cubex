@@ -9,6 +9,7 @@ use cassandra\IndexClause;
 use Cubex\Data\Attribute\Attribute;
 use Cubex\Cassandra\DataType\BytesType;
 use Cubex\Cassandra\DataType\CassandraType;
+use Cubex\Events\EventManager;
 use Cubex\Log\Log;
 use Thrift\Exception\TApplicationException;
 use cassandra\AuthenticationException;
@@ -60,6 +61,8 @@ class ColumnFamily
    * @var DataType\BytesType
    */
   protected $_subColumnDataType;
+
+  const QUERY_EVENT = 'cassandra.columnfamily.event';
 
   public function __construct(Connection $connection, $name, $keyspace)
   {
@@ -684,9 +687,8 @@ class ColumnFamily
 
       $mutations[] = new Mutation(
         [
-          'column_or_supercolumn' => new ColumnOrSuperColumn(
-            ['column' => $column]
-          )
+          'column_or_supercolumn' =>
+            new ColumnOrSuperColumn(['column' => $column])
         ]
       );
     }
@@ -860,9 +862,8 @@ class ColumnFamily
           $key,
           new Mutation(
             [
-              'column_or_supercolumn' => new ColumnOrSuperColumn(
-                ['counter_column' => $counter]
-              )
+              'column_or_supercolumn' =>
+                new ColumnOrSuperColumn(['counter_column' => $counter])
             ]
           )
         );
@@ -1267,7 +1268,9 @@ class ColumnFamily
     {
       try
       {
-        $response = call_user_func_array([$this, $method], $args);
+        $startTime = microtime(true);
+        $response  = call_user_func_array([$this, $method], $args);
+        $this->_triggerEvent($startTime, $method, $args);
         return $response;
       }
       catch(NotFoundException $e)
@@ -1309,5 +1312,23 @@ class ColumnFamily
       }
     }
     throw new \Exception("Read retry on '$method' did something bad :s");
+  }
+
+  protected function _triggerEvent($startTime, $method, $args)
+  {
+    $endTime = microtime(true);
+    EventManager::trigger(
+      self::QUERY_EVENT,
+      [
+        'execution_time' => $endTime - $startTime,
+        'start_time'     => $startTime,
+        'end_time'       => $endTime,
+        'column_family'  => $this->_name,
+        'keyspace'       => $this->_keyspace,
+        'method'         => $method,
+        'args'           => $args
+      ],
+      $this
+    );
   }
 }
