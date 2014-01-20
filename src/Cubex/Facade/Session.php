@@ -76,7 +76,7 @@ class Session extends BaseFacade
   {
     $accessor = static::getAccessor();
 
-    return $accessor->get($key) === null;
+    return $accessor->get($key) !== null;
   }
 
   /**
