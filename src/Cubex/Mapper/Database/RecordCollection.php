@@ -28,10 +28,26 @@ class RecordCollection extends Collection
    */
   protected $_mapperType;
   protected $_preFetches;
+  protected $_connectionMode;
 
   public function __construct(RecordMapper $map, array $mappers = null)
   {
     parent::__construct($map, $mappers);
+  }
+
+  public function setConnectionMode(ConnectionMode $mode)
+  {
+    $this->_connectionMode = $mode;
+    return $this;
+  }
+
+  public function getConnectionMode()
+  {
+    if($this->_connectionMode === null)
+    {
+      return new ConnectionMode(ConnectionMode::READ);
+    }
+    return $this->_connectionMode;
   }
 
   public function setLimit($offset = 0, $limit = 100)
@@ -191,9 +207,7 @@ class RecordCollection extends Collection
 
   public function connection()
   {
-    return $this->_mapperType->connection(
-      new ConnectionMode(ConnectionMode::READ)
-    );
+    return $this->_mapperType->connection($this->getConnectionMode());
   }
 
   protected function _makeTableQuery($columns)
