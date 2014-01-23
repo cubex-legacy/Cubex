@@ -14,7 +14,7 @@ use Cubex\Mapper\Database\RecordMapper;
  * @index locked, locked_by, queue_name
  * @index queue_name, locked, available_from
  */
-class QueueMapper extends RecordMapper implements ICubid
+class QueueMapper extends RecordMapper
 {
   public $queueName;
   /**
@@ -36,7 +36,7 @@ class QueueMapper extends RecordMapper implements ICubid
    */
   public $availableFrom;
 
-  protected $_idType = self::ID_CUBID;
+  protected $_idType = self::ID_UNIQID;
 
   public function getIdStorageDataType()
   {
@@ -46,21 +46,5 @@ class QueueMapper extends RecordMapper implements ICubid
   protected function _configure()
   {
     $this->_attribute("data")->setSerializer(Attribute::SERIALIZATION_JSON);
-  }
-
-  /**
-   * @return string sub type for the class e.g. USER | COMMENT
-   */
-  public static function getCubidSubType()
-  {
-    return 'Q';
-  }
-
-  /**
-   * @return int Length of the final CUBID
-   */
-  public static function getCubidLength()
-  {
-    return 32;
   }
 }
