@@ -34,7 +34,7 @@ class ShardedDatabaseQueue extends DatabaseQueue
     }
     return $this->_numTables;
   }
-#
+
   protected function _getDBServices()
   {
     if($this->_dbServices === null)
