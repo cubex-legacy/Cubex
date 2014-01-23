@@ -163,6 +163,14 @@ abstract class RecordMapper extends DataMapper
     return $this;
   }
 
+  public function loadFromMaster()
+  {
+    $this->deleteEphemeralCache();
+    $this->load($this->id());
+    $this->_load(ConnectionMode::WRITE());
+    return $this;
+  }
+
   public function reload()
   {
     $this->deleteEphemeralCache();
@@ -171,7 +179,7 @@ abstract class RecordMapper extends DataMapper
     return $this;
   }
 
-  protected function _load()
+  protected function _load(ConnectionMode $readMode = null)
   {
     if($this->_loadPending === null)
     {
@@ -197,7 +205,9 @@ abstract class RecordMapper extends DataMapper
       }
     }
 
-    $connection = $this->connection(ConnectionMode::READ());
+    $connection = $this->connection(
+      $readMode === null ? ConnectionMode::READ() : $readMode
+    );
 
     $idAttr = $this->getAttribute($this->getIdKey());
     if($idAttr instanceof CompositeAttribute)
@@ -477,8 +487,8 @@ abstract class RecordMapper extends DataMapper
       return in_array(
         $config[self::CONFIG_IDS],
         [
-        self::ID_COMPOSITE,
-        self::ID_COMPOSITE_SPLIT
+          self::ID_COMPOSITE,
+          self::ID_COMPOSITE_SPLIT
         ]
       );
     }
@@ -627,9 +637,9 @@ abstract class RecordMapper extends DataMapper
           }
 
           if(
-          $this->_autoTimestamp
-          && $attr->name() != $this->createdAttribute()
-          && $attr->name() != $this->updatedAttribute()
+            $this->_autoTimestamp
+            && $attr->name() != $this->createdAttribute()
+            && $attr->name() != $this->updatedAttribute()
           )
           {
             $this->_changes[$attr->name()] = [
@@ -665,9 +675,9 @@ abstract class RecordMapper extends DataMapper
             $updates[] = ParseQuery::parse(
               $connection,
               [
-              "%C = %ns",
-              $this->stringToColumnName($attr->name()),
-              $val
+                "%C = %ns",
+                $this->stringToColumnName($attr->name()),
+                $val
               ]
             );
           }
@@ -750,7 +760,7 @@ abstract class RecordMapper extends DataMapper
     $connection = $this->connection(ConnectionMode::WRITE());
 
     $pattern = 'INSERT INTO %T SET ' . $this->idPattern(',') . ' , %C = %d'
-    . ' ON DUPLICATE KEY UPDATE %C = IFNULL(%C, 0) + %d';
+      . ' ON DUPLICATE KEY UPDATE %C = IFNULL(%C, 0) + %d';
 
     $idValues = [];
     $idAttr   = $this->getAttribute($this->getIdKey());
@@ -773,11 +783,11 @@ abstract class RecordMapper extends DataMapper
       [$pattern, $this->getTableName()],
       $idValues,
       [
-      $attribute->name(),
-      $count,
-      $attribute->name(),
-      $attribute->name(),
-      $count,
+        $attribute->name(),
+        $count,
+        $attribute->name(),
+        $attribute->name(),
+        $count,
       ]
     );
     $query = ParseQuery::parse($connection, $args);
@@ -964,8 +974,8 @@ abstract class RecordMapper extends DataMapper
     $collection->setColumns($columns);
     return call_user_func_array(
       [
-      $collection,
-      'loadOneWhere'
+        $collection,
+        'loadOneWhere'
       ],
       $args
     );
