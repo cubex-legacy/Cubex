@@ -186,6 +186,17 @@ class DatabaseQueue implements IBatchQueueProvider
       $limit
     );
     $collection->setColumns(['id', 'data', 'attempts']);
+
+    $collection->loadWhere(
+      [
+        'locked'     => 1,
+        'locked_by'  => $this->_getOwnKey(),
+        'queue_name' => $queue->name()
+      ]
+    );
+
+    $collection->get();
+
     return $collection;
   }
 
@@ -202,14 +213,7 @@ class DatabaseQueue implements IBatchQueueProvider
 
     while(true)
     {
-      $collection   = $this->_lockRecords($queue, $batchSize);
-      $batchMappers = $collection->loadWhere(
-        [
-          'locked'     => 1,
-          'locked_by'  => $this->_getOwnKey(),
-          'queue_name' => $queue->name()
-        ]
-      )->get();
+      $batchMappers = $this->_lockRecords($queue, $batchSize);
 
       if($batchMappers->count() === 0)
       {
@@ -270,13 +274,7 @@ class DatabaseQueue implements IBatchQueueProvider
     while(true)
     {
       $collection = $this->_lockRecords($queue, 1);
-      $mapper     = $collection->loadOneWhere(
-        [
-          'locked'     => 1,
-          'locked_by'  => $this->_getOwnKey(),
-          'queue_name' => $queue->name()
-        ]
-      );
+      $mapper = $collection->first();
 
       if($mapper === null)
       {
