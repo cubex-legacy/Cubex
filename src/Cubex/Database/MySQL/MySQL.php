@@ -23,7 +23,11 @@ class MySQL implements IDatabaseService
   protected $_deadlockRetries = 5;
 
   private static $_connectionCache = [];
-  protected $_escapeStringCache = [];
+  private $_escapeStringCache = [];
+  /**
+   * @var \mysqli_stmt[]
+   */
+  private $_stmtCache = [];
 
   protected $_autoContextSwitch = true;
 
@@ -95,6 +99,7 @@ class MySQL implements IDatabaseService
       $hostname = current($slaves);
     }
 
+    $oldConnection = $this->_connection;
     $this->_connection = self::_getConnection(
       $hostname,
       $database,
@@ -103,6 +108,10 @@ class MySQL implements IDatabaseService
       $this->_config->getStr('port', 3306),
       $this->_config
     );
+    if($this->_connection != $oldConnection)
+    {
+      $this->_clearStmtCache();
+    }
 
     if($this->_connection->connect_errno)
     {
@@ -116,11 +125,21 @@ class MySQL implements IDatabaseService
     return $this;
   }
 
+  private function _clearStmtCache()
+  {
+    foreach($this->_stmtCache as $stmt)
+    {
+      $stmt->close();
+    }
+    $this->_stmtCache = [];
+  }
+
   /**
    *
    */
   public function disconnect()
   {
+    $this->_clearStmtCache();
     $this->_connection->close();
   }
 
@@ -147,7 +166,7 @@ class MySQL implements IDatabaseService
       return $column;
     }
 
-    $column = str_replace('`', '', $this->escapeString($column));
+    $column = str_replace('`', '', $this->escapeString($column, true));
 
     if(empty($column))
     {
@@ -163,11 +182,12 @@ class MySQL implements IDatabaseService
 
   /**
    * @param $string
+   * @param bool $useCache
    *
    * @return mixed
    * @throws \Exception
    */
-  public function escapeString($string)
+  public function escapeString($string, $useCache = false)
   {
     if($string === null || empty($string))
     {
@@ -177,13 +197,23 @@ class MySQL implements IDatabaseService
     //Correctly handle objects which perform toString e.g. Enums
     $string = (string)$string;
 
-    if(!isset($this->_escapeStringCache[$string]))
+    if($useCache)
+    {
+      if(!isset($this->_escapeStringCache[$string]))
+      {
+        $this->_prepareConnection('r');
+        $this->_escapeStringCache[$string] =
+          $this->_connection->real_escape_string($string);
+      }
+      $result = $this->_escapeStringCache[$string];
+    }
+    else
     {
       $this->_prepareConnection('r');
-      $this->_escapeStringCache[$string] =
-      $this->_connection->real_escape_string($string);
+      $result = $this->_connection->real_escape_string($string);
     }
-    return $this->_escapeStringCache[$string];
+
+    return $result;
   }
 
   public function errorNo()
@@ -266,6 +296,50 @@ class MySQL implements IDatabaseService
   {
     $this->_prepareConnection(starts_with($query, "select", false) ? 'r' : 'w');
     return $this->_doQuery($query);
+  }
+
+  /**
+   * Prepare and execute a statement
+   *
+   * @param string $query
+   * @param array $values
+   * @param bool $useCache
+   *
+   * @return bool
+   */
+  public function prepareAndExecute($query, $values, $useCache = true)
+  {
+    $this->_prepareConnection(starts_with($query, "select", false) ? 'r' : 'w');
+
+    if($useCache && isset($this->_stmtCache[$query]))
+    {
+      $stmt = $this->_stmtCache[$query];
+    }
+    else
+    {
+      $stmt = $this->_connection->prepare($query);
+      if($useCache)
+      {
+        $this->_stmtCache[$query] = $stmt;
+      }
+    }
+
+    // TODO: Use proper types instead of making everything a string
+    $args = [str_repeat('s', count($values))];
+    foreach($values as &$value)
+    {
+      $args[] = &$value;
+    }
+
+    call_user_func_array([$stmt, 'bind_param'], $args);
+    // TODO: Add deadlock retries like in _doQuery
+    $result = $stmt->execute();
+    if(! $useCache)
+    {
+      $stmt->close();
+    }
+
+    return $result;
   }
 
   /**

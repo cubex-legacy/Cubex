@@ -36,6 +36,17 @@ interface IDatabaseService extends IService
   public function query($query);
 
   /**
+   * Prepare and execute a statement
+   * (only useful for operations that don't return anything)
+   *
+   * @param string $query
+   * @param array $values
+   *
+   * @return bool
+   */
+  public function prepareAndExecute($query, $values);
+
+  /**
    * Get a single field
    *
    * @param $query
