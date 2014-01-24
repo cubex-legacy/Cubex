@@ -5,6 +5,7 @@
 
 namespace Cubex\Mapper\Database\I18n;
 
+use Cubex\Database\ConnectionMode;
 use Cubex\Mapper\Database\RecordMapper;
 
 abstract class I18nRecordMapper extends RecordMapper
@@ -61,7 +62,7 @@ abstract class I18nRecordMapper extends RecordMapper
     return parent::reload();
   }
 
-  protected function _load()
+  protected function _load(ConnectionMode $readMode = null)
   {
     $loaded = parent::_load();
     if($loaded && $this->_textMapper)
