@@ -481,7 +481,7 @@ abstract class DataMapper
       $attr = $this->_attribute($attribute);
 
       if($this->_validationType === self::VALIDATION_ONSET
-      && !$bypassValidation
+        && !$bypassValidation
       )
       {
         $valid = $attr->isValid(
@@ -1006,7 +1006,6 @@ abstract class DataMapper
       }
       else
       {
-        $k      = $this->_cleanAttributeName($k);
         $exists = $this->attributeExists($k);
         if(!$exists && $createAttributes)
         {
@@ -1230,7 +1229,7 @@ abstract class DataMapper
 
     $config = $this->getConfiguration();
     if(isset($config[static::CONFIG_IDS])
-    && $config[static::CONFIG_IDS] !== static::ID_COMPOSITE
+      && $config[static::CONFIG_IDS] !== static::ID_COMPOSITE
     )
     {
       $this->setId(null);
@@ -1289,9 +1288,9 @@ abstract class DataMapper
         if($attr->isModified() && $attr->saveToDatabase())
         {
           if(
-          !$this->_autoTimestamp
-          || ($attr->name() != $this->createdAttribute()
-          && $attr->name() != $this->updatedAttribute())
+            !$this->_autoTimestamp
+            || ($attr->name() != $this->createdAttribute()
+              && $attr->name() != $this->updatedAttribute())
           )
           {
             $this->_changes[$attr->name()] = [
