@@ -185,10 +185,9 @@ class CassandraMapper extends DataMapper
 
         if($attr->isModified() && $attr->saveToDatabase())
         {
-          if(
-          !$this->_autoTimestamp
-          || ($attr->name() != $this->createdAttribute()
-          && $attr->name() != $this->updatedAttribute())
+          if(!$this->_autoTimestamp
+            || ($attr->name() != $this->createdAttribute()
+              && $attr->name() != $this->updatedAttribute())
           )
           {
             $columns[$attr->name()]        = $attr;
@@ -196,6 +195,7 @@ class CassandraMapper extends DataMapper
               'before' => $attr->originalData(),
               'after'  => $attr->serialize()
             ];
+            $attr->unsetModified();
           }
         }
       }
