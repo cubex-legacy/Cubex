@@ -550,6 +550,14 @@ abstract class RecordMapper extends DataMapper
   {
   }
 
+  public function saveAsNew(
+    $validate = false, $processAll = false, $failFirst = false
+  )
+  {
+    $this->_load();
+    return parent::saveAsNew();
+  }
+
   /**
    * @param bool|array $validate   all fields, or array of fields to validate
    * @param bool       $processAll Process all validators, or fail on first
