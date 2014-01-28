@@ -637,20 +637,22 @@ abstract class RecordMapper extends DataMapper
           }
         }
 
+        $attrName = $attr->name();
+
         if($attr->isModified() && $attr->saveToDatabase($this))
         {
-          if(in_array($attr->name(), $idFields) && $this->exists())
+          if(in_array($attrName, $idFields) && $this->exists())
           {
             throw new \Exception("You cannot update IDs on a pivot table");
           }
 
           if(
-            $this->_autoTimestamp
-            && $attr->name() != $this->createdAttribute()
-            && $attr->name() != $this->updatedAttribute()
+          $this->_autoTimestamp
+          && $attrName != $this->createdAttribute()
+          && $attrName != $this->updatedAttribute()
           )
           {
-            $this->_changes[$attr->name()] = [
+            $this->_changes[$attrName] = [
               'before' => $attr->originalData(),
               'after'  => $attr->data()
             ];
@@ -659,7 +661,7 @@ abstract class RecordMapper extends DataMapper
           $val = $attr->rawData();
           if($val instanceof \DateTime)
           {
-            $val = $val->format($this->getDateFormat($attr->name()));
+            $val = $val->format($this->getDateFormat($attrName));
           }
           else if($attr->hasSerializer())
           {
@@ -672,22 +674,15 @@ abstract class RecordMapper extends DataMapper
 
           if($cache !== null)
           {
-            $keyname         = $attr->name();
+            $keyname         = $attrName;
             $cache->$keyname = $val;
           }
 
-          $inserts[$this->stringToColumnName($attr->name())] = $val;
+          $inserts[$this->stringToColumnName($attrName)] = $val;
 
-          if($attr->name() != $this->createdAttribute())
+          if($attrName != $this->createdAttribute())
           {
-            $updates[] = ParseQuery::parse(
-              $connection,
-              [
-                "%C = %ns",
-                $this->stringToColumnName($attr->name()),
-                $val
-              ]
-            );
+            $updates[$this->stringToColumnName($attrName)] = $val;
           }
         }
       }
@@ -705,20 +700,32 @@ abstract class RecordMapper extends DataMapper
 
     if(!$this->exists())
     {
-      $pattern = 'INSERT INTO %T (%LC) VALUES(%Ls)';
+      $pattern = 'INSERT INTO %T (%LC) ' .
+        'VALUES(' . implode(',', array_fill(0, count($inserts), '?')) . ')';
 
       $args = array(
         $this->getTableName(),
         array_keys($inserts),
-        array_values($inserts),
       );
-
       array_unshift($args, $pattern);
+
       $query = ParseQuery::parse($connection, $args);
+      $values = array_values($inserts);
 
       if($this->id() !== null)
       {
-        $query .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
+        $query .= ' ON DUPLICATE KEY UPDATE ';
+        $updateParts = [];
+        $updateArgs = [];
+        foreach($updates as $col => $value)
+        {
+          $updateParts[] .= '%C=?';
+          $updateArgs[] = $col;
+          $values[] = $value;
+        }
+
+        array_unshift($updateArgs, implode(", ", $updateParts));
+        $query .= ParseQuery::parse($connection, $updateArgs);
       }
     }
     else
@@ -751,10 +758,24 @@ abstract class RecordMapper extends DataMapper
       }
 
       $query = ParseQuery::parse($connection, $args);
-      $query = str_replace('#UPDATES#', implode(', ', $updates), $query);
+      $values = [];
+
+      $updateParts = [];
+      $updateArgs = [];
+      foreach($updates as $col => $value)
+      {
+        $updateParts[] .= '%C=?';
+        $updateArgs[] = $col;
+        $values[] = $value;
+      }
+      array_unshift($updateArgs, implode(", ", $updateParts));
+
+      $query = str_replace(
+        '#UPDATES#', ParseQuery::parse($connection, $updateArgs), $query
+      );
     }
 
-    return $this->_saveQuery($query);
+    return $this->_saveQuery($query, $values);
   }
 
   public function decrement($attribute, $count = 1)
@@ -802,12 +823,19 @@ abstract class RecordMapper extends DataMapper
     return $this->_saveQuery($query);
   }
 
-  protected function _saveQuery($query)
+  protected function _saveQuery($query, $values = null)
   {
     $connection = $this->connection(ConnectionMode::WRITE());
     try
     {
-      $result = $connection->query($query);
+      if($values)
+      {
+        $result = $connection->prepareAndExecute($query, $values);
+      }
+      else
+      {
+        $result = $connection->query($query);
+      }
     }
     catch(\Exception $e)
     {

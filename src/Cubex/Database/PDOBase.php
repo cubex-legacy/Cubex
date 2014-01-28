@@ -104,6 +104,21 @@ abstract class PDOBase implements IDatabaseService
   }
 
   /**
+   * Prepare and execute a statement
+   * (only useful for operations that don't return anything)
+   *
+   * @param string $query
+   * @param array  $values
+   *
+   * @return bool
+   */
+  public function prepareAndExecute($query, $values)
+  {
+    $stmt = $this->_connection->prepare($query);
+    return $stmt->execute($values);
+  }
+
+  /**
    * @param $query
    *
    * @return bool
