@@ -438,18 +438,21 @@ class DispatchMapper extends Dispatcher
 
     $file = build_path($directory, $this->getDispatchIniFilename());
 
-    $newContent      = parse_ini_string($config);
-    $existingContent = parse_ini_file($file);
-
-    if(!empty($existingContent))
+    if(file_exists($file))
     {
-      foreach($existingContent as $section => $hashes)
+      $newContent      = parse_ini_string($config);
+      $existingContent = parse_ini_file($file);
+
+      if(!empty($existingContent))
       {
-        foreach($hashes as $hash => $path)
+        foreach($existingContent as $section => $hashes)
         {
-          if(!isset($newContent[$section][$hash]))
+          foreach($hashes as $hash => $path)
           {
-            $config = $section . "[$hash] = $path\n" . $config;
+            if(!isset($newContent[$section][$hash]))
+            {
+              $config = $section . "[$hash] = $path\n" . $config;
+            }
           }
         }
       }
