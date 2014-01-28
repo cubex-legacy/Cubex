@@ -20,6 +20,9 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class AmqpQueue implements IBatchQueueProvider
 {
+  const DATA_FORMAT_SERIALIZE = 'serialize';
+  const DATA_FORMAT_JSON = 'json';
+
   use ServiceConfigTrait;
 
   /**
@@ -53,6 +56,13 @@ class AmqpQueue implements IBatchQueueProvider
    * @var bool
    */
   protected $_persistentDefault = false;
+
+  /**
+   * Data format to use in the queue - 'serialize' or 'json'
+   *
+   * @var string
+   */
+  protected $_dataFormat = self::DATA_FORMAT_SERIALIZE;
 
   protected function _configureExchange()
   {
@@ -97,6 +107,13 @@ class AmqpQueue implements IBatchQueueProvider
       $this->_lastQueue = $name;
 
       $this->_persistentDefault = $this->config()->getBool('persistent', false);
+      $this->_dataFormat = $this->config()->getStr(
+        'data_format', self::DATA_FORMAT_SERIALIZE
+      );
+      if($this->_dataFormat != self::DATA_FORMAT_JSON)
+      {
+        $this->_dataFormat = self::DATA_FORMAT_SERIALIZE;
+      }
     }
   }
 
@@ -188,11 +205,35 @@ class AmqpQueue implements IBatchQueueProvider
     }
 
     $msg = new AMQPMessage(
-      serialize($data), ['delivery_mode' => $persistent ? 2 : 1]
+      $this->_encodeData($data), ['delivery_mode' => $persistent ? 2 : 1]
     );
     $this->_channel()->batch_basic_publish(
       $msg, $this->_exchange, $queue->name()
     );
+  }
+
+  protected function _encodeData($data)
+  {
+    switch($this->_dataFormat)
+    {
+      case self::DATA_FORMAT_JSON:
+        return json_encode($data);
+      case self::DATA_FORMAT_SERIALIZE:
+      default:
+        return serialize($data);
+    }
+  }
+
+  protected function _decodeData($data)
+  {
+    switch($this->_dataFormat)
+    {
+      case self::DATA_FORMAT_JSON:
+        return json_decode($data);
+      case self::DATA_FORMAT_SERIALIZE:
+      default:
+        return unserialize($data);
+    }
   }
 
   public function consume(IQueue $queue, IQueueConsumer $consumer)
@@ -268,7 +309,7 @@ class AmqpQueue implements IBatchQueueProvider
   {
     $result = $this->_currentConsumer->process(
       $this->_queue,
-      unserialize($msg->body)
+      $this->_decodeData($msg->body)
     );
     $this->_completeMessage($msg, $result);
   }
@@ -282,7 +323,7 @@ class AmqpQueue implements IBatchQueueProvider
      * @var $consumer IBatchQueueConsumer
      */
     $consumer = $this->_currentConsumer;
-    $consumer->process($this->_queue, unserialize($msg->body), $taskId);
+    $consumer->process($this->_queue, $this->_decodeData($msg->body), $taskId);
     $this->_processBatch();
   }
 
