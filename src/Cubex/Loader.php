@@ -103,15 +103,23 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     $this->setResponse($this->buildResponse());
     if($handleErrors)
     {
-      $run     = new \Whoops\Run();
-      $handler = new \Whoops\Handler\PrettyPageHandler();
-      $run->pushHandler($handler);
-      $throwNotices = \getenv('CUBEX_THROW_NOTICES');
-      if(!$throwNotices)
+      if(CUBEX_CLI)
       {
-        $run->silenceErrorsInPaths("/\.ph(tml|p)$/", E_NOTICE);
+        set_exception_handler(array($this, 'handleException'));
+        set_error_handler(array($this, 'handleError'));
       }
-      $run->register();
+      else
+      {
+        $run     = new \Whoops\Run();
+        $handler = new \Whoops\Handler\PrettyPageHandler();
+        $run->pushHandler($handler);
+        $throwNotices = \getenv('CUBEX_THROW_NOTICES');
+        if(!$throwNotices)
+        {
+          $run->silenceErrorsInPaths("/\.ph(tml|p)$/", E_NOTICE);
+        }
+        $run->register();
+      }
     }
 
     try
