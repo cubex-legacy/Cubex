@@ -13,6 +13,7 @@ use Cubex\Foundation\Config\ConfigGroup;
 class Cli extends DispatchMapper
 {
   private $_output = [];
+  protected $_path;
 
   public function __construct(ConfigGroup $configGroup, FileSystem $fileSystem)
   {
@@ -25,6 +26,17 @@ class Cli extends DispatchMapper
 
     if($path !== null)
     {
+      $path = $path;
+      if(substr($path, -1, 1) !== '/')
+      {
+        $path .= '/';
+      }
+      if(substr($path, -4, 3) !== 'src')
+      {
+        $path .= 'src/';
+      }
+
+      $this->_path             = $path;
       $this->_projectBase      = null;
       $this->_projectNamespace = null;
     }
@@ -42,10 +54,19 @@ class Cli extends DispatchMapper
     $maps = $this->mapEntities($entities);
     $this->saveMaps($maps);
 
-    //Do not write configs if processing a specified path
     if($path === null)
     {
-      $this->writeConfig();
+      $this->writeConfig(
+        $this->getFileSystem()->resolvePath(
+          $this->getProjectBase() . "/../conf"
+        )
+      );
+    }
+    else
+    {
+      $this->writeConfig(
+        build_path(dirname($path), "conf")
+      );
     }
 
     foreach($this->_output as $outputEntity)
@@ -63,7 +84,7 @@ class Cli extends DispatchMapper
   {
     $shouldOutput = !$entityPath;
 
-    $entityHash = $this->generateEntityHash($entity);
+    $entityHash = $this->generateEntityHash($this->_cleanEntityPath($entity));
 
     if($shouldOutput)
     {
@@ -101,7 +122,7 @@ class Cli extends DispatchMapper
     $this->_pushLine($entityHash, $this->_getResult($saved) . "\n");
   }
 
-  public function writeConfig()
+  public function writeConfig($directory)
   {
     $this->_pushLine(
       "config",
@@ -118,7 +139,7 @@ class Cli extends DispatchMapper
       )
     );
 
-    $result = parent::writeConfig();
+    $result = parent::writeConfig($directory);
 
     $this->_pushLine("config", $this->_getResult($result));
   }
@@ -181,5 +202,17 @@ class Cli extends DispatchMapper
   private function _pushLine($entityHash, $line)
   {
     $this->_output[$entityHash][] = $line;
+  }
+
+  protected function _cleanEntityPath($path)
+  {
+    if($this->_path === null)
+    {
+      return parent::_cleanEntityPath($path);
+    }
+    else
+    {
+      return str_replace($this->_path, '', $path);
+    }
   }
 }

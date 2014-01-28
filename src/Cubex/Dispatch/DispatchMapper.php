@@ -37,7 +37,12 @@ class DispatchMapper extends Dispatcher
     $entities = $this->findEntities();
     $this->setEntityMapConfigLines($entities);
     $this->setExternalMapConfigLines();
-    $this->writeConfig();
+
+    $directory = $this->getFileSystem()->resolvePath(
+      $this->getProjectBase() . "/../conf"
+    );
+    $this->writeConfig($directory);
+
     $maps      = $this->mapEntities($entities);
     $savedMaps = $this->saveMaps($maps);
 
@@ -121,7 +126,7 @@ class DispatchMapper extends Dispatcher
         if($directoryListItem === $this->getResourceDirectory())
         {
           if($this->getProjectBase() !== null
-          && $this->getFileSystem()->isAbsolute($newEntityPath)
+            && $this->getFileSystem()->isAbsolute($newEntityPath)
           )
           {
             $newEntityPath = $this->getFileSystem()->getRelativePath(
@@ -405,7 +410,7 @@ class DispatchMapper extends Dispatcher
       $brandDirectory = build_path($directory, $directoryListItem);
 
       if($this->getFileSystem()->isDir($brandDirectory)
-      && strncmp($directoryListItem, ".", 1) === 0
+        && strncmp($directoryListItem, ".", 1) === 0
       )
       {
         $directories[] = $brandDirectory;
@@ -415,9 +420,9 @@ class DispatchMapper extends Dispatcher
     return $directories;
   }
 
-  public function writeConfig()
+  public function writeConfig($directory)
   {
-    $config = "";
+    $config = "\n";
     sort($this->_configLines);
 
     foreach($this->_configLines as $configLine)
@@ -431,11 +436,24 @@ class DispatchMapper extends Dispatcher
       return true;
     }
 
-    $directory = $this->getFileSystem()->resolvePath(
-      $this->getProjectBase() . "/../conf"
-    );
-
     $file = build_path($directory, $this->getDispatchIniFilename());
+
+    $newContent      = parse_ini_string($config);
+    $existingContent = parse_ini_file($file);
+
+    if(!empty($existingContent))
+    {
+      foreach($existingContent as $section => $hashes)
+      {
+        foreach($hashes as $hash => $path)
+        {
+          if(!isset($newContent[$section][$hash]))
+          {
+            $config = $section . "[$hash] = $path\n" . $config;
+          }
+        }
+      }
+    }
 
     try
     {
@@ -458,6 +476,7 @@ class DispatchMapper extends Dispatcher
   {
     foreach($entities as $entity)
     {
+      $entity     = $this->_cleanEntityPath($entity);
       $entityHash = $this->generateEntityHash($entity);
       $this->setConfigLine("entity_map[$entityHash] = $entity");
     }
@@ -494,5 +513,10 @@ class DispatchMapper extends Dispatcher
     }
 
     return false;
+  }
+
+  protected function _cleanEntityPath($path)
+  {
+    return $path;
   }
 }
