@@ -22,6 +22,11 @@ class CassandraService implements IDataService
   protected $_keyspace;
   protected $_returnAttributes = false;
 
+  /**
+   * @param $name
+   *
+   * @return ColumnFamily
+   */
   public function cf($name)
   {
     if($this->_connection === null)
