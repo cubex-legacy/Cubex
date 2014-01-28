@@ -49,6 +49,11 @@ class AmqpQueue implements IBatchQueueProvider
 
   protected $_retries = 3;
 
+  /**
+   * @var bool
+   */
+  protected $_persistentDefault = false;
+
   protected function _configureExchange()
   {
     if($this->_exchange === null)
@@ -90,6 +95,8 @@ class AmqpQueue implements IBatchQueueProvider
         $args
       );
       $this->_lastQueue = $name;
+
+      $this->_persistentDefault = $this->config()->getBool('persistent', false);
     }
   }
 
@@ -117,20 +124,25 @@ class AmqpQueue implements IBatchQueueProvider
     return $this->_chan;
   }
 
-  public function push(IQueue $queue, $data = null, $delay = 0)
+  public function push(
+    IQueue $queue, $data = null, $delay = 0, $persistent = null
+  )
   {
-    $this->pushBatch($queue, [$data]);
+    $this->pushBatch($queue, [$data], $persistent);
   }
 
-  public function pushBatch(IQueue $queue, array $data, $delay = 0)
+  public function pushBatch(
+    IQueue $queue, array $data, $delay = 0, $persistent = null
+  )
   {
     $this->_configureExchange();
     $this->_configureQueue($queue->name());
+
     try
     {
       foreach($data as $msg)
       {
-        $this->_publish($queue, $msg);
+        $this->_publish($queue, $msg, $persistent);
       }
       $this->_channel()->publish_batch();
     }
@@ -146,7 +158,7 @@ class AmqpQueue implements IBatchQueueProvider
 
       if($this->_retries > 0)
       {
-        return $this->pushBatch($queue, $data, $delay);
+        return $this->pushBatch($queue, $data, $delay, $persistent);
       }
       else
       {
@@ -168,9 +180,16 @@ class AmqpQueue implements IBatchQueueProvider
     $this->_configureQueue($queue->name());
   }
 
-  protected function _publish(IQueue $queue, $data = null)
+  protected function _publish(IQueue $queue, $data = null, $persistent = null)
   {
-    $msg = new AMQPMessage(serialize($data));
+    if($persistent === null)
+    {
+      $persistent = $this->_persistentDefault;
+    }
+
+    $msg = new AMQPMessage(
+      serialize($data), ['delivery_mode' => $persistent ? 2 : 1]
+    );
     $this->_channel()->batch_basic_publish(
       $msg, $this->_exchange, $queue->name()
     );
