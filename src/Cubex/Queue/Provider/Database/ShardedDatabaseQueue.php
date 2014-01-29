@@ -86,7 +86,17 @@ class ShardedDatabaseQueue extends DatabaseQueue
     do
     {
       $this->_nextTable();
-      $collection = parent::_lockRecords($queue, $limit);
+      try
+      {
+        $collection = parent::_lockRecords($queue, $limit);
+      }
+      catch(\Exception $e)
+      {
+        if($e->getCode() != 1146)
+        {
+          throw $e;
+        }
+      }
       $cnt++;
     }
     while(($cnt < $this->_getNumTables()) && (! $collection->hasMappers()));
