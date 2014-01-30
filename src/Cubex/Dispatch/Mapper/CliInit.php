@@ -21,14 +21,7 @@ class CliInit
       $path = $args[1];
       if(file_exists($path))
       {
-        if(isset($args[2]) && $args[2] == 'nosrc')
-        {
-          $cli->execute($path, false);
-        }
-        else
-        {
-          $cli->execute($path);
-        }
+        $cli->execute($path);
       }
       else
       {
