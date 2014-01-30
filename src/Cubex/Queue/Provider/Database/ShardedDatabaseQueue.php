@@ -9,10 +9,10 @@ use Cubex\Queue\IQueue;
 
 class ShardedDatabaseQueue extends DatabaseQueue
 {
-  protected $_curTableIndex = 1;
+  protected $_curTableIndex = -1;
   protected $_numTables = null;
   protected $_dbServices = null;
-  protected $_curServiceIndex = 0;
+  protected $_curServiceIndex = -1;
 
   public function push(IQueue $queue, $data = null, $delay = 0)
   {
@@ -62,6 +62,8 @@ class ShardedDatabaseQueue extends DatabaseQueue
 
   protected function _queueMapper($createNew = false, $createTable = false)
   {
+    $this->_checkTableIndex();
+
     if($this->_map === null || $createNew)
     {
       $this->_map = new QueueMapper();
@@ -105,6 +107,8 @@ class ShardedDatabaseQueue extends DatabaseQueue
 
   protected function _nextTable()
   {
+    $this->_checkTableIndex();
+
     $this->_curTableIndex++;
     if($this->_curTableIndex > $this->_getNumTables())
     {
@@ -128,6 +132,18 @@ class ShardedDatabaseQueue extends DatabaseQueue
     {
       $this->_curServiceIndex = $idx;
       $this->_map = null;
+    }
+  }
+
+  protected function _checkTableIndex()
+  {
+    if($this->_curServiceIndex == -1)
+    {
+      $this->_curServiceIndex = mt_rand(0, count($this->_getDBServices()) - 1);
+    }
+    if($this->_curTableIndex == -1)
+    {
+      $this->_curTableIndex = mt_rand(1, $this->_getNumTables());
     }
   }
 }
