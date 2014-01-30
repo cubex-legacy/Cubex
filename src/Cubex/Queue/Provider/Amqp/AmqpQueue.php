@@ -9,19 +9,17 @@ use Cubex\Queue\IBatchQueueConsumer;
 use Cubex\Queue\IBatchQueueProvider;
 use Cubex\Queue\IQueue;
 use Cubex\Queue\IQueueConsumer;
-use Cubex\Queue\IQueueProvider;
 use Cubex\ServiceManager\ServiceConfigTrait;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Exception\AMQPProtocolException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class AmqpQueue implements IBatchQueueProvider
 {
   const DATA_FORMAT_SERIALIZE = 'serialize';
-  const DATA_FORMAT_JSON = 'json';
+  const DATA_FORMAT_JSON      = 'json';
 
   use ServiceConfigTrait;
 
@@ -107,7 +105,7 @@ class AmqpQueue implements IBatchQueueProvider
       $this->_lastQueue = $name;
 
       $this->_persistentDefault = $this->config()->getBool('persistent', false);
-      $this->_dataFormat = $this->config()->getStr(
+      $this->_dataFormat        = $this->config()->getStr(
         'data_format', self::DATA_FORMAT_SERIALIZE
       );
       if($this->_dataFormat != self::DATA_FORMAT_JSON)
@@ -249,6 +247,7 @@ class AmqpQueue implements IBatchQueueProvider
     try
     {
       $this->_waits = 0;
+      $waitTime = 0;
       while(true)
       {
         $channel = $this->_channel();
@@ -266,12 +265,13 @@ class AmqpQueue implements IBatchQueueProvider
         {
           while(count($channel->callbacks))
           {
-            $channel->wait(null, true, 1);
+            $channel->wait(null, true, $waitTime);
           }
         }
         catch(AMQPTimeoutException $e)
         {
-          //Expected on smaller queues
+          //Expected on smaller queues, no message received in $waitTime
+          \Log::debug("No message received in wait time ({$waitTime}s)");
         }
         catch(\Exception $e)
         {
@@ -291,8 +291,6 @@ class AmqpQueue implements IBatchQueueProvider
         else if($waitTime > 0)
         {
           $this->_waits++;
-          \Log::debug('Nothing to consume, sleeping for '.$waitTime);
-          sleep($waitTime);
           $this->_reconnect($queue);
         }
       }
@@ -301,6 +299,7 @@ class AmqpQueue implements IBatchQueueProvider
     {
       \Log::debug('Line ' . __LINE__ . ': ' . $e->getMessage());
     }
+    $this->disconnect();
     $consumer->shutdown();
     return true;
   }
@@ -416,5 +415,8 @@ class AmqpQueue implements IBatchQueueProvider
     {
     }
     $this->_conn = null;
+
+    $this->_exchange  = null;
+    $this->_lastQueue = null;
   }
 }
