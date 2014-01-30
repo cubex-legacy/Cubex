@@ -33,7 +33,10 @@ class Cli extends DispatchMapper
       }
       if(substr($path, -4, 3) !== 'src')
       {
-        $path .= 'src/';
+        if(file_exists($path . 'src/'))
+        {
+          $path .= 'src/';
+        }
       }
 
       $this->_path             = $path;
@@ -62,7 +65,7 @@ class Cli extends DispatchMapper
         )
       );
     }
-    else
+    else if(substr($path, -4, 3) == 'src')
     {
       $this->writeConfig(
         build_path(dirname($path), "conf")
