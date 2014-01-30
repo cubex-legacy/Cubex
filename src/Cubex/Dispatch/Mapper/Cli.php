@@ -20,7 +20,7 @@ class Cli extends DispatchMapper
     parent::__construct($configGroup, $fileSystem);
   }
 
-  public function execute($path = null)
+  public function execute($path = null, $appendSrc = true)
   {
     $this->_startMapper();
 
@@ -31,7 +31,7 @@ class Cli extends DispatchMapper
       {
         $path .= '/';
       }
-      if(substr($path, -4, 3) !== 'src')
+      if($appendSrc && substr($path, -4, 3) !== 'src')
       {
         if(file_exists($path . 'src/'))
         {
