@@ -5,6 +5,7 @@
 
 namespace Cubex\Queue\Provider\Amqp;
 
+use Cubex\Log\Log;
 use Cubex\Queue\IBatchQueueConsumer;
 use Cubex\Queue\IBatchQueueProvider;
 use Cubex\Queue\IQueue;
@@ -27,6 +28,8 @@ class AmqpQueue implements IBatchQueueProvider
    * @var AMQPStreamConnection
    */
   protected $_conn;
+  protected $_hosts;
+
   /**
    * @var AmqpChannel
    */
@@ -119,12 +122,33 @@ class AmqpQueue implements IBatchQueueProvider
   {
     if($this->_conn === null)
     {
-      $this->_conn = new AMQPStreamConnection(
-        $this->config()->getStr("host", 'localhost'),
-        $this->config()->getInt("port", 5672),
-        $this->config()->getStr("username", 'guest'),
-        $this->config()->getStr("password", 'guest')
-      );
+      if($this->_hosts === null)
+      {
+        $this->_hosts = $this->config()->getArr("host", 'localhost');
+      }
+      while((!$this->_conn) && $this->_hosts)
+      {
+        $host = reset($this->_hosts);
+        try
+        {
+          $this->_conn = new AMQPStreamConnection(
+            $host,
+            $this->config()->getInt("port", 5672),
+            $this->config()->getStr("username", 'guest'),
+            $this->config()->getStr("password", 'guest')
+          );
+        }
+        catch(\Exception $e)
+        {
+          Log::warning('AMQP host failed to connect: ' . $host);
+          array_shift($this->_hosts);
+          if(!$this->_hosts)
+          {
+            throw new \Exception('All hosts failed to connect.');
+          }
+          shuffle($this->_hosts);
+        }
+      }
     }
 
     return $this->_conn;
