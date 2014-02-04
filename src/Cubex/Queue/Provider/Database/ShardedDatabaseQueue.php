@@ -84,6 +84,7 @@ class ShardedDatabaseQueue extends DatabaseQueue
 
   protected function _lockRecords(IQueue $queue, $limit = 1)
   {
+    $collection = null;
     $cnt = 0;
     do
     {
@@ -101,7 +102,10 @@ class ShardedDatabaseQueue extends DatabaseQueue
       }
       $cnt++;
     }
-    while(($cnt < $this->_getNumTables()) && (! $collection->hasMappers()));
+    while(
+      ($cnt < $this->_getNumTables()) &&
+      ((!$collection) || (! $collection->hasMappers()))
+    );
     return $collection;
   }
 
