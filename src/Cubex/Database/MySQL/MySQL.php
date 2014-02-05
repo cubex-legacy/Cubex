@@ -195,7 +195,7 @@ class MySQL implements IDatabaseService
     {
       $this->_prepareConnection('r');
       $this->_escapeStringCache[$string] =
-      $this->_connection->real_escape_string($string);
+        $this->_connection->real_escape_string($string);
     }
     return $this->_escapeStringCache[$string];
   }
@@ -224,7 +224,7 @@ class MySQL implements IDatabaseService
     $result = $this->_connection->query($query);
     $tries  = 0;
     while($this->_connection->errno == 1213 &&
-    $tries++ < $this->_deadlockRetries)
+      $tries++ < $this->_deadlockRetries)
     {
       msleep(50);
       $result = $this->_connection->query($query);
@@ -242,12 +242,15 @@ class MySQL implements IDatabaseService
     EventManager::trigger(
       EventManager::CUBEX_QUERY,
       [
-      'execution_time' => $endTime - $startTime,
-      'start_time'     => $startTime,
-      'end_time'       => $endTime,
-      'query'          => $query,
-      'result'         => $result,
-      'error'          => ['num' => $this->_errorno, 'msg' => $this->_errormsg]
+        'execution_time' => $endTime - $startTime,
+        'start_time'     => $startTime,
+        'end_time'       => $endTime,
+        'query'          => $query,
+        'result'         => $result,
+        'error'          => [
+          'num' => $this->_errorno,
+          'msg' => $this->_errormsg
+        ]
       ],
       $this
     );
