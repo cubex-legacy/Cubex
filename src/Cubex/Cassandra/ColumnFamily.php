@@ -47,6 +47,7 @@ class ColumnFamily
   protected $_processingBatch = false;
   protected $_batchMutation;
 
+  protected static $_defaultReadRetries = 1;
   protected $_readRetries = 1;
 
   /**
@@ -64,6 +65,11 @@ class ColumnFamily
 
   const QUERY_EVENT = 'cassandra.columnfamily.event';
 
+  public static function setDefaultReadRetries($count)
+  {
+    self::$_defaultReadRetries = $count;
+  }
+
   public function __construct(Connection $connection, $name, $keyspace)
   {
     $bytesType                = new BytesType();
@@ -73,6 +79,7 @@ class ColumnFamily
     $this->_connection        = $connection;
     $this->_name              = $name;
     $this->_keyspace          = $keyspace;
+    $this->_readRetries       = self::$_defaultReadRetries;
   }
 
   public function setReadRetries($count = 2)
