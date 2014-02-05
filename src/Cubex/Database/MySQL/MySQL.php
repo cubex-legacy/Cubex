@@ -36,28 +36,23 @@ class MySQL implements IDatabaseService
     $key = implode('|', [$hostname, $database, $username, $password, $port]);
     if(!isset(self::$_connectionCache[$key]))
     {
-      try
+      $conn = new \mysqli($hostname, $username, $password, $database, $port);
+      if($conn->connect_errno)
       {
-        self::$_connectionCache[$key] =
-        new \mysqli($hostname, $username, $password, $database, $port);
-      }
-      catch(\Exception $e)
-      {
-        $conn = $hostname;
+        $service = $hostname;
         if($config !== null)
         {
-          $conn = $config->getStr("register_service_as", $hostname);
+          $service = $config->getStr("register_service_as", $hostname);
         }
         throw new \Exception(
-          sprintf(
-            "Unable to connect to host: '%s', Service: '%s' - Error: %s",
-            $hostname,
-            $conn,
-            $e->getMessage()
-          ),
-          $e->getCode(),
-          $e
+          "Failed to connect to MySQL [" . $conn->connect_errno . "] " .
+          "($hostname.$database) Service: $service",
+          $conn->connect_errno
         );
+      }
+      else
+      {
+        self::$_connectionCache[$key] = $conn;
       }
     }
 
@@ -81,36 +76,55 @@ class MySQL implements IDatabaseService
     return (bool)$this->_autoContextSwitch;
   }
 
+  protected $_masters;
+  protected $_slaves;
+  protected $_db;
+
   public function connect($mode = 'w')
   {
-    //TODO: Find some optimisation around reading config on every connect
-    //Called from RecordMapper->connection() many times.
-
-    $hostname = $this->_config->getStr('hostname', 'localhost');
-    $database = $this->_config->getStr('database', 'test');
-    if($mode == 'r')
+    if($this->_masters === null)
     {
-      $slaves = $this->_config->getArr('slaves', array($hostname));
-      shuffle($slaves);
-      $hostname = current($slaves);
+      $this->_masters = $this->_config->getArr('hostname', array('localhost'));
+    }
+    if($this->_slaves === null)
+    {
+      $this->_slaves = $this->_config->getArr('slaves', $this->_masters);
+    }
+    if($this->_db === null)
+    {
+      $this->_db = $this->_config->getStr('database', 'test');
     }
 
-    $this->_connection = self::_getConnection(
-      $hostname,
-      $database,
-      $this->_config->getStr('username', 'root'),
-      $this->_config->getStr('password', ''),
-      $this->_config->getStr('port', 3306),
-      $this->_config
-    );
-
-    if($this->_connection->connect_errno)
+    $hosts = & $this->_masters;
+    if($mode == 'r')
     {
-      throw new \RuntimeException(
-        "Failed to connect to MySQL: ($hostname.$database) " .
-        "[" . $this->_connection->connect_errno . "] " .
-        $this->_connection->connect_error
-      );
+      $hosts = & $this->_slaves;
+    }
+
+    while(!$this->_connection && $hosts)
+    {
+      shuffle($hosts);
+      $hostname = reset($hosts);
+      try
+      {
+        $this->_connection = self::_getConnection(
+          $hostname,
+          $this->_db,
+          $this->_config->getStr('username', 'root'),
+          $this->_config->getStr('password', ''),
+          $this->_config->getStr('port', 3306),
+          $this->_config
+        );
+      }
+      catch(\Exception $e)
+      {
+        array_shift($hosts);
+        \Log::warning($e->getMessage());
+        if(!$hosts)
+        {
+          throw new \Exception('No more available hosts');
+        }
+      }
     }
 
     return $this;
