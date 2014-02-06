@@ -326,7 +326,7 @@ class MySQL implements IDatabaseService
    */
   public function query($query)
   {
-    $this->_prepareConnection(starts_with($query, "select", false) ? 'r' : 'w');
+    $this->_prepareConnection('w');
     return $this->_doQuery($query);
   }
 
