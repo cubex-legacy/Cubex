@@ -5,6 +5,7 @@
 
 namespace Cubex\Database\MySQL;
 
+use Cubex\Database\ConnectionMode;
 use Cubex\Database\IDatabaseService;
 use Cubex\Events\EventManager;
 use Cubex\Foundation\Config\Config;
@@ -129,17 +130,17 @@ class MySQL implements IDatabaseService
   {
     $this->_preCacheConfig();
 
-    if($mode == 'w')
-    {
-      $hosts    =& $this->_masters;
-      $username = $this->_username;
-      $password = $this->_password;
-    }
-    else
+    if(($mode == 'r') || ($mode == ConnectionMode::READ()))
     {
       $hosts    =& $this->_slaves;
       $username = $this->_slaveUsername;
       $password = $this->_slavePassword;
+    }
+    else
+    {
+      $hosts    =& $this->_masters;
+      $username = $this->_username;
+      $password = $this->_password;
     }
 
     while(!$this->_connection && $hosts)
