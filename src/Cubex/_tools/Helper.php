@@ -145,6 +145,8 @@ if(!function_exists("is_assoc"))
 if(!function_exists("starts_with"))
 {
   /**
+   * Check a string starts with a specific string
+   *
    * @param      $haystack
    * @param      $needle
    * @param bool $case
@@ -153,7 +155,7 @@ if(!function_exists("starts_with"))
    */
   function starts_with($haystack, $needle, $case = true)
   {
-    if($case)
+    if(!$case)
     {
       return strncasecmp($haystack, $needle, strlen($needle)) == 0;
     }

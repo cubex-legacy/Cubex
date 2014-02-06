@@ -18,6 +18,7 @@ class MySQL implements IDatabaseService
    * @var \mysqli
    */
   protected $_connection;
+  protected $_connectionMode;
 
   protected $_errorno;
   protected $_errormsg;
@@ -135,12 +136,14 @@ class MySQL implements IDatabaseService
       $hosts    =& $this->_slaves;
       $username = $this->_slaveUsername;
       $password = $this->_slavePassword;
+      $this->_connectionMode = "r";
     }
     else
     {
       $hosts    =& $this->_masters;
       $username = $this->_username;
       $password = $this->_password;
+      $this->_connectionMode = "w";
     }
 
     while(!$this->_connection && $hosts)
