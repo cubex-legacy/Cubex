@@ -27,10 +27,20 @@ class MySQL implements IDatabaseService
 
   protected $_autoContextSwitch = true;
 
+  protected $_masters = null;
+  protected $_slaves = null;
+  protected $_db = null;
+  protected $_username = null;
+  protected $_password = null;
+  protected $_slaveUsername = null;
+  protected $_slavePassword = null;
+  protected $_serviceName = null;
+  protected $_port = null;
+
   use ServiceConfigTrait;
 
   protected static function _getConnection(
-    $hostname, $database, $username, $password, $port, Config $config = null
+    $hostname, $database, $username, $password, $port, $serviceName
   )
   {
     $key = implode('|', [$hostname, $database, $username, $password, $port]);
@@ -39,14 +49,9 @@ class MySQL implements IDatabaseService
       $conn = new \mysqli($hostname, $username, $password, $database, $port);
       if($conn->connect_errno)
       {
-        $service = $hostname;
-        if($config !== null)
-        {
-          $service = $config->getStr("register_service_as", $hostname);
-        }
         throw new \Exception(
           "Failed to connect to MySQL [" . $conn->connect_errno . "] " .
-          "($hostname.$database) Service: $service",
+          "(" . $hostname . "." . $database . ") Service: " . $serviceName,
           $conn->connect_errno
         );
       }
@@ -76,11 +81,7 @@ class MySQL implements IDatabaseService
     return (bool)$this->_autoContextSwitch;
   }
 
-  protected $_masters;
-  protected $_slaves;
-  protected $_db;
-
-  public function connect($mode = 'w')
+  private function _preCacheConfig()
   {
     if($this->_masters === null)
     {
@@ -94,11 +95,51 @@ class MySQL implements IDatabaseService
     {
       $this->_db = $this->_config->getStr('database', 'test');
     }
-
-    $hosts = & $this->_masters;
-    if($mode == 'r')
+    if($this->_username === null)
     {
-      $hosts = & $this->_slaves;
+      $this->_username = $this->_config->getStr('username', 'root');
+    }
+    if($this->_password === null)
+    {
+      $this->_password = $this->_config->getStr('password', '');
+    }
+    if($this->_slaveUsername === null)
+    {
+      $this->_slaveUsername = $this->_config->getStr(
+        'slave_username', $this->_username
+      );
+    }
+    if($this->_slavePassword === null)
+    {
+      $this->_slavePassword = $this->_config->getStr(
+        'slave_password', $this->_password
+      );
+    }
+    if($this->_serviceName === null)
+    {
+      $this->_serviceName = $this->_config->getStr("register_service_as", '');
+    }
+    if($this->_port === null)
+    {
+      $this->_port = $this->_config->getStr('port', 3306);
+    }
+  }
+
+  public function connect($mode = 'w')
+  {
+    $this->_preCacheConfig();
+
+    if($mode == 'w')
+    {
+      $hosts    =& $this->_masters;
+      $username = $this->_username;
+      $password = $this->_password;
+    }
+    else
+    {
+      $hosts    =& $this->_slaves;
+      $username = $this->_slaveUsername;
+      $password = $this->_slavePassword;
     }
 
     while(!$this->_connection && $hosts)
@@ -110,10 +151,10 @@ class MySQL implements IDatabaseService
         $this->_connection = self::_getConnection(
           $hostname,
           $this->_db,
-          $this->_config->getStr('username', 'root'),
-          $this->_config->getStr('password', ''),
-          $this->_config->getStr('port', 3306),
-          $this->_config
+          $username,
+          $password,
+          $this->_port,
+          $this->_serviceName
         );
       }
       catch(\Exception $e)
