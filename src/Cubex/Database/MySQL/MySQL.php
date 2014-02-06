@@ -134,7 +134,7 @@ class MySQL implements IDatabaseService
     $this->_connectionMode = $mode;
     $this->_preCacheConfig();
 
-    if(($mode == 'r') || ($mode == ConnectionMode::READ()))
+    if((string)$mode == 'r')
     {
       $hosts                 =& $this->_slaves;
       $username              = $this->_slaveUsername;
@@ -167,7 +167,9 @@ class MySQL implements IDatabaseService
       catch(\Exception $e)
       {
         array_shift($hosts);
-        \Log::warning($e->getMessage());
+        \Log::warning(
+          "Unable to connect to $mode connection: " . $e->getMessage()
+        );
         if(!$hosts)
         {
           throw new \Exception('No more available hosts');
