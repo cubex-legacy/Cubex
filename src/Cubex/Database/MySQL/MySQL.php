@@ -131,6 +131,11 @@ class MySQL implements IDatabaseService
 
   public function connect($mode = 'w')
   {
+    if($this->_connectionMode !== $mode)
+    {
+      $this->_connection = null;
+    }
+
     $this->_connectionMode = $mode;
     $this->_preCacheConfig();
 
