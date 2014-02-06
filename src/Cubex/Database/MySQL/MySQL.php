@@ -108,13 +108,15 @@ class MySQL implements IDatabaseService
     if($this->_slaveUsername === null)
     {
       $this->_slaveUsername = $this->_config->getStr(
-        'slave_username', $this->_username
+        'slave_username',
+        $this->_username
       );
     }
     if($this->_slavePassword === null)
     {
       $this->_slavePassword = $this->_config->getStr(
-        'slave_password', $this->_password
+        'slave_password',
+        $this->_password
       );
     }
     if($this->_serviceName === null)
@@ -129,20 +131,21 @@ class MySQL implements IDatabaseService
 
   public function connect($mode = 'w')
   {
+    $this->_connectionMode = $mode;
     $this->_preCacheConfig();
 
     if(($mode == 'r') || ($mode == ConnectionMode::READ()))
     {
-      $hosts    =& $this->_slaves;
-      $username = $this->_slaveUsername;
-      $password = $this->_slavePassword;
+      $hosts                 =& $this->_slaves;
+      $username              = $this->_slaveUsername;
+      $password              = $this->_slavePassword;
       $this->_connectionMode = "r";
     }
     else
     {
-      $hosts    =& $this->_masters;
-      $username = $this->_username;
-      $password = $this->_password;
+      $hosts                 =& $this->_masters;
+      $username              = $this->_username;
+      $password              = $this->_password;
       $this->_connectionMode = "w";
     }
 
@@ -313,7 +316,9 @@ class MySQL implements IDatabaseService
    */
   protected function _prepareConnection($mode = 'r')
   {
-    if($this->_autoContextSwitch || $this->_connection === null)
+    if($this->_autoContextSwitch || $this->_connection === null
+      || ($this->_connectionMode == 'r' && $mode == 'w')
+    )
     {
       $this->connect($mode);
     }
