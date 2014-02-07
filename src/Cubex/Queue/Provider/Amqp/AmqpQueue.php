@@ -403,8 +403,8 @@ class AmqpQueue implements IBatchQueueProvider
     }
     else
     {
-      $msg->delivery_info['channel']->basic_cancel(
-        $msg->delivery_info['delivery_tag']
+      $msg->delivery_info['channel']->basic_reject(
+        $msg->delivery_info['delivery_tag'], 1
       );
     }
   }
