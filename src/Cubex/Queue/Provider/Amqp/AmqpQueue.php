@@ -271,7 +271,6 @@ class AmqpQueue implements IBatchQueueProvider
     try
     {
       $this->_waits = 0;
-      $waitTime = 0;
       while(true)
       {
         $channel = $this->_channel();
@@ -285,6 +284,7 @@ class AmqpQueue implements IBatchQueueProvider
           [$this, $consumeMethod]
         );
 
+        $waitTime = $consumer->waitTime($this->_waits);
         try
         {
           while(count($channel->callbacks))
@@ -307,7 +307,6 @@ class AmqpQueue implements IBatchQueueProvider
           $this->_processBatch(true);
         }
 
-        $waitTime = $consumer->waitTime($this->_waits);
         if($waitTime === false)
         {
           break;
