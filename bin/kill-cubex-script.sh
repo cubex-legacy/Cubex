@@ -24,5 +24,7 @@ else
   do
     echo "Killing Cubex Class $CLASSNAME PID $P"
     kill $P
+    sleep 5
+    kill -0 $P >/dev/null 2>&1 && kill -9 $P
   done
 fi
