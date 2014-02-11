@@ -65,6 +65,11 @@ class AmqpQueue implements IBatchQueueProvider
    */
   protected $_dataFormat = self::DATA_FORMAT_SERIALIZE;
 
+  protected $_hostsRetriesMax = 3;
+  protected $_hostsRetries = 3;
+  protected $_hostsResetTimeMax = 300;
+  protected $_hostsResetTime = null;
+
   protected function _configureExchange()
   {
     if($this->_exchange === null)
@@ -118,16 +123,41 @@ class AmqpQueue implements IBatchQueueProvider
     }
   }
 
+  protected function _getHosts()
+  {
+    if(!$this->_hosts)
+    {
+      if((!$this->_hostsResetTime)
+        || (time() - $this->_hostsResetTime > $this->_hostsResetTimeMax)
+      )
+      {
+        $this->_hostsRetries   = $this->_hostsRetriesMax;
+        $this->_hostsResetTime = time();
+      }
+      if($this->_hostsRetries)
+      {
+        $this->_hosts = $this->config()->getArr("host", 'localhost');
+        $this->_hostsRetries--;
+      }
+      else
+      {
+        throw new \Exception(
+          'All hosts failed to connect ' . $this->_hostsRetriesMax .
+          ' times within ' . $this->_hostsResetTimeMax . ' seconds'
+        );
+      }
+    }
+    shuffle($this->_hosts);
+    return $this->_hosts;
+  }
+
   protected function _connection()
   {
     if($this->_conn === null)
     {
-      if($this->_hosts === null)
+      while((!$this->_conn))
       {
-        $this->_hosts = $this->config()->getArr("host", 'localhost');
-      }
-      while((!$this->_conn) && $this->_hosts)
-      {
+        $this->_getHosts();
         $host = reset($this->_hosts);
         try
         {
@@ -142,11 +172,6 @@ class AmqpQueue implements IBatchQueueProvider
         {
           Log::warning('AMQP host failed to connect: ' . $host);
           array_shift($this->_hosts);
-          if(!$this->_hosts)
-          {
-            throw new \Exception('All hosts failed to connect.');
-          }
-          shuffle($this->_hosts);
         }
       }
     }
