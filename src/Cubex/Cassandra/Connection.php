@@ -43,10 +43,27 @@ class Connection
   protected $_processingBatch = false;
   protected $_batchMutation = null;
 
+  protected static $_defaultSendTimeout = 1000;
+  protected static $_defaultReceiveTimeout = 1000;
+  protected static $_defaultConnectTimeout = 100;
+
+  public static function setDefaultTimeout($send, $receive = -1, $connect = -1)
+  {
+    self::$_defaultSendTimeout    = $send;
+    self::$_defaultReceiveTimeout = $receive > -1 ? $receive : $send;
+    if($connect > -1)
+    {
+      self::$_defaultConnectTimeout = $connect;
+    }
+  }
+
   public function __construct(array $hosts = ['localhost'], $port = 9160)
   {
-    $this->_hosts = $hosts;
-    $this->_port  = $port;
+    $this->_hosts          = $hosts;
+    $this->_port           = $port;
+    $this->_connectTimeout = self::$_defaultConnectTimeout;
+    $this->_sendTimeout    = self::$_defaultSendTimeout;
+    $this->_recieveTimeout = self::$_defaultReceiveTimeout;
   }
 
   public function setConnectTimeout($timeout)
