@@ -191,6 +191,7 @@ class ColumnFamily
 
   public function connection()
   {
+    $this->_connection->setKeyspace($this->_keyspace);
     return $this->_connection;
   }
 
