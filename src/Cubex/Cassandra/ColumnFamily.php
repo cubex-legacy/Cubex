@@ -525,6 +525,17 @@ class ColumnFamily
     return $of;
   }
 
+  public function multiGetChunked(array $keys, array $columns, $batchSize = 100)
+  {
+    $data = array();
+    foreach(array_chunk($keys, $batchSize, true) as $chunk)
+    {
+      $result = $this->multiGet(array_keys($chunk), $columns);
+      $data = $data + $result;
+    }
+    return $data;
+  }
+
   public function multiGet(array $keys, array $columns = null)
   {
     return $this->_readRetry("_multiGet", func_get_args());
