@@ -64,6 +64,20 @@ class CassandraCollection extends Collection
     return $this;
   }
 
+  public function multiGet(array $keys, $columns = null)
+  {
+    if($columns === null)
+    {
+      $results = $this->cf()->multiGetSlice($keys);
+    }
+    else
+    {
+      $results = $this->cf()->multiGetChunked($keys, $columns);
+    }
+    $this->_populate($results);
+    return $this;
+  }
+
   public function getKeys($start = '', $finish = '', $predicate = null)
   {
     $results = $this->cf()->getKeys($start, $finish, $this->_limit, $predicate);
