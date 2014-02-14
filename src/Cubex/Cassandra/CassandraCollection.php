@@ -68,7 +68,7 @@ class CassandraCollection extends Collection
   {
     if($columns === null)
     {
-      $results = $this->cf()->multiGetSlice($keys);
+      $results = $this->cf()->multiGetSliceChunked($keys);
     }
     else
     {
