@@ -370,21 +370,31 @@ class ColumnFamily
     {
       if($limit !== null)
       {
-        $thisChunkSize = min($chunkSize, $limit - $total);
+        $thisChunkSize = min($chunkSize, ($limit - $total) + 1);
       }
       else
       {
         $thisChunkSize = $chunkSize;
       }
-      $columns = $this->getSlice($key, $start, $end, $reverse, $thisChunkSize);
-      $result  = $result + $columns;
 
-      end($columns);
-      $start     = key($columns);
-      $thisTotal = count($columns);
-      $total += $thisTotal;
+      if($thisChunkSize > 0)
+      {
+        $columns = $this->getSlice(
+          $key, $start, $end, $reverse, $thisChunkSize
+        );
+        $result  = $result + $columns;
+
+        end($columns);
+        $start     = key($columns);
+        $thisTotal = count($columns);
+        $total = count($result);
+      }
+      else
+      {
+        $thisTotal = 0;
+      }
     }
-    while($thisTotal === $chunkSize && ($limit === null || $total <= $limit));
+    while($thisTotal === $chunkSize && ($limit === null || $total < $limit));
 
     return $result;
   }
@@ -451,6 +461,79 @@ class ColumnFamily
       throw $this->formException($e);
     }
     return $this->_formKeySliceResult($result);
+  }
+
+  /**
+   * @param array  $keys
+   * @param string $start
+   * @param string $finish
+   * @param bool   $reverse
+   * @param int    $limit
+   * @param int    $keysChunkSize
+   * @param int    $colsChunkSize
+   *
+   * @return array
+   */
+  public function multiGetSliceChunked(
+    array $keys, $start = '', $finish = '', $reverse = false, $limit = null,
+    $keysChunkSize = 100, $colsChunkSize = 100
+  )
+  {
+    $hasLimit = $limit > 0;
+    if($hasLimit && ($limit < $colsChunkSize))
+    {
+      $colsChunkSize = $limit;
+    }
+
+    $data = [];
+    // Just to be sure...
+    $keys = array_unique($keys);
+
+    foreach(array_chunk($keys, $keysChunkSize) as $chunk)
+    {
+      $thisData = $this->multiGetSlice(
+        $chunk, $start, $finish, $reverse, $colsChunkSize
+      );
+      if($thisData)
+      {
+        $data = $data + $thisData;
+      }
+    }
+
+    // Find keys where we still have data to get
+    $remainingCounts = [];
+    $remainingLookups = [];
+    foreach($data as $key => $cols)
+    {
+      $numCols = count($cols);
+      if(($numCols >= $colsChunkSize) && ((!$hasLimit) || ($numCols < $limit)))
+      {
+        end($cols);
+        $remainingLookups[$key] = key($cols);
+        $remainingCounts[$key] = $limit === null ? null : $limit + 1 - $numCols;
+      }
+    }
+
+    foreach($remainingLookups as $key => $firstCol)
+    {
+      $thisData = $this->getSliceChunked(
+        $key, $firstCol, $finish, $reverse, $remainingCounts[$key],
+        $colsChunkSize
+      );
+      if($thisData)
+      {
+        if(empty($data[$key]))
+        {
+          $data[$key] = $thisData;
+        }
+        else
+        {
+          $data[$key] += $thisData;
+        }
+      }
+    }
+
+    return $data;
   }
 
   public function multiGetSlice(
