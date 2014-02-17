@@ -106,9 +106,9 @@ class Dispatcher
     $this->_externalMap         = $dispatchConfig->getArr("external_map", []);
     $this->_buildOptions        = array_merge(
       [
-      self::BUILD_OPT_FORCE_SECURE => false,
-      self::BUILD_OPT_TYPE         => self::BUILD_OPT_TYPE_PATH,
-      self::BUILD_OPT_PATTERN      => "res"
+        self::BUILD_OPT_FORCE_SECURE => false,
+        self::BUILD_OPT_TYPE         => self::BUILD_OPT_TYPE_PATH,
+        self::BUILD_OPT_PATTERN      => "res"
       ],
       $dispatchConfig->getArr("build_options", [])
     );
@@ -215,11 +215,20 @@ class Dispatcher
   }
 
   /**
-   * @return string
+   * @param bool $asDir Return as a directory
+   *
+   * @return mixed|null
    */
-  public function getProjectNamespace()
+  public function getProjectNamespace($asDir = false)
   {
-    return $this->_projectNamespace;
+    if($asDir)
+    {
+      return str_replace('\\', DS, $this->_projectNamespace);
+    }
+    else
+    {
+      return $this->_projectNamespace;
+    }
   }
 
   /**
@@ -235,10 +244,9 @@ class Dispatcher
    */
   public function getProjectPath()
   {
-    return $this->getProjectBase() . DS . str_replace(
-      '\\',
-      DS,
-      $this->getProjectNamespace()
+    return build_path(
+      $this->getProjectBase(),
+      $this->getProjectNamespace(true)
     );
   }
 
@@ -299,7 +307,10 @@ class Dispatcher
   {
     if($entityHash === $this->getBaseHash())
     {
-      return $this->getProjectNamespace() . "/" . $this->getResourceDirectory();
+      return build_path(
+        $this->getProjectNamespace(true),
+        $this->getResourceDirectory()
+      );
     }
     else if(isset($this->getEntityMap()[$entityHash]))
     {
