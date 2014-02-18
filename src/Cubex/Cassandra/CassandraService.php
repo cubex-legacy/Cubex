@@ -21,6 +21,7 @@ class CassandraService implements IDataService
   protected $_columnFamily = [];
   protected $_keyspace;
   protected $_returnAttributes = false;
+  protected $_readRetries = null;
 
   /**
    * @param $name
@@ -42,6 +43,10 @@ class CassandraService implements IDataService
     $cf = $this->_columnFamily[$name];
     if($cf instanceof ColumnFamily)
     {
+      if($this->_readRetries != null)
+      {
+        $cf->setReadRetries($this->_readRetries);
+      }
       $cf->setReturnAttribute($this->returnAttributes());
     }
     return $cf;
@@ -97,6 +102,8 @@ class CassandraService implements IDataService
     {
       $this->_connection->setSendTimeout($sendTimeout);
     }
+
+    $this->_readRetries = $this->config()->getInt("read_retries", null);
 
     $this->_connection->setKeyspace($this->_keyspace);
   }
