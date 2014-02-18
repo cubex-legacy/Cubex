@@ -52,17 +52,20 @@ class Cookies
               $name  = urldecode(trim($name));
               $value = urldecode(trim($value));
 
-              if(EncryptedCookie::isEncrypted($value))
+              if($name != "")
               {
-                $cookie = new EncryptedCookie($name, $value);
-              }
-              else
-              {
-                $cookie = new StandardCookie($name, $value);
-              }
+                if(EncryptedCookie::isEncrypted($value))
+                {
+                  $cookie = new EncryptedCookie($name, $value);
+                }
+                else
+                {
+                  $cookie = new StandardCookie($name, $value);
+                }
 
-              $cookie->setMode(StandardCookie::MODE_READ);
-              self::$_cookies[$name] = $cookie;
+                $cookie->setMode(StandardCookie::MODE_READ);
+                self::$_cookies[$name] = $cookie;
+              }
             }
           }
         }
