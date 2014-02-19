@@ -53,7 +53,7 @@ class PidFile
       }
       else
       {
-        $path = '/var/run/cubex/';
+        $path = '/var/run/cubex/' . $path;
       }
     }
 
