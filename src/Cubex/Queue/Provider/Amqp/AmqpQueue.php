@@ -53,6 +53,8 @@ class AmqpQueue implements IBatchQueueProvider
 
   protected $_retries = 3;
 
+  protected $_qosSize;
+
   /**
    * @var bool
    */
@@ -283,6 +285,15 @@ class AmqpQueue implements IBatchQueueProvider
     }
   }
 
+  protected function _getQosCount()
+  {
+    if($this->_qosSize === null)
+    {
+      $this->_qosSize = $this->config()->getInt('qos_size', 0);
+    }
+    return $this->_qosSize;
+  }
+
   public function consume(IQueue $queue, IQueueConsumer $consumer)
   {
     $this->_queue           = $queue;
@@ -293,12 +304,17 @@ class AmqpQueue implements IBatchQueueProvider
     $batched       = $consumer instanceof IBatchQueueConsumer;
     $consumeMethod = $batched ? "processBatchMessage" : "processMessage";
 
+    $qosSize = $this->_getQosCount();
     try
     {
       $this->_waits = 0;
       while(true)
       {
         $channel = $this->_channel();
+        if($qosSize)
+        {
+          $channel->basic_qos(0, $qosSize, false);
+        }
         $channel->basic_consume(
           $queue->name(),
           CUBEX_TRANSACTION,
