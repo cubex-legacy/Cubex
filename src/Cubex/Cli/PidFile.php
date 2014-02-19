@@ -12,15 +12,9 @@ class PidFile
   private $_pidFilePath;
   private $_enabled;
 
-  public function __construct($path = "", $instanceName = "")
+  public function __construct($path = '', $instanceName = '')
   {
     $this->_enabled = true;
-
-    // no PID file on Windows
-    if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
-    {
-      $this->_enabled = false;
-    }
 
     $conf = Container::config()->get('pidfile');
     if($conf)
@@ -40,28 +34,38 @@ class PidFile
     $this->_deletePidFile();
   }
 
-  private function _getPidFilePath($path = "", $instanceName = "")
+  private function _getPidFilePath($path = '', $instanceName = '')
   {
-    if($path == "")
+    if($path == '')
     {
       $conf = Container::config()->get('pidfile');
       if($conf)
       {
-        $path = $conf->getStr('path', "");
+        $path = $conf->getStr('path', '');
       }
     }
-    if($path == "")
+
+    if($path == '')
     {
       $filename = $_REQUEST['__path__'];
-      if($instanceName != "")
+      if($instanceName != '')
       {
-        $filename .= "." . $instanceName;
+        $filename .= '.' . $instanceName;
       }
-      $filename .= ".pid";
+      $filename .= '.pid';
 
+      $conf = Container::config()->get('project');
+      if($conf)
+      {
+        $ns = $conf->getStr('namespace', '');
+        if($ns)
+        {
+          $filename = $ns . DS . $filename;
+        }
+      }
       if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
       {
-        $path = realpath(dirname(WEB_ROOT)) . DS . $filename;
+        $path = realpath(dirname(WEB_ROOT)) . DS . 'pids' . DS . $filename;
       }
       else
       {
@@ -99,9 +103,9 @@ class PidFile
     else
     {
       $pidDir = dirname($this->_pidFilePath);
-      if(! file_exists($pidDir))
+      if(!file_exists($pidDir))
       {
-        if(! mkdir($pidDir, 0755, true))
+        if(!mkdir($pidDir, 0755, true))
         {
           throw new \Exception('Error creating PID file directory ' . $pidDir);
         }
