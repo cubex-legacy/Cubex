@@ -38,41 +38,33 @@ class PidFile
   {
     if($path == '')
     {
-      $conf = Container::config()->get('pidfile');
-      if($conf)
-      {
-        $path = $conf->getStr('path', '');
-      }
-    }
-
-    if($path == '')
-    {
-      $filename = $_REQUEST['__path__'];
-      if($instanceName != '')
-      {
-        $filename .= '.' . $instanceName;
-      }
-      $filename .= '.pid';
-
       $conf = Container::config()->get('project');
       if($conf)
       {
         $ns = $conf->getStr('namespace', '');
         if($ns)
         {
-          $filename = $ns . DS . $filename;
+          $path = $ns . DS;
         }
       }
       if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
       {
-        $path = realpath(dirname(WEB_ROOT)) . DS . 'pids' . DS . $filename;
+        $path = realpath(dirname(WEB_ROOT)) . DS . 'pids' . DS . $path;
       }
       else
       {
-        $path = '/var/run/cubex/' . $filename;
+        $path = '/var/run/cubex/';
       }
     }
-    return $path;
+
+    $filename = $_REQUEST['__path__'];
+    if($instanceName != '')
+    {
+      $filename .= '.' . $instanceName;
+    }
+    $filename .= '.pid';
+
+    return $path . $filename;
   }
 
   private function _createPidFile()
