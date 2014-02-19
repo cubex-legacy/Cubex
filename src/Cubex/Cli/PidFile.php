@@ -53,6 +53,7 @@ class PidFile
       }
       else
       {
+        $path = str_replace(['\\', '/'], DS, $path);
         $path = '/var/run/cubex/' . $path;
       }
     }
