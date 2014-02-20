@@ -332,6 +332,11 @@ class AmqpQueue implements IBatchQueueProvider
           {
             $channel->wait(null, true, $waitTime);
           }
+
+          if($batched)
+          {
+            $this->_processBatch(true);
+          }
         }
         catch(AMQPTimeoutException $e)
         {
@@ -341,11 +346,6 @@ class AmqpQueue implements IBatchQueueProvider
         catch(\Exception $e)
         {
           \Log::debug($e->getCode() . ': ' . $e->getMessage());
-        }
-
-        if($batched)
-        {
-          $this->_processBatch(true);
         }
 
         if($waitTime === false)
