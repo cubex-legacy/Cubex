@@ -345,7 +345,7 @@ class AmqpQueue implements IBatchQueueProvider
         }
         catch(\Exception $e)
         {
-          \Log::debug($e->getCode() . ': ' . $e->getMessage());
+          \Log::error($e->getCode() . ': ' . $e->getMessage());
         }
 
         if($waitTime === false)
@@ -361,7 +361,7 @@ class AmqpQueue implements IBatchQueueProvider
     }
     catch(\Exception $e)
     {
-      \Log::debug('Line ' . __LINE__ . ': ' . $e->getMessage());
+      \Log::error('Line ' . __LINE__ . ': ' . $e->getMessage());
     }
     $this->disconnect();
     $consumer->shutdown();
