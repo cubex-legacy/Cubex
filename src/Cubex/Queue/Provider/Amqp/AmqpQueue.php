@@ -289,7 +289,7 @@ class AmqpQueue implements IBatchQueueProvider
   {
     if($this->_qosSize === null)
     {
-      $this->_qosSize = $this->config()->getInt('qos_size', 0);
+      $this->_qosSize = $this->config()->getInt('qos_size', 1);
     }
     return $this->_qosSize;
   }
