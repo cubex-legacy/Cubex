@@ -328,20 +328,23 @@ class AmqpQueue implements IBatchQueueProvider
         $waitTime = $consumer->waitTime($this->_waits);
         try
         {
-          while(count($channel->callbacks))
+          try
           {
-            $channel->wait(null, true, $waitTime);
+            while(count($channel->callbacks))
+            {
+              $channel->wait(null, true, $waitTime);
+            }
+          }
+          catch(AMQPTimeoutException $e)
+          {
+            //Expected on smaller queues, no message received in $waitTime
+            \Log::debug("No message received in wait time ({$waitTime}s)");
           }
 
           if($batched)
           {
             $this->_processBatch(true);
           }
-        }
-        catch(AMQPTimeoutException $e)
-        {
-          //Expected on smaller queues, no message received in $waitTime
-          \Log::debug("No message received in wait time ({$waitTime}s)");
         }
         catch(\Exception $e)
         {
