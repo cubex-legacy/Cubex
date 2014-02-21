@@ -311,7 +311,7 @@ class DatabaseQueue implements IBatchQueueProvider
     else
     {
       $mapper->locked   = 0;
-      $mapper->lockedBy = '';
+      $mapper->lockedBy = null;
       $mapper->attempts++;
       $mapper->saveChanges();
     }
