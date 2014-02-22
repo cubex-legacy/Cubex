@@ -933,6 +933,47 @@ class ColumnFamily
     $this->_remove($key, $superColumn, $columns, $timestamp);
   }
 
+  /**
+   * Delete multiple columns from multiple rows using batch mutations
+   *
+   * @param array        $keysAndCols Array of key => [col, col...]
+   * @param int          $batchSize
+   *
+   * @throws \Exception
+   */
+  public function removeMultiBatched(array $keysAndCols,$batchSize = 100)
+  {
+    if(count($keysAndCols) < 1)
+    {
+      return;
+    }
+
+    $this->openBatch();
+    try
+    {
+      $i = 0;
+      foreach($keysAndCols as $key => $cols)
+      {
+        if(! empty($cols))
+        {
+          $this->remove($key, $cols);
+          $i++;
+        }
+        if($i >= $batchSize)
+        {
+          $this->flushBatch();
+          $i = 0;
+        }
+      }
+    }
+    catch(\Exception $e)
+    {
+      $this->cancelBatch();
+      throw $e;
+    }
+    $this->closeBatch();
+  }
+
   public function increment($key, $column, $increment = 1)
   {
     return $this->_updateCounter($key, $column, abs($increment));
