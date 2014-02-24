@@ -109,11 +109,5 @@ class AmazonSES extends Mail
     $this->reset();
     return $msgId;
   }
-
-  public function reset()
-  {
-    $this->_conn = null;
-    parent::reset();
-  }
 }
 
