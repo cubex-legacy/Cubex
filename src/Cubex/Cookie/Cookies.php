@@ -33,42 +33,19 @@ class Cookies
     {
       self::$_cookies = [];
 
-      if(is_array($_SERVER))
+      foreach($_COOKIE as $name => $value)
       {
-        foreach($_SERVER as $kk => $vv)
+        if(EncryptedCookie::isEncrypted($value))
         {
-          if($kk === "HTTP_COOKIE")
-          {
-            $flatCookieArr = explode(";", $vv);
-            foreach($flatCookieArr as $flatCookie)
-            {
-              if(strstr($flatCookie, "=") === false)
-              {
-                $flatCookie .= "=";
-              }
-
-              list($name, $value) = explode("=", $flatCookie);
-
-              $name  = urldecode(trim($name));
-              $value = urldecode(trim($value));
-
-              if($name != "")
-              {
-                if(EncryptedCookie::isEncrypted($value))
-                {
-                  $cookie = new EncryptedCookie($name, $value);
-                }
-                else
-                {
-                  $cookie = new StandardCookie($name, $value);
-                }
-
-                $cookie->setMode(StandardCookie::MODE_READ);
-                self::$_cookies[$name] = $cookie;
-              }
-            }
-          }
+          $cookie = new EncryptedCookie($name, $value);
         }
+        else
+        {
+          $cookie = new StandardCookie($name, $value);
+        }
+
+        $cookie->setMode(StandardCookie::MODE_READ);
+        self::$_cookies[$name] = $cookie;
       }
     }
   }
