@@ -137,7 +137,7 @@ class ColumnFamily
     }
     else if(!is_array($keys))
     {
-      return $dataType->pack($keys);
+      return empty($keys) ? $keys : $dataType->pack($keys);
     }
     else
     {
@@ -588,8 +588,8 @@ class ColumnFamily
   )
   {
     $range           = new SliceRange();
-    $range->start    = $start;
-    $range->finish   = $finish;
+    $range->start    = $this->prepareDataType($this->columnDataType(), $start);
+    $range->finish   = $this->prepareDataType($this->columnDataType(), $finish);
     $range->reversed = $reverse;
     $range->count    = $limit;
     return $range;
