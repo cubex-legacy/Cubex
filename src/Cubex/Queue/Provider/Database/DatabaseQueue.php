@@ -274,7 +274,7 @@ class DatabaseQueue implements IBatchQueueProvider
     while(true)
     {
       $collection = $this->_lockRecords($queue, 1);
-      $mapper = $collection->first();
+      $mapper     = $collection->first();
 
       if($mapper === null)
       {
@@ -382,6 +382,16 @@ class DatabaseQueue implements IBatchQueueProvider
     }
 
     return $this->_map;
+  }
+
+  public function queueSize($processing = null)
+  {
+    $mapper = $this->_queueMapper();
+    if($processing !== null)
+    {
+      return $mapper->count('id', '`locked` = ' . (int)$processing);
+    }
+    return $mapper->count();
   }
 
   protected function _processBatchDeletes()
