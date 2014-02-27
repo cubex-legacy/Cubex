@@ -7,6 +7,7 @@ namespace Cubex\Queue\Provider\Database;
 
 use Cubex\FileSystem\FileSystem;
 use Cubex\Helpers\DateTimeHelper;
+use Cubex\Mapper\Database\Aggregate;
 use Cubex\Mapper\Database\RecordCollection;
 use Cubex\Queue\IBatchQueueConsumer;
 use Cubex\Queue\IBatchQueueProvider;
@@ -386,12 +387,12 @@ class DatabaseQueue implements IBatchQueueProvider
 
   public function queueSize($processing = null)
   {
-    $mapper = $this->_queueMapper();
+    $agr = new Aggregate($this->_queueMapper());
     if($processing !== null)
     {
-      return $mapper->count('id', '`locked` = ' . (int)$processing);
+      $agr->where('`locked` = ' . (int)$processing);
     }
-    return $mapper->count();
+    return $agr->count();
   }
 
   protected function _processBatchDeletes()
