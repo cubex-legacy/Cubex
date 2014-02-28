@@ -239,9 +239,7 @@ class AmqpQueue implements IBatchQueueProvider
 
   protected function _reconnect(IQueue $queue)
   {
-    $this->disconnect();
-    $this->_exchange  = null;
-    $this->_lastQueue = null;
+    $this->_forceDisconnect();
     $this->_configureExchange();
     $this->_configureQueue($queue->name());
   }
@@ -483,6 +481,18 @@ class AmqpQueue implements IBatchQueueProvider
     }
     $this->_conn = null;
 
+    $this->_exchange  = null;
+    $this->_lastQueue = null;
+  }
+
+  protected function _forceDisconnect()
+  {
+    if($this->_conn !== null)
+    {
+      $this->_conn->set_close_on_destruct(false);
+    }
+    $this->_chan = null;
+    $this->_conn = null;
     $this->_exchange  = null;
     $this->_lastQueue = null;
   }
