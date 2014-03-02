@@ -19,11 +19,28 @@ class MySQL implements IDatabaseService
    */
   protected $_connection;
   protected $_connectionMode;
+  protected $_connectionCacheKey;
 
   protected $_errorno;
   protected $_errormsg;
   protected $_deadlockRetries = 5;
+  /**
+   * A list of error codes that will trigger a reconnect and retry
+   * @var int[]
+   */
+  protected $_reconnectErrorCodes = [
+    2006 // MySQL server has gone away
+  ];
+  /**
+   * Maximum number of times to reconnect on the errors listed above
+   *
+   * @var int
+   */
+  protected $_errorReconnects = 2;
 
+  /**
+   * @var \mysqli[]
+   */
   private static $_connectionCache = [];
   protected $_escapeStringCache = [];
 
@@ -46,7 +63,7 @@ class MySQL implements IDatabaseService
   )
   {
     $key = implode('|', [$hostname, $database, $username, $password, $port]);
-    if(!isset(self::$_connectionCache[$key]))
+    if(empty(self::$_connectionCache[$key]))
     {
       $conn = new \mysqli($hostname, $username, $password, $database, $port);
       if($conn->connect_errno)
@@ -63,7 +80,16 @@ class MySQL implements IDatabaseService
       }
     }
 
-    return self::$_connectionCache[$key];
+    return [self::$_connectionCache[$key], $key];
+  }
+
+  protected static function _closeCachedConnection($cacheKey)
+  {
+    if(isset(self::$_connectionCache[$cacheKey]))
+    {
+      self::$_connectionCache[$cacheKey]->close();
+      unset(self::$_connectionCache[$cacheKey]);
+    }
   }
 
   public function enableAutoContextSwitching()
@@ -160,7 +186,7 @@ class MySQL implements IDatabaseService
       $hostname = reset($hosts);
       try
       {
-        $this->_connection = self::_getConnection(
+        list($conn, $cacheKey) = self::_getConnection(
           $hostname,
           $this->_db,
           $username,
@@ -168,6 +194,8 @@ class MySQL implements IDatabaseService
           $this->_port,
           $this->_serviceName
         );
+        $this->_connection = $conn;
+        $this->_connectionCacheKey = $cacheKey;
       }
       catch(\Exception $e)
       {
@@ -185,12 +213,17 @@ class MySQL implements IDatabaseService
     return $this;
   }
 
-  /**
-   *
-   */
   public function disconnect()
   {
-    $this->_connection->close();
+    self::_closeCachedConnection($this->_connectionCacheKey);
+    $this->_connection = null;
+    $this->_connectionCacheKey = null;
+  }
+
+  public function reconnect()
+  {
+    $this->disconnect();
+    $this->_prepareConnection($this->_connectionMode);
   }
 
   /**
@@ -276,13 +309,30 @@ class MySQL implements IDatabaseService
     $startTime      = microtime(true);
     $this->_errorno = $this->_errormsg = null;
 
-    $result = $this->_connection->query($query);
-    $tries  = 0;
-    while($this->_connection->errno == 1213 &&
-      $tries++ < $this->_deadlockRetries)
+    $done = false;
+    $deadlockRetries  = 0;
+    $reconnects = 0;
+    $result = false;
+    while(!$done)
     {
-      msleep(50);
       $result = $this->_connection->query($query);
+
+      if(($this->_connection->errno == 1213) &&
+        ($deadlockRetries++ < $this->_deadlockRetries)
+      )
+      {
+        msleep(50);
+      }
+      else if(in_array($this->_connection->errno, $this->_reconnectErrorCodes)
+        && ($reconnects++ < $this->_errorReconnects)
+      )
+      {
+        $this->reconnect();
+      }
+      else
+      {
+        $done = true;
+      }
     }
 
     if(!$result)
