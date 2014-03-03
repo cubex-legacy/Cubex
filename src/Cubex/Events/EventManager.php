@@ -50,6 +50,8 @@ class EventManager
   const DISPATCH_PACKAGE_REQUIRE  = 'dispatch.package.require';
   const DISPATCH_URL              = 'dispatch.url';
 
+  const CUBEX_QUEUE_WAIT = 'cubex.queue.wait';
+
   protected static $_nsListenEvents = array();
   protected static $_listeners = array();
   protected static $_spies = array();

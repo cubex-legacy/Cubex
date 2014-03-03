@@ -5,6 +5,7 @@
 
 namespace Cubex\Queue\Provider\Beanstalkd;
 
+use Cubex\Events\EventManager;
 use Cubex\Queue\IBatchQueueConsumer;
 use Cubex\Queue\IQueue;
 use Cubex\Queue\IQueueConsumer;
@@ -70,6 +71,12 @@ class BeanstalkQueue implements IQueueProvider
         {
           $this->_waits++;
           \Log::debug('Nothing to consume, sleeping for '.$waitTime);
+
+          EventManager::trigger(
+            EventManager::CUBEX_QUEUE_WAIT,
+            ['service' => $this]
+          );
+
           sleep($waitTime);
         }
       }

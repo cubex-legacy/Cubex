@@ -5,6 +5,7 @@
 
 namespace Cubex\Queue\Provider\Database;
 
+use Cubex\Events\EventManager;
 use Cubex\FileSystem\FileSystem;
 use Cubex\Helpers\DateTimeHelper;
 use Cubex\Mapper\Database\Aggregate;
@@ -335,6 +336,12 @@ class DatabaseQueue implements IBatchQueueProvider
     {
       $this->_waits++;
       \Log::debug('Nothing to consume, sleeping for ' . $waitTime);
+
+      EventManager::trigger(
+        EventManager::CUBEX_QUEUE_WAIT,
+        ['service' => $this]
+      );
+
       sleep($waitTime);
     }
     return true;
