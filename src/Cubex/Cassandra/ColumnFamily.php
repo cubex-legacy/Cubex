@@ -611,9 +611,9 @@ class ColumnFamily
   public function multiGetChunked(array $keys, array $columns, $batchSize = 100)
   {
     $data = array();
-    foreach(array_chunk($keys, $batchSize, true) as $chunk)
+    foreach(array_chunk($keys, $batchSize) as $chunk)
     {
-      $result = $this->multiGet(array_keys($chunk), $columns);
+      $result = $this->multiGet($chunk, $columns);
       $data = $data + $result;
     }
     return $data;
