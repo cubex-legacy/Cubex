@@ -28,11 +28,24 @@ class AmqpDuplexQueue implements IBatchQueueProvider
    */
   private $_consumeQueue = null;
 
+  private function _getQueueClass()
+  {
+    $queue = $this->config()->getStr(
+      'queue_class', '\Cubex\Queue\Provider\Amqp\AmqpQueue'
+    );
+    if(!class_exists($queue))
+    {
+      throw new \Exception('Queue class does not exist.');
+    }
+    return $queue;
+  }
+
   private function _pushQueue()
   {
-    if(! $this->_pushQueue)
+    if(!$this->_pushQueue)
     {
-      $this->_pushQueue = new AmqpQueue();
+      $className        = $this->_getQueueClass();
+      $this->_pushQueue = new $className();
       $this->_pushQueue->configure($this->config());
     }
     return $this->_pushQueue;
@@ -40,9 +53,10 @@ class AmqpDuplexQueue implements IBatchQueueProvider
 
   private function _consumeQueue()
   {
-    if(! $this->_consumeQueue)
+    if(!$this->_consumeQueue)
     {
-      $this->_consumeQueue = new AmqpQueue();
+      $className           = $this->_getQueueClass();
+      $this->_consumeQueue = new $className();
       $this->_consumeQueue->configure($this->config());
     }
     return $this->_consumeQueue;
