@@ -516,15 +516,9 @@ class AmqpQueueExtension implements IBatchQueueProvider
 
   public function disconnect()
   {
-    $this->_exchange  = null;
-    $this->_lastQueue = null;
-    $this->_chan      = null;
     try
     {
-      if($this->_conn !== null
-        && $this->_conn instanceof \AMQPConnection
-        && $this->_conn->isConnected()
-      )
+      if($this->_conn instanceof \AMQPConnection)
       {
         $this->_conn->disconnect();
       }
@@ -532,6 +526,9 @@ class AmqpQueueExtension implements IBatchQueueProvider
     catch(\Exception $e)
     {
     }
-    $this->_conn = null;
+    $this->_conn      = null;
+    $this->_chan      = null;
+    $this->_exchange  = null;
+    $this->_lastQueue = null;
   }
 }
