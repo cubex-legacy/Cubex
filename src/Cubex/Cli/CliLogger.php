@@ -20,6 +20,30 @@ class CliLogger
   protected $_longestLevel = 0;
 
   /**
+   * Rotate log files when they grow beyond this size (in bytes)
+   *
+   * @var int
+   */
+  protected $_rotateSize = 524288000; // 500MB
+  /**
+   * Rotate log files when they reach this age (in seconds)
+   *
+   * @var int
+   */
+  protected $_rotateAge = 0;
+  /**
+   * Maximum number of log files to keep
+   *
+   * @var int
+   */
+  protected $_rotateKeep = 10;
+  /**
+   *
+   * @var int
+   */
+  private $_lastRotateCheck = 0;
+
+  /**
    * @param string $echoLevel
    * @param string $logLevel
    * @param string $logFile
@@ -47,6 +71,20 @@ class CliLogger
     $this->_logFilePath = $this->_getLogFilePath($logFile, $instanceName);
 
     EventManager::listen(EventManager::CUBEX_LOG, [$this, 'handleLogEvent']);
+  }
+
+  /**
+   * Set log rotation options
+   *
+   * @param int $maxAge    Rotate files older than this (in seconds)
+   * @param int $maxSize   Rotate files larger than this (in bytes)
+   * @param int $keepFiles Keep a maximum of this number of log files
+   */
+  public function setRotateOptions($maxAge = 0, $maxSize = 0, $keepFiles = 10)
+  {
+    $this->_rotateAge = $maxAge;
+    $this->_rotateSize = $maxSize;
+    $this->_rotateKeep = $keepFiles;
   }
 
   public static function getDefaultLogPath($instanceName = "")
@@ -105,6 +143,8 @@ class CliLogger
       {
         mkdir($logDir, 0755, true);
       }
+
+      $this->_rotateLogsIfRequired();
 
       $fp = fopen($this->_logFilePath, "a");
       if($fp)
@@ -216,6 +256,111 @@ class CliLogger
   public function getEchoLevel()
   {
     return $this->_echoLevel;
+  }
+
+  public function rotateLogs()
+  {
+    $this->_rotateLogFile(
+      dirname($this->_logFilePath),
+      basename($this->_logFilePath)
+    );
+  }
+
+  protected function _rotateLogsIfRequired()
+  {
+    if(($this->_logFilePath !== null) &&
+      (($this->_rotateSize > 0) || ($this->_rotateAge > 0))
+    )
+    {
+      if($this->_logFileNeedsRotation($this->_logFilePath))
+      {
+        $this->_rotateLogFile(
+          dirname($this->_logFilePath),
+          basename($this->_logFilePath)
+        );
+      }
+    }
+  }
+
+  // TODO: Make this more efficient
+  protected function _logFileNeedsRotation($logFile)
+  {
+    $needRotate = false;
+
+    $now = time();
+    // only check once per second
+    if(($now - $this->_lastRotateCheck) > 0)
+    {
+      $this->_lastRotateCheck = $now;
+      clearstatcache(false, $logFile);
+
+      $dateLen = 19;
+      if(file_exists($logFile))
+      {
+        $size = filesize($logFile);
+
+        // Check the file size
+        if(($this->_rotateSize > 0) && ($size >= $this->_rotateSize))
+        {
+          $needRotate = true;
+        }
+
+        // Work out the age of the file from the first log message
+        if((! $needRotate) && ($this->_rotateAge > 0) && ($size > $dateLen))
+        {
+          $fp = fopen($logFile, "r");
+          $dateStr = fread($fp, $dateLen);
+          fclose($fp);
+
+          $date = \DateTime::createFromFormat($this->_dateFormat, $dateStr);
+          if($date && (($now - $date->getTimestamp()) >= $this->_rotateAge))
+          {
+            $needRotate = true;
+          }
+        }
+      }
+    }
+    return $needRotate;
+  }
+
+  /**
+   * Rotate a log file to the next number and rotate any with the next number
+   * that are in the way
+   *
+   * @param $logDir
+   * @param $logFile
+   */
+  protected function _rotateLogFile($logDir, $logFile)
+  {
+    $logFilePath = build_path($logDir, $logFile);
+
+    if(file_exists($logFilePath))
+    {
+      $thisNum = end(explode(".", $logFile));
+      if(! is_numeric($thisNum))
+      {
+        $thisNum = 0;
+      }
+
+      // work out the new name and rotate any files that are in the way
+      $newNum = $thisNum + 1;
+      $newFile = basename($logFile, '.' . $thisNum) . '.' . $newNum;
+      $newFilePath = build_path($logDir, $newFile);
+
+      if(file_exists($newFilePath))
+      {
+        $this->_rotateLogFile($logDir, $newFile);
+      }
+
+      if(($this->_rotateKeep > 0) && ($newNum >= $this->_rotateKeep))
+      {
+        unlink($logFilePath);
+      }
+      else
+      {
+        rename($logFilePath, $newFilePath);
+      }
+    }
   }
 }
 
