@@ -5,6 +5,7 @@
 
 namespace Cubex\Queue\Provider\Amqp;
 
+use Cubex\Events\EventManager;
 use Cubex\Log\Log;
 use Cubex\Queue\IBatchQueueConsumer;
 use Cubex\Queue\IBatchQueueProvider;
@@ -404,6 +405,11 @@ class AmqpQueueExtension implements IBatchQueueProvider
         }
         else if($waitTime > 0)
         {
+          EventManager::trigger(
+            EventManager::CUBEX_QUEUE_WAIT,
+            ['service' => $this]
+          );
+
           //sleep($waitTime);
           $this->_waits++;
           $this->_reconnect($queue);
