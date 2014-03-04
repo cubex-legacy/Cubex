@@ -5,20 +5,14 @@
 
 namespace Cubex\Queue\Provider\Amqp;
 
-use Cubex\Events\EventManager;
 use Cubex\Log\Log;
 use Cubex\Queue\IBatchQueueConsumer;
 use Cubex\Queue\IBatchQueueProvider;
 use Cubex\Queue\IQueue;
 use Cubex\Queue\IQueueConsumer;
 use Cubex\ServiceManager\ServiceConfigTrait;
-use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AbstractConnection;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Exception\AMQPTimeoutException;
-use PhpAmqpLib\Message\AMQPMessage;
 
-class AmqpQueue implements IBatchQueueProvider
+class AmqpQueueExtension implements IBatchQueueProvider
 {
   const DATA_FORMAT_SERIALIZE = 'serialize';
   const DATA_FORMAT_JSON      = 'json';
@@ -26,15 +20,16 @@ class AmqpQueue implements IBatchQueueProvider
   use ServiceConfigTrait;
 
   /**
-   * @var AMQPStreamConnection
+   * @var \AMQPConnection
    */
   protected $_conn;
   protected $_hosts;
 
   /**
-   * @var AmqpChannel
+   * @var \AMQPChannel
    */
   protected $_chan;
+  protected $_queue;
   protected $_exchange;
   protected $_lastQueue;
 
@@ -45,7 +40,7 @@ class AmqpQueue implements IBatchQueueProvider
   /**
    * @var IQueue
    */
-  protected $_queue;
+  protected $_queueName;
 
   protected $_batchQueue;
   protected $_batchQueueCount;
@@ -73,46 +68,91 @@ class AmqpQueue implements IBatchQueueProvider
   protected $_hostsResetTimeMax = 300;
   protected $_hostsResetTime = null;
 
-  protected function _configureExchange()
+  protected function _exchange()
   {
     if($this->_exchange === null)
     {
-      $this->_exchange = $this->config()->getStr("exchange", "queue");
-
-      $this->_channel()->exchange_declare(
-        $this->_exchange,
-        $this->config()->getStr("exchange_type", "direct"),
-        $this->config()->getBool("exchange_passive", false),
-        $this->config()->getBool("exchange_durable", true),
-        $this->config()->getBool("exchange_autodelete", false),
-        $this->config()->getBool("exchange_internal", false),
-        $this->config()->getBool("exchange_nowait", false),
-        $this->config()->getArr("exchange_args", null)
+      $this->_exchange = new \AMQPExchange($this->_channel());
+      $this->_exchange->setName($this->config()->getStr("exchange", "queue"));
+      $this->_exchange->setType(
+        $this->config()->getStr("exchange_type", AMQP_EX_TYPE_DIRECT)
       );
+      $flags = 0;
+      if($this->config()->getBool("exchange_passive", false))
+      {
+        $flags = $flags | AMQP_PASSIVE;
+      }
+      if($this->config()->getBool("exchange_durable", true))
+      {
+        $flags = $flags | AMQP_DURABLE;
+      }
+      if($this->config()->getBool("exchange_autodelete", false))
+      {
+        $flags = $flags | AMQP_AUTODELETE;
+      }
+      if($this->config()->getBool("exchange_internal", false))
+      {
+        $flags = $flags | AMQP_INTERNAL;
+      }
+      if($this->config()->getBool("exchange_nowait", false))
+      {
+        $flags = $flags | AMQP_NOWAIT;
+      }
+      $this->_exchange->setFlags($flags);
+
+      if($args = $this->config()->getArr("exchange_args", null))
+      {
+        $this->_exchange->setArguments($args);
+      }
+
+      $this->_exchange->declareExchange();
     }
+    return $this->_exchange;
   }
 
-  protected function _configureQueue($name)
+  protected function _getQueue($name)
   {
     if($this->_lastQueue !== $name)
     {
+      $this->_queue = new \AMQPQueue($this->_channel());
+      $this->_queue->setName($name);
+      $flags = 0;
+      if($this->config()->getBool("queue_passive", false))
+      {
+        $flags = $flags | AMQP_PASSIVE;
+      }
+      if($this->config()->getBool("queue_durable", true))
+      {
+        $flags = $flags | AMQP_DURABLE;
+      }
+      if($this->config()->getBool("queue_exclusive", false))
+      {
+        $flags = $flags | AMQP_EXCLUSIVE;
+      }
+      if($this->config()->getBool("queue_autodelete", false))
+      {
+        $flags = $flags | AMQP_AUTODELETE;
+      }
+      if($this->config()->getBool("queue_nowait", false))
+      {
+        $flags = $flags | AMQP_NOWAIT;
+      }
+      $this->_queue->setFlags($flags);
+
       $args        = $this->config()->getArr("queue_args", null);
-      $x_ha_policy = $this->config()->getArr("x-ha-policy", null);
+      $x_ha_policy = $this->config()->getStr("x-ha-policy", null);
       if($x_ha_policy)
       {
         $args                = (array)$args;
         $args['x-ha-policy'] = $x_ha_policy;
       }
+      if(is_array($args))
+      {
+        $this->_queue->setArguments($args);
+      }
 
-      $this->_channel()->queue_declare(
-        $name,
-        $this->config()->getBool("queue_passive", false),
-        $this->config()->getBool("queue_durable", true),
-        $this->config()->getBool("queue_exclusive", false),
-        $this->config()->getBool("queue_autodelete", false),
-        $this->config()->getBool("queue_nowait", false),
-        $args
-      );
+      $this->_queue->declareQueue();
+      $this->_queue->bind($this->_exchange()->getName(), $name);
       $this->_lastQueue = $name;
 
       $this->_persistentDefault = $this->config()->getBool('persistent', false);
@@ -124,6 +164,7 @@ class AmqpQueue implements IBatchQueueProvider
         $this->_dataFormat = self::DATA_FORMAT_SERIALIZE;
       }
     }
+    return $this->_queue;
   }
 
   protected function _getHosts()
@@ -158,18 +199,28 @@ class AmqpQueue implements IBatchQueueProvider
   {
     if($this->_conn === null)
     {
+      if(!extension_loaded('amqp'))
+      {
+        throw new \Exception('Required AMQP module not loaded.');
+      }
       while(!$this->_conn)
       {
         $this->_getHosts();
         $host = reset($this->_hosts);
         try
         {
-          $this->_conn = new AMQPStreamConnection(
-            $host,
-            $this->config()->getInt("port", 5672),
-            $this->config()->getStr("username", 'guest'),
-            $this->config()->getStr("password", 'guest')
+          $credentials = array(
+            'host'            => $host,
+            'port'            => $this->config()->getInt("port", 5672),
+            //'vhost' => amqp.vhost The virtual host on the host.
+            'login'           => $this->config()->getStr("username", 'guest'),
+            'password'        => $this->config()->getStr("password", 'guest'),
+            'read_timeout'    => 0,
+            'write_timeout'   => 0,
+            'connect_timeout' => 0
           );
+          $this->_conn = new \AMQPConnection($credentials);
+          $this->_conn->connect();
         }
         catch(\Exception $e)
         {
@@ -186,7 +237,12 @@ class AmqpQueue implements IBatchQueueProvider
   {
     if($this->_chan === null)
     {
-      $this->_chan = $this->_connection()->channel();
+      $this->_chan = new \AMQPChannel($this->_connection());
+      $qosCount    = $this->_getQosCount();
+      if($qosCount)
+      {
+        $this->_chan->qos(0, $qosCount);
+      }
     }
     return $this->_chan;
   }
@@ -195,23 +251,23 @@ class AmqpQueue implements IBatchQueueProvider
     IQueue $queue, $data = null, $delay = 0, $persistent = null
   )
   {
-    $this->pushBatch($queue, [$data], $persistent);
+    $this->_publish($queue, $data, $persistent);
   }
 
   public function pushBatch(
     IQueue $queue, array $data, $delay = 0, $persistent = null
   )
   {
-    $this->_configureExchange();
-    $this->_configureQueue($queue->name());
+    $this->_exchange();
+    $this->_getQueue($queue->name());
 
     try
     {
-      foreach($data as $msg)
+      foreach($data as $k => $msg)
       {
         $this->_publish($queue, $msg, $persistent);
+        unset($data[$k]);
       }
-      $this->_channel()->publish_batch();
     }
     catch(\Exception $e)
     {
@@ -240,9 +296,9 @@ class AmqpQueue implements IBatchQueueProvider
 
   protected function _reconnect(IQueue $queue)
   {
-    $this->_forceDisconnect();
-    $this->_configureExchange();
-    $this->_configureQueue($queue->name());
+    $this->disconnect();
+    $this->_exchange();
+    $this->_getQueue($queue->name());
   }
 
   protected function _publish(IQueue $queue, $data = null, $persistent = null)
@@ -252,11 +308,9 @@ class AmqpQueue implements IBatchQueueProvider
       $persistent = $this->_persistentDefault;
     }
 
-    $msg = new AMQPMessage(
-      $this->_encodeData($data), ['delivery_mode' => $persistent ? 2 : 1]
-    );
-    $this->_channel()->batch_basic_publish(
-      $msg, $this->_exchange, $queue->name()
+    $this->_exchange()->publish(
+      $this->_encodeData($data), $queue->name(),
+      $persistent ? AMQP_DURABLE : AMQP_NOPARAM
     );
   }
 
@@ -295,54 +349,48 @@ class AmqpQueue implements IBatchQueueProvider
 
   public function consume(IQueue $queue, IQueueConsumer $consumer)
   {
-    $this->_queue           = $queue;
+    $this->_queueName       = $queue;
     $this->_currentConsumer = $consumer;
-    $this->_configureExchange();
-    $this->_configureQueue($queue->name());
 
     $batched       = $consumer instanceof IBatchQueueConsumer;
     $consumeMethod = $batched ? "processBatchMessage" : "processMessage";
 
-    $qosSize = $this->_getQosCount();
     try
     {
       $this->_waits = 0;
       while(true)
       {
-        $channel = $this->_channel();
-        if($qosSize)
-        {
-          $channel->basic_qos(0, $qosSize, false);
-        }
-        $channel->basic_consume(
-          $queue->name(),
-          CUBEX_TRANSACTION,
-          false,
-          false,
-          false,
-          false,
-          [$this, $consumeMethod]
-        );
+        $amqpQueue = $this->_getQueue($queue->name());
+        // AMQP_NOLOCAL | AMQP_EXCLUSIVE | AMQP_NOWAIT; // noack
 
         $waitTime = $consumer->waitTime($this->_waits);
+        $this->_connection()->setReadTimeout($waitTime);
+        $this->_connection()->setWriteTimeout($waitTime);
         try
         {
           try
           {
-            while(count($channel->callbacks))
-            {
-              $channel->wait(null, true, $waitTime);
-            }
+            $amqpQueue->consume(
+              [$this, $consumeMethod], AMQP_NOPARAM, CUBEX_TRANSACTION
+            );
           }
-          catch(AMQPTimeoutException $e)
+          catch(\AMQPException $e)
           {
-            //Expected on smaller queues, no message received in $waitTime
-            \Log::debug("No message received in wait time ({$waitTime}s)");
+            if($e->getCode() == 9) // AMQP_STATUS_SOCKET_ERROR
+            {
+              //no message received in $waitTime
+              \Log::debug("No message received in wait time ({$waitTime}s)");
+              $this->_reconnect($queue);
+            }
+            else
+            {
+              throw $e;
+            }
           }
 
           if($batched)
           {
-            $this->_processBatch(true);
+            $this->_processBatch($amqpQueue, true);
           }
         }
         catch(\Exception $e)
@@ -356,11 +404,7 @@ class AmqpQueue implements IBatchQueueProvider
         }
         else if($waitTime > 0)
         {
-          EventManager::trigger(
-            EventManager::CUBEX_QUEUE_WAIT,
-            ['service' => $this]
-          );
-
+          //sleep($waitTime);
           $this->_waits++;
           $this->_reconnect($queue);
         }
@@ -375,29 +419,33 @@ class AmqpQueue implements IBatchQueueProvider
     return true;
   }
 
-  public function processMessage(AMQPMessage $msg)
+  public function processMessage(\AMQPEnvelope $msg, \AMQPQueue $queue)
   {
     $result = $this->_currentConsumer->process(
-      $this->_queue,
-      $this->_decodeData($msg->body)
+      $this->_queueName,
+      $this->_decodeData($msg->getBody())
     );
-    $this->_completeMessage($msg, $result);
+    $this->_completeMessage($queue, $msg, $result);
+    return true;
   }
 
-  public function processBatchMessage(AMQPMessage $msg)
+  public function processBatchMessage(\AMQPEnvelope $msg, \AMQPQueue $queue)
   {
-    $taskId                     = $msg->delivery_info['delivery_tag'];
+    $taskId                     = $msg->getDeliveryTag();
     $this->_batchQueue[$taskId] = $msg;
     $this->_batchQueueCount++;
     /**
      * @var $consumer IBatchQueueConsumer
      */
     $consumer = $this->_currentConsumer;
-    $consumer->process($this->_queue, $this->_decodeData($msg->body), $taskId);
-    $this->_processBatch();
+    $consumer->process(
+      $this->_queueName, $this->_decodeData($msg->getBody()), $taskId
+    );
+    $this->_processBatch($queue);
+    return true;
   }
 
-  protected function _processBatch($push = false)
+  protected function _processBatch(\AMQPQueue $queue, $push = false)
   {
     if($this->_batchQueueCount == 0)
     {
@@ -422,6 +470,7 @@ class AmqpQueue implements IBatchQueueProvider
           if(isset($this->_batchQueue[$jobId]))
           {
             $this->_completeMessage(
+              $queue,
               $this->_batchQueue[$jobId],
               $result
             );
@@ -440,19 +489,17 @@ class AmqpQueue implements IBatchQueueProvider
     }
   }
 
-  protected function _completeMessage(AMQPMessage $msg, $passed = true)
+  protected function _completeMessage(
+    \AMQPQueue $queue, \AMQPEnvelope $msg, $passed = true
+  )
   {
     if($passed)
     {
-      $msg->delivery_info['channel']->basic_ack(
-        $msg->delivery_info['delivery_tag']
-      );
+      $queue->ack($msg->getDeliveryTag());
     }
     else
     {
-      $msg->delivery_info['channel']->basic_reject(
-        $msg->delivery_info['delivery_tag'], 1
-      );
+      $queue->reject($msg->getDeliveryTag(), AMQP_REQUEUE);
     }
   }
 
@@ -463,43 +510,22 @@ class AmqpQueue implements IBatchQueueProvider
 
   public function disconnect()
   {
+    $this->_exchange  = null;
+    $this->_lastQueue = null;
+    $this->_chan      = null;
     try
     {
-      if($this->_chan !== null && $this->_chan instanceof AMQPChannel)
+      if($this->_conn !== null
+        && $this->_conn instanceof \AMQPConnection
+        && $this->_conn->isConnected()
+      )
       {
-        $this->_chan->close();
-      }
-    }
-    catch(\Exception $e)
-    {
-    }
-    $this->_chan = null;
-
-    try
-    {
-      if($this->_conn !== null && $this->_conn instanceof AbstractConnection)
-      {
-        $this->_conn->close();
+        $this->_conn->disconnect();
       }
     }
     catch(\Exception $e)
     {
     }
     $this->_conn = null;
-
-    $this->_exchange  = null;
-    $this->_lastQueue = null;
-  }
-
-  protected function _forceDisconnect()
-  {
-    if($this->_conn !== null)
-    {
-      $this->_conn->set_close_on_destruct(false);
-    }
-    $this->_chan = null;
-    $this->_conn = null;
-    $this->_exchange  = null;
-    $this->_lastQueue = null;
   }
 }
