@@ -76,6 +76,7 @@ class MySQL implements IDatabaseService
       }
       else
       {
+        $conn->set_charset('utf8');
         self::$_connectionCache[$key] = $conn;
       }
     }
