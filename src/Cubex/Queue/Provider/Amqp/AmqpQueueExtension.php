@@ -480,12 +480,23 @@ class AmqpQueueExtension implements IBatchQueueProvider
 
     if($push)
     {
-      $results = $consumer->runBatch();
-      if(!empty($results))
+      $this->_completeBatch($queue, $consumer->runBatch());
+
+      $this->_batchQueueCount = 0;
+      $this->_batchQueue      = [];
+    }
+  }
+
+  protected function _completeBatch(\AMQPQueue $queue, $results)
+  {
+    if(!empty($results))
+    {
+      $jobId = null;
+      foreach($results as $jobId => $result)
       {
-        foreach($results as $jobId => $result)
+        if(isset($this->_batchQueue[$jobId]))
         {
-          if(isset($this->_batchQueue[$jobId]))
+          if(!$result)
           {
             $this->_completeMessage(
               $queue,
@@ -493,17 +504,18 @@ class AmqpQueueExtension implements IBatchQueueProvider
               $result
             );
           }
-          else
-          {
-            throw new \Exception(
-              "Unable to locate task Id '" . $jobId . "' in the queue"
-            );
-          }
+        }
+        else
+        {
+          throw new \Exception(
+            "Unable to locate task Id '" . $jobId . "' in the queue"
+          );
         }
       }
-
-      $this->_batchQueueCount = 0;
-      $this->_batchQueue      = [];
+      if($jobId && isset($this->_batchQueue[$jobId]))
+      {
+        $queue->ack($this->_batchQueue[$jobId]->getDeliveryTag(), AMQP_MULTIPLE);
+      }
     }
   }
 
