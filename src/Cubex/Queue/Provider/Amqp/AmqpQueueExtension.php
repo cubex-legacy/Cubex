@@ -379,9 +379,19 @@ class AmqpQueueExtension implements IBatchQueueProvider
           {
             if($e->getCode() == 9) // AMQP_STATUS_SOCKET_ERROR
             {
-              //no message received in $waitTime
-              \Log::debug("No message received in wait time ({$waitTime}s)");
-              $this->_reconnect($queue);
+              if($batched && $this->_batchQueue)
+              {
+                \Log::debug(
+                  'Message quota not received in wait time (' . $waitTime . 's)'
+                );
+              }
+              else
+              {
+                \Log::debug(
+                  'No message received in wait time (' . $waitTime . 's). Reconnecting.'
+                );
+                $this->_reconnect($queue);
+              }
             }
             else
             {
