@@ -18,7 +18,10 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
-class AmqpQueue implements IBatchQueueProvider
+/**
+ * AMQP queue provider that uses the php-amqplib library
+ */
+class AmqpQueueLibrary implements IBatchQueueProvider
 {
   const DATA_FORMAT_SERIALIZE = 'serialize';
   const DATA_FORMAT_JSON      = 'json';

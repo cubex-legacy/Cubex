@@ -20,11 +20,11 @@ class AmqpDuplexQueue implements IBatchQueueProvider
   use ServiceConfigTrait;
 
   /**
-   * @var AmqpQueue|null
+   * @var IBatchQueueProvider|null
    */
   private $_pushQueue = null;
   /**
-   * @var AmqpQueue|null
+   * @var IBatchQueueProvider|null
    */
   private $_consumeQueue = null;
 
@@ -79,11 +79,13 @@ class AmqpDuplexQueue implements IBatchQueueProvider
 
   public function disconnect()
   {
-    if($this->_pushQueue !== null)
+    if(($this->_pushQueue !== null) &&
+      method_exists($this->_pushQueue, 'disconnect'))
     {
       $this->_pushQueue->disconnect();
     }
-    if($this->_consumeQueue !== null)
+    if(($this->_consumeQueue !== null) &&
+      method_exists($this->_consumeQueue, 'disconnect'))
     {
       $this->_consumeQueue->disconnect();
     }

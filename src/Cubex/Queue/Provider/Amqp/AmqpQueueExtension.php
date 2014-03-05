@@ -13,6 +13,9 @@ use Cubex\Queue\IQueue;
 use Cubex\Queue\IQueueConsumer;
 use Cubex\ServiceManager\ServiceConfigTrait;
 
+/**
+ * AMQP queue provider that uses the amqp PECL module
+ */
 class AmqpQueueExtension implements IBatchQueueProvider
 {
   const DATA_FORMAT_SERIALIZE = 'serialize';
