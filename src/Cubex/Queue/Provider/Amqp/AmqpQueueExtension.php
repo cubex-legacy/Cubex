@@ -155,15 +155,6 @@ class AmqpQueueExtension implements IBatchQueueProvider
       $this->_queue->declareQueue();
       $this->_queue->bind($this->_exchange()->getName(), $name);
       $this->_lastQueue = $name;
-
-      $this->_persistentDefault = $this->config()->getBool('persistent', false);
-      $this->_dataFormat        = $this->config()->getStr(
-        'data_format', self::DATA_FORMAT_SERIALIZE
-      );
-      if($this->_dataFormat != self::DATA_FORMAT_JSON)
-      {
-        $this->_dataFormat = self::DATA_FORMAT_SERIALIZE;
-      }
     }
     return $this->_queue;
   }
@@ -227,6 +218,17 @@ class AmqpQueueExtension implements IBatchQueueProvider
         {
           Log::warning('AMQP host failed to connect: ' . $host);
           array_shift($this->_hosts);
+        }
+
+        $this->_persistentDefault = $this->config()->getBool(
+          'persistent', false
+        );
+        $this->_dataFormat        = $this->config()->getStr(
+          'data_format', self::DATA_FORMAT_SERIALIZE
+        );
+        if($this->_dataFormat != self::DATA_FORMAT_JSON)
+        {
+          $this->_dataFormat = self::DATA_FORMAT_SERIALIZE;
         }
       }
     }
