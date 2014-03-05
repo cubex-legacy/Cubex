@@ -178,7 +178,8 @@ class HtmlElement implements IRenderable
     if(!empty($this->_tag))
     {
       if(!isset($this->_selfClosingTags[$this->_tag])
-        || !empty($this->_content))
+        || !empty($this->_content)
+      )
       {
         $return .= '</' . $this->_tag . '>';
       }
@@ -204,6 +205,10 @@ class HtmlElement implements IRenderable
    */
   public static function escape($content)
   {
+    if(function_exists('mb_convert_encoding'))
+    {
+      return mb_convert_encoding($content, 'HTML-ENTITIES');
+    }
     return \htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
   }
 
