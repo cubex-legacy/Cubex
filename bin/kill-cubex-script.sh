@@ -1,31 +1,51 @@
 #!/bin/bash
 
-if [ $# -lt 1 ]
+CLASSNAME=""
+INST=""
+TIMEOUT=10
+
+while [ $# -gt 0 ]
+do
+     case "$1" in
+          -t=*|--timeout=*)
+               TIMEOUT=`echo "$1" | cut -d'=' -f2`
+          ;;
+          *)
+               if [ "$CLASSNAME" = "" ]
+               then
+                    CLASSNAME="$1"
+               elif [ "$INST" = "" ]
+               then
+                    INST="$1"
+               fi
+          ;;
+     esac
+     shift
+done
+
+if [ "$CLASSNAME" = "" ] || [ -z "${TIMEOUT##*[!0-9]*}" ]
 then
-  echo "Usage: $0 className"
+  echo "Usage: `basename "$0"` className [instanceName] [-t|--timeout=<seconds>]"
   exit 1
 fi
-
-CLASSNAME="$1"
-INST="$2"
 
 if [ "$INST" != "" ]
 then
   INST="\s$INST(\s|$)"
 fi
 
-PID=`ps ax | grep "/cubex" | grep "$CLASSNAME" | grep -E "$INST" | grep -v grep | awk '{print $1}'`
+PID=`ps ax | grep "/cubex" | grep "$CLASSNAME" | grep -E "$INST" | grep -v grep | grep -v bash | awk '{print $1}'`
 
 if [ "$PID" = "" ]
 then
-  echo "not running"
+  echo "Not running"
 else
   for P in $PID
   do
     echo "Killing Cubex Class $CLASSNAME PID $P"
     kill $P
   done
-  sleep 5
+  sleep $TIMEOUT
   for P in $PID
   do
     kill -0 $P >/dev/null 2>&1 && kill -9 $P
