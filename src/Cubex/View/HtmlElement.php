@@ -207,7 +207,7 @@ class HtmlElement implements IRenderable
   {
     if(function_exists('mb_convert_encoding'))
     {
-      return mb_convert_encoding($content, 'HTML-ENTITIES');
+      return mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8');
     }
     return \htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
   }
