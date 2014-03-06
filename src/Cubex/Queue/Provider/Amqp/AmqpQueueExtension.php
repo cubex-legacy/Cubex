@@ -53,7 +53,7 @@ class AmqpQueueExtension implements IBatchQueueProvider
 
   protected $_retries = 3;
 
-  protected $_qosSize;
+  protected $_qosCount;
 
   /**
    * @var bool
@@ -346,11 +346,21 @@ class AmqpQueueExtension implements IBatchQueueProvider
 
   protected function _getQosCount()
   {
-    if($this->_qosSize === null)
+    if($this->_qosCount === null)
     {
-      $this->_qosSize = $this->config()->getInt('qos_size', 1);
+      $this->_qosCount = $this->config()->getInt('qos_size', 1);
     }
-    return $this->_qosSize;
+    return $this->_qosCount;
+  }
+
+  protected function _setQosCountMinimum($value)
+  {
+    $qos = $this->_getQosCount();
+    if(($qos > 0) && ($qos < $value))
+    {
+      Log::notice('Setting minimum QoS count');
+      $this->_qosCount = $value;
+    }
   }
 
   public function consume(IQueue $queue, IQueueConsumer $consumer)
@@ -358,8 +368,17 @@ class AmqpQueueExtension implements IBatchQueueProvider
     $this->_queueName       = $queue;
     $this->_currentConsumer = $consumer;
 
-    $batched       = $consumer instanceof IBatchQueueConsumer;
-    $consumeMethod = $batched ? "processBatchMessage" : "processMessage";
+    if($consumer instanceof IBatchQueueConsumer)
+    {
+      $this->_setQosCountMinimum($consumer->getBatchSize());
+      $consumeMethod = 'processBatchMessage';
+      $batched       = true;
+    }
+    else
+    {
+      $consumeMethod = 'processMessage';
+      $batched       = false;
+    }
 
     try
     {
@@ -367,9 +386,7 @@ class AmqpQueueExtension implements IBatchQueueProvider
       while(true)
       {
         $amqpQueue = $this->_getQueue($queue->name());
-        // AMQP_NOLOCAL | AMQP_EXCLUSIVE | AMQP_NOWAIT; // noack
-
-        $waitTime = $consumer->waitTime($this->_waits);
+        $waitTime  = $consumer->waitTime($this->_waits);
         $this->_connection()->setReadTimeout($waitTime);
         $this->_connection()->setWriteTimeout($waitTime);
         try
@@ -517,7 +534,9 @@ class AmqpQueueExtension implements IBatchQueueProvider
       }
       if($jobId && isset($this->_batchQueue[$jobId]))
       {
-        $queue->ack($this->_batchQueue[$jobId]->getDeliveryTag(), AMQP_MULTIPLE);
+        $queue->ack(
+          $this->_batchQueue[$jobId]->getDeliveryTag(), AMQP_MULTIPLE
+        );
       }
     }
   }

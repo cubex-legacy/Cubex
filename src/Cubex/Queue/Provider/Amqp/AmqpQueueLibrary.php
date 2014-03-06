@@ -57,7 +57,7 @@ class AmqpQueueLibrary implements IBatchQueueProvider
 
   protected $_retries = 3;
 
-  protected $_qosSize;
+  protected $_qosCount;
 
   /**
    * @var bool
@@ -291,11 +291,21 @@ class AmqpQueueLibrary implements IBatchQueueProvider
 
   protected function _getQosCount()
   {
-    if($this->_qosSize === null)
+    if($this->_qosCount === null)
     {
-      $this->_qosSize = $this->config()->getInt('qos_size', 1);
+      $this->_qosCount = $this->config()->getInt('qos_size', 1);
     }
-    return $this->_qosSize;
+    return $this->_qosCount;
+  }
+
+  protected function _setQosCountMinimum($value)
+  {
+    $qos = $this->_getQosCount();
+    if(($qos > 0) && ($qos < $value))
+    {
+      Log::notice('Setting minimum QoS count to ' . $value);
+      $this->_qosCount = $value;
+    }
   }
 
   public function consume(IQueue $queue, IQueueConsumer $consumer)
@@ -305,19 +315,29 @@ class AmqpQueueLibrary implements IBatchQueueProvider
     $this->_configureExchange();
     $this->_configureQueue($queue->name());
 
-    $batched       = $consumer instanceof IBatchQueueConsumer;
-    $consumeMethod = $batched ? "processBatchMessage" : "processMessage";
+    if($consumer instanceof IBatchQueueConsumer)
+    {
+      $this->_setQosCountMinimum($consumer->getBatchSize());
+      $consumeMethod = 'processBatchMessage';
+      $batched       = true;
+    }
+    else
+    {
+      $consumeMethod = 'processMessage';
+      $batched       = false;
+    }
 
-    $qosSize = $this->_getQosCount();
+    $qos = $this->_getQosCount();
+
     try
     {
       $this->_waits = 0;
       while(true)
       {
         $channel = $this->_channel();
-        if($qosSize)
+        if($qos)
         {
-          $channel->basic_qos(0, $qosSize, false);
+          $channel->basic_qos(0, $qos, false);
         }
         $channel->basic_consume(
           $queue->name(),
@@ -399,6 +419,7 @@ class AmqpQueueLibrary implements IBatchQueueProvider
      */
     $consumer = $this->_currentConsumer;
     $consumer->process($this->_queue, $this->_decodeData($msg->body), $taskId);
+    echo '.';
     $this->_processBatch();
   }
 
@@ -502,8 +523,8 @@ class AmqpQueueLibrary implements IBatchQueueProvider
     {
       $this->_conn->set_close_on_destruct(false);
     }
-    $this->_chan = null;
-    $this->_conn = null;
+    $this->_chan      = null;
+    $this->_conn      = null;
     $this->_exchange  = null;
     $this->_lastQueue = null;
   }
