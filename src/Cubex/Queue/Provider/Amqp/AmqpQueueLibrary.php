@@ -1,8 +1,4 @@
 <?php
-/**
- * @author  brooke.bryan
- */
-
 namespace Cubex\Queue\Provider\Amqp;
 
 use Cubex\Events\EventManager;
@@ -133,7 +129,7 @@ class AmqpQueueLibrary implements IBatchQueueProvider
       }
       if($this->_hostsRetries)
       {
-        $this->_hosts = $this->config()->getArr("host", 'localhost');
+        $this->_hosts = $this->config()->getArr("host", ['localhost']);
         $this->_hostsRetries--;
       }
       else
@@ -172,10 +168,12 @@ class AmqpQueueLibrary implements IBatchQueueProvider
         }
 
         $this->_persistentDefault = $this->config()->getBool(
-          'persistent', false
+          'persistent',
+          false
         );
         $this->_dataFormat        = $this->config()->getStr(
-          'data_format', self::DATA_FORMAT_SERIALIZE
+          'data_format',
+          self::DATA_FORMAT_SERIALIZE
         );
         if($this->_dataFormat != self::DATA_FORMAT_JSON)
         {
@@ -261,7 +259,9 @@ class AmqpQueueLibrary implements IBatchQueueProvider
       $this->_encodeData($data), ['delivery_mode' => $persistent ? 2 : 1]
     );
     $this->_channel()->batch_basic_publish(
-      $msg, $this->_exchange, $queue->name()
+      $msg,
+      $this->_exchange,
+      $queue->name()
     );
   }
 
@@ -477,7 +477,8 @@ class AmqpQueueLibrary implements IBatchQueueProvider
     else
     {
       $msg->delivery_info['channel']->basic_reject(
-        $msg->delivery_info['delivery_tag'], 1
+        $msg->delivery_info['delivery_tag'],
+        1
       );
     }
   }
