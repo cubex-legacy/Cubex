@@ -58,6 +58,11 @@ class AmqpQueueLibrary implements IBatchQueueProvider
   /**
    * @var bool
    */
+  protected $_blocking = true;
+
+  /**
+   * @var bool
+   */
   protected $_persistentDefault = false;
 
   /**
@@ -308,6 +313,16 @@ class AmqpQueueLibrary implements IBatchQueueProvider
     }
   }
 
+  protected function _setQosCountMaximum($value)
+  {
+    $qos = $this->_getQosCount();
+    if($qos > $value)
+    {
+      Log::notice('Setting maximum QoS count to ' . $value);
+      $this->_qosCount = $value;
+    }
+  }
+
   public function consume(IQueue $queue, IQueueConsumer $consumer)
   {
     $this->_queue           = $queue;
@@ -318,6 +333,10 @@ class AmqpQueueLibrary implements IBatchQueueProvider
     if($consumer instanceof IBatchQueueConsumer)
     {
       $this->_setQosCountMinimum($consumer->getBatchSize());
+      if(!$this->_blocking)
+      {
+        $this->_setQosCountMaximum($consumer->getBatchSize());
+      }
       $consumeMethod = 'processBatchMessage';
       $batched       = true;
     }
@@ -339,15 +358,18 @@ class AmqpQueueLibrary implements IBatchQueueProvider
         {
           $channel->basic_qos(0, $qos, false);
         }
-        $channel->basic_consume(
-          $queue->name(),
-          CUBEX_TRANSACTION,
-          false,
-          false,
-          false,
-          false,
-          [$this, $consumeMethod]
-        );
+        if(!isset($channel->callbacks[CUBEX_TRANSACTION]))
+        {
+          $channel->basic_consume(
+            $queue->name(),
+            CUBEX_TRANSACTION,
+            false,
+            false,
+            false,
+            false,
+            [$this, $consumeMethod]
+          );
+        }
 
         $waitTime = $consumer->waitTime($this->_waits);
         try
@@ -356,13 +378,20 @@ class AmqpQueueLibrary implements IBatchQueueProvider
           {
             while(count($channel->callbacks))
             {
-              $channel->wait(null, true, $waitTime);
+              $channel->wait(null, true, ($this->_blocking ? $waitTime : 1));
+              if(($batched && $this->_processBatch()) || !$batched)
+              {
+                break;
+              }
             }
           }
           catch(AMQPTimeoutException $e)
           {
             //Expected on smaller queues, no message received in $waitTime
-            \Log::debug("No message received in wait time ({$waitTime}s)");
+            if($this->_blocking)
+            {
+              \Log::debug("No message received in wait time ({$waitTime}s)");
+            }
           }
 
           if($batched)
@@ -375,7 +404,7 @@ class AmqpQueueLibrary implements IBatchQueueProvider
           \Log::error($e->getCode() . ': ' . $e->getMessage());
         }
 
-        if($waitTime === false)
+        if($waitTime === false || !$this->_blocking)
         {
           break;
         }
@@ -395,7 +424,6 @@ class AmqpQueueLibrary implements IBatchQueueProvider
     {
       \Log::error('Line ' . __LINE__ . ': ' . $e->getMessage());
     }
-    $this->disconnect();
     $consumer->shutdown();
     return true;
   }
@@ -419,15 +447,13 @@ class AmqpQueueLibrary implements IBatchQueueProvider
      */
     $consumer = $this->_currentConsumer;
     $consumer->process($this->_queue, $this->_decodeData($msg->body), $taskId);
-    echo '.';
-    $this->_processBatch();
   }
 
   protected function _processBatch($push = false)
   {
     if($this->_batchQueueCount == 0)
     {
-      return;
+      return false;
     }
     /**
      * @var $consumer IBatchQueueConsumer
@@ -440,29 +466,44 @@ class AmqpQueueLibrary implements IBatchQueueProvider
 
     if($push)
     {
-      $results = $consumer->runBatch();
-      if(!empty($results))
+      $this->_completeBatch($consumer->runBatch());
+
+      $this->_batchQueueCount = 0;
+      $this->_batchQueue      = [];
+    }
+    return $push;
+  }
+
+  protected function _completeBatch($results)
+  {
+    if(!empty($results))
+    {
+      $jobId = null;
+      foreach($results as $jobId => $result)
       {
-        foreach($results as $jobId => $result)
+        if(isset($this->_batchQueue[$jobId]))
         {
-          if(isset($this->_batchQueue[$jobId]))
+          if(!$result)
           {
             $this->_completeMessage(
               $this->_batchQueue[$jobId],
               $result
             );
           }
-          else
-          {
-            throw new \Exception(
-              "Unable to locate task Id '" . $jobId . "' in the queue"
-            );
-          }
+        }
+        else
+        {
+          throw new \Exception(
+            "Unable to locate task Id '" . $jobId . "' in the queue"
+          );
         }
       }
-
-      $this->_batchQueueCount = 0;
-      $this->_batchQueue      = [];
+      if($jobId && isset($this->_batchQueue[$jobId]))
+      {
+        $this->_batchQueue[$jobId]->delivery_info['channel']->basic_ack(
+          $this->_batchQueue[$jobId]->delivery_info['delivery_tag'], true
+        );
+      }
     }
   }
 
@@ -477,8 +518,7 @@ class AmqpQueueLibrary implements IBatchQueueProvider
     else
     {
       $msg->delivery_info['channel']->basic_reject(
-        $msg->delivery_info['delivery_tag'],
-        1
+        $msg->delivery_info['delivery_tag'], true
       );
     }
   }
@@ -528,5 +568,15 @@ class AmqpQueueLibrary implements IBatchQueueProvider
     $this->_conn      = null;
     $this->_exchange  = null;
     $this->_lastQueue = null;
+  }
+
+  public function setBlocking($value = true)
+  {
+    $this->_blocking = $value;
+  }
+
+  public function getBlocking()
+  {
+    return $this->_blocking;
   }
 }

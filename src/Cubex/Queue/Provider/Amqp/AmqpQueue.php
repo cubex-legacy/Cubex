@@ -52,4 +52,14 @@ class AmqpQueue implements IBatchQueueProvider
   {
     $this->_queueProvider->disconnect();
   }
+
+  public function setBlocking($value = true)
+  {
+    $this->_queueProvider->setBlocking($value);
+  }
+
+  public function getBlocking()
+  {
+    return $this->_queueProvider->getBlocking();
+  }
 }

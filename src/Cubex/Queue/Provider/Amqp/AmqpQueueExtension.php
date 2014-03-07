@@ -58,6 +58,11 @@ class AmqpQueueExtension implements IBatchQueueProvider
   /**
    * @var bool
    */
+  protected $_blocking = true;
+
+  /**
+   * @var bool
+   */
   protected $_persistentDefault = false;
 
   /**
@@ -393,9 +398,22 @@ class AmqpQueueExtension implements IBatchQueueProvider
         {
           try
           {
-            $amqpQueue->consume(
-              [$this, $consumeMethod], AMQP_NOPARAM, CUBEX_TRANSACTION
-            );
+            if(!$this->_blocking)
+            {
+              $msg = $amqpQueue->get(AMQP_NOPARAM);
+              if($msg)
+              {
+                call_user_func_array(
+                  [$this, $consumeMethod], [$msg, $amqpQueue]
+                );
+              }
+            }
+            else
+            {
+              $amqpQueue->consume(
+                [$this, $consumeMethod], AMQP_NOPARAM, CUBEX_TRANSACTION
+              );
+            }
           }
           catch(\AMQPException $e)
           {
@@ -431,7 +449,7 @@ class AmqpQueueExtension implements IBatchQueueProvider
           \Log::error($e->getCode() . ': ' . $e->getMessage());
         }
 
-        if($waitTime === false)
+        if($waitTime === false || !$this->_blocking)
         {
           break;
         }
@@ -452,7 +470,6 @@ class AmqpQueueExtension implements IBatchQueueProvider
     {
       \Log::error('Line ' . __LINE__ . ': ' . $e->getMessage());
     }
-    $this->disconnect();
     $consumer->shutdown();
     return true;
   }
@@ -576,5 +593,15 @@ class AmqpQueueExtension implements IBatchQueueProvider
     $this->_chan      = null;
     $this->_exchange  = null;
     $this->_lastQueue = null;
+  }
+
+  public function setBlocking($value = false)
+  {
+    $this->_blocking = $value;
+  }
+
+  public function getBlocking()
+  {
+    return $this->_blocking;
   }
 }
