@@ -257,7 +257,7 @@ class AmqpQueueExtension implements IBatchQueueProvider
     IQueue $queue, $data = null, $delay = 0, $persistent = null
   )
   {
-    $this->_publish($queue, $data, $persistent);
+    $this->pushBatch($queue, [$data], $delay, $persistent);
   }
 
   public function pushBatch(
