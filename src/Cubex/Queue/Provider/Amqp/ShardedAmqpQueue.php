@@ -82,7 +82,7 @@ class ShardedAmqpQueue implements IBatchQueueProvider
 
   protected function _getStdQueue(IQueue $queue)
   {
-    return new StdQueue($queue->name() . $this->_curTableIndex);
+    return new StdQueue($queue->name() . ':' . $this->_curTableIndex);
   }
 
   protected function _nextTable()
