@@ -152,7 +152,7 @@ class MySQL implements IDatabaseService
     }
     if($this->_port === null)
     {
-      $this->_port = $this->_config->getStr('port', 3306);
+      $this->_port = $this->_config->getInt('port', 3306);
     }
   }
 
