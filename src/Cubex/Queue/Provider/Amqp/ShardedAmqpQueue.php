@@ -108,7 +108,7 @@ class ShardedAmqpQueue implements IBatchQueueProvider
   {
     if($this->_numTables === null)
     {
-      $this->_numTables = $this->_config->getInt('num_tables', 10);
+      $this->_numTables = $this->_config->getInt('num_queues', 10);
     }
     return $this->_numTables;
   }
