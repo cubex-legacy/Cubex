@@ -455,7 +455,6 @@ class AmqpQueueExtension implements IBatchQueueProvider
 
           //sleep($waitTime);
           $this->_waits++;
-          $this->_reconnect($queue);
         }
       }
     }
