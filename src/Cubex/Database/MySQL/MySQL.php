@@ -210,6 +210,10 @@ class MySQL implements IDatabaseService
         }
       }
     }
+    if(!$this->_connection)
+    {
+      throw new \Exception('Failed to connect');
+    }
 
     return $this;
   }
