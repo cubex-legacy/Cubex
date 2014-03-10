@@ -35,7 +35,7 @@ class AmqpQueueExtension implements IBatchQueueProvider
   protected $_chan;
   protected $_queue;
   protected $_exchange;
-  protected $_lastQueue;
+  protected $_queueCache = [];
 
   /**
    * @var IQueueConsumer
@@ -121,10 +121,10 @@ class AmqpQueueExtension implements IBatchQueueProvider
 
   protected function _getQueue($name)
   {
-    if($this->_lastQueue !== $name)
+    if(!isset($this->_queueCache[$name]))
     {
-      $this->_queue = new \AMQPQueue($this->_channel());
-      $this->_queue->setName($name);
+      $queue = new \AMQPQueue($this->_channel());
+      $queue->setName($name);
       $flags = 0;
       if($this->config()->getBool("queue_passive", false))
       {
@@ -146,7 +146,7 @@ class AmqpQueueExtension implements IBatchQueueProvider
       {
         $flags = $flags | AMQP_NOWAIT;
       }
-      $this->_queue->setFlags($flags);
+      $queue->setFlags($flags);
 
       $args        = $this->config()->getArr("queue_args", null);
       $x_ha_policy = $this->config()->getStr("x-ha-policy", null);
@@ -157,14 +157,15 @@ class AmqpQueueExtension implements IBatchQueueProvider
       }
       if(is_array($args))
       {
-        $this->_queue->setArguments($args);
+        $queue->setArguments($args);
       }
 
-      $this->_queue->declareQueue();
-      $this->_queue->bind($this->_exchange()->getName(), $name);
-      $this->_lastQueue = $name;
+      $queue->declareQueue();
+      $queue->bind($this->_exchange()->getName(), $name);
+
+      $this->_queueCache[$name] = $queue;
     }
-    return $this->_queue;
+    return $this->_queueCache[$name];
   }
 
   protected function _getHosts()
@@ -391,29 +392,25 @@ class AmqpQueueExtension implements IBatchQueueProvider
       while(true)
       {
         $amqpQueue = $this->_getQueue($queue->name());
-        $waitTime  = $consumer->waitTime($this->_waits);
+        if($this->_blocking)
+        {
+          $waitTime = $consumer->waitTime($this->_waits);
+        }
+        else
+        {
+          $waitTime = 1;
+        }
         $this->_connection()->setReadTimeout($waitTime);
         $this->_connection()->setWriteTimeout($waitTime);
         try
         {
           try
           {
-            if(!$this->_blocking)
-            {
-              $msg = $amqpQueue->get(AMQP_NOPARAM);
-              if($msg)
-              {
-                call_user_func_array(
-                  [$this, $consumeMethod], [$msg, $amqpQueue]
-                );
-              }
-            }
-            else
-            {
-              $amqpQueue->consume(
-                [$this, $consumeMethod], AMQP_NOPARAM, CUBEX_TRANSACTION
-              );
-            }
+            $amqpQueue->cancel(CUBEX_TRANSACTION . ':' . $queue->name());
+            $amqpQueue->consume(
+              [$this, $consumeMethod], AMQP_NOPARAM,
+              CUBEX_TRANSACTION . ':' . $queue->name()
+            );
           }
           catch(\AMQPException $e)
           {
@@ -424,6 +421,7 @@ class AmqpQueueExtension implements IBatchQueueProvider
                 \Log::debug(
                   'Message quota not received in wait time (' . $waitTime . 's)'
                 );
+                $this->_processBatch($amqpQueue, true);
               }
               else
               {
@@ -437,11 +435,6 @@ class AmqpQueueExtension implements IBatchQueueProvider
             {
               throw $e;
             }
-          }
-
-          if($batched)
-          {
-            $this->_processBatch($amqpQueue, true);
           }
         }
         catch(\Exception $e)
@@ -496,15 +489,14 @@ class AmqpQueueExtension implements IBatchQueueProvider
     $consumer->process(
       $this->_queueName, $this->_decodeData($msg->getBody()), $taskId
     );
-    $this->_processBatch($queue);
-    return true;
+    return $this->_processBatch($queue);
   }
 
   protected function _processBatch(\AMQPQueue $queue, $push = false)
   {
     if($this->_batchQueueCount == 0)
     {
-      return;
+      return false;
     }
     /**
      * @var $consumer IBatchQueueConsumer
@@ -522,6 +514,7 @@ class AmqpQueueExtension implements IBatchQueueProvider
       $this->_batchQueueCount = 0;
       $this->_batchQueue      = [];
     }
+    return !$push;
   }
 
   protected function _completeBatch(\AMQPQueue $queue, $results)
@@ -589,10 +582,10 @@ class AmqpQueueExtension implements IBatchQueueProvider
     catch(\Exception $e)
     {
     }
-    $this->_conn      = null;
-    $this->_chan      = null;
-    $this->_exchange  = null;
-    $this->_lastQueue = null;
+    $this->_conn       = null;
+    $this->_chan       = null;
+    $this->_exchange   = null;
+    $this->_queueCache = [];
   }
 
   public function setBlocking($value = false)
