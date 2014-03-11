@@ -402,44 +402,39 @@ class AmqpQueueExtension implements IBatchQueueProvider
         }
         $this->_connection()->setReadTimeout($waitTime);
         $this->_connection()->setWriteTimeout($waitTime);
+
         try
         {
-          try
+          $amqpQueue->cancel(CUBEX_TRANSACTION . ':' . $queue->name());
+          $amqpQueue->consume(
+            [$this, $consumeMethod], AMQP_NOPARAM,
+            CUBEX_TRANSACTION . ':' . $queue->name()
+          );
+        }
+        catch(\AMQPException $e)
+        {
+          if($e->getCode() == 9) // AMQP_STATUS_SOCKET_ERROR
           {
-            $amqpQueue->cancel(CUBEX_TRANSACTION . ':' . $queue->name());
-            $amqpQueue->consume(
-              [$this, $consumeMethod], AMQP_NOPARAM,
-              CUBEX_TRANSACTION . ':' . $queue->name()
-            );
-          }
-          catch(\AMQPException $e)
-          {
-            if($e->getCode() == 9) // AMQP_STATUS_SOCKET_ERROR
+            if($batched && $this->_batchQueue)
             {
-              if($batched && $this->_batchQueue)
-              {
-                \Log::debug(
-                  'Message quota not received in wait time (' . $waitTime . 's)'
-                );
-                $this->_processBatch($amqpQueue, true);
-              }
-              else
-              {
-                \Log::debug(
-                  'No message received in wait time (' . $waitTime . 's). Reconnecting.'
-                );
-                $this->_reconnect($queue);
-              }
+              \Log::debug(
+                'Message quota not received in wait time (' . $waitTime . 's)'
+              );
+              $this->_processBatch($amqpQueue, true);
             }
             else
             {
-              throw $e;
+              \Log::debug(
+                'No message received in wait time (' . $waitTime . 's). Reconnecting.'
+              );
+              $this->_reconnect($queue);
             }
           }
-        }
-        catch(\Exception $e)
-        {
-          \Log::error($e->getCode() . ': ' . $e->getMessage());
+          else
+          {
+            \Log::error($e->getCode() . ': ' . $e->getMessage());
+            $this->_reconnect($queue);
+          }
         }
 
         if($waitTime === false || !$this->_blocking)
