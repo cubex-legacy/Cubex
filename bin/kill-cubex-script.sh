@@ -34,20 +34,49 @@ then
   INST="\s$INST(\s|$)"
 fi
 
-PID=`ps ax | grep "/cubex" | grep "$CLASSNAME" | grep -E "$INST" | grep -v grep | grep -v bash | awk '{print $1}'`
+PIDS=`ps ax | grep "/cubex" | grep "$CLASSNAME" | grep -E "$INST" | grep -v grep | grep -v bash | awk '{print $1}'`
 
-if [ "$PID" = "" ]
+if [ "$PIDS" = "" ]
 then
   echo "Not running"
 else
-  for P in $PID
+  for PID in $PIDS
   do
-    echo "Killing Cubex Class $CLASSNAME PID $P"
-    kill $P
+    echo "Killing Cubex class $CLASSNAME PID $PID"
+    kill $PID
   done
-  sleep $TIMEOUT
-  for P in $PID
+
+  ENDTIME=$(( `date +%s` + $TIMEOUT ))
+
+  while [ "$PIDS" != "" ]
   do
-    kill -0 $P >/dev/null 2>&1 && kill -9 $P
+    NEWPIDS=""
+    for PID in $PIDS
+    do
+      kill -0 $PID >/dev/null 2>&1
+      if [ $? -eq 0 ]
+      then
+        NEWPIDS="$NEWPIDS $PID"
+      fi
+    done
+
+    PIDS="$NEWPIDS"
+
+    sleep 1
+
+    if [ `date +%s` -ge $ENDTIME ]
+    then
+      break
+    fi
+  done
+
+  for PID in $PIDS
+  do
+    kill -0 $PID >/dev/null 2>&1
+    if [ $? -eq 0 ]
+    then
+      echo "Terminating PID $PID"
+      kill -9 $PID
+    fi
   done
 fi
