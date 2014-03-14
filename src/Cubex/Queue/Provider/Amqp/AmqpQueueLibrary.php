@@ -479,6 +479,7 @@ class AmqpQueueLibrary implements IBatchQueueProvider
     if(!empty($results))
     {
       $jobId = null;
+      $lastPass = null;
       foreach($results as $jobId => $result)
       {
         if(isset($this->_batchQueue[$jobId]))
@@ -490,6 +491,10 @@ class AmqpQueueLibrary implements IBatchQueueProvider
               $result
             );
           }
+          else
+          {
+            $lastPass = $jobId;
+          }
         }
         else
         {
@@ -498,10 +503,10 @@ class AmqpQueueLibrary implements IBatchQueueProvider
           );
         }
       }
-      if($jobId && isset($this->_batchQueue[$jobId]))
+      if(($lastPass !== null) && isset($this->_batchQueue[$lastPass]))
       {
-        $this->_batchQueue[$jobId]->delivery_info['channel']->basic_ack(
-          $this->_batchQueue[$jobId]->delivery_info['delivery_tag'], true
+        $this->_batchQueue[$lastPass]->delivery_info['channel']->basic_ack(
+          $this->_batchQueue[$lastPass]->delivery_info['delivery_tag'], true
         );
       }
     }

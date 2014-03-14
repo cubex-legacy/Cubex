@@ -516,6 +516,7 @@ class AmqpQueueExtension implements IBatchQueueProvider
     if(!empty($results))
     {
       $jobId = null;
+      $lastPass = null;
       foreach($results as $jobId => $result)
       {
         if(isset($this->_batchQueue[$jobId]))
@@ -528,6 +529,10 @@ class AmqpQueueExtension implements IBatchQueueProvider
               $result
             );
           }
+          else
+          {
+            $lastPass = $jobId;
+          }
         }
         else
         {
@@ -536,10 +541,10 @@ class AmqpQueueExtension implements IBatchQueueProvider
           );
         }
       }
-      if($jobId && isset($this->_batchQueue[$jobId]))
+      if(($lastPass !== null) && isset($this->_batchQueue[$lastPass]))
       {
         $queue->ack(
-          $this->_batchQueue[$jobId]->getDeliveryTag(), AMQP_MULTIPLE
+          $this->_batchQueue[$lastPass]->getDeliveryTag(), AMQP_MULTIPLE
         );
       }
     }
