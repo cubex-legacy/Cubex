@@ -29,6 +29,7 @@ class RoundRobin implements IEmailService
       {
         throw new \Exception('No email services defined for RoundRobin');
       }
+      shuffle($this->_serviceList);
       $this->_service = reset($this->_serviceList);
     }
     else
