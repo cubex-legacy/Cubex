@@ -47,6 +47,7 @@ class DatabaseMailer extends Mail
     }
     catch(\Exception $e)
     {
+      $this->reset();
     }
     return false;
   }
