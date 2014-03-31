@@ -155,7 +155,11 @@ class Shell
     {
       if(self::commandExists("tput"))
       {
-        $cols = (int)exec('tput cols');
+        $cols = (int)trim(exec('tput cols 2>/dev/null', $x, $ret));
+        if($ret != 0)
+        {
+          self::_setCommandBroken("tput");
+        }
       }
 
       if($cols < 1 && System::isWindows())
@@ -351,6 +355,16 @@ class Shell
       EphemeralCache::storeCache($cacheKey, $exists, __CLASS__);
     }
     return $exists;
+  }
+
+  /**
+   * Flag a command as not existing so we don't try to use it if it's broken
+   *
+   * @param $cmd
+   */
+  private static function _setCommandBroken($cmd)
+  {
+    EphemeralCache::storeCache('commandExists:' . $cmd, false, __CLASS__);
   }
 }
 
