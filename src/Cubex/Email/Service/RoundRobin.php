@@ -10,9 +10,10 @@ namespace Cubex\Email\Service;
 
 use Cubex\Email\IEmailService;
 use Cubex\Facade\Email;
+use Cubex\ServiceManager\IDestructableService;
 use Cubex\ServiceManager\ServiceConfigTrait;
 
-class RoundRobin implements IEmailService
+class RoundRobin implements IEmailService, IDestructableService
 {
   use ServiceConfigTrait;
 
@@ -124,5 +125,12 @@ class RoundRobin implements IEmailService
   public function attach($file)
   {
     $this->_getService()->attach($file);
+  }
+
+  public function destruct() {
+    foreach ($this->_serviceList as $service)
+    {
+      Email::getServiceManager()->destroy($service);
+    }
   }
 }

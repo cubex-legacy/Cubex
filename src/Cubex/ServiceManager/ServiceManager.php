@@ -10,7 +10,6 @@ use Cubex\Foundation\Config\ConfigGroup;
 /**
  * Container for services
  */
-
 class ServiceManager
 {
   protected $_services = [];
@@ -218,6 +217,10 @@ class ServiceManager
 
   public function destroy($name)
   {
+    if($this->_shared[$name] instanceof IDestructableService)
+    {
+      $this->_shared[$name]->destruct();
+    }
     unset($this->_shared[$name]);
   }
 
