@@ -127,8 +127,9 @@ class RoundRobin implements IEmailService, IDestructableService
     $this->_getService()->attach($file);
   }
 
-  public function destruct() {
-    foreach ($this->_serviceList as $service)
+  public function destruct()
+  {
+    foreach($this->_serviceList as $service)
     {
       Email::getServiceManager()->destroy($service);
     }

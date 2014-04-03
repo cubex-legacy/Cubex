@@ -217,7 +217,9 @@ class ServiceManager
 
   public function destroy($name)
   {
-    if($this->_shared[$name] instanceof IDestructableService)
+    if(isset($this->_shared[$name])
+      && $this->_shared[$name] instanceof IDestructableService
+    )
     {
       $this->_shared[$name]->destruct();
     }
