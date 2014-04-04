@@ -4,14 +4,21 @@
  */
 namespace Cubex\Facade;
 
+use Cubex\Email\IEmailService;
+
 class Email extends BaseFacade
 {
   /**
    * @return \Cubex\Email\IEmailService
    */
-  public static function getAccessor($serviceName = "email")
+  public static function getAccessor($serviceName = "email", $reset = true)
   {
-    return static::getServiceManager()->get($serviceName);
+    $service = static::getServiceManager()->get($serviceName);
+    if($reset && $service instanceof IEmailService)
+    {
+      $service->reset();
+    }
+    return $service;
   }
 
   /**

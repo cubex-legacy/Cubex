@@ -113,13 +113,12 @@ class RoundRobin implements IEmailService, IDestructableService
   public function send()
   {
     $this->_getService()->send();
-    $this->reset();
   }
 
   public function reset()
   {
-    $this->_getService()->reset();
     $this->_nextService();
+    $this->_getService()->reset();
   }
 
   public function attach($file)

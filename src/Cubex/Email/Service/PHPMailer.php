@@ -154,8 +154,6 @@ final class PHPMailer implements IEmailService
   {
     $sent = $this->_mailer->Send();
 
-    $this->reset();
-
     if($sent)
     {
       return true;

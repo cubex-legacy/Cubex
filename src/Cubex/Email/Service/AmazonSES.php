@@ -16,7 +16,7 @@ class AmazonSES extends Mail
   {
     if($this->_conn === null)
     {
-      if(! class_exists('\Aws\Ses\SesClient'))
+      if(!class_exists('\Aws\Ses\SesClient'))
       {
         throw new \Exception(
           'SesClient class is not available. ' .
@@ -24,7 +24,7 @@ class AmazonSES extends Mail
           '"aws/aws-sdk-php": "2.4.*"'
         );
       }
-      $key = $this->config()->getStr('key');
+      $key    = $this->config()->getStr('key');
       $secret = $this->config()->getStr('secret_key');
 
       if(($key === null) || ($secret === null))
@@ -51,7 +51,7 @@ class AmazonSES extends Mail
     {
       $message = $this->_generateMessageAndSetHeaders(true);
       $headers = implode("\r\n", $this->_headers);
-      $msgId = $this->conn()->sendRawEmail(
+      $msgId   = $this->conn()->sendRawEmail(
         [
           'RawMessage' => [
             'Data' => base64_encode($headers . "\r\n\r\n" . $message)
@@ -61,7 +61,7 @@ class AmazonSES extends Mail
     }
     else
     {
-      if(! ($this->_hasHtml() || ($this->_hasPlaintext())))
+      if(!($this->_hasHtml() || ($this->_hasPlaintext())))
       {
         throw new \Exception('Cannot send a blank email');
       }
@@ -70,14 +70,14 @@ class AmazonSES extends Mail
       if($this->_hasHtml())
       {
         $body['Html'] = [
-          'Data' => $this->_htmlBody,
+          'Data'    => $this->_htmlBody,
           'Charset' => 'UTF-8'
         ];
       }
       if($this->_hasPlaintext())
       {
         $body['Text'] = [
-          'Data' => $this->_textBody,
+          'Data'    => $this->_textBody,
           'Charset' => 'UTF-8'
         ];
       }
@@ -106,8 +106,6 @@ class AmazonSES extends Mail
 
     Log::debug('Sent email, message ID=' . $msgId);
 
-    $this->reset();
     return $msgId;
   }
 }
-

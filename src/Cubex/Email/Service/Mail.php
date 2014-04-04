@@ -226,8 +226,6 @@ class Mail implements IEmailService
 
     $mail = mail($to, $this->_subject, $message, $headers);
 
-    $this->reset();
-
     return $mail;
   }
 
@@ -268,12 +266,12 @@ class Mail implements IEmailService
       if($this->_hasHtml())
       {
         $this->_headers[] = 'Content-Type: text/html; charset="UTF-8"';
-        $message = $this->_htmlBody;
+        $message          = $this->_htmlBody;
       }
       else if($this->_hasPlaintext())
       {
         $this->_headers[] = 'Content-Type: text/plain; charset="UTF-8"';
-        $message = $this->_textBody;
+        $message          = $this->_textBody;
       }
       else
       {
