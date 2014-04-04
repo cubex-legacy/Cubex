@@ -153,9 +153,10 @@ class Shell
 
     if($cols === null)
     {
-      if(self::commandExists("tput"))
+      $tputPath = self::findCommand("tput");
+      if($tputPath)
       {
-        $cols = (int)trim(exec('tput cols 2>/dev/null', $x, $ret));
+        $cols = (int)trim(exec('"' . $tputPath . '" cols', $x, $ret));
         if($ret != 0)
         {
           self::_setCommandBroken("tput");
@@ -185,29 +186,30 @@ class Shell
    */
   protected static function _windowsColumns()
   {
-    if(!self::commandExists("mode"))
-    {
-      return null;
-    }
-    $columns = 0;
-    exec("mode", $output);
+    $columns = null;
 
-    if(is_array($output))
+    $path = self::findCommand("mode");
+    if($path)
     {
-      foreach($output as $line)
+      exec($path, $output);
+
+      if(is_array($output))
       {
-        if(substr(trim($line), 0, 8) === "Columns:")
+        foreach($output as $line)
         {
-          $matched = preg_match(
-            "/^\s*Columns\:\s*(\d+)\s*$/",
-            $line,
-            $matches
-          );
-
-          if($matched)
+          if(substr(trim($line), 0, 8) === "Columns:")
           {
-            $columns = (int)$matches[1];
-            break;
+            $matched = preg_match(
+              "/^\s*Columns\:\s*(\d+)\s*$/",
+              $line,
+              $matches
+            );
+
+            if($matched)
+            {
+              $columns = (int)$matches[1];
+              break;
+            }
           }
         }
       }
@@ -338,23 +340,25 @@ class Shell
 
   public static function commandExists($cmd)
   {
-    $cacheKey = 'commandExists:' . $cmd;
-    $exists = EphemeralCache::getCache($cacheKey, __CLASS__, null);
-    if($exists === null)
+    return self::findCommand($cmd) ? true : false;
+  }
+
+  public static function findCommand($cmd)
+  {
+    $cacheKey = 'findCommand:' . $cmd;
+    $path = EphemeralCache::getCache($cacheKey, __CLASS__, null);
+    if($path === null)
     {
-      if(System::isWindows())
+      $retval = -1;
+      $searchCmd = System::isWindows() ? 'where' : 'which';
+      exec(sprintf('%s "%s"', $searchCmd, $cmd), $output, $retval);
+      if($retval === 0)
       {
-        exec("where $cmd /Q", $output, $returnVal);
-        $exists = $returnVal === 0;
+        $path = $output[0];
       }
-      else
-      {
-        exec("which $cmd", $output, $returnVal);
-        $exists = $returnVal === 0;
-      }
-      EphemeralCache::storeCache($cacheKey, $exists, __CLASS__);
+      EphemeralCache::storeCache($cacheKey, $path, __CLASS__);
     }
-    return $exists;
+    return $path;
   }
 
   /**
@@ -364,7 +368,7 @@ class Shell
    */
   private static function _setCommandBroken($cmd)
   {
-    EphemeralCache::storeCache('commandExists:' . $cmd, false, __CLASS__);
+    EphemeralCache::storeCache('findCommand:' . $cmd, false, __CLASS__);
   }
 }
 
