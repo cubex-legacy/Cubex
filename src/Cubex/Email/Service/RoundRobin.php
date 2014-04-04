@@ -117,6 +117,10 @@ class RoundRobin implements IEmailService, IDestructableService
 
   public function reset()
   {
+    if($this->_service)
+    {
+      $this->_getService()->reset();
+    }
     $this->_nextService();
     $this->_getService()->reset();
   }
