@@ -176,6 +176,10 @@ class Serve extends Dispatcher implements IDispatchable
 
         try
         {
+          if(!$this->getFileSystem()->fileExists($file))
+          {
+            continue;
+          }
           $fileData = $this->getFileSystem()->readFile($file);
           $data .= $this->dispatchContent($fileData);
 
