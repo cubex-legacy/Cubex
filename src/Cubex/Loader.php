@@ -696,6 +696,10 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
       }
 
       $this->_response->addHeader("X-Cubex-TID", CUBEX_TRANSACTION);
+      if(defined('LOCALE'))
+      {
+        $this->_response->addHeader("X-Cubex-Locale", LOCALE);
+      }
 
       if($this->_configuration === null)
       {
