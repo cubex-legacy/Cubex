@@ -113,8 +113,8 @@ class BrowsCapBrowsCapPhp implements IBrowserDetection
       EphemeralCache::storeCache($cacheKey, $browser, "detection");
     }
 
-    static::$_browser[$userAgent] = isset($browser->Browse)
-      ? $browser->Browse : '';
+    static::$_browser[$userAgent] = isset($browser->Browser)
+      ? $browser->Browser : '';
     static::$_version[$userAgent] = isset($browser->Version)
       ? $browser->Version : '';
   }
