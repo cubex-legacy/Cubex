@@ -113,8 +113,10 @@ class BrowsCapBrowsCapPhp implements IPlatformDetection
       EphemeralCache::storeCache($cacheKey, $browser, "detection");
     }
 
-    static::$_platform[$userAgent] = $browser->Platform;
-    static::$_version[$userAgent] = $browser->Platform_Version;
+    static::$_platform[$userAgent] = isset($browser->Platform) ?
+      $browser->Platform : '';
+    static::$_version[$userAgent]  = isset($browser->Platform_Version) ?
+      $browser->Platform_Version : '';
   }
 
   /**
