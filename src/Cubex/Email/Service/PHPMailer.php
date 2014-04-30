@@ -19,6 +19,8 @@ final class PHPMailer implements IEmailService
    */
   private $_config;
 
+  private $_error;
+
   /**
    * @return $this
    */
@@ -152,7 +154,8 @@ final class PHPMailer implements IEmailService
 
   public function send()
   {
-    $sent = $this->_mailer->Send();
+    $sent         = $this->_mailer->Send();
+    $this->_error = $this->_mailer->ErrorInfo;
 
     if($sent)
     {
@@ -162,5 +165,10 @@ final class PHPMailer implements IEmailService
     {
       return false;
     }
+  }
+
+  public function getError()
+  {
+    return $this->_error;
   }
 }
