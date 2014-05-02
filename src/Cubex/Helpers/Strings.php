@@ -25,7 +25,7 @@ class Strings
   {
     $variable = self::camelWords($variable);
     $variable = str_replace(' ', '_', $variable);
-    $variable = strtolower($variable);
+    $variable = mb_strtolower($variable);
     return $variable;
   }
 
