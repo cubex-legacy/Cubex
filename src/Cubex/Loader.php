@@ -188,11 +188,20 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
       $obj->setLocale($locale);
     }
 
-    putenv('LC_ALL=' . $obj->getLocale());
-    setlocale(LC_ALL, $obj->getLocale());
+    $localeResult = $obj->getLocale();
+    $lang         = substr($localeResult, 0, 2);
 
-    define("LOCALE", $obj->getLocale());
-    define("LOCALE2", substr($obj->getLocale(), 0, 2));
+    if(!in_array($lang, $this->config('i18n')->getArr('languages', ['en'])))
+    {
+      $lang         = 'en';
+      $localeResult = 'en_US';
+    }
+
+    putenv('LC_ALL=' . $localeResult);
+    setlocale(LC_ALL, $localeResult);
+
+    define("LOCALE", $localeResult);
+    define("LOCALE2", $lang);
 
     return $this;
   }
@@ -922,8 +931,8 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     EventManager::trigger(
       EventManager::CUBEX_UNHANDLED_EXCEPTION,
       array(
-           'exception'         => $e,
-           'formatted_message' => $output
+        'exception'         => $e,
+        'formatted_message' => $output
       )
     );
     $this->_failed = true;
@@ -940,11 +949,11 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
       EventManager::trigger(
         EventManager::CUBEX_PHP_ERROR,
         array(
-             'errNo'      => $errNo,
-             'errMsg'     => $errMsg,
-             'errFile'    => $errFile,
-             'errLine'    => $errLine,
-             'errContext' => $errContext
+          'errNo'      => $errNo,
+          'errMsg'     => $errMsg,
+          'errFile'    => $errFile,
+          'errLine'    => $errLine,
+          'errContext' => $errContext
         )
       );
     }
