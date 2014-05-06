@@ -194,11 +194,15 @@ class Loader implements IConfigurable, IDispatchableAccess, IDispatchInjection,
     if(!in_array($lang, $this->config('i18n')->getArr('languages', ['en'])))
     {
       $lang         = 'en';
-      $localeResult = 'en_US';
+      $localeResult = 'en_US.utf8';
     }
 
     putenv('LC_ALL=' . $localeResult);
     setlocale(LC_ALL, $localeResult);
+
+    // reset CTYPE back to en_US
+    putenv('LC_CTYPE=' . 'en_US.utf8');
+    setlocale(LC_CTYPE, 'en_US.utf8');
 
     define("LOCALE", $localeResult);
     define("LOCALE2", $lang);
