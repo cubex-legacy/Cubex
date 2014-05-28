@@ -823,7 +823,9 @@ abstract class RecordMapper extends DataMapper
       if(!$this->exists())
       {
         $newId = $connection->insertId();
-        if($newId !== null && $newId !== 0)
+        if($newId !== null && $newId !== 0
+          && $this->_idType == self::ID_AUTOINCREMENT
+        )
         {
           $this->setId($newId);
         }
