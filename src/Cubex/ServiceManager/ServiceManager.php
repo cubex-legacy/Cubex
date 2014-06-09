@@ -511,4 +511,21 @@ class ServiceManager
       );
     }
   }
+
+  public function getAllWithType($type)
+  {
+    $return = [];
+    foreach ($this->_services as $name => $service) {
+      /**
+       * @var $config ServiceConfig
+       */
+      $config     = $service['config'];
+      $provider   = $config->getStr('service_provider');
+      if(is_subclass_of($provider, $type))
+      {
+        $return[] = $config->getStr('register_service_as');
+      }
+    }
+    return $return;
+  }
 }
