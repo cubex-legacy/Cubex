@@ -47,6 +47,11 @@ class Build
 
   public function addArea($directory, $depth = 2)
   {
+
+    $directory                = build_path_custom(
+      DS,
+      explode('\\', $directory)
+    );
     $this->_areas[$directory] = $depth;
     return $this;
   }
