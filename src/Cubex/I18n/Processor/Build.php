@@ -35,7 +35,7 @@ class Build
   public function __construct($projectDir, ITranslator $translator)
   {
     Log::info("Starting translation build process");
-    $this->_projectDir = $projectDir;
+    $this->_projectDir = build_path_custom(DS, explode('\\', $projectDir));
     $this->setTranslator($translator);
   }
 
