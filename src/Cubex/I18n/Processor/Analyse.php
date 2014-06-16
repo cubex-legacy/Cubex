@@ -43,8 +43,8 @@ class Analyse
           );
         }
         else if(
-        substr($entry, -4) == '.php'
-        || substr($entry, -6) == '.phtml'
+          substr($entry, -4) == '.php'
+          || substr($entry, -6) == '.phtml'
         )
         {
           $this->processFile($base, $directory . DIRECTORY_SEPARATOR . $entry);
@@ -302,6 +302,7 @@ class Analyse
   public function slashf($message)
   {
     $message = $this->format($message);
+    $message = str_replace("\n", ' ', $message);
     return $this->slash($message);
   }
 
@@ -408,28 +409,28 @@ class Analyse
         if($current - $lastStart >= $width)
         {
           $result .=
-          mb_substr($string, $lastStart, $current - $lastStart, $charset)
-          . $break;
+            mb_substr($string, $lastStart, $current - $lastStart, $charset)
+            . $break;
           $lastStart = $current + 1;
         }
 
         $lastSpace = $current;
       }
       elseif($current - $lastStart >= $width
-      && $cut
-      && $lastStart >= $lastSpace
+        && $cut
+        && $lastStart >= $lastSpace
       )
       {
         $result .=
-        mb_substr($string, $lastStart, $current - $lastStart, $charset)
-        . $break;
+          mb_substr($string, $lastStart, $current - $lastStart, $charset)
+          . $break;
         $lastStart = $lastSpace = $current;
       }
       elseif($current - $lastStart >= $width && $lastStart < $lastSpace)
       {
         $result .=
-        mb_substr($string, $lastStart, $lastSpace - $lastStart, $charset)
-        . $break;
+          mb_substr($string, $lastStart, $lastSpace - $lastStart, $charset)
+          . $break;
         $lastStart = $lastSpace = $lastSpace + 1;
       }
     }
@@ -437,7 +438,7 @@ class Analyse
     if($lastStart !== $current)
     {
       $result .=
-      mb_substr($string, $lastStart, $current - $lastStart, $charset);
+        mb_substr($string, $lastStart, $current - $lastStart, $charset);
     }
     return $result;
   }
