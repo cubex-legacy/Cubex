@@ -231,7 +231,7 @@ class Analyse
             $sourceLanguage,
             $language
           );
-          if(strlen($message) < $wrapon)
+          if(mb_strlen($message) < $wrapon)
           {
             $result .= 'msgid "' . $this->slashf($message) . '"';
           }
@@ -241,7 +241,7 @@ class Analyse
             $result .= $this->wrap($message, $wrapat);
           }
           $result .= "\n";
-          if(strlen($translated) < $wrapon)
+          if(mb_strlen($translated) < $wrapon)
           {
             $result .= 'msgstr "' . $this->slashf($translated) . '"';
           }
@@ -265,7 +265,7 @@ class Analyse
             $language
           );
 
-          if(strlen($message[0]) < $wrapon)
+          if(mb_strlen($message[0]) < $wrapon)
           {
             $result .= 'msgid "' . $this->slashf($message[0]) . '"';
           }
@@ -277,7 +277,7 @@ class Analyse
 
           $result .= "\n";
 
-          if(strlen($message[1]) < $wrapon)
+          if(mb_strlen($message[1]) < $wrapon)
           {
             $result .= 'msgid_plural "' . $this->slashf($message[1]) . '"';
           }
@@ -319,7 +319,7 @@ class Analyse
       {
         $result .= $lineappend;
       }
-      if(strlen($result) > $at)
+      if(mb_strlen($result) > $at)
       {
         $result = $this->wordwrap($result, $at, " \n");
       }
@@ -358,7 +358,7 @@ class Analyse
     $stringWidth = mb_strlen($string, $charset);
     $breakWidth  = mb_strlen($break, $charset);
 
-    if(strlen($string) === 0)
+    if(mb_strlen($string) === 0)
     {
       return '';
     }
