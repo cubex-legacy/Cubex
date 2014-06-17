@@ -34,14 +34,14 @@ class Response
 
   protected $_fileLocation;
 
-  const RENDER_REDIRECT   = 'redirect';
+  const RENDER_REDIRECT = 'redirect';
   const RENDER_RENDERABLE = 'renderable';
-  const RENDER_JSON       = 'json';
-  const RENDER_JSONP      = 'jsonp';
-  const RENDER_TEXT       = 'text';
-  const RENDER_UNKNOWN    = 'unknown';
-  const RENDER_DISPATCH   = 'dispatch';
-  const RENDER_DOWNLOAD   = 'download';
+  const RENDER_JSON = 'json';
+  const RENDER_JSONP = 'jsonp';
+  const RENDER_TEXT = 'text';
+  const RENDER_UNKNOWN = 'unknown';
+  const RENDER_DISPATCH = 'dispatch';
+  const RENDER_DOWNLOAD = 'download';
 
   /**
    * Create a new response object with a generic render type
@@ -390,6 +390,9 @@ class Response
           "Expires",
           $this->generateHeaderDate(time() + $this->_cacheable)
         );
+        $this->addHeader("Pragma", "cache");
+        $this->addHeader("Cache-Control", "max-age=$this->_cacheable");
+        $this->addHeader("User-Cache-Control", "max-age=$this->_cacheable");
       }
       else
       {
@@ -516,10 +519,10 @@ class Response
   {
     // @link http://support.microsoft.com/kb/323308
     if($request->isHttps() && preg_match(
-      '/MSIE (.*?);/i',
-      $request->serverVariables('HTTP_USER_AGENT'),
-      $match
-    ) == 1
+        '/MSIE (.*?);/i',
+        $request->serverVariables('HTTP_USER_AGENT'),
+        $match
+      ) == 1
     )
     {
       if(intval(preg_replace("/(MSIE )(.*?);/", "$2", $match[0])) < 9)
