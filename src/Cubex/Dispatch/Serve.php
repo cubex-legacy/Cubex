@@ -69,11 +69,9 @@ class Serve extends Dispatcher implements IDispatchable
     $response->addHeader("Vary", "Accept-Encoding");
 
     $debugString  = $this->getDispatchPath()->getDebugString();
-    $resourceHash = $this->getDispatchPath()->getResourceHash();
 
     if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
     && $debugString !== self::getNocacheDebugString()
-    && $resourceHash !== $this->getNomapHash()
     )
     {
       $this->_setCacheHeaders($response);
@@ -137,7 +135,7 @@ class Serve extends Dispatcher implements IDispatchable
         }
         else if($this->getUseMap() === false)
         {
-          $response->disableCache();
+          $response->cacheFor(3600);
         }
       }
     }
