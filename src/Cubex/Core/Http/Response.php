@@ -518,11 +518,9 @@ class Response
   public function prepare(Request $request)
   {
     // @link http://support.microsoft.com/kb/323308
-    if($request->isHttps() && preg_match(
-        '/MSIE (.*?);/i',
-        $request->serverVariables('HTTP_USER_AGENT'),
-        $match
-      ) == 1
+    $userAgent = $request->serverVariables('HTTP_USER_AGENT');
+    if($request->isHttps()
+      && preg_match('/MSIE (.*?);/i', $userAgent, $match) == 1
     )
     {
       if(intval(preg_replace("/(MSIE )(.*?);/", "$2", $match[0])) < 9)
