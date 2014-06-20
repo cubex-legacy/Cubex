@@ -33,25 +33,26 @@ class Email extends BaseFacade
    */
   public static function mail($to, $subject, $message, $headers = array())
   {
-    static::getAccessor()->reset();
+    $accessor = static::getAccessor();
+    $accessor->reset();
 
     if(is_array($to))
     {
-      static::getAccessor()->addRecipient($to[0], $to[1]);
+      $accessor->addRecipient($to[0], $to[1]);
     }
     else
     {
-      static::getAccessor()->addRecipient($to);
+      $accessor->addRecipient($to);
     }
 
-    static::getAccessor()->setSubject($subject);
-    static::getAccessor()->setTextBody($message);
+    $accessor->setSubject($subject);
+    $accessor->setTextBody($message);
 
     foreach($headers as $headerName => $headerValue)
     {
-      static::getAccessor()->addHeader($headerName, $headerValue);
+      $accessor->addHeader($headerName, $headerValue);
     }
 
-    return static::getAccessor()->send();
+    return $accessor->send();
   }
 }
