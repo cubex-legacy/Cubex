@@ -33,6 +33,7 @@
     "phpseclib/phpseclib":          "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
     "pda/pheanstalk":               "Required if you wish to use Beanstalkd Queue Provider",
     "videlalvaro/php-amqplib":      "Required if you wish to use AMQP Queue Provider",
+    "crossjoin/browscap":           "Requried for use with one of our Browser and Platform services, lighter and extensible alternative",
     "browscap/browscap-php":        "Requried for use with one of our Browser and Platform services"
   },
   "bin":               ["bin/kill-cubex-script.sh"],
