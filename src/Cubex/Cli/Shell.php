@@ -351,7 +351,7 @@ class Shell
     {
       $retval = -1;
       $searchCmd = System::isWindows() ? 'where' : 'which';
-      exec(sprintf('%s "%s"', $searchCmd, $cmd), $output, $retval);
+      exec(sprintf('%s "%s" 2>/dev/null', $searchCmd, $cmd), $output, $retval);
       if($retval === 0)
       {
         $path = $output[0];
