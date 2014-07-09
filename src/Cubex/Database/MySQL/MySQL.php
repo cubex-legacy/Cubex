@@ -388,12 +388,13 @@ class MySQL implements IDatabaseService
 
   /**
    * @param $query
+   * @param $mode
    *
    * @return \mysqli_result
    */
-  public function query($query)
+  public function query($query, $mode = 'w')
   {
-    $this->_prepareConnection('w');
+    $this->_prepareConnection($mode);
     return $this->_doQuery($query);
   }
 
