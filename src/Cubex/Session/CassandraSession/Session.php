@@ -37,14 +37,17 @@ class Session implements ISessionService
    */
   public function configure(ServiceConfig $config)
   {
-    $this->_config = $config;
+    $this->_config   = $config;
     $serviceProvider = Cassandra::getAccessor(
       $this->_config->getStr("cassandra_service", "Session")
     );
 
-    $this->_columnFamily = $this->_config->getStr("column_family", "Session");
+    $this->_columnFamily    = $this->_config->getStr(
+      "column_family",
+      "Session"
+    );
     $this->_serviceProvider = $serviceProvider;
-    $this->_ttl = $this->_config->getInt("ttl", 2592000);
+    $this->_ttl             = $this->_config->getInt("ttl", 2592000);
 
     $this->init();
 
@@ -68,8 +71,8 @@ class Session implements ISessionService
    */
   public function prefetch(array $columns)
   {
-    $columnsToFetch     = array_diff($columns, array_keys(self::$_sessionData));
-    $fetchData          = $this->_serviceProvider->getRow(
+    $columnsToFetch = array_diff($columns, array_keys(self::$_sessionData));
+    $fetchData      = $this->_serviceProvider->getRow(
       $this->_columnFamily,
       $this->_getSessionId(),
       $columnsToFetch
@@ -146,7 +149,7 @@ class Session implements ISessionService
    */
   public function destroy()
   {
-    $setToNull = function()
+    $setToNull = function ()
     {
       return null;
     };
@@ -179,7 +182,7 @@ class Session implements ISessionService
     return idx($ttls, $key, $this->_ttl);
   }
 
-  public function __destruct()
+  public function save()
   {
     if(self::$_sessionData)
     {
@@ -221,5 +224,10 @@ class Session implements ISessionService
         self::$_sessionDataDeleted
       );
     }
+  }
+
+  public function __destruct()
+  {
+    $this->save();
   }
 }
