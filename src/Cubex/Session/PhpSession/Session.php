@@ -26,6 +26,15 @@ class Session implements ISessionService
    */
   public function init()
   {
+    // make sure we have a valid session ID
+    $sessionName = session_name();
+    if(isset($_COOKIE[$sessionName])
+      && (!preg_match('/^[a-zA-Z0-9]{26}$/', $_COOKIE[$sessionName]))
+    )
+    {
+      unset($_COOKIE[$sessionName]);
+    }
+
     session_start();
     if(!isset($_SESSION['cubex']))
     {
