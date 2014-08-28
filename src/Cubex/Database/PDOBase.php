@@ -23,6 +23,8 @@ abstract class PDOBase implements IDatabaseService
 
   protected $_affectedRows;
 
+  protected $_connectionMode;
+
   use ServiceConfigTrait;
 
   abstract protected function _dsn();
@@ -40,12 +42,19 @@ abstract class PDOBase implements IDatabaseService
       $this->_config->getStr("password", ''),
       $this->_config->getArr("options", [])
     );
+    $this->_connectionMode = $mode;
     return $this;
   }
 
   public function disconnect()
   {
     $this->_connection = null;
+  }
+
+  public function reconnect()
+  {
+    $this->disconnect();
+    $this->_prepareConnection($this->_connectionMode);
   }
 
   /**

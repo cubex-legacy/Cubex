@@ -27,6 +27,11 @@ interface IDatabaseService extends IService
   public function disconnect();
 
   /**
+   * Disconnect and reconnect
+   */
+  public function reconnect();
+
+  /**
    * Run a standard query
    *
    * @param $query
