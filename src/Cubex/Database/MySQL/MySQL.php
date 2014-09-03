@@ -206,6 +206,10 @@ class MySQL implements IDatabaseService
         );
         if(!$hosts)
         {
+          if($mode !== 'w')
+          {
+            return $this->connect('w');
+          }
           throw new \Exception('No more available hosts');
         }
       }
