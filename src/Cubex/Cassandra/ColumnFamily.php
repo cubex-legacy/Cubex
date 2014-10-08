@@ -220,14 +220,14 @@ class ColumnFamily
     return new ColumnParent(['column_family' => $this->_name]);
   }
 
-  public function setConsistencyLevel($level = ConsistencyLevel::LOCAL_QUORUM)
+  public function setConsistencyLevel($level = ConsistencyLevel::QUORUM)
   {
     $this->setReadConsistencyLevel($level);
     $this->setWriteConsistencyLevel($level);
     return $this;
   }
 
-  public function setReadConsistencyLevel($level = ConsistencyLevel::LOCAL_QUORUM)
+  public function setReadConsistencyLevel($level = ConsistencyLevel::QUORUM)
   {
     $this->_readConsistency = $level;
     return $this;
@@ -237,12 +237,12 @@ class ColumnFamily
   {
     if($this->_readConsistency === null)
     {
-      $this->_readConsistency = ConsistencyLevel::LOCAL_QUORUM;
+      $this->_readConsistency = ConsistencyLevel::QUORUM;
     }
     return $this->_readConsistency;
   }
 
-  public function setWriteConsistencyLevel($level = ConsistencyLevel::LOCAL_QUORUM)
+  public function setWriteConsistencyLevel($level = ConsistencyLevel::QUORUM)
   {
     $this->_writeConsistency = $level;
     return $this;
@@ -252,7 +252,7 @@ class ColumnFamily
   {
     if($this->_writeConsistency === null)
     {
-      $this->_writeConsistency = ConsistencyLevel::LOCAL_QUORUM;
+      $this->_writeConsistency = ConsistencyLevel::QUORUM;
     }
     return $this->_writeConsistency;
   }
