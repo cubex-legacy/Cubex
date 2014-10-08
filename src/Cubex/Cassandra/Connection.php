@@ -276,7 +276,7 @@ class Connection
   }
 
   public function flushBatch(
-    $atomic = true, $writeConsistencyLevel = ConsistencyLevel::QUORUM
+    $atomic = true, $writeConsistencyLevel = ConsistencyLevel::LOCAL_QUORUM
   )
   {
     if($this->_batchMutation === null || empty($this->_batchMutation))
@@ -310,7 +310,7 @@ class Connection
   }
 
   public function closeBatch(
-    $atomic = true, $writeConsistencyLevel = ConsistencyLevel::QUORUM
+    $atomic = true, $writeConsistencyLevel = ConsistencyLevel::LOCAL_QUORUM
   )
   {
     $this->flushBatch($atomic, $writeConsistencyLevel);
