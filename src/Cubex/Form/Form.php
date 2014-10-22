@@ -417,9 +417,8 @@ class Form extends DataMapper implements IRenderable
 
   public function formNameInput()
   {
-    $out = '';
-    $out .= '<input type="hidden" name="' . Request::TYPE_FORM . '"';
-    $out .= 'value="frm:' . $this->_formName . '"/>';
+    $out = '<input type="hidden" name="' . Request::TYPE_FORM . '"';
+    $out .= ' value="frm:' . $this->_formName . '"/>';
     return $out;
   }
 
