@@ -204,13 +204,10 @@ class DispatchMapper extends Dispatcher
   {
     $map       = [];
     $directory = build_path($this->getProjectBase(), $entity);
-
+    $isHidden = false;
     if($entityPath)
     {
-      if($this->_hasHiddenDirectoryInPath($entityPath))
-      {
-        return [];
-      }
+      $isHidden = $this->_hasHiddenDirectoryInPath($entityPath);
 
       $directory = build_path($directory, $entityPath);
     }
@@ -225,6 +222,7 @@ class DispatchMapper extends Dispatcher
     }
 
     $cleanedEntityPath = str_replace("\\", "/", $entityPath);
+    $cleanedBaseEntityPath = $this->getUnbrandedPath($cleanedEntityPath);
     $directoryContent  = "";
 
     foreach($directoryList as $directoryListItem)
@@ -246,28 +244,63 @@ class DispatchMapper extends Dispatcher
           (build_path($entityPath, $directoryListItem))
         );
 
+        // if is on branded folder instead of skipping entirely the map
+        // we want to map it as if were on the main folder
+        // this to fix the case we have a branded css but no base css
+        $cleanedBaseCurrentEntity = $this->getUnbrandedPath($cleanedCurrentEntity);
+        //main folder path
+
+        //skip post pre stuff
+        if($this->isPrePostEntity($cleanedBaseCurrentEntity))
+        {
+          $cleanedCurrentEntity = false;
+        }
+
         // Little bit weak, but we don't want to risk adding an empty key to the
         // array and breaking our ini files
-        if($cleanedCurrentEntity)
+        // we loop also branded folder so we check isset
+        // to concatenate all files only once with the basefile path
+        if($cleanedCurrentEntity && !isset($map[$cleanedBaseCurrentEntity]))
         {
           $content = $this->_concatAllRelatedFiles(
             $entity,
-            $cleanedEntityPath,
+            $cleanedBaseEntityPath,
             $directoryListItem
           );
 
           $directoryContent .= $content;
-          $map[$cleanedCurrentEntity] = md5($content);
+          $map[$cleanedBaseCurrentEntity] = md5($content);
         }
       }
     }
 
-    if($directoryContent)
+    /* we skip map of folder for branded ones*/
+    if($directoryContent && !$isHidden)
     {
-      $map[$cleanedEntityPath] = md5($directoryContent);
+      $map[$cleanedBaseEntityPath] = md5($directoryContent);
     }
 
     return $map;
+  }
+
+  /**
+   * @param $path
+   *
+   * @return string
+   */
+  private function getUnbrandedPath($path)
+  {
+    return preg_replace('#\.[a-zA-Z-_0-9]+[/\\\]#', '', $path);
+  }
+
+  /**
+   * @param $string
+   *
+   * @return bool
+   */
+  private function isPrePostEntity($string)
+  {
+    return stristr($string, '.post.') || stristr($string,'.pre.');
   }
 
   /**
