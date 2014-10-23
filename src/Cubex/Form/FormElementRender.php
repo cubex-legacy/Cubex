@@ -123,6 +123,10 @@ class FormElementRender implements IFormElementRender
     $out = '';
     foreach($attributes as $k => $v)
     {
+      if ($k == 'id' && trim($v) == '')
+      {
+        continue; // Empty ID is invalid HTML
+      }
       if($v === null)
       {
         $out .= " $k";
