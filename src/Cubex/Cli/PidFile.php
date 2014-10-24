@@ -6,6 +6,7 @@
 namespace Cubex\Cli;
 
 use Cubex\Foundation\Container;
+use Cubex\Helpers\System;
 
 class PidFile
 {
@@ -47,7 +48,7 @@ class PidFile
           $path = $ns . DS;
         }
       }
-      if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
+      if(System::isWindows())
       {
         $path = realpath(dirname(WEB_ROOT)) . DS . 'pids' . DS . $path;
       }
@@ -64,6 +65,11 @@ class PidFile
       $filename .= '.' . $instanceName;
     }
     $filename .= '.pid';
+
+    if(System::isWindows())
+    {
+      $filename = str_replace(':', '_', $filename);
+    }
 
     return $path . $filename;
   }
