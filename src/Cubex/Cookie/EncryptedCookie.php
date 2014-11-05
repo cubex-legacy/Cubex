@@ -50,6 +50,10 @@ class EncryptedCookie extends StandardCookie
    */
   public static function isEncrypted($value)
   {
+    if(is_array($value))
+    {
+      return false;
+    }
     $valueKey = substr($value, 0, strlen(EncryptedCookie::PRE_VALUE_KEY));
 
     return $valueKey === EncryptedCookie::PRE_VALUE_KEY;
