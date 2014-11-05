@@ -222,7 +222,7 @@ class DispatchMapper extends Dispatcher
     }
 
     $cleanedEntityPath = str_replace("\\", "/", $entityPath);
-    $cleanedBaseEntityPath = $this->getUnbrandedPath($cleanedEntityPath);
+    $cleanedBaseEntityPath = $this->_getUnbrandedPath($cleanedEntityPath);
     $directoryContent  = "";
 
     foreach($directoryList as $directoryListItem)
@@ -247,11 +247,11 @@ class DispatchMapper extends Dispatcher
         // if is on branded folder instead of skipping entirely the map
         // we want to map it as if were on the main folder
         // this to fix the case we have a branded css but no base css
-        $cleanedBaseCurrentEntity = $this->getUnbrandedPath($cleanedCurrentEntity);
+        $cleanedBaseCurrentEntity = $this->_getUnbrandedPath($cleanedCurrentEntity);
         //main folder path
 
         //skip post pre stuff
-        if($this->isPrePostEntity($cleanedBaseCurrentEntity))
+        if($this->_isPrePostEntity($cleanedBaseCurrentEntity))
         {
           $cleanedCurrentEntity = false;
         }
@@ -288,7 +288,7 @@ class DispatchMapper extends Dispatcher
    *
    * @return string
    */
-  private function getUnbrandedPath($path)
+  private function _getUnbrandedPath($path)
   {
     return preg_replace('#\.[a-zA-Z-_0-9]+[/\\\]#', '', $path);
   }
@@ -298,9 +298,9 @@ class DispatchMapper extends Dispatcher
    *
    * @return bool
    */
-  private function isPrePostEntity($string)
+  private function _isPrePostEntity($string)
   {
-    return stristr($string, '.post.') || stristr($string,'.pre.');
+    return stristr($string, '.post.') || stristr($string, '.pre.');
   }
 
   /**
