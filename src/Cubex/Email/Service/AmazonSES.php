@@ -104,7 +104,7 @@ class AmazonSES extends Mail
       );
     }
 
-    Log::debug('Sent email, message ID=' . $msgId);
+    Log::debug('Email sent');
 
     return $msgId;
   }
