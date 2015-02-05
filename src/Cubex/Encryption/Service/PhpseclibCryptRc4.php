@@ -9,17 +9,18 @@ namespace Cubex\Encryption\Service;
 
 use Cubex\Encryption\IEncryptionService;
 use Cubex\ServiceManager\ServiceConfig;
+use phpseclib\Crypt\RC4;
 
 class PhpseclibCryptRc4 implements IEncryptionService
 {
   /**
-   * @var \Crypt_RC4 $_encrypter
+   * @var RC4 $_encrypter
    */
   protected $_encryption;
 
   public function __construct()
   {
-    $this->_encryption = new \Crypt_RC4();
+    $this->_encryption = new RC4();
   }
 
   public function configure(ServiceConfig $config)
