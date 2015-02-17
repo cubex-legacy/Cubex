@@ -11,7 +11,7 @@ use Cubex\Queue\IBatchQueueConsumer;
 use Cubex\Queue\IBatchQueueProvider;
 use Cubex\Queue\IQueue;
 use Cubex\Queue\IQueueConsumer;
-use Cubex\ServiceManager\ServiceConfigTrait;
+use Cubex\ServiceManager\ServiceConfig;
 
 /**
  * AMQP queue provider that uses the amqp PECL module
@@ -20,8 +20,6 @@ class AmqpQueueExtension implements IBatchQueueProvider
 {
   const DATA_FORMAT_SERIALIZE = 'serialize';
   const DATA_FORMAT_JSON      = 'json';
-
-  use ServiceConfigTrait;
 
   /**
    * @var \AMQPConnection
@@ -76,6 +74,39 @@ class AmqpQueueExtension implements IBatchQueueProvider
   protected $_hostsRetries = 3;
   protected $_hostsResetTimeMax = 300;
   protected $_hostsResetTime = null;
+
+  /**
+   * @var \Cubex\ServiceManager\ServiceConfig
+   */
+  protected $_config;
+
+  /**
+   * @param \Cubex\ServiceManager\ServiceConfig $config
+   *
+   * @return mixed|void
+   */
+  public function configure(ServiceConfig $config)
+  {
+    $this->_config = $config;
+    $this->_persistentDefault = $this->config()->getBool(
+      'persistent', false
+    );
+    $this->_dataFormat        = $this->config()->getStr(
+      'data_format', self::DATA_FORMAT_SERIALIZE
+    );
+    if($this->_dataFormat != self::DATA_FORMAT_JSON)
+    {
+      $this->_dataFormat = self::DATA_FORMAT_SERIALIZE;
+    }
+  }
+
+  /**
+   * @return \Cubex\ServiceManager\ServiceConfig
+   */
+  public function config()
+  {
+    return $this->_config;
+  }
 
   protected function _exchange()
   {
@@ -204,6 +235,7 @@ class AmqpQueueExtension implements IBatchQueueProvider
       {
         throw new \Exception('Required AMQP module not loaded.');
       }
+
       while(!$this->_conn)
       {
         $this->_getHosts();
@@ -220,24 +252,16 @@ class AmqpQueueExtension implements IBatchQueueProvider
             'write_timeout'   => 0,
             'connect_timeout' => 0
           );
-          $this->_conn = new \AMQPConnection($credentials);
-          $this->_conn->connect();
+          $conn = new \AMQPConnection($credentials);
+          if($conn->connect())
+          {
+            $this->_conn = $conn;
+          }
         }
         catch(\Exception $e)
         {
           Log::warning('AMQP host failed to connect: ' . $host);
           array_shift($this->_hosts);
-        }
-
-        $this->_persistentDefault = $this->config()->getBool(
-          'persistent', false
-        );
-        $this->_dataFormat        = $this->config()->getStr(
-          'data_format', self::DATA_FORMAT_SERIALIZE
-        );
-        if($this->_dataFormat != self::DATA_FORMAT_JSON)
-        {
-          $this->_dataFormat = self::DATA_FORMAT_SERIALIZE;
         }
       }
     }
