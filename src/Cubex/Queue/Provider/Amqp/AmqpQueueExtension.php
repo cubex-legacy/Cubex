@@ -344,9 +344,12 @@ class AmqpQueueExtension implements IBatchQueueProvider
       $persistent = $this->_persistentDefault;
     }
 
+    $attributes = $persistent ? ['delivery_mode' => AMQP_DURABLE] : [];
+
     $this->_exchange()->publish(
       $this->_encodeData($data), $queue->name(),
-      $persistent ? AMQP_DURABLE : AMQP_NOPARAM
+      AMQP_NOPARAM,
+      $attributes
     );
   }
 
