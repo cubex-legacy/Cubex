@@ -317,17 +317,16 @@ class AmqpQueueExtension implements IBatchQueueProvider
 
       if($this->_retries > 0)
       {
-        return $this->pushBatch($queue, $data, $delay, $persistent);
+        $this->pushBatch($queue, $data, $delay, $persistent);
       }
       else
       {
         $this->_retries = 3;
+        // Retries failed so just throw the last exception
+        throw $e;
       }
-
-      return false;
     }
     $this->_retries = 3;
-    return true;
   }
 
   protected function _reconnect(IQueue $queue)
