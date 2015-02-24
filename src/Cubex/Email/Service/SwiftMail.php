@@ -64,6 +64,8 @@ final class SwiftMail implements IEmailService
           $config->getStr("smtp.security", null)
         );
 
+        $transport->setTimeout($config->getInt('smtp.timeout', 5));
+
         if($config->getExists("smtp.username"))
         {
           $transport->setUsername($config->getStr("smtp.username"));
@@ -201,11 +203,9 @@ final class SwiftMail implements IEmailService
 
     try
     {
+      $this->_mailer->getTransport()->start();
       $numSent = $this->_mailer->send($message);
-    }
-    catch(\Swift_TransportException $e)
-    {
-      $numSent = 0;
+      $this->_mailer->getTransport()->stop();
     }
     catch(\Exception $e)
     {
