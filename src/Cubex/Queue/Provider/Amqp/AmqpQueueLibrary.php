@@ -31,6 +31,14 @@ class AmqpQueueLibrary implements IBatchQueueProvider
   protected $_hosts;
 
   /**
+   * How often to reconnect while consuming (in seconds)
+   *
+   * @var int
+   */
+  protected $_reconnectInterval = 1800;
+  protected $_lastConnectTime = 0;
+
+  /**
    * @var AmqpChannel
    */
   protected $_chan;
@@ -184,6 +192,8 @@ class AmqpQueueLibrary implements IBatchQueueProvider
         {
           $this->_dataFormat = self::DATA_FORMAT_SERIALIZE;
         }
+
+        $this->_lastConnectTime = time();
       }
     }
 
@@ -247,7 +257,8 @@ class AmqpQueueLibrary implements IBatchQueueProvider
 
   protected function _reconnect(IQueue $queue)
   {
-    $this->_forceDisconnect();
+    Log::debug('AmqpQueueLibrary reconnecting');
+    $this->disconnect();
     $this->_configureExchange();
     $this->_configureQueue($queue->name());
   }
@@ -401,6 +412,7 @@ class AmqpQueueLibrary implements IBatchQueueProvider
         catch(\Exception $e)
         {
           \Log::error($e->getCode() . ': ' . $e->getMessage());
+          $this->_reconnect($queue);
         }
 
         if($waitTime === false || !$this->_blocking)
@@ -415,6 +427,11 @@ class AmqpQueueLibrary implements IBatchQueueProvider
           );
 
           $this->_waits++;
+        }
+
+        // Reconnect periodically for safety
+        if((time() - $this->_lastConnectTime) >= $this->_reconnectInterval)
+        {
           $this->_reconnect($queue);
         }
       }
