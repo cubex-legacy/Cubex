@@ -5,10 +5,10 @@
 namespace Cubex\Dispatch\Mapper;
 
 use Cubex\Cli\Shell;
+use Cubex\Figlet\Figlet;
 use Cubex\FileSystem\FileSystem;
 use Cubex\Dispatch\DispatchMapper;
 use Cubex\Foundation\Config\ConfigGroup;
-use Packaged\Figlet\Figlet;
 
 class Cli extends DispatchMapper
 {
