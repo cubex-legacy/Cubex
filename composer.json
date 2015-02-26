@@ -18,7 +18,7 @@
   ],
   "require":           {
     "php":          ">=5.4.0",
-    "cubex/figlet": "*",
+    "packaged/figlet": "0.l",
     "filp/whoops":  "1.*",
     "psr/log":      "1.0.0"
   },
