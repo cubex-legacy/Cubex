@@ -171,9 +171,9 @@ class Log
   protected static function _log($level, $message, array $context = array())
   {
     $backtrace  = \debug_backtrace(null, 2);
-    $sourceLine = isset($backtrace[1]['line']) ?
-      $backtrace[1]['line'] : 'unknown';
-    $sourceFile = isset($backtrace[1]['file']) ? $backtrace[1]['file'] : 0;
+    $sourceFile = isset($backtrace[1]['file']) ?
+      $backtrace[1]['file'] : 'unknown';
+    $sourceLine = isset($backtrace[1]['line']) ? $backtrace[1]['line'] : 0;
 
     $log = new Logger(static::$_eventType);
     $log->_log($level, $message, $context, $sourceFile, $sourceLine);
