@@ -728,9 +728,12 @@ function newv($className, array $argv)
  * @return   mixed  The first value of the array.
  * @group util
  */
-function head(array $arr)
+if(!function_exists('head'))
 {
-  return reset($arr);
+  function head(array $arr)
+  {
+    return reset($arr);
+  }
 }
 
 /**
@@ -742,9 +745,12 @@ function head(array $arr)
  * @return   mixed  The last value of the array.
  * @group util
  */
-function last(array $arr)
+if(!function_exists('last'))
 {
-  return end($arr);
+  function last(array $arr)
+  {
+    return end($arr);
+  }
 }
 
 /**
