@@ -330,7 +330,7 @@ class MySQL implements IDatabaseService
         ($deadlockRetries++ < $this->_deadlockRetries)
       )
       {
-        msleep(50);
+        msleep(mt_rand(10, 100));
       }
       else if(in_array($this->_connection->errno, $this->_reconnectErrorCodes)
         && ($reconnects++ < $this->_errorReconnects)
