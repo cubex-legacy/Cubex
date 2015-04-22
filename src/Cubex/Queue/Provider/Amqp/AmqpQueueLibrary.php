@@ -234,7 +234,7 @@ class AmqpQueueLibrary implements IBatchQueueProvider
     catch(\Exception $e)
     {
       $this->_retries--;
-      $this->_reconnect($queue);
+      $this->_reconnect($queue, 'Exception in push');
 
       \Log::debug(
         '(' . $this->_retries . ') ' . get_class($e) .
@@ -255,9 +255,14 @@ class AmqpQueueLibrary implements IBatchQueueProvider
     $this->_retries = 3;
   }
 
-  protected function _reconnect(IQueue $queue)
+  protected function _reconnect(IQueue $queue, $reason = '')
   {
-    Log::debug('AmqpQueueLibrary reconnecting');
+    $logMsg = 'AmqpQueueLibrary reconnecting';
+    if($reason != "")
+    {
+      $logMsg .= ' : ' . $reason;
+    }
+    Log::debug($logMsg);
     $this->disconnect();
     $this->_configureExchange();
     $this->_configureQueue($queue->name());
@@ -412,7 +417,7 @@ class AmqpQueueLibrary implements IBatchQueueProvider
         catch(\Exception $e)
         {
           \Log::error($e->getCode() . ': ' . $e->getMessage());
-          $this->_reconnect($queue);
+          $this->_reconnect($queue, 'Exception in consumer');
         }
 
         if($waitTime === false || !$this->_blocking)
@@ -432,7 +437,7 @@ class AmqpQueueLibrary implements IBatchQueueProvider
         // Reconnect periodically for safety
         if((time() - $this->_lastConnectTime) >= $this->_reconnectInterval)
         {
-          $this->_reconnect($queue);
+          $this->_reconnect($queue, 'Connection refresh');
         }
       }
     }
