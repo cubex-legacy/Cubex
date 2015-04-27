@@ -21,11 +21,13 @@
  * @return  mixed Unmodified argument.
  * @group   util
  */
-function id($x)
+if(!function_exists('id'))
 {
-  return $x;
+  function id($x)
+  {
+    return $x;
+  }
 }
-
 /**
  * Access an array index, retrieving the value stored there if it exists or
  * a default if it does not. This function allows you to concisely access an
@@ -39,23 +41,25 @@ function id($x)
  *                  $default is returned without raising a warning.
  * @group   util
  */
-function idx(array $array, $key, $default = null)
+if(!function_exists('idx'))
 {
-  // isset() is a micro-optimization - it is fast but fails for null values.
-  if(isset($array[$key]))
+  function idx(array $array, $key, $default = null)
   {
-    return $array[$key];
-  }
+    // isset() is a micro-optimization - it is fast but fails for null values.
+    if(isset($array[$key]))
+    {
+      return $array[$key];
+    }
 
-  // Comparing $default is also a micro-optimization.
-  if($default === null || array_key_exists($key, $array))
-  {
-    return null;
-  }
+    // Comparing $default is also a micro-optimization.
+    if($default === null || array_key_exists($key, $array))
+    {
+      return null;
+    }
 
-  return $default;
+    return $default;
+  }
 }
-
 /**
  * Call a method on a list of objects. Short for "method pull", this function
  * works just like @{function:ipull}, except that it operates on a list of
