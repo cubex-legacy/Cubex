@@ -28,6 +28,7 @@ if(!function_exists('id'))
     return $x;
   }
 }
+
 /**
  * Access an array index, retrieving the value stored there if it exists or
  * a default if it does not. This function allows you to concisely access an
@@ -60,6 +61,7 @@ if(!function_exists('idx'))
     return $default;
   }
 }
+
 /**
  * Call a method on a list of objects. Short for "method pull", this function
  * works just like @{function:ipull}, except that it operates on a list of
@@ -117,26 +119,30 @@ if(!function_exists('idx'))
  *                        to whatever you passed as $method and $key_method.
  * @group   util
  */
-function mpull(array $list, $method, $keyMethod = null)
+if(!function_exists('mpull'))
 {
-  $result = array();
-  foreach($list as $key => $object)
+  function mpull(array $list, $method, $keyMethod = null)
   {
-    if($keyMethod !== null)
+    $result = array();
+    foreach($list as $key => $object)
     {
-      $key = $object->$keyMethod();
+      if($keyMethod !== null)
+      {
+        $key = $object->$keyMethod();
+      }
+      if($method !== null)
+      {
+        $value = $object->$method();
+      }
+      else
+      {
+        $value = $object;
+      }
+      $result[$key] = $value;
     }
-    if($method !== null)
-    {
-      $value = $object->$method();
-    }
-    else
-    {
-      $value = $object;
-    }
-    $result[$key] = $value;
+
+    return $result;
   }
-  return $result;
 }
 
 /**
@@ -198,26 +204,30 @@ function mpull(array $list, $method, $keyMethod = null)
  *                        to whatever you passed as $property and $key_property.
  * @group   util
  */
-function ppull(array $list, $property, $keyProperty = null)
+if(!function_exists('ppull'))
 {
-  $result = array();
-  foreach($list as $key => $object)
+  function ppull(array $list, $property, $keyProperty = null)
   {
-    if($keyProperty !== null)
+    $result = array();
+    foreach($list as $key => $object)
     {
-      $key = $object->$keyProperty;
+      if($keyProperty !== null)
+      {
+        $key = $object->$keyProperty;
+      }
+      if($property !== null)
+      {
+        $value = $object->$property;
+      }
+      else
+      {
+        $value = $object;
+      }
+      $result[$key] = $value;
     }
-    if($property !== null)
-    {
-      $value = $object->$property;
-    }
-    else
-    {
-      $value = $object;
-    }
-    $result[$key] = $value;
+
+    return $result;
   }
-  return $result;
 }
 
 /**
@@ -252,26 +262,30 @@ function ppull(array $list, $property, $keyProperty = null)
  *                        to whatever you passed for $index and $key_index.
  * @group   util
  */
-function ipull(array $list, $index, $keyIndex = null)
+if(!function_exists('ipull'))
 {
-  $result = array();
-  foreach($list as $key => $array)
+  function ipull(array $list, $index, $keyIndex = null)
   {
-    if($keyIndex !== null)
+    $result = array();
+    foreach($list as $key => $array)
     {
-      $key = $array[$keyIndex];
+      if($keyIndex !== null)
+      {
+        $key = $array[$keyIndex];
+      }
+      if($index !== null)
+      {
+        $value = $array[$index];
+      }
+      else
+      {
+        $value = $array;
+      }
+      $result[$key] = $value;
     }
-    if($index !== null)
-    {
-      $value = $array[$index];
-    }
-    else
-    {
-      $value = $array;
-    }
-    $result[$key] = $value;
+
+    return $result;
   }
-  return $result;
 }
 
 /**
@@ -306,35 +320,38 @@ function ipull(array $list, $index, $keyIndex = null)
  *                  all objects which returned that value.
  * @group   util
  */
-function mgroup(array $list, $by /* , ... */)
+if(!function_exists('mgroup'))
 {
-  $map = mpull($list, $by);
-
-  $groups = array();
-  foreach($map as $group)
+  function mgroup(array $list, $by /* , ... */)
   {
-    // Can't array_fill_keys() here because 'false' gets encoded wrong.
-    $groups[$group] = array();
-  }
+    $map = mpull($list, $by);
 
-  foreach($map as $key => $group)
-  {
-    $groups[$group][$key] = $list[$key];
-  }
-
-  $args = func_get_args();
-  $args = array_slice($args, 2);
-  if($args)
-  {
-    array_unshift($args, null);
-    foreach($groups as $groupKey => $grouped)
+    $groups = array();
+    foreach($map as $group)
     {
-      $args[0]           = $grouped;
-      $groups[$groupKey] = call_user_func_array('mgroup', $args);
+      // Can't array_fill_keys() here because 'false' gets encoded wrong.
+      $groups[$group] = array();
     }
-  }
 
-  return $groups;
+    foreach($map as $key => $group)
+    {
+      $groups[$group][$key] = $list[$key];
+    }
+
+    $args = func_get_args();
+    $args = array_slice($args, 2);
+    if($args)
+    {
+      array_unshift($args, null);
+      foreach($groups as $groupKey => $grouped)
+      {
+        $args[0]           = $grouped;
+        $groups[$groupKey] = call_user_func_array('mgroup', $args);
+      }
+    }
+
+    return $groups;
+  }
 }
 
 /**
@@ -351,34 +368,37 @@ function mgroup(array $list, $by /* , ... */)
  *                  all objects which had that value at the index.
  * @group   util
  */
-function igroup(array $list, $by /* , ... */)
+if(!function_exists('igroup'))
 {
-  $map = ipull($list, $by);
-
-  $groups = array();
-  foreach($map as $group)
+  function igroup(array $list, $by /* , ... */)
   {
-    $groups[$group] = array();
-  }
+    $map = ipull($list, $by);
 
-  foreach($map as $key => $group)
-  {
-    $groups[$group][$key] = $list[$key];
-  }
-
-  $args = func_get_args();
-  $args = array_slice($args, 2);
-  if($args)
-  {
-    array_unshift($args, null);
-    foreach($groups as $groupKey => $grouped)
+    $groups = array();
+    foreach($map as $group)
     {
-      $args[0]           = $grouped;
-      $groups[$groupKey] = call_user_func_array('igroup', $args);
+      $groups[$group] = array();
     }
-  }
 
-  return $groups;
+    foreach($map as $key => $group)
+    {
+      $groups[$group][$key] = $list[$key];
+    }
+
+    $args = func_get_args();
+    $args = array_slice($args, 2);
+    if($args)
+    {
+      array_unshift($args, null);
+      foreach($groups as $groupKey => $grouped)
+      {
+        $args[0]           = $grouped;
+        $groups[$groupKey] = call_user_func_array('igroup', $args);
+      }
+    }
+
+    return $groups;
+  }
 }
 
 /**
@@ -400,19 +420,22 @@ function igroup(array $list, $by /* , ... */)
  * @return  array    Objects ordered by the return values of the method calls.
  * @group   util
  */
-function msort(array $list, $method)
+if(!function_exists('msort'))
 {
-  $surrogate = mpull($list, $method);
-
-  asort($surrogate);
-
-  $result = array();
-  foreach($surrogate as $key => $value)
+  function msort(array $list, $method)
   {
-    $result[$key] = $list[$key];
-  }
+    $surrogate = mpull($list, $method);
 
-  return $result;
+    asort($surrogate);
+
+    $result = array();
+    foreach($surrogate as $key => $value)
+    {
+      $result[$key] = $list[$key];
+    }
+
+    return $result;
+  }
 }
 
 /**
@@ -426,19 +449,22 @@ function msort(array $list, $method)
  * @return  array    Arrays ordered by the index values.
  * @group   util
  */
-function isort(array $list, $index)
+if(!function_exists('isort'))
 {
-  $surrogate = ipull($list, $index);
-
-  asort($surrogate);
-
-  $result = array();
-  foreach($surrogate as $key => $value)
+  function isort(array $list, $index)
   {
-    $result[$key] = $list[$key];
-  }
+    $surrogate = ipull($list, $index);
 
-  return $result;
+    asort($surrogate);
+
+    $result = array();
+    foreach($surrogate as $key => $value)
+    {
+      $result[$key] = $list[$key];
+    }
+
+    return $result;
+  }
 }
 
 /**
@@ -466,35 +492,38 @@ function isort(array $list, $index)
  * @throws InvalidArgumentException
  * @group  util
  */
-function mfilter(array $list, $method, $negate = false)
+if(!function_exists('mfilter'))
 {
-  if(!is_string($method))
+  function mfilter(array $list, $method, $negate = false)
   {
-    throw new InvalidArgumentException('Argument method is not a string.');
-  }
-
-  $result = array();
-  foreach($list as $key => $object)
-  {
-    $value = $object->$method();
-
-    if(!$negate)
+    if(!is_string($method))
     {
-      if(!empty($value))
+      throw new InvalidArgumentException('Argument method is not a string.');
+    }
+
+    $result = array();
+    foreach($list as $key => $object)
+    {
+      $value = $object->$method();
+
+      if(!$negate)
       {
-        $result[$key] = $object;
+        if(!empty($value))
+        {
+          $result[$key] = $object;
+        }
+      }
+      else
+      {
+        if(empty($value))
+        {
+          $result[$key] = $object;
+        }
       }
     }
-    else
-    {
-      if(empty($value))
-      {
-        $result[$key] = $object;
-      }
-    }
-  }
 
-  return $result;
+    return $result;
+  }
 }
 
 /**
@@ -521,36 +550,39 @@ function mfilter(array $list, $method, $negate = false)
  * @throws InvalidArgumentException
  * @group  util
  */
-function ifilter(array $list, $index, $negate = false)
+if(!function_exists('ifilter'))
 {
-  if(!is_scalar($index))
+  function ifilter(array $list, $index, $negate = false)
   {
-    throw new InvalidArgumentException('Argument index is not a scalar.');
-  }
-
-  $result = array();
-  if(!$negate)
-  {
-    foreach($list as $key => $array)
+    if(!is_scalar($index))
     {
-      if(!empty($array[$index]))
+      throw new InvalidArgumentException('Argument index is not a scalar.');
+    }
+
+    $result = array();
+    if(!$negate)
+    {
+      foreach($list as $key => $array)
       {
-        $result[$key] = $array;
+        if(!empty($array[$index]))
+        {
+          $result[$key] = $array;
+        }
       }
     }
-  }
-  else
-  {
-    foreach($list as $key => $array)
+    else
     {
-      if(empty($array[$index]))
+      foreach($list as $key => $array)
       {
-        $result[$key] = $array;
+        if(empty($array[$index]))
+        {
+          $result[$key] = $array;
+        }
       }
     }
-  }
 
-  return $result;
+    return $result;
+  }
 }
 
 /**
@@ -569,17 +601,21 @@ function ifilter(array $list, $index, $negate = false)
  *                 determined by the list order.
  * @group   util
  */
-function array_select_keys(array $dict, array $keys)
+if(!function_exists('array_select_keys'))
 {
-  $result = array();
-  foreach($keys as $key)
+  function array_select_keys(array $dict, array $keys)
   {
-    if(array_key_exists($key, $dict))
+    $result = array();
+    foreach($keys as $key)
     {
-      $result[$key] = $dict[$key];
+      if(array_key_exists($key, $dict))
+      {
+        $result[$key] = $dict[$key];
+      }
     }
+
+    return $result;
   }
-  return $result;
 }
 
 /**
@@ -592,38 +628,44 @@ function array_select_keys(array $dict, array $keys)
  * @group   util
  * @throws InvalidArgumentException
  */
-function assert_instances_of(array $arr, $class)
+if(!function_exists('assert_instances_of'))
 {
-  $isArray = !strcasecmp($class, 'array');
-
-  foreach($arr as $key => $object)
+  function assert_instances_of(array $arr, $class)
   {
-    if($isArray)
-    {
-      if(!is_array($object))
-      {
-        $given = gettype($object);
-        throw new InvalidArgumentException(
-          "Array item with key '{$key}' must be of type array, " .
-          "{$given} given."
-        );
-      }
-    }
-    else if(!($object instanceof $class))
-    {
-      $given = gettype($object);
-      if(is_object($object))
-      {
-        $given = 'instance of ' . get_class($object);
-      }
-      throw new InvalidArgumentException(
-        "Array item with key '{$key}' must be an instance of {$class}, " .
-        "{$given} given."
-      );
-    }
-  }
+    $isArray = !strcasecmp($class, 'array');
 
-  return $arr;
+    foreach($arr as $key => $object)
+    {
+      if($isArray)
+      {
+        if(!is_array($object))
+        {
+          $given = gettype($object);
+          throw new InvalidArgumentException(
+            "Array item with key '{$key}' must be of type array, " .
+            "{$given} given."
+          );
+        }
+      }
+      else
+      {
+        if(!($object instanceof $class))
+        {
+          $given = gettype($object);
+          if(is_object($object))
+          {
+            $given = 'instance of ' . get_class($object);
+          }
+          throw new InvalidArgumentException(
+            "Array item with key '{$key}' must be an instance of {$class}, " .
+            "{$given} given."
+          );
+        }
+      }
+    }
+
+    return $arr;
+  }
 }
 
 /**
@@ -634,17 +676,21 @@ function assert_instances_of(array $arr, $class)
  * @return mixed       First non-##null## arg, or null if no such arg exists.
  * @group  util
  */
-function coalesce( /* ... */)
+if(!function_exists('coalesce'))
 {
-  $args = func_get_args();
-  foreach($args as $arg)
+  function coalesce( /* ... */)
   {
-    if($arg !== null)
+    $args = func_get_args();
+    foreach($args as $arg)
     {
-      return $arg;
+      if($arg !== null)
+      {
+        return $arg;
+      }
     }
+
+    return null;
   }
-  return null;
 }
 
 /**
@@ -660,19 +706,23 @@ function coalesce( /* ... */)
  *                     exists, or null if you passed in zero args.
  * @group  util
  */
-function nonempty( /* ... */)
+if(!function_exists('nonempty'))
 {
-  $args   = func_get_args();
-  $result = null;
-  foreach($args as $arg)
+  function nonempty( /* ... */)
   {
-    $result = $arg;
-    if($arg)
+    $args   = func_get_args();
+    $result = null;
+    foreach($args as $arg)
     {
-      break;
+      $result = $arg;
+      if($arg)
+      {
+        break;
+      }
     }
+
+    return $result;
   }
-  return $result;
 }
 
 /**
@@ -710,16 +760,19 @@ function nonempty( /* ... */)
  *                 the argument vector to its constructor.
  * @group util
  */
-function newv($className, array $argv)
+if(!function_exists('newv'))
 {
-  $reflector = new ReflectionClass($className);
-  if($argv)
+  function newv($className, array $argv)
   {
-    return $reflector->newInstanceArgs($argv);
-  }
-  else
-  {
-    return $reflector->newInstance();
+    $reflector = new ReflectionClass($className);
+    if($argv)
+    {
+      return $reflector->newInstanceArgs($argv);
+    }
+    else
+    {
+      return $reflector->newInstance();
+    }
   }
 }
 
@@ -734,9 +787,12 @@ function newv($className, array $argv)
  */
 if(!function_exists('head'))
 {
-  function head(array $arr)
+  if(!function_exists('head'))
   {
-    return reset($arr);
+    function head(array $arr)
+    {
+      return reset($arr);
+    }
   }
 }
 
@@ -751,9 +807,12 @@ if(!function_exists('head'))
  */
 if(!function_exists('last'))
 {
-  function last(array $arr)
+  if(!function_exists('last'))
   {
-    return end($arr);
+    function last(array $arr)
+    {
+      return end($arr);
+    }
   }
 }
 
@@ -764,10 +823,14 @@ if(!function_exists('last'))
  * @return   int|string  The first key of the array.
  * @group util
  */
-function head_key(array $arr)
+if(!function_exists('head_key'))
 {
-  reset($arr);
-  return key($arr);
+  function head_key(array $arr)
+  {
+    reset($arr);
+
+    return key($arr);
+  }
 }
 
 /**
@@ -777,10 +840,14 @@ function head_key(array $arr)
  * @return   int|string  The last key of the array.
  * @group util
  */
-function last_key(array $arr)
+if(!function_exists('last_key'))
 {
-  end($arr);
-  return key($arr);
+  function last_key(array $arr)
+  {
+    end($arr);
+
+    return key($arr);
+  }
 }
 
 /**
@@ -798,14 +865,17 @@ function last_key(array $arr)
  * @return array Arrays, merged with array_merge() semantics.
  * @group util
  */
-function array_mergev(array $arrayv)
+if(!function_exists('array_mergev'))
 {
-  if(!$arrayv)
+  function array_mergev(array $arrayv)
   {
-    return array();
-  }
+    if(!$arrayv)
+    {
+      return array();
+    }
 
-  return call_user_func_array('array_merge', $arrayv);
+    return call_user_func_array('array_merge', $arrayv);
+  }
 }
 
 /**
@@ -820,31 +890,34 @@ function array_mergev(array $arrayv)
  * @return array List of lines.
  * @group util
  */
-function phutil_split_lines($corpus, $retainEndings = true)
+if(!function_exists('phutil_split_lines'))
 {
-  if(!strlen($corpus))
+  function phutil_split_lines($corpus, $retainEndings = true)
   {
-    return array('');
-  }
+    if(!strlen($corpus))
+    {
+      return array('');
+    }
 
-  // Split on "\r\n" or "\n".
-  if($retainEndings)
-  {
-    $lines = preg_split('/(?<=\n)/', $corpus);
-  }
-  else
-  {
-    $lines = preg_split('/\r?\n/', $corpus);
-  }
+    // Split on "\r\n" or "\n".
+    if($retainEndings)
+    {
+      $lines = preg_split('/(?<=\n)/', $corpus);
+    }
+    else
+    {
+      $lines = preg_split('/\r?\n/', $corpus);
+    }
 
-  // If the text ends with "\n" or similar, we'll end up with an empty string
-  // at the end; discard it.
-  if(end($lines) == '')
-  {
-    array_pop($lines);
-  }
+    // If the text ends with "\n" or similar, we'll end up with an empty string
+    // at the end; discard it.
+    if(end($lines) == '')
+    {
+      array_pop($lines);
+    }
 
-  return $lines;
+    return $lines;
+  }
 }
 
 /**
@@ -866,13 +939,17 @@ function phutil_split_lines($corpus, $retainEndings = true)
  * @return  array  Dictionary with inputs mapped to themselves.
  * @group util
  */
-function array_fuse(array $list)
+if(!function_exists('array_fuse'))
 {
-  if($list)
+  function array_fuse(array $list)
   {
-    return array_combine($list, $list);
+    if($list)
+    {
+      return array_combine($list, $list);
+    }
+
+    return array();
   }
-  return array();
 }
 
 /**
@@ -902,14 +979,18 @@ function array_fuse(array $list)
  * @return array Original list with the new element interleaved.
  * @group util
  */
-function array_interleave($interleave, array $array)
+if(!function_exists('array_interleave'))
 {
-  $result = array();
-  foreach($array as $item)
+  function array_interleave($interleave, array $array)
   {
-    $result[] = $item;
-    $result[] = $interleave;
+    $result = array();
+    foreach($array as $item)
+    {
+      $result[] = $item;
+      $result[] = $interleave;
+    }
+    array_pop($result);
+
+    return $result;
   }
-  array_pop($result);
-  return $result;
 }
