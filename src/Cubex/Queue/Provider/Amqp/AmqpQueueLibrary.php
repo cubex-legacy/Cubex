@@ -126,6 +126,8 @@ class AmqpQueueLibrary implements IBatchQueueProvider
         $args
       );
       $this->_lastQueue = $name;
+
+      $this->_channel()->queue_bind($name, $this->_exchange, $name);
     }
   }
 
