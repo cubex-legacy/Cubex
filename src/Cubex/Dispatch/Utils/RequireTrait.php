@@ -135,11 +135,11 @@ trait RequireTrait
     }
 
     $event = (new DispatchEvent(EventManager::DISPATCH_RESOURCE_REQUIRE))
-             ->setFile($file)
-             ->setType($type)
-             ->setVersion($version)
-             ->setExternalKey($key)
-             ->setSource($this);
+      ->setFile($file)
+      ->setType($type)
+      ->setVersion($version)
+      ->setExternalKey($key)
+      ->setSource($this);
 
     EventManager::triggerWithEvent(
       EventManager::DISPATCH_RESOURCE_REQUIRE,
@@ -161,9 +161,9 @@ trait RequireTrait
     }
 
     $event = (new DispatchEvent(EventManager::DISPATCH_BLOCK_ADD))
-             ->setFile($block)
-             ->setType($type)
-             ->setSource($this);
+      ->setFile($block)
+      ->setType($type)
+      ->setSource($this);
 
     EventManager::triggerWithEvent(
       EventManager::DISPATCH_BLOCK_ADD,
@@ -188,9 +188,9 @@ trait RequireTrait
     }
 
     $event = (new DispatchEvent(EventManager::DISPATCH_PACKAGE_REQUIRE))
-             ->setFile($package)
-             ->setType($type)
-             ->setSource($this);
+      ->setFile($package)
+      ->setType($type)
+      ->setSource($this);
 
     EventManager::triggerWithEvent(
       EventManager::DISPATCH_PACKAGE_REQUIRE,
@@ -220,8 +220,8 @@ trait RequireTrait
   public function getDispatchUrl($file, $namespace = null)
   {
     $event = (new DispatchEvent(EventManager::DISPATCH_URL))
-             ->setFile($file)
-             ->setSource($this);
+      ->setFile($file)
+      ->setSource($this);
 
     if($namespace === null)
     {
@@ -247,9 +247,9 @@ trait RequireTrait
     }
     else
     {
-      $ns =  Dispatcher::getNamespaceFromSource($this);
+      $ns = Dispatcher::getNamespaceFromSource($this);
     }
 
-    return ltrim($ns,'\\');
+    return ltrim($ns, '\\');
   }
 }
