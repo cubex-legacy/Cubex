@@ -243,11 +243,13 @@ trait RequireTrait
   {
     if($this instanceof INamespaceAware)
     {
-      return $this->getNamespace();
+      $ns = $this->getNamespace();
     }
     else
     {
-      return Dispatcher::getNamespaceFromSource($this);
+      $ns =  Dispatcher::getNamespaceFromSource($this);
     }
+
+    return ltrim($ns,'\\');
   }
 }
