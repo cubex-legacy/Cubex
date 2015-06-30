@@ -35,17 +35,23 @@ class Cookies
 
       foreach($_COOKIE as $name => $value)
       {
-        if(EncryptedCookie::isEncrypted($value))
+        try
         {
-          $cookie = new EncryptedCookie($name, $value);
-        }
-        else
-        {
-          $cookie = new StandardCookie($name, $value);
-        }
+          if(EncryptedCookie::isEncrypted($value))
+          {
+            $cookie = new EncryptedCookie($name, $value);
+          }
+          else
+          {
+            $cookie = new StandardCookie($name, $value);
+          }
 
-        $cookie->setMode(StandardCookie::MODE_READ);
-        self::$_cookies[$name] = $cookie;
+          $cookie->setMode(StandardCookie::MODE_READ);
+          self::$_cookies[$name] = $cookie;
+        }
+        catch(\InvalidArgumentException $e)
+        {
+        }
       }
     }
   }

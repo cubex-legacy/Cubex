@@ -95,7 +95,7 @@ class StandardCookie implements ICookie
     if(preg_match("/[=,; \t\r\n\013\014]/", $name))
     {
       throw new \InvalidArgumentException(
-        sprintf("The cookie name '%s' container invalid characters.", $name)
+        sprintf("The cookie name '%s' contains invalid characters.", $name)
       );
     }
 
