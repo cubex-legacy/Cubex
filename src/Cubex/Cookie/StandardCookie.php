@@ -270,41 +270,48 @@ class StandardCookie implements ICookie
    */
   public function __toString()
   {
-    $str = urlencode($this->getName()) ."=";
-
-    if((string)$this->getValue() === "")
+    try
     {
-      $str .= "deleted; expires=" .
-        gmdate("D, d-M-Y H:i:s T", time() - 31536001);
-    }
-    else
-    {
-      $str .= urlencode($this->getValue());
+      $str = urlencode($this->getName()) . "=";
 
-      if($this->getExpire() !== 0)
+      if((string)$this->getValue() === "")
       {
-        $str .= "; expires=".gmdate("D, d-M-Y H:i:s T", $this->getExpire());
+        $str .= "deleted; expires=" .
+          gmdate("D, d-M-Y H:i:s T", time() - 31536001);
+      }
+      else
+      {
+        $str .= urlencode($this->getValue());
+
+        if($this->getExpire() !== 0)
+        {
+          $str .= "; expires=" . gmdate("D, d-M-Y H:i:s T", $this->getExpire());
+        }
+      }
+
+      if($this->getPath() !== null)
+      {
+        $str .= "; path=" . $this->getPath();
+      }
+
+      if($this->getDomain() !== null)
+      {
+        $str .= "; domain=" . $this->getDomain();
+      }
+
+      if($this->isSecure() === true)
+      {
+        $str .= "; secure";
+      }
+
+      if($this->isHttpOnly() === true)
+      {
+        $str .= "; httponly";
       }
     }
-
-    if($this->getPath() !== null)
+    catch(\Exception $e)
     {
-      $str .= "; path=".$this->getPath();
-    }
-
-    if($this->getDomain() !== null)
-    {
-      $str .= "; domain=".$this->getDomain();
-    }
-
-    if($this->isSecure() === true)
-    {
-      $str .= "; secure";
-    }
-
-    if($this->isHttpOnly() === true)
-    {
-      $str .= "; httponly";
+      $str = '';
     }
 
     return $str;
