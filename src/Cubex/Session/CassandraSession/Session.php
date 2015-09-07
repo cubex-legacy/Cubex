@@ -9,6 +9,7 @@ use Cubex\Facade\Cassandra;
 use Cubex\ServiceManager\ServiceConfig;
 use Cubex\Session\SessionIdTrait;
 use Cubex\Session\ISessionService;
+use cassandra\ConsistencyLevel;
 
 class Session implements ISessionService
 {
@@ -45,6 +46,9 @@ class Session implements ISessionService
     $this->_columnFamily    = $this->_config->getStr(
       "column_family",
       "Session"
+    );
+    $serviceProvider->cf($this->_columnFamily)->setConsistencyLevel(
+      $config->getInt("consistency", ConsistencyLevel::QUORUM)
     );
     $this->_serviceProvider = $serviceProvider;
     $this->_ttl             = $this->_config->getInt("ttl", 2592000);
