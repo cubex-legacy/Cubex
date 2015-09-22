@@ -9,6 +9,7 @@ use Cubex\Data\Service\IDataService;
 use Cubex\ServiceManager\ServiceConfigTrait;
 use cassandra\AuthenticationRequest;
 use cassandra\InvalidRequestException;
+use cassandra\ConsistencyLevel;
 
 class CassandraService implements IDataService
 {
@@ -43,6 +44,7 @@ class CassandraService implements IDataService
     $cf = $this->_columnFamily[$name];
     if($cf instanceof ColumnFamily)
     {
+      $cf->setConsistencyLevel($this->config()->getInt("consistency", ConsistencyLevel::QUORUM));
       if($this->_readRetries != null)
       {
         $cf->setReadRetries($this->_readRetries);
