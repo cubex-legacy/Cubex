@@ -306,7 +306,11 @@ class Request implements \IteratorAggregate
    */
   public function isHttps()
   {
-    if(isset($_SERVER['HTTP_VIA']) && stristr($_SERVER['HTTP_VIA'], 'HTTPS'))
+    if(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+    {
+      return true;
+    }
+    elseif(isset($_SERVER['HTTP_VIA']) && stristr($_SERVER['HTTP_VIA'], 'HTTPS'))
     {
       return true;
     }
