@@ -56,7 +56,7 @@ final class PHPMailer implements IEmailService
         $mailer->Port        = $config->getInt("smtp.port", 25);
         $mailer->SMTPSecure  = $config->getStr("smtp.security", '');
         $mailer->Debugoutput = $config->getStr("smtp.debugoutput", 'error_log');
-        $mailer->SMTPDebug   = $config->getStr("smtp.debugoutput", 0);
+        $mailer->SMTPDebug   = $config->getStr("smtp.smtpdebug", 0);
 
         if($config->getExists("smtp.username"))
         {
