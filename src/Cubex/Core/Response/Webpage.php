@@ -327,12 +327,7 @@ class Webpage implements
       '&amp;'
     );
 
-    $noscript = '<meta http-equiv="refresh" content="0; URL=';
-    $noscript .= $requestUrl . '&amp;__noscript__=1" />';
-    if($this->request()->jsSupport() === false)
-    {
-      $noscript = '';
-    }
+    $noscript = '';
 
     $response = "<!DOCTYPE html>\n"
     . '<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"><![endif]-->'
