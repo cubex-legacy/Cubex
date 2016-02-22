@@ -328,7 +328,7 @@ class Webpage implements
     //    );
 
     $noscript = '<meta http-equiv="refresh" content="0; URL=';
-    $noscript .= $requestUrl . '?amp;__noscript__=1" />';
+    $noscript .= $requestUrl . '?&amp;__noscript__=1" />';
     if($this->request()->jsSupport() === false)
     {
       $noscript = '';
