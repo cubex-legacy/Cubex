@@ -60,4 +60,9 @@ class MailerMapper extends RecordMapper
    * @datatype mediumtext
    */
   public $rawMessage;
+
+  /**
+   * @datatype int
+   */
+  public $campaignId;
 }
