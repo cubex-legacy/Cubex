@@ -13,12 +13,19 @@ use Cubex\Email\Service\DatabaseMailer\MailerMapper;
  */
 class DatabaseMailer extends Mail
 {
+  protected $campaignId;
+
   protected function _newMapper($id = null)
   {
     $mapper = new MailerMapper($id);
     $mapper->setTableName($this->config()->getStr('table_name', 'dbmailer'));
     $mapper->setServiceName($this->config()->getStr('db_service', 'db'));
     return $mapper;
+  }
+
+  public function setCampaignId($campaignId)
+  {
+    $this->campaignId = $campaignId;
   }
 
   public function send()
@@ -38,6 +45,7 @@ class DatabaseMailer extends Mail
     $mapper->headers    = implode("\r\n", $this->_headers);
     $mapper->files      = implode("\r\n", $this->_files);
     $mapper->rawMessage = $rawMessage;
+    $mapper->campaignId = $this->campaignId;
     return $mapper->saveChanges();
   }
 }
